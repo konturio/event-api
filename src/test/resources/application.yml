@@ -1,0 +1,16 @@
+pdcHpSrv:
+  host: 'http://localhost:18080'
+  user: 'u1'
+  password: 'p1'
+
+app:
+  scheduler:
+    hpSrvImport:
+      initialDelay: 600000
+      fixedDelay: 600000
+
+spring:
+  datasource:
+    driverClassName: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
+    platform: 'postgres'
+    url: 'jdbc:tc:postgis12:///event-api'

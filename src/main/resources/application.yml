@@ -1,0 +1,30 @@
+server:
+  port: 8624
+
+spring:
+  datasource:
+    platform: 'postgres'
+    url: 'jdbc:postgresql://localhost:5432/postgres'
+    username: 'postgres'
+    password: 'postgres'
+
+pdcHpSrv:
+  host: 'https://testemops.pdc.org/hp_srv'
+  user: 'sanych'
+  password: '111111'
+
+app:
+  scheduler:
+    hpSrvImport:
+      initialDelay: 1000
+      fixedDelay: 600000
+
+feign:
+  client:
+    config:
+      pdcHpSrvBasicAuth:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: headers
+        requestInterceptors:
+          - feign.auth.BasicAuthRequestInterceptor
