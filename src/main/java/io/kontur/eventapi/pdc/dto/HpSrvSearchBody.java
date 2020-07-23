@@ -2,13 +2,16 @@ package io.kontur.eventapi.pdc.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HpSrvSearchBody {
 
     private Order order = new Order();
     private Pagination pagination = new Pagination();
+    private List<List<Map<String, String>>> restrictions = new ArrayList<>();
 
     public Order getOrder() {
         return order;
@@ -24,6 +27,33 @@ public class HpSrvSearchBody {
 
     public void setPagination(Pagination pagination) {
         this.pagination = pagination;
+    }
+
+    public List<List<Map<String, String>>> getRestrictions() {
+        return restrictions;
+    }
+
+    /**
+     * Add restriction to search criteria <br>
+     * Available search types:
+     * <ul>
+     * <li>LIKE: the field contains value</li>
+     * <li>EQUALS: the field and the value are equals</li>
+     * <li>NOT_EQUALS: the field and the value are not equals</li>
+     * <li>LESS_THAN: the field is lower than the value</li>
+     * <li>GREATER_THAN: the field is greater than the value</li>
+     * <li>NULL: the field is null</li>
+     * <li>NOT_NULL: the field is not null</li>
+     * </ul>
+     */
+    public void addAndRestriction(String searchType, String field, String value) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("searchType", searchType);
+        map.put(field, value);
+        if (restrictions.isEmpty()) {
+            restrictions.add(new ArrayList<>());
+        }
+        restrictions.get(0).add(map);
     }
 
     public static class Pagination {

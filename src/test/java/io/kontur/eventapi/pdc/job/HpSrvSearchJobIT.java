@@ -2,6 +2,7 @@ package io.kontur.eventapi.pdc.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import io.kontur.eventapi.pdc.client.HpSrvClient;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
@@ -19,11 +20,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getAllServeEvents;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@AutoConfigureWireMock(port = 18080)
-class PdcHazardImportJobIT {
+@AutoConfigureWireMock(port = 18080, stubs="classpath:mappings/PdcHazardImportJobIT.json")
+class HpSrvSearchJobIT {
 
     @Autowired
-    private PdcHazardImportJob job;
+    private HpSrvSearchJob job;
 
     @Autowired
     private HpSrvClient hpSrvClient;
@@ -35,6 +36,12 @@ class PdcHazardImportJobIT {
         job.run();
 
         verifyPagination();
+
+        WireMock.resetAllRequests();
+
+        job.run();
+
+        verifyDownloadUpdatedHazardsSinceLastStart();
     }
 
     private void verifyPagination() throws JsonProcessingException {
@@ -55,4 +62,12 @@ class PdcHazardImportJobIT {
                 "offset should be equal to previous offset value plus number of received hazards");
     }
 
+    private void verifyDownloadUpdatedHazardsSinceLastStart() throws JsonProcessingException {
+        List<ServeEvent> allServeEvents = new ArrayList<>(getAllServeEvents());
+        assertEquals(1, allServeEvents.size(), "1 request to hpSrv API is expected");
+
+        HpSrvSearchBody searchBody = objectMapper.readValue(allServeEvents.get(0).getRequest().getBodyAsString(), HpSrvSearchBody.class);
+        assertEquals("1594975736787", searchBody.getRestrictions().get(0).get(0).get("updateDate"));
+        assertEquals("GREATER_THAN", searchBody.getRestrictions().get(0).get(0).get("searchType"));
+    }
 }

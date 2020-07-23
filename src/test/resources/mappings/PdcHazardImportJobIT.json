@@ -10,7 +10,7 @@
         },
         "bodyPatterns": [
           {
-            "equalToJson": "{\"order\":{\"orderlist\":{\"createDate\":\"ASC\"}},\"pagination\":{\"offset\":0,\"pagesize\":20}}"
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":0,\"pagesize\":20},\"restrictions\":[]}"
           }
         ]
       },
@@ -32,7 +32,7 @@
         },
         "bodyPatterns": [
           {
-            "equalToJson": "{\"order\":{\"orderlist\":{\"createDate\":\"ASC\"}},\"pagination\":{\"offset\":3,\"pagesize\":20}}"
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":3,\"pagesize\":20},\"restrictions\":[]}"
           }
         ]
       },
@@ -54,7 +54,29 @@
         },
         "bodyPatterns": [
           {
-            "equalToJson": "{\"order\":{\"orderlist\":{\"createDate\":\"ASC\"}},\"pagination\":{\"offset\":5,\"pagesize\":20}}"
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":5,\"pagesize\":20},\"restrictions\":[]}"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "body": "[]",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "url": "/services/hazards/1/json/search_hazard",
+        "basicAuthCredentials": {
+          "username": "u1",
+          "password": "p1"
+        },
+        "bodyPatterns": [
+          {
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":0,\"pagesize\":20},\"restrictions\":[[ {\n  \"updateDate\" : \"1594975736787\",\n  \"searchType\" : \"GREATER_THAN\"\n} ]]}"
           }
         ]
       },

@@ -1,6 +1,6 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.pdc.job.PdcHazardImportJob;
+import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -10,17 +10,17 @@ public class WorkerScheduler {
 
     private final ThreadPoolTaskExecutor taskExecutor;
 
-    private final PdcHazardImportJob pdcHazardImportJob;
+    private final HpSrvSearchJob hpSrvSearchJob;
 
     public WorkerScheduler(ThreadPoolTaskExecutor taskExecutor,
-                           PdcHazardImportJob pdcHazardImportJob) {
+                           HpSrvSearchJob hpSrvSearchJob) {
         this.taskExecutor = taskExecutor;
-        this.pdcHazardImportJob = pdcHazardImportJob;
+        this.hpSrvSearchJob = hpSrvSearchJob;
     }
 
     @Scheduled(initialDelayString = "${app.scheduler.hpSrvImport.initialDelay}", fixedDelayString = "${app.scheduler.hpSrvImport.fixedDelay}")
     public void startPdcHazardImport() {
-        taskExecutor.execute(pdcHazardImportJob);
+        taskExecutor.execute(hpSrvSearchJob);
     }
 
 }

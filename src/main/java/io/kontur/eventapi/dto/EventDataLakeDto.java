@@ -1,12 +1,13 @@
 package io.kontur.eventapi.dto;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
-public class HazardData {
+public class EventDataLakeDto {
 
     private String hazardId;
-    private LocalDateTime createDate;
-    private LocalDateTime uploadDate;
+    private OffsetDateTime createDate;
+    private OffsetDateTime updateDate;
+    private OffsetDateTime uploadDate;
     private String provider;
     private String data;
 
@@ -18,19 +19,27 @@ public class HazardData {
         this.hazardId = hazardId;
     }
 
-    public LocalDateTime getCreateDate() {
+    public OffsetDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDateTime createDate) {
+    public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public LocalDateTime getUploadDate() {
+    public OffsetDateTime getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(OffsetDateTime updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public OffsetDateTime getUploadDate() {
         return uploadDate;
     }
 
-    public void setUploadDate(LocalDateTime uploadDate) {
+    public void setUploadDate(OffsetDateTime uploadDate) {
         this.uploadDate = uploadDate;
     }
 
