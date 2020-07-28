@@ -3,11 +3,10 @@ pdc:
   user: 'u1'
   password: 'p1'
 
-app:
-  scheduler:
-    hpSrvImport:
-      enable: false
-      initialDelay: 1000
+scheduler:
+  hpSrvImport:
+    enable: false
+    initialDelay: 1000
 
 spring:
   datasource:
