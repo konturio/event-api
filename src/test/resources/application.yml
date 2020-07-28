@@ -6,8 +6,8 @@ pdc:
 app:
   scheduler:
     hpSrvImport:
-      initialDelay: 600000
-      fixedDelay: 600000
+      enable: false
+      initialDelay: 1000
 
 spring:
   datasource:

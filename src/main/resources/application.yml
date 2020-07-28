@@ -13,12 +13,10 @@ pdc:
   user: 'sanych'
   password: '111111'
 
-app:
-  scheduler:
-    hpSrvImport:
-      initialDelay: 1000
-      fixedDelay: 600000000
-#      fixedDelay: 600000
+scheduler:
+  hpSrvImport:
+    enable: false
+    initialDelay: 1000
 
 feign:
   client:
