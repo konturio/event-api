@@ -3,31 +3,23 @@ package io.kontur.eventapi.pdc.job;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
-import io.kontur.eventapi.pdc.client.HpSrvClient;
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
+import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.getAllServeEvents;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@AutoConfigureWireMock(port = 18080, stubs="classpath:mappings/PdcHazardImportJobIT.json")
-class HpSrvSearchJobIT {
+@AutoConfigureWireMock(port = 18080, stubs = "classpath:mappings/PdcHazardImportJobIT.json")
+class HpSrvSearchJobIT extends AbstractIntegrationTest {
 
     @Autowired
     private HpSrvSearchJob job;
-
-    @Autowired
-    private HpSrvClient hpSrvClient;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -36,37 +28,45 @@ class HpSrvSearchJobIT {
         job.run();
 
         verifyPagination();
+        verifyMagsRequests();
 
         WireMock.resetAllRequests();
 
         job.run();
 
         verifyDownloadUpdatedHazardsSinceLastStart();
+        verifyMagsRequests(); //since this test doesn't provide any mags, job should try to download them at every start
     }
 
     private void verifyPagination() throws JsonProcessingException {
-        List<ServeEvent> allServeEvents = new ArrayList<>(getAllServeEvents());
-        assertEquals(3, allServeEvents.size(), "3 requests to hpSrv API are expected");
+        verify(3, postRequestedFor(urlEqualTo("/hp_srv/services/hazards/1/json/search_hazard")));
 
-        allServeEvents.sort(Comparator.comparing(o -> o.getRequest().getLoggedDate()));
+        List<LoggedRequest> requests = findAll(
+                postRequestedFor(urlEqualTo("/hp_srv/services/hazards/1/json/search_hazard")));
 
-        HpSrvSearchBody searchBody = objectMapper.readValue(allServeEvents.get(0).getRequest().getBodyAsString(), HpSrvSearchBody.class);
+        HpSrvSearchBody searchBody = objectMapper.readValue(requests.get(0).getBodyAsString(), HpSrvSearchBody.class);
         assertEquals(0, searchBody.getPagination().getOffset(), "offset=0 is expected at first request to hpSrv");
 
-        searchBody = objectMapper.readValue(allServeEvents.get(1).getRequest().getBodyAsString(), HpSrvSearchBody.class);
+        searchBody = objectMapper.readValue(requests.get(1).getBodyAsString(), HpSrvSearchBody.class);
         assertEquals(3, searchBody.getPagination().getOffset(),
                 "offset should be equal to previous offset value plus number of received hazards");
 
-        searchBody = objectMapper.readValue(allServeEvents.get(2).getRequest().getBodyAsString(), HpSrvSearchBody.class);
+        searchBody = objectMapper.readValue(requests.get(2).getBodyAsString(), HpSrvSearchBody.class);
         assertEquals(5, searchBody.getPagination().getOffset(),
                 "offset should be equal to previous offset value plus number of received hazards");
     }
 
-    private void verifyDownloadUpdatedHazardsSinceLastStart() throws JsonProcessingException {
-        List<ServeEvent> allServeEvents = new ArrayList<>(getAllServeEvents());
-        assertEquals(1, allServeEvents.size(), "1 request to hpSrv API is expected");
+    private void verifyMagsRequests() {
+        verify(5, getRequestedFor(urlPathEqualTo("/hp_srv/services/mags/1/json/get_mags")));
+    }
 
-        HpSrvSearchBody searchBody = objectMapper.readValue(allServeEvents.get(0).getRequest().getBodyAsString(), HpSrvSearchBody.class);
+    private void verifyDownloadUpdatedHazardsSinceLastStart() throws JsonProcessingException {
+        verify(1, postRequestedFor(urlEqualTo("/hp_srv/services/hazards/1/json/search_hazard")));
+
+        List<LoggedRequest> requests = findAll(
+                postRequestedFor(urlEqualTo("/hp_srv/services/hazards/1/json/search_hazard")));
+
+        HpSrvSearchBody searchBody = objectMapper.readValue(requests.get(0).getBodyAsString(), HpSrvSearchBody.class);
         assertEquals("1594975736787", searchBody.getRestrictions().get(0).get(0).get("updateDate"));
         assertEquals("GREATER_THAN", searchBody.getRestrictions().get(0).get(0).get("searchType"));
     }

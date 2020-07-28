@@ -3,7 +3,7 @@
     {
       "request": {
         "method": "POST",
-        "url": "/services/hazards/1/json/search_hazard",
+        "url": "/hp_srv/services/hazards/1/json/search_hazard",
         "basicAuthCredentials": {
           "username": "u1",
           "password": "p1"
@@ -25,7 +25,7 @@
     {
       "request": {
         "method": "POST",
-        "url": "/services/hazards/1/json/search_hazard",
+        "url": "/hp_srv/services/hazards/1/json/search_hazard",
         "basicAuthCredentials": {
           "username": "u1",
           "password": "p1"
@@ -47,7 +47,7 @@
     {
       "request": {
         "method": "POST",
-        "url": "/services/hazards/1/json/search_hazard",
+        "url": "/hp_srv/services/hazards/1/json/search_hazard",
         "basicAuthCredentials": {
           "username": "u1",
           "password": "p1"
@@ -69,7 +69,7 @@
     {
       "request": {
         "method": "POST",
-        "url": "/services/hazards/1/json/search_hazard",
+        "url": "/hp_srv/services/hazards/1/json/search_hazard",
         "basicAuthCredentials": {
           "username": "u1",
           "password": "p1"
@@ -86,6 +86,20 @@
         "headers": {
           "Content-Type": "application/json"
         }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPath": "/hp_srv/services/mags/1/json/get_mags",
+        "queryParameters" : {
+          "hazard_id" : {
+            "matches" : "^\\d*$"
+          }
+        }
+      },
+      "response": {
+        "status": 204
       }
     }
   ]

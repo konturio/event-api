@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FeignClientConfiguration {
 
-    @Value("${pdcHpSrv.user}")
+    @Value("${pdc.user}")
     private String hpSrvUser;
 
-    @Value("${pdcHpSrv.password}")
+    @Value("${pdc.password}")
     private String hpSrvPassword;
 
     @Bean

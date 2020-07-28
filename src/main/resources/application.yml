@@ -8,8 +8,8 @@ spring:
     username: 'postgres'
     password: 'postgres'
 
-pdcHpSrv:
-  host: 'https://testemops.pdc.org/hp_srv'
+pdc:
+  host: 'https://testemops.pdc.org'
   user: 'sanych'
   password: '111111'
 
@@ -17,14 +17,15 @@ app:
   scheduler:
     hpSrvImport:
       initialDelay: 1000
-      fixedDelay: 600000
+      fixedDelay: 600000000
+#      fixedDelay: 600000
 
 feign:
   client:
     config:
       pdcHpSrvBasicAuth:
-        connectTimeout: 5000
-        readTimeout: 5000
+        connectTimeout: 60000
+        readTimeout: 60000
         loggerLevel: headers
         requestInterceptors:
           - feign.auth.BasicAuthRequestInterceptor

@@ -1,4 +1,4 @@
-pdcHpSrv:
+pdc:
   host: 'http://localhost:18080'
   user: 'u1'
   password: 'p1'

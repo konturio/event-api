@@ -5,6 +5,7 @@ import io.kontur.eventapi.dto.EventDataLakeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -17,11 +18,15 @@ public class EventDataLakeDao {
         this.mapper = mapper;
     }
 
-    public void storeHazardData(EventDataLakeDto hazard) {
-        mapper.create(hazard);
+    public void storeEventData(EventDataLakeDto eventDataLakeDto) {
+        mapper.create(eventDataLakeDto);
     }
 
     public Optional<EventDataLakeDto> getLatestUpdatedHazard(String provider) {
-        return mapper.getLatestUpdatedHazard(provider);
+        return mapper.getLatestUpdatedEventForProvider(provider);
+    }
+
+    public List<String> getPdcEventsWithoutAreas() {
+        return mapper.getPdcHazardsWithoutAreas();
     }
 }

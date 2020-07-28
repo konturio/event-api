@@ -81,6 +81,11 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.wololo</groupId>
+			<artifactId>jts2geojson</artifactId>
+			<version>0.12.0</version>
+		</dependency>
 
 		<!--Test dependencies-->
 		<dependency>
