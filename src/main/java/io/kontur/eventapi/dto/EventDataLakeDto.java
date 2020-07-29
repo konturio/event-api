@@ -1,15 +1,28 @@
 package io.kontur.eventapi.dto;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
+
+
+
 
 public class EventDataLakeDto {
 
+    private UUID observationId;
     private String hazardId;
     private OffsetDateTime createDate;
     private OffsetDateTime updateDate;
     private OffsetDateTime uploadDate;
     private String provider;
     private String data;
+
+    public UUID getObservationId() {
+        return observationId;
+    }
+
+    public void setObservationId(UUID observationId) {
+        this.observationId = observationId;
+    }
 
     public String getHazardId() {
         return hazardId;

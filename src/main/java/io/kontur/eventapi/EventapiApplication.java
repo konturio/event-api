@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableFeignClients
-@MapperScan
+@MapperScan("io.kontur.eventapi.dao.mapper")
 public class EventapiApplication {
 
 	public static void main(String[] args) {
