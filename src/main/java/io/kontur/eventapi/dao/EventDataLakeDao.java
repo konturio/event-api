@@ -29,4 +29,8 @@ public class EventDataLakeDao {
     public List<String> getPdcEventsWithoutAreas() {
         return mapper.getPdcHazardsWithoutAreas();
     }
+
+    public List<EventDataLakeDto> getDenormalizedEvents() {
+        return mapper.getDenormalizedEvents();
+    }
 }

@@ -7,9 +7,15 @@ scheduler:
   hpSrvImport:
     enable: false
     initialDelay: 1000
-
+  normalization:
+    enable: false
+    initialDelay: 1000
+    fixedDelay: 60000
 spring:
   datasource:
     driverClassName: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
     platform: 'postgres'
     url: 'jdbc:tc:postgis12:///event-api'
+
+mybatis:
+  type-handlers-package: io.kontur.eventapi.typehandler
