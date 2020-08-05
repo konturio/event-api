@@ -63,7 +63,7 @@ public class HpSrvSearchJob implements Runnable {
         searchBody.getPagination().setPageSize(20);
 
         eventDataLakeDao.getLatestUpdatedHazard(HP_SRV_SEARCH_PROVIDER)
-                .map(EventDataLakeDto::getUpdateDate)
+                .map(EventDataLakeDto::getUpdatedOn)
                 .ifPresent(lastUpdateTime -> searchBody.addAndRestriction("GREATER_THAN", "updateDate",
                         convertOffsetDateTimeToEpochMillis(lastUpdateTime)));
 

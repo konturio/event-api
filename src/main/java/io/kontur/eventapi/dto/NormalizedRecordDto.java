@@ -8,28 +8,29 @@ public class NormalizedRecordDto {
     private UUID observationId;
     private String provider;
     private String wktGeometry;
+    private OffsetDateTime loadedOn;
     private Integer appId;
     private Boolean autoexpire;
     private String categoryId;
     private String charterUri;
     private String commentText;
-    private OffsetDateTime createDate;
+    private OffsetDateTime createdOn;
     private String creator;
-    private OffsetDateTime endDate;
+    private OffsetDateTime endedOn;
     private String glideUri;
-    private String hazardId;
+    private String externalId;
     private String hazardName;
-    private OffsetDateTime lastUpdate;
+    private OffsetDateTime lastUpdatedOn;
     private String point;
     private String masterIncidentId;
     private String messageId;
     private Integer orgId;
     private String severityId;
     private String sncUrl;
-    private OffsetDateTime startDate;
+    private OffsetDateTime startedOn;
     private String status;
     private String typeId;
-    private OffsetDateTime updateDate;
+    private OffsetDateTime updatedOn;
     private String updateUser;
     private String productTotal;
     private UUID uuid;
@@ -39,8 +40,8 @@ public class NormalizedRecordDto {
     // HpSrv Mags
     private Integer magId;
     private UUID magUuid;
-    private OffsetDateTime magCreateDate;
-    private OffsetDateTime magUpdateDate;
+    private OffsetDateTime magCreatedOn;
+    private OffsetDateTime magUpdatedOn;
     private String title;
     private String magType;
     private Boolean isActive;
@@ -67,6 +68,14 @@ public class NormalizedRecordDto {
 
     public void setWktGeometry(String wktGeometry) {
         this.wktGeometry = wktGeometry;
+    }
+
+    public OffsetDateTime getLoadedOn() {
+        return loadedOn;
+    }
+
+    public void setLoadedOn(OffsetDateTime loadedOn) {
+        this.loadedOn = loadedOn;
     }
 
     public Integer getAppId() {
@@ -109,12 +118,12 @@ public class NormalizedRecordDto {
         this.commentText = commentText;
     }
 
-    public OffsetDateTime getCreateDate() {
-        return createDate;
+    public OffsetDateTime getCreatedOn() {
+        return createdOn;
     }
 
-    public void setCreateDate(OffsetDateTime createDate) {
-        this.createDate = createDate;
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 
     public String getCreator() {
@@ -125,12 +134,12 @@ public class NormalizedRecordDto {
         this.creator = creator;
     }
 
-    public OffsetDateTime getEndDate() {
-        return endDate;
+    public OffsetDateTime getEndedOn() {
+        return endedOn;
     }
 
-    public void setEndDate(OffsetDateTime endDate) {
-        this.endDate = endDate;
+    public void setEndedOn(OffsetDateTime endedOn) {
+        this.endedOn = endedOn;
     }
 
     public String getGlideUri() {
@@ -141,12 +150,12 @@ public class NormalizedRecordDto {
         this.glideUri = glideUri;
     }
 
-    public String getHazardId() {
-        return hazardId;
+    public String getExternalId() {
+        return externalId;
     }
 
-    public void setHazardId(String hazardId) {
-        this.hazardId = hazardId;
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public String getHazardName() {
@@ -157,12 +166,12 @@ public class NormalizedRecordDto {
         this.hazardName = hazardName;
     }
 
-    public OffsetDateTime getLastUpdate() {
-        return lastUpdate;
+    public OffsetDateTime getLastUpdatedOn() {
+        return lastUpdatedOn;
     }
 
-    public void setLastUpdate(OffsetDateTime lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setLastUpdatedOn(OffsetDateTime lastUpdatedOn) {
+        this.lastUpdatedOn = lastUpdatedOn;
     }
 
     public String getPoint() {
@@ -213,12 +222,12 @@ public class NormalizedRecordDto {
         this.sncUrl = sncUrl;
     }
 
-    public OffsetDateTime getStartDate() {
-        return startDate;
+    public OffsetDateTime getStartedOn() {
+        return startedOn;
     }
 
-    public void setStartDate(OffsetDateTime startDate) {
-        this.startDate = startDate;
+    public void setStartedOn(OffsetDateTime startedOn) {
+        this.startedOn = startedOn;
     }
 
     public String getStatus() {
@@ -237,12 +246,12 @@ public class NormalizedRecordDto {
         this.typeId = typeId;
     }
 
-    public OffsetDateTime getUpdateDate() {
-        return updateDate;
+    public OffsetDateTime getUpdatedOn() {
+        return updatedOn;
     }
 
-    public void setUpdateDate(OffsetDateTime updateDate) {
-        this.updateDate = updateDate;
+    public void setUpdatedOn(OffsetDateTime updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
     public String getUpdateUser() {
@@ -309,20 +318,20 @@ public class NormalizedRecordDto {
         this.magUuid = magUuid;
     }
 
-    public OffsetDateTime getMagCreateDate() {
-        return magCreateDate;
+    public OffsetDateTime getMagCreatedOn() {
+        return magCreatedOn;
     }
 
-    public void setMagCreateDate(OffsetDateTime magCreateDate) {
-        this.magCreateDate = magCreateDate;
+    public void setMagCreatedOn(OffsetDateTime magCreatedOn) {
+        this.magCreatedOn = magCreatedOn;
     }
 
-    public OffsetDateTime getMagUpdateDate() {
-        return magUpdateDate;
+    public OffsetDateTime getMagUpdatedOn() {
+        return magUpdatedOn;
     }
 
-    public void setMagUpdateDate(OffsetDateTime magUpdateDate) {
-        this.magUpdateDate = magUpdateDate;
+    public void setMagUpdatedOn(OffsetDateTime magUpdatedOn) {
+        this.magUpdatedOn = magUpdatedOn;
     }
 
     public String getTitle() {

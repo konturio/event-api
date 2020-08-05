@@ -17,10 +17,13 @@ scheduler:
   hpSrvImport:
     enable: true
     initialDelay: 1000
-
   normalization:
     enable: true
     initialDelay: 1000
+    fixedDelay: 60000
+  recombination:
+    enable: true
+    initialDelay: 10000
     fixedDelay: 60000
 
 feign:
@@ -34,4 +37,5 @@ feign:
           - feign.auth.BasicAuthRequestInterceptor
 
 mybatis:
+  config-location: classpath:mybatis-config.xml
   type-handlers-package: io.kontur.eventapi.typehandler

@@ -3,16 +3,13 @@ package io.kontur.eventapi.dto;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-
-
-
 public class EventDataLakeDto {
 
     private UUID observationId;
-    private String hazardId;
-    private OffsetDateTime createDate;
-    private OffsetDateTime updateDate;
-    private OffsetDateTime uploadDate;
+    private String externalId;
+    private OffsetDateTime createdOn;
+    private OffsetDateTime updatedOn;
+    private OffsetDateTime loadedOn;
     private String provider;
     private String data;
 
@@ -24,36 +21,36 @@ public class EventDataLakeDto {
         this.observationId = observationId;
     }
 
-    public String getHazardId() {
-        return hazardId;
+    public String getExternalId() {
+        return externalId;
     }
 
-    public void setHazardId(String hazardId) {
-        this.hazardId = hazardId;
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
-    public OffsetDateTime getCreateDate() {
-        return createDate;
+    public OffsetDateTime getCreatedOn() {
+        return createdOn;
     }
 
-    public void setCreateDate(OffsetDateTime createDate) {
-        this.createDate = createDate;
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 
-    public OffsetDateTime getUpdateDate() {
-        return updateDate;
+    public OffsetDateTime getUpdatedOn() {
+        return updatedOn;
     }
 
-    public void setUpdateDate(OffsetDateTime updateDate) {
-        this.updateDate = updateDate;
+    public void setUpdatedOn(OffsetDateTime updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
-    public OffsetDateTime getUploadDate() {
-        return uploadDate;
+    public OffsetDateTime getLoadedOn() {
+        return loadedOn;
     }
 
-    public void setUploadDate(OffsetDateTime uploadDate) {
-        this.uploadDate = uploadDate;
+    public void setLoadedOn(OffsetDateTime loadedOn) {
+        this.loadedOn = loadedOn;
     }
 
     public String getProvider() {

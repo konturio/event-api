@@ -21,11 +21,11 @@ public class PdcEventDataLakeConverter {
     public static EventDataLakeDto convertHazardData(ObjectNode node) {
         EventDataLakeDto eventDataLakeDto = new EventDataLakeDto();
         eventDataLakeDto.setObservationId(UUID.randomUUID());
-        eventDataLakeDto.setHazardId(node.get("hazard_ID").asText());
-        eventDataLakeDto.setCreateDate(getDateTimeFromNode(node.get("create_Date")));
-        eventDataLakeDto.setUpdateDate(getDateTimeFromNode(node.get("update_Date")));
+        eventDataLakeDto.setExternalId(node.get("hazard_ID").asText());
+        eventDataLakeDto.setCreatedOn(getDateTimeFromNode(node.get("create_Date")));
+        eventDataLakeDto.setUpdatedOn(getDateTimeFromNode(node.get("update_Date")));
         eventDataLakeDto.setProvider(HP_SRV_SEARCH_PROVIDER);
-        eventDataLakeDto.setUploadDate(OffsetDateTime.now(ZoneOffset.UTC));
+        eventDataLakeDto.setLoadedOn(OffsetDateTime.now(ZoneOffset.UTC));
         eventDataLakeDto.setData(node.toString());
         return eventDataLakeDto;
     }
@@ -33,13 +33,13 @@ public class PdcEventDataLakeConverter {
     public static EventDataLakeDto convertMagData(Feature feature) {
         EventDataLakeDto eventDataLakeDto = new EventDataLakeDto();
         eventDataLakeDto.setObservationId(UUID.randomUUID());
-        eventDataLakeDto.setHazardId(String.valueOf(feature.getProperties().get("hazard.hazardId")));
-        eventDataLakeDto.setCreateDate(OffsetDateTime
+        eventDataLakeDto.setExternalId(String.valueOf(feature.getProperties().get("hazard.hazardId")));
+        eventDataLakeDto.setCreatedOn(OffsetDateTime
                 .parse(feature.getProperties().get("createDate").toString(), magsDateTimeFormatter));
-        eventDataLakeDto.setUpdateDate(OffsetDateTime
+        eventDataLakeDto.setUpdatedOn(OffsetDateTime
                 .parse(feature.getProperties().get("updateDate").toString(), magsDateTimeFormatter));
         eventDataLakeDto.setProvider(HP_SRV_MAG_PROVIDER);
-        eventDataLakeDto.setUploadDate(OffsetDateTime.now(ZoneOffset.UTC));
+        eventDataLakeDto.setLoadedOn(OffsetDateTime.now(ZoneOffset.UTC));
         eventDataLakeDto.setData(feature.toString());
         return eventDataLakeDto;
     }
