@@ -3,10 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.1.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>io.kontur.k2</groupId>
+		<artifactId>k2parent</artifactId>
+		<version>2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>event-api</artifactId>
@@ -90,7 +89,6 @@
 		<dependency>
 			<groupId>org.wololo</groupId>
 			<artifactId>jts2geojson</artifactId>
-			<version>0.12.0</version>
 		</dependency>
 
 		<!--Test dependencies-->
@@ -114,7 +112,6 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>1.14.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -193,15 +190,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>3.0.0-M4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 					<runOrder>alphabetical</runOrder>
 					<reuseForks>true</reuseForks>
@@ -248,28 +236,4 @@
 			</releases>
 		</repository>
 	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>kontur</id>
-			<url>https://nexus.kontur.io/repository/common/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</pluginRepository>
-	</pluginRepositories>
-
-	<distributionManagement>
-		<repository>
-			<id>kontur-releases</id>
-			<url>https://nexus.kontur.io/repository/common-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>kontur-snapshots</id>
-			<url>https://nexus.kontur.io/repository/common-snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
