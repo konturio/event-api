@@ -1,0 +1,81 @@
+- hosts: all
+  any_errors_fatal: true
+  vars:
+    app_name: event-api
+    home: '{{ ansible_env.HOME }}'
+    app_home: '{{ home }}'
+  tasks:
+    - name: make app dir
+      file:
+        path: '{{ app_home }}/{{ app_name }}_{{ version }}'
+        state: directory
+        mode: 0750
+    - name: Upload and unpack an artifact
+      unarchive:
+        src: '{{ path_to_dist }}'
+        dest: '{{ app_home }}/{{ app_name }}_{{ version }}'
+    - name: Remove old symlink to the current version
+      file:
+        path: '{{ app_home }}/current'
+        state: absent
+    - name: Make symlink to the current version
+      file:
+        src: '{{ app_name }}_{{ version }}'
+        dest: '{{ app_home }}/current'
+        state: link
+        force: 'yes'
+    - name: Prepare hosted files
+      block:
+        - copy:
+            src: '{{ app_home }}/current/config.yaml'
+            dest: '{{ app_home }}/config.local.yaml'
+            remote_src: 'yes'
+            force: 'no'
+        - copy:
+            src: '{{ app_home }}/current/environment.rc.sample'
+            dest: '{{ app_home }}/environment.rc'
+            remote_src: 'yes'
+            force: 'no'
+    - name: Deploy event-api.service
+      block:
+        - file:
+            path: '{{ home }}/bin/'
+            state: directory
+            recurse: 'yes'
+        - copy:
+            src: '{{ app_home }}/current/wrapper.sh'
+            dest: '{{ home }}/bin/'
+            remote_src: 'yes'
+            mode: 0750
+            force: 'yes'
+        - file:
+            src: '{{ home }}/bin/wrapper.sh'
+            dest: '{{ home }}/bin/{{ app_name }}'
+            state: link
+            force: 'yes'
+        - file:
+            path: '{{ home }}/.config/systemd/user/'
+            state: directory
+            recurse: 'yes'
+        - copy:
+            src: '{{ app_home }}/current/event-api.service'
+            dest: '{{ home }}/.config/systemd/user/event-api.service'
+            remote_src: 'yes'
+            force: 'no'
+        - find:
+            paths: '{{ app_home }}/current'
+            patterns: event-api-*.jar
+          register: files
+        - replace:
+            path: '{{ home }}/.config/systemd/user/event-api.service'
+            regexp: \$jar_file
+            replace: '{{ item.path | basename }}'
+          with_items: '{{ files.files }}'
+    - name: Restart
+      systemd:
+        name: event-api
+        state: restarted
+        enabled: 'yes'
+        force: 'yes'
+        scope: user
+        daemon_reload: 'yes'
