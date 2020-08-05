@@ -36,6 +36,7 @@ public class HpSrvMagsNormalizer extends Normalizer {
 
         recordDto.setObservationId(dataLakeDto.getObservationId());
         recordDto.setProvider(dataLakeDto.getProvider());
+        recordDto.setLoadedOn(dataLakeDto.getLoadedOn());
 
         try {
             Feature feature = mapper.readValue(dataLakeDto.getData(), Feature.class);
@@ -51,20 +52,18 @@ public class HpSrvMagsNormalizer extends Normalizer {
                 recordDto.setMagUuid(UUID.fromString(uuid));
             }
             recordDto.setTitle(readString(props, "title"));
-            recordDto.setMagCreateDate(readDateTime(props, "createDate"));
-            recordDto.setMagUpdateDate(readDateTime(props, "updateDate"));
             recordDto.setMagType(readString(props, "magType"));
             recordDto.setCreator(readString(props, "creator"));
             recordDto.setActive(readBoolean(props, "isActive"));
             recordDto.setTypeId(readString(props, "hazard.hazardType.typeId"));
-            recordDto.setHazardId(readString(props, "hazard.hazardId"));
+            recordDto.setExternalId(readString(props, "hazard.hazardId"));
             recordDto.setHazardName(readString(props, "hazard.hazardName"));
             recordDto.setCommentText(readString(props, "hazard.commentText"));
-            recordDto.setCreateDate(readDateTime(props, "hazard.createDate"));
-            recordDto.setStartDate(readDateTime(props, "hazard.startDate"));
-            recordDto.setEndDate(readDateTime(props, "hazard.endDate"));
-            recordDto.setLastUpdate(readDateTime(props, "hazard.lastUpdate"));
-            recordDto.setUpdateDate(readDateTime(props, "hazard.updateDate"));
+            recordDto.setCreatedOn(readDateTime(props, "hazard.createDate"));
+            recordDto.setStartedOn(readDateTime(props, "hazard.startDate"));
+            recordDto.setEndedOn(readDateTime(props, "hazard.endDate"));
+            recordDto.setLastUpdatedOn(readDateTime(props, "createDate"));
+            recordDto.setUpdatedOn(readDateTime(props, "updateDate"));
             recordDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
                     readDouble(props, "hazard.latitude")));
             recordDto.setOrgId(readInt(props, "hazard.orgId"));

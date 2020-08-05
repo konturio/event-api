@@ -11,6 +11,11 @@ scheduler:
     enable: false
     initialDelay: 1000
     fixedDelay: 60000
+  recombination:
+    enable: false
+    initialDelay: 10000
+    fixedDelay: 60000
+
 spring:
   datasource:
     driverClassName: 'org.testcontainers.jdbc.ContainerDatabaseDriver'

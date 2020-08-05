@@ -28,6 +28,7 @@ public class HpSrvSearchNormalizer extends Normalizer {
 
         recordDto.setObservationId(dataLakeDto.getObservationId());
         recordDto.setProvider(dataLakeDto.getProvider());
+        recordDto.setLoadedOn(dataLakeDto.getLoadedOn());
 
         try {
             Map<String, Object> props = mapper.readValue(dataLakeDto.getData(), new TypeReference<>() {});
@@ -38,7 +39,7 @@ public class HpSrvSearchNormalizer extends Normalizer {
             recordDto.setCommentText(readString(props, "comment_Text"));
             recordDto.setCreator(readString(props, "creator"));
             recordDto.setGlideUri(readString(props, "glide_Uri"));
-            recordDto.setHazardId(readString(props, "hazard_ID"));
+            recordDto.setExternalId(readString(props, "hazard_ID"));
             recordDto.setHazardName(readString(props, "hazard_Name"));
             recordDto.setMasterIncidentId(readString(props, "master_Incident_ID"));
             recordDto.setMessageId(readString(props, "message_ID"));
@@ -57,11 +58,11 @@ public class HpSrvSearchNormalizer extends Normalizer {
             recordDto.setAreabriefUrl(readString(props, "areabrief_url"));
             recordDto.setDescription(readString(props, "description"));
 
-            recordDto.setCreateDate(readDateTime(props, "create_Date"));
-            recordDto.setEndDate(readDateTime(props, "end_Date"));
-            recordDto.setLastUpdate(readDateTime(props, "last_Update"));
-            recordDto.setStartDate(readDateTime(props, "start_Date"));
-            recordDto.setUpdateDate(readDateTime(props, "update_Date"));
+            recordDto.setCreatedOn(readDateTime(props, "create_Date"));
+            recordDto.setEndedOn(readDateTime(props, "end_Date"));
+            recordDto.setLastUpdatedOn(readDateTime(props, "last_Update"));
+            recordDto.setStartedOn(readDateTime(props, "start_Date"));
+            recordDto.setUpdatedOn(readDateTime(props, "update_Date"));
 
             recordDto.setPoint(makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude")));
         } catch (JsonProcessingException e) {

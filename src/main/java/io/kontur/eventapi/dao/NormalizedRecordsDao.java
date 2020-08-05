@@ -4,6 +4,8 @@ import io.kontur.eventapi.dao.mapper.NormalizedRecordsMapper;
 import io.kontur.eventapi.dto.NormalizedRecordDto;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class NormalizedRecordsDao {
 
@@ -15,6 +17,14 @@ public class NormalizedRecordsDao {
 
     public int insertNormalizedRecords(NormalizedRecordDto record) {
         return mapper.insertNormalizedRecord(record);
+    }
+
+    public List<String> getEventsIds() {
+        return mapper.getEventsIds();
+    }
+
+    public List<NormalizedRecordDto> getRecordsToCombine(String eventId) {
+        return mapper.getRecordsToCombine(eventId);
     }
 
 }
