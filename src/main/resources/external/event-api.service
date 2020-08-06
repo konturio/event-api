@@ -10,7 +10,7 @@ Type=forking
 Environment=APP_JAVA_OPTS="-Xmx300m -XX:+HeapDumpOnOutOfMemoryError"
 Environment=CLASSPATH=""
 Environment=APP_ENTRY_POINT="-jar event-api-1.0-SNAPSHOT.jar"
-Environment=APP_ARGS="--spring.config.location=%h/application.yml"
+Environment=APP_ARGS=""
 Environment=SPRING_CONFIG_LOCATION="file:%h/config.local.yaml"
 Environment=APP_HOME="%h/current"
 Environment=APP_BASE="%h"
