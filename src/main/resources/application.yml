@@ -37,5 +37,5 @@ feign:
           - feign.auth.BasicAuthRequestInterceptor
 
 mybatis:
-  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:db/mappers/*Mapper.xml
   type-handlers-package: io.kontur.eventapi.typehandler
