@@ -37,7 +37,7 @@ deploy-sonic:
     ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
     path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
     --limit=sonic_event_api ansible/deploy.yml
-  environment: sonic
+  environment: test-apps.konturlabs.com
   when: manual
   dependencies:
     - build
@@ -51,7 +51,7 @@ deploy-zigzag:
     ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
     path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
     --limit=zigzag_event_api ansible/deploy.yml
-  environment: zigzag
+  environment: test-apps02.konturlabs.com
   when: manual
   dependencies:
     - build
@@ -65,7 +65,7 @@ deploy-lima:
     ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
     path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
     --limit=lima_event_api ansible/deploy.yml
-  environment: lima
+  environment: apps.kontur.io
   only:
     - /^release-.*$/
   when: manual
