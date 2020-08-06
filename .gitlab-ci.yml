@@ -39,7 +39,7 @@ deploy-sonic:
     --limit=sonic_event_api ansible/deploy.yml
   environment:
     name: TEST sonic
-    url: https://test-apps.konturlabs.com/event-api/
+    url: https://test-apps.konturlabs.com/events/
   when: manual
   dependencies:
     - build
@@ -55,7 +55,7 @@ deploy-zigzag:
     --limit=zigzag_event_api ansible/deploy.yml
   environment:
     name: TEST zigzag
-    url: https://test-apps02.konturlabs.com/event-api/
+    url: https://test-apps02.konturlabs.com/events/
 
   when: manual
   dependencies:
@@ -72,7 +72,7 @@ deploy-lima:
     --limit=lima_event_api ansible/deploy.yml
   environment:
     name: PROD lima
-    url: https://apps.kontur.io/event-api/
+    url: https://apps.kontur.io/events/
   only:
     - /^release-.*$/
   when: manual
