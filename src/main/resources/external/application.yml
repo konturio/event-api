@@ -1,6 +1,24 @@
 spring:
-  profile:
-    active: develop
-  cloud:
-    config:
-      uri: http://localhost:8888
+  datasource:
+    platform: 'postgres'
+    url: 'jdbc:postgresql://localhost:5432/postgres'
+    username: 'postgres'
+    password: 'postgres'
+
+pdc:
+  host: 'https://testemops.pdc.org'
+  user: 'user'
+  password: 'password'
+
+scheduler:
+  hpSrvImport:
+    enable: true
+    initialDelay: 1000
+  normalization:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 60000
+  recombination:
+    enable: true
+    initialDelay: 10000
+    fixedDelay: 60000
