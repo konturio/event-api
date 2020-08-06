@@ -16,8 +16,8 @@ Environment=APP_HOME="%h/current"
 Environment=APP_BASE="%h"
 
 WorkingDirectory=%h/current
-ExecStart=/bin/bash -c "\"%h/bin/eventapi\" start"
-ExecStop=/bin/bash  -c "\"%h/bin/eventapi\" stop"
+ExecStart=/bin/bash -c "\"%h/bin/event-api\" start"
+ExecStop=/bin/bash  -c "\"%h/bin/event-api\" stop"
 
 [Install]
 WantedBy=default.target
