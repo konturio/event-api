@@ -1,7 +1,7 @@
 pdc:
   host: 'http://localhost:18080'
-  user: 'u1'
-  password: 'p1'
+  user: u1
+  password: p1
 
 scheduler:
   hpSrvImport:
@@ -18,8 +18,8 @@ scheduler:
 
 spring:
   datasource:
-    driverClassName: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
-    platform: 'postgres'
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    platform: postgres
     url: 'jdbc:tc:postgis12:///event-api'
 
 mybatis:

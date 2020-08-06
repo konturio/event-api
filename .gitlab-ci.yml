@@ -1,0 +1,80 @@
+---
+variables:
+  MAVEN_CLI_OPTS: '--batch-mode'
+  MAVEN_OPTS: '-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository'
+
+cache:
+  paths:
+    - .m2/repository/
+
+.default-job-settings:
+  tags:
+    - maven
+    - java
+    - docker
+
+stages:
+  - build
+  - deploy
+
+build:
+  extends: .default-job-settings
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS clean install -U -Prelease
+    - mv target/*.zip .
+  artifacts:
+    name: event-api-$CI_COMMIT_REF_SLUG
+    paths:
+      - '*.zip'
+
+deploy-sonic:
+  tags:
+    - kontur
+    - ansible
+  stage: deploy
+  script: >
+    ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
+    path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
+    --limit=sonic_event_api ansible/deploy.yml
+  environment:
+    name: TEST sonic
+    url: https://test-apps.konturlabs.com/events/
+  when: manual
+  dependencies:
+    - build
+
+deploy-zigzag:
+  tags:
+    - kontur
+    - ansible
+  stage: deploy
+  script: >
+    ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
+    path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
+    --limit=zigzag_event_api ansible/deploy.yml
+  environment:
+    name: TEST zigzag
+    url: https://test-apps02.konturlabs.com/events/
+
+  when: manual
+  dependencies:
+    - build
+
+deploy-lima:
+  tags:
+    - kontur
+    - ansible
+  stage: deploy
+  script: >
+    ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
+    path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
+    --limit=lima_event_api ansible/deploy.yml
+  environment:
+    name: PROD lima
+    url: https://apps.kontur.io/events/
+  only:
+    - /^release-.*$/
+  when: manual
+  dependencies:
+    - build

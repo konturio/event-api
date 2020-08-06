@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    platform: postgres
+    url: 'jdbc:postgresql://localhost:5432/event_api'
+    username: event_api_user01
+    password: 'CHANGE_ME_TO_SECURE_PASSWORD'
+
+pdc:
+  host: 'https://testemops.pdc.org'
+  user: user
+  password: password
+
+scheduler:
+  hpSrvImport:
+    enable: true
+    initialDelay: 1000
+  normalization:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 60000
+  recombination:
+    enable: true
+    initialDelay: 10000
+    fixedDelay: 60000

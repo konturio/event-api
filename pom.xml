@@ -3,21 +3,21 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.1.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>io.kontur.k2</groupId>
+		<artifactId>k2parent</artifactId>
+		<version>2.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>eventapi</artifactId>
+	<artifactId>event-api</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
-	<name>eventapi</name>
+	<name>event-api</name>
 	<description>Kontur Event API</description>
 
 	<properties>
 		<java.version>11</java.version>
 		<spring-cloud.version>2.2.3.RELEASE</spring-cloud.version>
+		<project.resource.directory>src/main/resources</project.resource.directory>
 	</properties>
 
 	<dependencies>
@@ -84,7 +84,6 @@
 		<dependency>
 			<groupId>org.wololo</groupId>
 			<artifactId>jts2geojson</artifactId>
-			<version>0.12.0</version>
 		</dependency>
 
 		<!--Test dependencies-->
@@ -108,7 +107,6 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>1.14.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -121,16 +119,72 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>${maven-failsafe-plugin.version}</version>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Build-Time>${maven.build.timestamp}</Implementation-Build-Time>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- Copy dependencies for runnable app archive packaging -->
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.2</version>
 				<executions>
 					<execution>
+						<phase>post-integration-test</phase>
 						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
+							<goal>copy-dependencies</goal>
 						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+					<execution>
+						<id>unpack</id>
+						<phase>package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>io.kontur.common</groupId>
+									<artifactId>systemd-service-wrapper</artifactId>
+									<version>1.0.7</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/unpacked</outputDirectory>
+									<includes>**/*.sh</includes>
+									<excludes>**/*.xml</excludes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<!-- Config assembly for runnable app archive packaging -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>assembly.xml</descriptor>
+					</descriptors>
+					<tarLongFileMode>posix</tarLongFileMode>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
 					<runOrder>alphabetical</runOrder>
 					<reuseForks>true</reuseForks>
@@ -143,4 +197,38 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>assembly</id>
+								<phase>install</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>kontur</id>
+			<url>https://nexus.kontur.io/repository/common/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
 </project>
