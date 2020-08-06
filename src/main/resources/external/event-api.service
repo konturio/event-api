@@ -10,13 +10,14 @@ Type=forking
 Environment=APP_JAVA_OPTS="-Xmx300m -XX:+HeapDumpOnOutOfMemoryError"
 Environment=CLASSPATH=""
 Environment=APP_ENTRY_POINT="-jar event-api-1.0-SNAPSHOT.jar"
-Environment=APP_ARGS="--spring.config.location=%h/application.yml"
+Environment=APP_ARGS=""
+Environment=SPRING_CONFIG_ADDITIONAL_LOCATION="file:%h/config.local.yaml"
 Environment=APP_HOME="%h/current"
 Environment=APP_BASE="%h"
 
 WorkingDirectory=%h/current
-ExecStart=/bin/bash -c "\"%h/bin/eventapi\" start"
-ExecStop=/bin/bash  -c "\"%h/bin/eventapi\" stop"
+ExecStart=/bin/bash -c "\"%h/bin/event-api\" start"
+ExecStop=/bin/bash  -c "\"%h/bin/event-api\" stop"
 
 [Install]
 WantedBy=default.target

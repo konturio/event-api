@@ -1,4 +1,3 @@
-## gitlab ci configuration
 ---
 variables:
   MAVEN_CLI_OPTS: '--batch-mode'
@@ -37,8 +36,10 @@ deploy-sonic:
   script: >
     ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
     path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
-    --limit=sonic_event-api ansible/deploy.yml
-  environment: sonic
+    --limit=sonic_event_api ansible/deploy.yml
+  environment:
+    name: TEST sonic
+    url: https://test-apps.konturlabs.com/events/
   when: manual
   dependencies:
     - build
@@ -51,8 +52,11 @@ deploy-zigzag:
   script: >
     ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
     path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
-    --limit=zigzag_event-api ansible/deploy.yml
-  environment: zigzag
+    --limit=zigzag_event_api ansible/deploy.yml
+  environment:
+    name: TEST zigzag
+    url: https://test-apps02.konturlabs.com/events/
+
   when: manual
   dependencies:
     - build
@@ -65,8 +69,10 @@ deploy-lima:
   script: >
     ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
     path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
-    --limit=lima_event-api ansible/deploy.yml
-  environment: lima
+    --limit=lima_event_api ansible/deploy.yml
+  environment:
+    name: PROD lima
+    url: https://apps.kontur.io/events/
   only:
     - /^release-.*$/
   when: manual

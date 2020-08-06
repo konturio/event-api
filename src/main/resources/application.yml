@@ -3,15 +3,15 @@ server:
 
 spring:
   datasource:
-    platform: 'postgres'
+    platform: postgres
     url: 'jdbc:postgresql://localhost:5432/postgres'
-    username: 'postgres'
-    password: 'postgres'
+    username: postgres
+    password: postgres
 
 pdc:
   host: 'https://testemops.pdc.org'
-  user: 'user'
-  password: 'password'
+  user: user
+  password: password
 
 scheduler:
   hpSrvImport:

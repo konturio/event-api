@@ -1,14 +1,14 @@
 spring:
   datasource:
-    platform: 'postgres'
-    url: 'jdbc:postgresql://localhost:5432/postgres'
-    username: 'postgres'
-    password: 'postgres'
+    platform: postgres
+    url: 'jdbc:postgresql://localhost:5432/event_api'
+    username: event_api_user01
+    password: 'CHANGE_ME_TO_SECURE_PASSWORD'
 
 pdc:
   host: 'https://testemops.pdc.org'
-  user: 'user'
-  password: 'password'
+  user: user
+  password: password
 
 scheduler:
   hpSrvImport:
