@@ -6,12 +6,11 @@
     <select id="getEventForExternalId" resultMap="combinedEventDtoMap">
         SELECT *
         FROM combined_events ce
-        WHERE observation_id = (
+        WHERE observation_id in (
             select observation_id
             from normalized_records
             where external_id = #{externalId}
-            order by updated_on
-            limit 1)
+            order by updated_on)
     </select>
 
     <insert id="insertEvent" keyProperty="id" keyColumn="id" useGeneratedKeys="true">

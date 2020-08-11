@@ -10,8 +10,8 @@ spring:
 
 pdc:
   host: 'https://testemops.pdc.org'
-  user: user
-  password: password
+  user: 'eventapi'
+  password: 'zvgusf48D'
 
 scheduler:
   hpSrvImport:

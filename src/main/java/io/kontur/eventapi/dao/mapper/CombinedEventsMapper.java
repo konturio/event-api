@@ -5,12 +5,12 @@ import io.kontur.eventapi.dto.CombinedEpisodeDto;
 import io.kontur.eventapi.dto.CombinedEventDto;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Optional;
+import java.util.List;
 
 @Mapper
 public interface CombinedEventsMapper {
 
-    Optional<CombinedEventDto> getEventForExternalId(String externalId);
+    List<CombinedEventDto> getEventForExternalId(String externalId);
 
     void insertEvent(CombinedEventDto eventDto);
 
