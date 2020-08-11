@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.NormalizedObservationsMapper">
+    <insert id="insert">
+        INSERT INTO normalized_observations (
+            observation_id,
+            provider,
+            <if test='point != null'>
+                point,
+            </if>
+            <if test='geometries != null'>
+                geometries,
+            </if>
+            event_severity,
+            name,
+            description,
+            type,
+            cost,
+            region,
+            loaded_at,
+            source_uri
+        ) VALUES (
+            #{observationId},
+            #{provider},
+            <if test='point != null'>
+                'SRID=4326;${point}'::geometry,
+            </if>
+            <if test='geometries != null'>
+                #{geometries}::jsonb,
+            </if>
+            #{eventSeverity},
+            #{name},
+            #{description},
+            #{type},
+            #{cost},
+            #{region},
+            #{loadedAt},
+            #{sourceUri}
+        )
+    </insert>
+</mapper>

@@ -3,27 +3,19 @@ package io.kontur.eventapi.pdc.normalization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.dto.EventDataLakeDto;
-import io.kontur.eventapi.dto.NormalizedRecordDto;
+import io.kontur.eventapi.dto.NormalizedObservationsDto;
 import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.WKTWriter;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
-import org.wololo.jts2geojson.GeoJSONReader;
+import org.wololo.geojson.FeatureCollection;
 
-import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.UUID;
-
-import static io.kontur.eventapi.pdc.converter.PdcEventDataLakeConverter.magsDateTimeFormatter;
+import java.util.*;
 
 @Component
 public class HpSrvMagsNormalizer extends Normalizer {
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final GeoJSONReader geoJSONReader = new GeoJSONReader();
-    private final WKTWriter wktWriter = new WKTWriter();
 
     @Override
     public boolean isApplicable(EventDataLakeDto dataLakeDto) {
@@ -31,60 +23,43 @@ public class HpSrvMagsNormalizer extends Normalizer {
     }
 
     @Override
-    public NormalizedRecordDto normalize(EventDataLakeDto dataLakeDto) {
-        NormalizedRecordDto recordDto = new NormalizedRecordDto();
-
-        recordDto.setObservationId(dataLakeDto.getObservationId());
-        recordDto.setProvider(dataLakeDto.getProvider());
-        recordDto.setLoadedOn(dataLakeDto.getLoadedOn());
-
+    public NormalizedObservationsDto normalize(EventDataLakeDto dataLakeDto) {
+        NormalizedObservationsDto normalizedDto = new NormalizedObservationsDto();
+        normalizedDto.setObservationId(dataLakeDto.getObservationId());
+        normalizedDto.setProvider(dataLakeDto.getProvider());
+        normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
         try {
-            Feature feature = mapper.readValue(dataLakeDto.getData(), Feature.class);
+            FeatureCollection fc = mapper.readValue(dataLakeDto.getData(), FeatureCollection.class);
+            normalizedDto.setGeometries(convertGeometries(fc).toString());
 
-            Geometry geometry = geoJSONReader.read(feature.getGeometry());
-            recordDto.setWktGeometry(wktWriter.write(geometry));
-
-            Map<String, Object> props = feature.getProperties();
-
-            recordDto.setMagId(readInt(props, "magId"));
-            String uuid = readString(props, "uuid");
-            if (uuid != null) {
-                recordDto.setMagUuid(UUID.fromString(uuid));
-            }
-            recordDto.setTitle(readString(props, "title"));
-            recordDto.setMagType(readString(props, "magType"));
-            recordDto.setCreator(readString(props, "creator"));
-            recordDto.setActive(readBoolean(props, "isActive"));
-            recordDto.setTypeId(readString(props, "hazard.hazardType.typeId"));
-            recordDto.setExternalId(readString(props, "hazard.hazardId"));
-            recordDto.setHazardName(readString(props, "hazard.hazardName"));
-            recordDto.setCommentText(readString(props, "hazard.commentText"));
-            recordDto.setCreatedOn(readDateTime(props, "hazard.createDate"));
-            recordDto.setStartedOn(readDateTime(props, "hazard.startDate"));
-            recordDto.setEndedOn(readDateTime(props, "hazard.endDate"));
-            recordDto.setLastUpdatedOn(readDateTime(props, "createDate"));
-            recordDto.setUpdatedOn(readDateTime(props, "updateDate"));
-            recordDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
-                    readDouble(props, "hazard.latitude")));
-            recordDto.setOrgId(readInt(props, "hazard.orgId"));
-            recordDto.setAutoexpire("Y".equalsIgnoreCase(readString(props, "hazard.autoexpire")));
-            recordDto.setMessageId(readString(props, "hazard.messageId"));
-            recordDto.setMasterIncidentId(readString(props, "hazard.masterIncidentId"));
-            recordDto.setStatus(readString(props, "hazard.status"));
-            String hazardUuid = readString(props, "hazard.uuid");
-            if (hazardUuid != null) {
-                recordDto.setUuid(UUID.fromString(hazardUuid));
+            if (fc.getFeatures() != null && fc.getFeatures().length > 0) {
+                Map<String, Object> props = fc.getFeatures()[0].getProperties();
+                normalizedDto.setName(readString(props, "hazard.hazardName"));
+                normalizedDto.setDescription(readString(props, "title"));
+                normalizedDto.setType(readString(props, "hazard.hazardType.typeId"));
+//                normalizedDto.setEventSeverity();  TODO
+                normalizedDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
+                        readDouble(props, "hazard.latitude")));
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
-        return recordDto;
+        return normalizedDto;
     }
 
-    @Override
-    protected OffsetDateTime readDateTime(Map<String, Object> map, String key) {
-        String dateTime = readString(map, key);
-        return dateTime == null ? null : OffsetDateTime.parse(dateTime, magsDateTimeFormatter);
+    private FeatureCollection convertGeometries(FeatureCollection input) {
+        List<Feature> features = new ArrayList<>(input.getFeatures().length);
+
+        Arrays.stream(input.getFeatures())
+                .forEach(feature -> {
+                    Map<String, Object> props = feature.getProperties();
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("description", props.get("title"));
+                    //map.put("severity", ) TODO add severity
+                    features.add(new Feature(feature.getGeometry(), map));
+                });
+
+        return new FeatureCollection(features.toArray(new Feature[0]));
     }
 }

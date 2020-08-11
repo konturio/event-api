@@ -3,7 +3,6 @@ package io.kontur.eventapi.pdc.converter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.kontur.eventapi.dto.EventDataLakeDto;
-import org.wololo.geojson.Feature;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -22,25 +21,20 @@ public class PdcEventDataLakeConverter {
         EventDataLakeDto eventDataLakeDto = new EventDataLakeDto();
         eventDataLakeDto.setObservationId(UUID.randomUUID());
         eventDataLakeDto.setExternalId(node.get("hazard_ID").asText());
-        eventDataLakeDto.setCreatedOn(getDateTimeFromNode(node.get("create_Date")));
-        eventDataLakeDto.setUpdatedOn(getDateTimeFromNode(node.get("update_Date")));
+        eventDataLakeDto.setUpdatedAt(getDateTimeFromNode(node.get("update_Date")));
         eventDataLakeDto.setProvider(HP_SRV_SEARCH_PROVIDER);
-        eventDataLakeDto.setLoadedOn(OffsetDateTime.now(ZoneOffset.UTC));
+        eventDataLakeDto.setLoadedAt(OffsetDateTime.now(ZoneOffset.UTC));
         eventDataLakeDto.setData(node.toString());
         return eventDataLakeDto;
     }
 
-    public static EventDataLakeDto convertMagData(Feature feature) {
+    public static EventDataLakeDto convertMagData(JsonNode jsonNode, String eventId) {
         EventDataLakeDto eventDataLakeDto = new EventDataLakeDto();
         eventDataLakeDto.setObservationId(UUID.randomUUID());
-        eventDataLakeDto.setExternalId(String.valueOf(feature.getProperties().get("hazard.hazardId")));
-        eventDataLakeDto.setCreatedOn(OffsetDateTime
-                .parse(feature.getProperties().get("createDate").toString(), magsDateTimeFormatter));
-        eventDataLakeDto.setUpdatedOn(OffsetDateTime
-                .parse(feature.getProperties().get("updateDate").toString(), magsDateTimeFormatter));
+        eventDataLakeDto.setExternalId(eventId);
         eventDataLakeDto.setProvider(HP_SRV_MAG_PROVIDER);
-        eventDataLakeDto.setLoadedOn(OffsetDateTime.now(ZoneOffset.UTC));
-        eventDataLakeDto.setData(feature.toString());
+        eventDataLakeDto.setLoadedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        eventDataLakeDto.setData(jsonNode.toString());
         return eventDataLakeDto;
     }
 

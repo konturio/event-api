@@ -7,9 +7,8 @@ public class EventDataLakeDto {
 
     private UUID observationId;
     private String externalId;
-    private OffsetDateTime createdOn;
-    private OffsetDateTime updatedOn;
-    private OffsetDateTime loadedOn;
+    private OffsetDateTime updatedAt;
+    private OffsetDateTime loadedAt;
     private String provider;
     private String data;
 
@@ -29,28 +28,20 @@ public class EventDataLakeDto {
         this.externalId = externalId;
     }
 
-    public OffsetDateTime getCreatedOn() {
-        return createdOn;
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setCreatedOn(OffsetDateTime createdOn) {
-        this.createdOn = createdOn;
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public OffsetDateTime getUpdatedOn() {
-        return updatedOn;
+    public OffsetDateTime getLoadedAt() {
+        return loadedAt;
     }
 
-    public void setUpdatedOn(OffsetDateTime updatedOn) {
-        this.updatedOn = updatedOn;
-    }
-
-    public OffsetDateTime getLoadedOn() {
-        return loadedOn;
-    }
-
-    public void setLoadedOn(OffsetDateTime loadedOn) {
-        this.loadedOn = loadedOn;
+    public void setLoadedAt(OffsetDateTime loadedAt) {
+        this.loadedAt = loadedAt;
     }
 
     public String getProvider() {

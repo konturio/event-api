@@ -8,15 +8,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wololo.geojson.FeatureCollection;
 
 @FeignClient(name = "pdcHpSrvBasicAuth", url ="${pdc.host}")
 public interface HpSrvClient {
 
     @PostMapping("/hp_srv/services/hazards/1/json/search_hazard")
     @Headers({"Content-Type: application/json", "accept: application/json"})
-    JsonNode getAuthorizationTokens(@RequestBody HpSrvSearchBody body);
+    JsonNode searchHazards(@RequestBody HpSrvSearchBody body);
 
     @GetMapping("/hp_srv/services/mags/1/json/get_mags")
-    FeatureCollection getMags(@RequestParam("hazard_id") String hazardId);
+    JsonNode getMags(@RequestParam("hazard_id") String hazardId);
 }

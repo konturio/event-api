@@ -105,7 +105,7 @@
         select st_astext(geometry) as geometry, st_astext(point) as point, *
         FROM normalized_records nr
         WHERE external_id = #{eventId}
-            and not exists(select 1 from combined_episodes ce where ce.observation_id = nr.observation_id)
+          and not exists(select 1 from combined_episodes ce where ce.observation_id = nr.observation_id)
         ORDER BY updated_on
     </select>
 

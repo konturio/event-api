@@ -1,9 +1,9 @@
 package io.kontur.eventapi.normalization;
 
 import io.kontur.eventapi.dao.EventDataLakeDao;
-import io.kontur.eventapi.dao.NormalizedRecordsDao;
+import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dto.EventDataLakeDto;
-import io.kontur.eventapi.dto.NormalizedRecordDto;
+import io.kontur.eventapi.dto.NormalizedObservationsDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,13 +17,13 @@ public class NormalizationJob implements Runnable {
 
     private final List<Normalizer> normalizers;
     private final EventDataLakeDao eventDataLakeDao;
-    private final NormalizedRecordsDao normalizedRecordsDao;
+    private final NormalizedObservationsDao normalizedObservationsDao;
 
     public NormalizationJob(List<Normalizer> normalizers, EventDataLakeDao eventDataLakeDao,
-                            NormalizedRecordsDao normalizedRecordsDao) {
+                            NormalizedObservationsDao normalizedObservationsDao) {
         this.normalizers = normalizers;
         this.eventDataLakeDao = eventDataLakeDao;
-        this.normalizedRecordsDao = normalizedRecordsDao;
+        this.normalizedObservationsDao = normalizedObservationsDao;
     }
 
     @Override
@@ -46,8 +46,8 @@ public class NormalizationJob implements Runnable {
         boolean isNormalized = false;
         for (Normalizer normalizer : normalizers) {
             if (normalizer.isApplicable(denormalizedEvent)) {
-                NormalizedRecordDto recordDto = normalizer.normalize(denormalizedEvent);
-                normalizedRecordsDao.insertNormalizedRecords(recordDto);
+                NormalizedObservationsDto normalizedDto = normalizer.normalize(denormalizedEvent);
+                normalizedObservationsDao.insert(normalizedDto);
                 isNormalized = true;
                 break;
             }
