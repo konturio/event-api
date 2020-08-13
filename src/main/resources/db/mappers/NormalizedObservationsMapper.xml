@@ -7,6 +7,7 @@
         INSERT INTO normalized_observations (
             observation_id,
             provider,
+            external_id,
             <if test='point != null'>
                 point,
             </if>
@@ -24,6 +25,7 @@
         ) VALUES (
             #{observationId},
             #{provider},
+            #{externalId},
             <if test='point != null'>
                 'SRID=4326;${point}'::geometry,
             </if>
@@ -40,4 +42,32 @@
             #{sourceUri}
         )
     </insert>
+
+    <select id="getExternalIdsToUpdate" resultType="String">
+        select distinct(external_id)
+        from normalized_observations no
+        where not exists(select 1 from kontur_events ke where ke.observation_id = no.observation_id)
+    </select>
+
+    <select id="getObservationIdsByExternalId" resultType="java.util.UUID">
+        select distinct(observation_id)
+        from normalized_observations
+        where external_id = #{externalId}
+    </select>
+
+    <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.dto.NormalizedObservationsDto">
+        <result property="observationId" column="observation_id"/>
+        <result property="externalId" column="external_id"/>
+        <result property="provider" column="provider"/>
+        <result property="point" column="point"/>
+        <result property="geometries" column="geometries"/>
+        <result property="eventSeverity" column="event_severity"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="type" column="type"/>
+        <result property="cost" column="cost"/>
+        <result property="region" column="region"/>
+        <result property="loadedAt" column="loaded_at"/>
+        <result property="sourceUri" column="source_uri"/>
+    </resultMap>
 </mapper>

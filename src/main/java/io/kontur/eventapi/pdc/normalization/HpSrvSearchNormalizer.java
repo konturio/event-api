@@ -25,6 +25,7 @@ public class HpSrvSearchNormalizer extends Normalizer {
     public NormalizedObservationsDto normalize(EventDataLakeDto dataLakeDto) {
         NormalizedObservationsDto normalizedDto = new NormalizedObservationsDto();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
+        normalizedDto.setExternalId(dataLakeDto.getExternalId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
         normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
 //                normalizedDto.setEventSeverity();  TODO

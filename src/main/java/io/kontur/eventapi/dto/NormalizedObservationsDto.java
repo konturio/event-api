@@ -7,13 +7,14 @@ import java.util.UUID;
 public class NormalizedObservationsDto {
 
     private UUID observationId;
+    private String externalId;
     private String provider;
     private String point;
     private String geometries;
+    private String eventSeverity;
     private String name;
     private String description;
     private String type;
-    private String eventSeverity;
     private BigDecimal cost;
     private String region;
     private OffsetDateTime loadedAt;
@@ -25,6 +26,14 @@ public class NormalizedObservationsDto {
 
     public void setObservationId(UUID observationId) {
         this.observationId = observationId;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public String getProvider() {
