@@ -42,6 +42,7 @@ public class HpSrvMagsNormalizer extends Normalizer {
             normalizedDto.setName(readString(props, "hazard.hazardName"));
             normalizedDto.setEpisodeDescription(convertDescription(props));
             normalizedDto.setType(readString(props, "hazard.hazardType.typeId"));
+            normalizedDto.setActive(readBoolean(props, "isActive"));
 
             normalizedDto.setStartedAt(readDateTime(props, "hazard.startDate"));
             normalizedDto.setEndedAt(readDateTime(props, "hazard.endDate"));
@@ -62,8 +63,7 @@ public class HpSrvMagsNormalizer extends Normalizer {
             Map<String, Object> map = new HashMap<>();
 
             map.put("description", convertDescription(props));
-//            map.put("startedAt", readDateTime(props, "hazard.startDate"));
-//            map.put("endedAt", readDateTime(props, "hazard.endDate"));
+            map.put("active", readBoolean(props, "isActive"));
             map.put("updatedAt", readDateTime(props, "updateDate"));
 
             features.add(new Feature(feature.getGeometry(), map));

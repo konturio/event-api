@@ -117,6 +117,7 @@ public class FeedCompositionJob implements Runnable {
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
         feedEpisode.setType(observation.getType());
+        feedEpisode.setActive(observation.getActive());
         feedEpisode.setSeverity(observation.getEventSeverity());
         feedEpisode.setStartedAt(observation.getStartedAt());
         feedEpisode.setEndedAt(observation.getEndedAt());

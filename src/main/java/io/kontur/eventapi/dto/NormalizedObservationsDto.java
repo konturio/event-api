@@ -16,6 +16,7 @@ public class NormalizedObservationsDto {
     private String description;
     private String episodeDescription;
     private String type;
+    private Boolean active;
     private BigDecimal cost;
     private String region;
     private OffsetDateTime loadedAt;
@@ -94,6 +95,14 @@ public class NormalizedObservationsDto {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public String getEventSeverity() {

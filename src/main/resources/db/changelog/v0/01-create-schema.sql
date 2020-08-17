@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS normalized_observations
     description         text,
     episode_description text,
     type                text,
+    active              boolean,
     cost                numeric,  -- EM-DAT
     region              text,     -- EM-DAT
     loaded_at           timestamptz,

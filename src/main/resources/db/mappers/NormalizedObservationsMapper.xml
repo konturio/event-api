@@ -19,6 +19,7 @@
             description,
             episode_description,
             type,
+            active,
             cost,
             region,
             loaded_at,
@@ -41,6 +42,7 @@
             #{description},
             #{episodeDescription},
             #{type},
+            #{active},
             #{cost},
             #{region},
             #{loadedAt},
@@ -83,6 +85,7 @@
         <result property="description" column="description"/>
         <result property="episodeDescription" column="episode_description"/>
         <result property="type" column="type"/>
+        <result property="active" column="active"/>
         <result property="cost" column="cost"/>
         <result property="region" column="region"/>
         <result property="loadedAt" column="loaded_at"/>

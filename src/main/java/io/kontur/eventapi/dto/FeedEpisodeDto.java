@@ -9,6 +9,7 @@ public class FeedEpisodeDto {
     private String name;
     private String description;
     private String type;
+    private Boolean active;
     private String severity;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
@@ -37,6 +38,14 @@ public class FeedEpisodeDto {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public String getSeverity() {
