@@ -17,10 +17,14 @@
             event_severity,
             name,
             description,
+            episode_description,
             type,
             cost,
             region,
             loaded_at,
+            started_at,
+            ended_at,
+            updated_at,
             source_uri
         ) VALUES (
             #{observationId},
@@ -35,10 +39,14 @@
             #{eventSeverity},
             #{name},
             #{description},
+            #{episodeDescription},
             #{type},
             #{cost},
             #{region},
             #{loadedAt},
+            #{startedAt},
+            #{endedAt},
+            #{updatedAt},
             #{sourceUri}
         )
     </insert>
@@ -53,7 +61,7 @@
         select *
         from normalized_observations
         where external_id = #{externalId}
-        order by loaded_at <!-- TODO use updatedAt for sorting? -->
+        order by updated_at
     </select>
 
     <select id="getObservations" resultMap="normalizedObservationsDtoMap">
@@ -73,10 +81,14 @@
         <result property="eventSeverity" column="event_severity"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
+        <result property="episodeDescription" column="episode_description"/>
         <result property="type" column="type"/>
         <result property="cost" column="cost"/>
         <result property="region" column="region"/>
         <result property="loadedAt" column="loaded_at"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="endedAt" column="ended_at"/>
+        <result property="updatedAt" column="updated_at"/>
         <result property="sourceUri" column="source_uri"/>
     </resultMap>
 </mapper>

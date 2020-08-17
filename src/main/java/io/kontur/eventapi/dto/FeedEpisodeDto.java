@@ -10,7 +10,9 @@ public class FeedEpisodeDto {
     private String description;
     private String type;
     private String severity;
-    private OffsetDateTime loadedAt;
+    private OffsetDateTime startedAt;
+    private OffsetDateTime endedAt;
+    private OffsetDateTime updatedAt;
     private FeatureCollection geometries;
 
     public String getName() {
@@ -45,12 +47,28 @@ public class FeedEpisodeDto {
         this.severity = severity;
     }
 
-    public OffsetDateTime getLoadedAt() {
-        return loadedAt;
+    public OffsetDateTime getStartedAt() {
+        return startedAt;
     }
 
-    public void setLoadedAt(OffsetDateTime loadedAt) {
-        this.loadedAt = loadedAt;
+    public void setStartedAt(OffsetDateTime startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public OffsetDateTime getEndedAt() {
+        return endedAt;
+    }
+
+    public void setEndedAt(OffsetDateTime endedAt) {
+        this.endedAt = endedAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public FeatureCollection getGeometries() {

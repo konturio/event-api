@@ -1,7 +1,5 @@
 package io.kontur.eventapi.pdc.normalization;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.dto.EventDataLakeDto;
 import io.kontur.eventapi.dto.NormalizedObservationsDto;
 import io.kontur.eventapi.normalization.Normalizer;
@@ -10,12 +8,15 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
+import java.time.OffsetDateTime;
 import java.util.*;
+
+import static io.kontur.eventapi.pdc.converter.PdcEventDataLakeConverter.magsDateTimeFormatter;
+import static io.kontur.eventapi.util.JsonUtil.readJson;
+import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class HpSrvMagsNormalizer extends Normalizer {
-
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public boolean isApplicable(EventDataLakeDto dataLakeDto) {
@@ -29,38 +30,57 @@ public class HpSrvMagsNormalizer extends Normalizer {
         normalizedDto.setExternalId(dataLakeDto.getExternalId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
         normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
-        try {
-            FeatureCollection fc = mapper.readValue(dataLakeDto.getData(), FeatureCollection.class);
-            normalizedDto.setGeometries(convertGeometries(fc).toString());
+        FeatureCollection fc = readJson(dataLakeDto.getData(), FeatureCollection.class);
 
-            if (fc.getFeatures() != null && fc.getFeatures().length > 0) {
-                Map<String, Object> props = fc.getFeatures()[0].getProperties();
-                normalizedDto.setName(readString(props, "hazard.hazardName"));
-                normalizedDto.setDescription(readString(props, "title"));
-                normalizedDto.setType(readString(props, "hazard.hazardType.typeId"));
-//                normalizedDto.setEventSeverity();  TODO
-                normalizedDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
-                        readDouble(props, "hazard.latitude")));
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        if (fc.getFeatures() != null && fc.getFeatures().length > 0) {
+            List<Feature> features = Arrays.asList(fc.getFeatures());
+            features.sort(Comparator.comparing(f -> readDateTime(f.getProperties(), "updateDate")));
+
+            normalizedDto.setGeometries(writeJson(convertGeometries(features)));
+
+            Map<String, Object> props = features.get(features.size() - 1).getProperties(); //take last updated feature
+            normalizedDto.setName(readString(props, "hazard.hazardName"));
+            normalizedDto.setEpisodeDescription(convertDescription(props));
+            normalizedDto.setType(readString(props, "hazard.hazardType.typeId"));
+
+            normalizedDto.setStartedAt(readDateTime(props, "hazard.startDate"));
+            normalizedDto.setEndedAt(readDateTime(props, "hazard.endDate"));
+            normalizedDto.setUpdatedAt(readDateTime(props, "updateDate"));
+
+            normalizedDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
+                    readDouble(props, "hazard.latitude")));
         }
 
         return normalizedDto;
     }
 
-    private FeatureCollection convertGeometries(FeatureCollection input) {
-        List<Feature> features = new ArrayList<>(input.getFeatures().length);
+    private FeatureCollection convertGeometries(List<Feature> input) {
+        List<Feature> features = new ArrayList<>(input.size());
 
-        Arrays.stream(input.getFeatures())
-                .forEach(feature -> {
-                    Map<String, Object> props = feature.getProperties();
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("description", props.get("title"));
-                    //map.put("severity", ) TODO add severity
-                    features.add(new Feature(feature.getGeometry(), map));
-                });
+        input.forEach(feature -> {
+            Map<String, Object> props = feature.getProperties();
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("description", convertDescription(props));
+//            map.put("startedAt", readDateTime(props, "hazard.startDate"));
+//            map.put("endedAt", readDateTime(props, "hazard.endDate"));
+            map.put("updatedAt", readDateTime(props, "updateDate"));
+
+            features.add(new Feature(feature.getGeometry(), map));
+        });
 
         return new FeatureCollection(features.toArray(new Feature[0]));
+    }
+
+    private String convertDescription(Map<String, Object> props) {
+        String commentText = readString(props, "hazard.commentText");
+        commentText = commentText != null ? " | " + commentText : "";
+        return readString(props, "title") + commentText;
+    }
+
+    @Override
+    protected OffsetDateTime readDateTime(Map<String, Object> map, String key) {
+        String dateTime = readString(map, key);
+        return dateTime == null ? null : OffsetDateTime.parse(dateTime, magsDateTimeFormatter);
     }
 }

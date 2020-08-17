@@ -108,10 +108,14 @@ public class HpSrvSearchJob implements Runnable {
             }
 
             String eventId = eventsWithoutAreas.get(i);
-            JsonNode json = obtainMagsFeatureCollection(eventId);
-            if (!json.isEmpty() && !json.get("features").isEmpty()) {
-                EventDataLakeDto magDto = PdcEventDataLakeConverter.convertMagData(json, eventId);
-                eventDataLakeDao.storeEventData(magDto);
+            try {
+                JsonNode json = obtainMagsFeatureCollection(eventId);
+                if (!json.isEmpty() && !json.get("features").isEmpty()) {
+                    EventDataLakeDto magDto = PdcEventDataLakeConverter.convertMagData(json, eventId);
+                    eventDataLakeDao.storeEventData(magDto);
+                }
+            } catch (Exception e) {
+                LOG.warn("Exception during hazard mag processing. Hazard Id = '{}'", eventId, e);
             }
         }
     }

@@ -15,19 +15,23 @@ CREATE TABLE IF NOT EXISTS data_lake
 
 CREATE TABLE IF NOT EXISTS normalized_observations
 (
-    observation_id uuid unique references data_lake (observation_id),
-    external_id    text,
-    provider       text,
-    point          geometry, -- centroid
-    geometries     jsonb,    -- featurecollection with area geometry:
-    event_severity text,
-    name           text,
-    description    text,
-    type           text,
-    cost           numeric,  -- EM-DAT
-    region         text,     -- EM-DAT
-    loaded_at      timestamptz,
-    source_uri     text
+    observation_id      uuid unique references data_lake (observation_id),
+    external_id         text,
+    provider            text,
+    point               geometry, -- centroid
+    geometries          jsonb,    -- featurecollection with area geometry:
+    event_severity      text,
+    name                text,
+    description         text,
+    episode_description text,
+    type                text,
+    cost                numeric,  -- EM-DAT
+    region              text,     -- EM-DAT
+    loaded_at           timestamptz,
+    started_at          timestamptz,
+    ended_at            timestamptz,
+    updated_at          timestamptz,
+    source_uri          text
 );
 
 CREATE INDEX ON normalized_observations (external_id);
@@ -56,9 +60,11 @@ CREATE TABLE IF NOT EXISTS feed_data
     version      bigint,
     name         text,
     description  text,
-    observations jsonb, -- array of observations as json
-    -- select to_json(r.*) from (select * from observations where ... order by ts);
-    episodes     jsonb, -- array of episodes as json
+    started_at   timestamptz,
+    ended_at     timestamptz,
+    updated_at   timestamptz,
+    observations jsonb,
+    episodes     jsonb,
 
     UNIQUE (event_id, feed_id, version)
 );

@@ -4,6 +4,7 @@ import io.kontur.eventapi.dto.FeedDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public interface FeedMapper {
 
     int insertFeedData(
             UUID eventId, UUID feedId, Long version, String name, String description,
+            OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt,
             @Param("observations") String observations, @Param("episodes") String episodes);
 
 }

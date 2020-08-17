@@ -14,10 +14,14 @@ public class NormalizedObservationsDto {
     private String eventSeverity;
     private String name;
     private String description;
+    private String episodeDescription;
     private String type;
     private BigDecimal cost;
     private String region;
     private OffsetDateTime loadedAt;
+    private OffsetDateTime startedAt;
+    private OffsetDateTime endedAt;
+    private OffsetDateTime updatedAt;
     private String sourceUri;
 
     public UUID getObservationId() {
@@ -76,6 +80,14 @@ public class NormalizedObservationsDto {
         this.description = description;
     }
 
+    public String getEpisodeDescription() {
+        return episodeDescription;
+    }
+
+    public void setEpisodeDescription(String episodeDescription) {
+        this.episodeDescription = episodeDescription;
+    }
+
     public String getType() {
         return type;
     }
@@ -114,6 +126,30 @@ public class NormalizedObservationsDto {
 
     public void setLoadedAt(OffsetDateTime loadedAt) {
         this.loadedAt = loadedAt;
+    }
+
+    public OffsetDateTime getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(OffsetDateTime startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public OffsetDateTime getEndedAt() {
+        return endedAt;
+    }
+
+    public void setEndedAt(OffsetDateTime endedAt) {
+        this.endedAt = endedAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getSourceUri() {

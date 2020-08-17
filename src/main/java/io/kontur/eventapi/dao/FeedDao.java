@@ -1,6 +1,5 @@
 package io.kontur.eventapi.dao;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.dto.FeedDataDto;
@@ -9,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class FeedDao {
@@ -28,17 +29,10 @@ public class FeedDao {
     public void insertFeedData(FeedDataDto feedData) {
         String episodesJson = writeJson(feedData.getEpisodes());
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
-                feedData.getName(),
-                feedData.getDescription(), null, episodesJson);
+                feedData.getName(), feedData.getDescription(),
+                feedData.getStartedAt(), feedData.getEndedAt(), feedData.getEndedAt(),
+                null, episodesJson);
 
-    }
-
-    private String writeJson(Object object) { //TODO move to JsonUtil
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

@@ -1,7 +1,5 @@
 package io.kontur.eventapi.feed;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
@@ -9,9 +7,15 @@ import io.kontur.eventapi.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.wololo.geojson.FeatureCollection;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
+
+import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 @Component
 public class FeedCompositionJob implements Runnable {
@@ -44,18 +48,65 @@ public class FeedCompositionJob implements Runnable {
 
     private void createFeedData(KonturEventDto event, FeedDto feed) {
         List<NormalizedObservationsDto> observations = observationsDao.getObservations(event.getObservationIds());
-        observations.sort(Comparator.comparing(NormalizedObservationsDto::getLoadedAt));
+        observations.sort(Comparator.comparing(NormalizedObservationsDto::getUpdatedAt));
 
         FeedDataDto feedDto = new FeedDataDto(event.getEventId(), feed.getFeedId(), event.getVersion());
-        NormalizedObservationsDto initialObservation = observations.get(0);
-        feedDto.setDescription(initialObservation.getDescription());
-        feedDto.setName(initialObservation.getName());
-//        feedDto.setObservations(event.getObservationIds());  TODO
-        observations
-                .forEach(observation -> convertObservation(observation)
-                    .ifPresent(feedDto::addEpisode));
+
+        fillFeedData(feedDto, observations);
+
+        observations.forEach(observation -> convertObservation(observation)
+                .ifPresent(feedDto::addEpisode));
 
         feedDao.insertFeedData(feedDto);
+    }
+
+    private void fillFeedData(FeedDataDto feedDto, List<NormalizedObservationsDto> observations) {
+        boolean isDataFilled = true;
+        ListIterator<NormalizedObservationsDto> iterator = observations.listIterator(observations.size());
+        while (iterator.hasPrevious()) {
+            NormalizedObservationsDto observation = iterator.previous();
+
+            if (StringUtils.isEmpty(feedDto.getDescription())) {
+                if (!StringUtils.isEmpty(observation.getDescription())) {
+                    feedDto.setDescription(observation.getDescription());
+                } else {
+                    isDataFilled = false;
+                }
+            }
+            if (StringUtils.isEmpty(feedDto.getName())) {
+                if (!StringUtils.isEmpty(observation.getName())) {
+                    feedDto.setName(observation.getName());
+                } else {
+                    isDataFilled = false;
+                }
+            }
+            if (feedDto.getStartedAt() == null) {
+                if (observation.getStartedAt() != null) {
+                    feedDto.setStartedAt(observation.getStartedAt());
+                } else {
+                    isDataFilled = false;
+                }
+            }
+            if (feedDto.getEndedAt() == null) {
+                if (observation.getEndedAt() != null) {
+                    feedDto.setEndedAt(observation.getEndedAt());
+                } else {
+                    isDataFilled = false;
+                }
+            }
+            if (feedDto.getUpdatedAt() == null) {
+                if (observation.getUpdatedAt() != null) {
+                    feedDto.setUpdatedAt(observation.getUpdatedAt());
+                } else {
+                    isDataFilled = false;
+                }
+            }
+            //        feedDto.setObservations(event.getObservationIds());  TODO
+
+            if (isDataFilled) {
+                break;
+            }
+        }
     }
 
     private Optional<FeedEpisodeDto> convertObservation(NormalizedObservationsDto observation) {
@@ -64,19 +115,14 @@ public class FeedCompositionJob implements Runnable {
         }
         FeedEpisodeDto feedEpisode = new FeedEpisodeDto();
         feedEpisode.setName(observation.getName());
-        feedEpisode.setDescription(observation.getDescription());
+        feedEpisode.setDescription(observation.getEpisodeDescription());
         feedEpisode.setType(observation.getType());
-        feedEpisode.setSeverity(observation.getEventSeverity()); //TODO event severity?
-        feedEpisode.setLoadedAt(observation.getLoadedAt());
+        feedEpisode.setSeverity(observation.getEventSeverity());
+        feedEpisode.setStartedAt(observation.getStartedAt());
+        feedEpisode.setEndedAt(observation.getEndedAt());
+        feedEpisode.setUpdatedAt(observation.getUpdatedAt());
         feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
         return Optional.of(feedEpisode);
     }
 
-    private <T> T readJson(String json, Class<T> clazz) { //TODO create JsonUtil class
-        try {
-            return new ObjectMapper().readValue(json, clazz);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

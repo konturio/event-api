@@ -1,5 +1,6 @@
 package io.kontur.eventapi.dto;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,9 @@ public class FeedDataDto {
     private Long version;
     private String name;
     private String description;
+    private OffsetDateTime startedAt;
+    private OffsetDateTime endedAt;
+    private OffsetDateTime updatedAt;
     private List<UUID> observations = new ArrayList<>();
     private List<FeedEpisodeDto> episodes = new ArrayList<>();
 
@@ -58,6 +62,30 @@ public class FeedDataDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public OffsetDateTime getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(OffsetDateTime startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public OffsetDateTime getEndedAt() {
+        return endedAt;
+    }
+
+    public void setEndedAt(OffsetDateTime endedAt) {
+        this.endedAt = endedAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public List<UUID> getObservations() {

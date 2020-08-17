@@ -85,6 +85,11 @@
 			<groupId>org.wololo</groupId>
 			<artifactId>jts2geojson</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-modules-java8</artifactId>
+			<version>2.11.0</version>
+		</dependency>
 
 		<!--Test dependencies-->
 		<dependency>

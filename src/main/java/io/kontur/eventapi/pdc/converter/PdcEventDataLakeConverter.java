@@ -21,7 +21,7 @@ public class PdcEventDataLakeConverter {
         EventDataLakeDto eventDataLakeDto = new EventDataLakeDto();
         eventDataLakeDto.setObservationId(UUID.randomUUID());
         eventDataLakeDto.setExternalId(node.get("hazard_ID").asText());
-        eventDataLakeDto.setUpdatedAt(getDateTimeFromNode(node.get("update_Date")));
+        eventDataLakeDto.setUpdatedAt(getDateTimeFromMillis(node.get("update_Date")));
         eventDataLakeDto.setProvider(HP_SRV_SEARCH_PROVIDER);
         eventDataLakeDto.setLoadedAt(OffsetDateTime.now(ZoneOffset.UTC));
         eventDataLakeDto.setData(node.toString());
@@ -34,12 +34,12 @@ public class PdcEventDataLakeConverter {
         eventDataLakeDto.setExternalId(eventId);
         eventDataLakeDto.setProvider(HP_SRV_MAG_PROVIDER);
         eventDataLakeDto.setLoadedAt(OffsetDateTime.now(ZoneOffset.UTC));
+
         eventDataLakeDto.setData(jsonNode.toString());
         return eventDataLakeDto;
     }
 
-    private static OffsetDateTime getDateTimeFromNode(JsonNode node) {
+    private static OffsetDateTime getDateTimeFromMillis(JsonNode node) {
         return OffsetDateTime.ofInstant(Instant.ofEpochMilli(node.asLong()), ZoneOffset.UTC);
     }
-
 }
