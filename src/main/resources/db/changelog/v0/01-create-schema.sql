@@ -52,45 +52,15 @@ CREATE TABLE IF NOT EXISTS feeds
 CREATE TABLE IF NOT EXISTS feed_data
 (
     event_id     uuid,
+    feed_id      uuid,
     version      bigint,
     name         text,
     description  text,
     observations jsonb, -- array of observations as json
     -- select to_json(r.*) from (select * from observations where ... order by ts);
-    episodes     jsonb -- array of episodes as json
-)
+    episodes     jsonb, -- array of episodes as json
 
---
--- CREATE TABLE IF NOT EXISTS combined_events
--- (
---     id             bigint generated always as identity primary key,
---     observation_id uuid unique,
---     type           text not null,
---     name           text,
---     description    text,
---     started_on     timestamptz,
---     ended_on       timestamptz
--- );
---
--- CREATE INDEX ON combined_events (observation_id);
---
--- CREATE TABLE IF NOT EXISTS combined_episodes
--- (
---     id             bigint generated always as identity primary key,
---     event_id       bigint not null references combined_events (id) on delete cascade,
---     observation_id uuid unique,
---     description    text,
---     occurred_on    timestamptz,
---     loaded_on      timestamptz,
---     provider       text
--- );
---
--- CREATE INDEX ON combined_episodes (observation_id);
---
--- CREATE TABLE IF NOT EXISTS combined_areas
--- (
---     id         bigint generated always as identity primary key,
---     episode_id bigint not null references combined_episodes (id) on delete cascade,
---     severity   text   not null,
---     geometry   geometry
--- );
+    UNIQUE (event_id, feed_id, version)
+);
+
+CREATE INDEX ON feed_data (event_id, version);

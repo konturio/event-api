@@ -10,7 +10,7 @@ public class NormalizedObservationsDto {
     private String externalId;
     private String provider;
     private String point;
-    private String geometries;
+    private String geometries; //TODO use FeatureCollection. Convert to string during insert
     private String eventSeverity;
     private String name;
     private String description;

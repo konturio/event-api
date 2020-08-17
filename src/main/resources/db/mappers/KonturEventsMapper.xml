@@ -21,12 +21,24 @@
         LIMIT 1
     </select>
 
-
+    <select id="getNewEventVersionsForFeed" resultMap="konturEventDtoMap">
+        select ke.event_id, ke.version, array_agg(ke.observation_id) as observation_ids
+        from kontur_events ke,
+             feeds f,
+             normalized_observations no
+        where not exists(select 1
+                         from feed_data fd
+                         where fd.event_id = ke.event_id
+                           and fd.version = ke.version)
+          and ke.observation_id = no.observation_id
+          and no.provider = ANY (f.providers)
+          and f.feed_id = #{uuid}
+        group by ke.event_id, ke.version
+    </select>
 
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.dto.KonturEventDto">
         <result property="eventId" column="event_id"/>
         <result property="version" column="version"/>
-        <result property="observationId" column="observation_id"/>
-
+        <result property="observationIds" column="observation_ids" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler"/>
     </resultMap>
 </mapper>

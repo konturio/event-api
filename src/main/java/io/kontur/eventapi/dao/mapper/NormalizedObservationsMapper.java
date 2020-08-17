@@ -13,5 +13,7 @@ public interface NormalizedObservationsMapper {
 
     List<String> getExternalIdsToUpdate();
 
-    List<UUID> getObservationIdsByExternalId(String externalId);
+    List<NormalizedObservationsDto> getObservationsByExternalId(String externalId);
+
+    List<NormalizedObservationsDto> getObservations(List<UUID> observationIds);
 }

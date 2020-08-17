@@ -3,23 +3,24 @@ package io.kontur.eventapi.combination;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dto.KonturEventDto;
+import io.kontur.eventapi.dto.NormalizedObservationsDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
-public class CombinationJob implements Runnable {
+public class EventCombinationJob implements Runnable {
 
-    public static final Logger LOG = LoggerFactory.getLogger(CombinationJob.class);
+    public static final Logger LOG = LoggerFactory.getLogger(EventCombinationJob.class);
     private final NormalizedObservationsDao observationsDao;
     private final KonturEventsDao eventsDao;
 
-    public CombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao) {
+    public EventCombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao) {
         this.observationsDao = observationsDao;
         this.eventsDao = eventsDao;
     }
@@ -38,24 +39,18 @@ public class CombinationJob implements Runnable {
     }
 
     private void processEvent(String externalId) {
-        KonturEventDto newEventVersion = createDummyEventVersion(externalId);
-        List<UUID> observations = observationsDao.getObservationIdsByExternalId(externalId);
-        List<KonturEventDto> events = convertEvents(newEventVersion, observations);
-        eventsDao.insertEventVersion(events);
+        KonturEventDto newEventVersion = createNewEventVersion(externalId);
+        List<UUID> observations = observationsDao.getObservationsByExternalId(externalId)
+                .stream()
+                .map(NormalizedObservationsDto::getObservationId)
+                .collect(toList());
+        newEventVersion.addObservations(observations);
+        eventsDao.insertEventVersion(newEventVersion);
     }
 
-    private KonturEventDto createDummyEventVersion(String externalId) {
+    private KonturEventDto createNewEventVersion(String externalId) {
         return eventsDao.getLatestEventByExternalId(externalId)
                 .map(event -> new KonturEventDto(event.getEventId(), event.getVersion() + 1))
                 .orElseGet(() -> new KonturEventDto(UUID.randomUUID(), 1L));
-    }
-
-    private List<KonturEventDto> convertEvents(KonturEventDto event, List<UUID> observations) {
-        if (observations.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return observations.stream()
-                .map(obs -> new KonturEventDto(event.getEventId(), event.getVersion(), obs))
-                .collect(Collectors.toList());
     }
 }

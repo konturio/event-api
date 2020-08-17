@@ -1,6 +1,7 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.combination.CombinationJob;
+import io.kontur.eventapi.combination.EventCombinationJob;
+import io.kontur.eventapi.feed.FeedCompositionJob;
 import io.kontur.eventapi.normalization.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import org.slf4j.Logger;
@@ -17,23 +18,27 @@ public class WorkerScheduler {
     private final ThreadPoolTaskExecutor taskExecutor;
     private final HpSrvSearchJob hpSrvSearchJob;
     private final NormalizationJob normalizationJob;
-    private final CombinationJob combinationJob;
+    private final EventCombinationJob eventCombinationJob;
+    private final FeedCompositionJob feedCompositionJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
     @Value("${scheduler.normalization.enable}")
     private String normalizationEnabled;
-    @Value("${scheduler.combination.enable}")
-    private String combinationEnabled;
+    @Value("${scheduler.eventCombination.enable}")
+    private String eventCombinationEnabled;
+    @Value("${scheduler.feedComposition.enable}")
+    private String feedCompositionEnabled;
 
     public WorkerScheduler(ThreadPoolTaskExecutor taskExecutor,
                            HpSrvSearchJob hpSrvSearchJob,
                            NormalizationJob normalizationJob,
-                           CombinationJob combinationJob) {
+                           EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob) {
         this.taskExecutor = taskExecutor;
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.normalizationJob = normalizationJob;
-        this.combinationJob = combinationJob;
+        this.eventCombinationJob = eventCombinationJob;
+        this.feedCompositionJob = feedCompositionJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -54,12 +59,21 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.combination.initialDelay}", fixedDelayString = "${scheduler.combination.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedDelayString = "${scheduler.eventCombination.fixedDelay}")
     public void startCombinationJob() {
-        if (Boolean.parseBoolean(combinationEnabled)) {
-            taskExecutor.execute(combinationJob);
+        if (Boolean.parseBoolean(eventCombinationEnabled)) {
+            taskExecutor.execute(eventCombinationJob);
         } else {
             LOG.info("Combination job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
+    public void startFeedCompositionJob() {
+        if (Boolean.parseBoolean(feedCompositionEnabled)) {
+            taskExecutor.execute(feedCompositionJob);
+        } else {
+            LOG.info("Feed Compose job invocation is skipped");
         }
     }
 }

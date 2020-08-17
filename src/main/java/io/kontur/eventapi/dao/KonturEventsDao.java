@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class KonturEventsDao {
@@ -24,8 +25,11 @@ public class KonturEventsDao {
     }
 
     @Transactional
-    public void insertEventVersion(List<KonturEventDto> events) {
-        events.forEach(mapper::insert);
+    public void insertEventVersion(KonturEventDto event) {
+        event.getObservationIds().forEach(obs -> mapper.insert(event.getEventId(), event.getVersion(), obs));
     }
 
+    public List<KonturEventDto> getNewEventVersionsForFeed(UUID feedId) {
+        return mapper.getNewEventVersionsForFeed(feedId);
+    }
 }

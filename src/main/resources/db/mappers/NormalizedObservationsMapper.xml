@@ -49,10 +49,19 @@
         where not exists(select 1 from kontur_events ke where ke.observation_id = no.observation_id)
     </select>
 
-    <select id="getObservationIdsByExternalId" resultType="java.util.UUID">
-        select distinct(observation_id)
+    <select id="getObservationsByExternalId" resultMap="normalizedObservationsDtoMap">
+        select *
         from normalized_observations
         where external_id = #{externalId}
+        order by loaded_at <!-- TODO use updatedAt for sorting? -->
+    </select>
+
+    <select id="getObservations" resultMap="normalizedObservationsDtoMap">
+        select *
+        from normalized_observations
+        <foreach item="obsId" collection="observationIds" separator="," open="where observation_id in (" close=")">
+            #{obsId}
+        </foreach>
     </select>
 
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.dto.NormalizedObservationsDto">
