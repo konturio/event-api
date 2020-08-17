@@ -89,6 +89,8 @@
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-modules-java8</artifactId>
 			<version>2.11.0</version>
+			<type>pom</type>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!--Test dependencies-->
