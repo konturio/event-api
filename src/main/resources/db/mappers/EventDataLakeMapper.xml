@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.EventDataLakeMapper">
+
+    <insert id="create" useGeneratedKeys="false">
+        INSERT INTO data_lake (observation_id, external_id, updated_at, loaded_at, provider, data)
+        VALUES (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data})
+    </insert>
+
+    <select id="getLatestUpdatedEventForProvider" resultType="io.kontur.eventapi.dto.EventDataLakeDto">
+        SELECT observation_id as observationId, external_id as externalId, updated_at as updatedAt, loaded_at as loadedAt, provider, data
+        FROM data_lake
+        WHERE provider = #{provider}
+        ORDER BY updated_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="getPdcHazardsWithoutAreas" resultType="String">
+        SELECT distinct e1.external_id
+        FROM data_lake e1
+        WHERE e1.provider = 'hpSrvSearch'
+          AND NOT EXISTS(
+                select * from data_lake e2 where e1.external_id = e2.external_id and e2.provider = 'hpSrvMag'
+              )
+    </select>
+
+    <select id="getDenormalizedEvents" resultType="io.kontur.eventapi.dto.EventDataLakeDto">
+        SELECT observation_id as observationId, external_id as externalId, updated_at as updatedAt, loaded_at as loadedAt, provider, data
+        FROM data_lake e
+        WHERE NOT EXISTS(
+                select * from normalized_observations nr where e.observation_id = nr.observation_id
+            )
+    </select>
+</mapper>

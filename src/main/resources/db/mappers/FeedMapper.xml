@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.FeedMapper">
+
+    <select id="getFeeds" resultMap="feedDtoMap">
+        select *
+        from feeds
+    </select>
+
+    <insert id="insertFeedData" useGeneratedKeys="false">
+        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes)
+        values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt}, #{observations}::jsonb, #{episodes}::jsonb)
+    </insert>
+
+    <resultMap id="feedDtoMap" type="io.kontur.eventapi.dto.FeedDto">
+        <result property="feedId" column="feed_id" />
+        <result property="description" column="description"/>
+        <result property="providers" column="providers" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+        <result property="roles" column="roles" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+    </resultMap>
+
+</mapper>

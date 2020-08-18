@@ -1,7 +1,7 @@
 package io.kontur.eventapi.normalization;
 
 import io.kontur.eventapi.dto.EventDataLakeDto;
-import io.kontur.eventapi.dto.NormalizedRecordDto;
+import io.kontur.eventapi.dto.NormalizedObservationsDto;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -12,7 +12,7 @@ public abstract class Normalizer {
 
     public abstract boolean isApplicable(EventDataLakeDto dataLakeDto);
 
-    public abstract NormalizedRecordDto normalize(EventDataLakeDto dataLakeDto);
+    public abstract NormalizedObservationsDto normalize(EventDataLakeDto dataLakeDto);
 
     protected String readString(Map<String, Object> map, String key) {
         Object value = map.get(key);

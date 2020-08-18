@@ -1,101 +1,73 @@
 --liquibase formatted sql
 
 --changeset event-api-migrations:01-create-schema runOnChange:true
-CREATE TABLE IF NOT EXISTS event_data_lake
+CREATE TABLE IF NOT EXISTS data_lake
 (
     observation_id uuid unique,
     external_id    text,
-    created_on     timestamptz,
-    updated_on     timestamptz,
-    loaded_on      timestamptz,
-    provider       varchar(16),
+    updated_at     timestamptz,
+    loaded_at      timestamptz,
+    provider       text,
     data           text,
 
-    CONSTRAINT hazard_episode_number UNIQUE (external_id, provider, updated_on)
+    UNIQUE (external_id, provider, updated_at)
 );
 
-CREATE INDEX ON event_data_lake (observation_id);
-CREATE INDEX ON event_data_lake (provider, updated_on);
-
-
-CREATE TABLE IF NOT EXISTS normalized_records
+CREATE TABLE IF NOT EXISTS normalized_observations
 (
---     HpSrv Hazards
-    observation_id     uuid unique,
-    provider           text,
-    geometry           geometry,
-    loaded_on          timestamptz,
-    app_id             int,
-    autoexpire         bool,
-    category_id        text,
-    charter_uri        text,
-    comment_text       text,
-    created_on         timestamptz,
-    creator            text,
-    ended_on           timestamptz,
-    glide_uri          text,
-    external_id        text,
-    hazard_name        text,
-    last_updated_on    timestamptz,
-    point              geometry,
-    master_incident_id text,
-    message_id         text,
-    org_id             int,
-    severity_id        text,
-    snc_url            text,
-    started_on         timestamptz,
-    status             text,
-    type_id            text,
-    updated_on         timestamptz,
-    update_user        text,
-    product_total      text,
-    uuid               uuid,
-    in_dashboard       text,
-    areabrief_url      text,
-    description        text,
-
---     HpSrv Mags
-    mag_id             int,
-    mag_uuid           uuid,
-    mag_updated_on     timestamptz,
-    mag_created_on     timestamptz,
-    title              text,
-    mag_type           text,
-    is_active          bool
+    observation_id      uuid unique references data_lake (observation_id),
+    external_id         text,
+    provider            text,
+    point               geometry, -- centroid
+    geometries          jsonb,    -- featurecollection with area geometry:
+    event_severity      text,
+    name                text,
+    description         text,
+    episode_description text,
+    type                text,
+    active              boolean,
+    cost                numeric,  -- EM-DAT
+    region              text,     -- EM-DAT
+    loaded_at           timestamptz,
+    started_at          timestamptz,
+    ended_at            timestamptz,
+    updated_at          timestamptz,
+    source_uri          text
 );
 
-CREATE INDEX ON normalized_records (external_id, updated_on);
+CREATE INDEX ON normalized_observations (external_id);
 
-CREATE TABLE IF NOT EXISTS combined_events
+CREATE TABLE IF NOT EXISTS kontur_events
 (
-    id             bigint generated always as identity primary key,
-    observation_id uuid unique,
-    type           text not null,
-    name           text,
-    description    text,
-    started_on     timestamptz,
-    ended_on       timestamptz
+    event_id       uuid,
+    version        bigint,
+    observation_id uuid references normalized_observations (observation_id),
+
+    UNIQUE (event_id, version, observation_id)
 );
 
-CREATE INDEX ON combined_events (observation_id);
-
-CREATE TABLE IF NOT EXISTS combined_episodes
+CREATE TABLE IF NOT EXISTS feeds
 (
-    id             bigint generated always as identity primary key,
-    event_id       bigint not null references combined_events (id) on delete cascade,
-    observation_id uuid unique,
-    description    text,
-    occurred_on    timestamptz,
-    loaded_on      timestamptz,
-    provider       text
+    feed_id     uuid primary key,
+    description text,
+    providers   text[],
+    roles       text[]
 );
 
-CREATE INDEX ON combined_episodes (observation_id);
-
-CREATE TABLE IF NOT EXISTS combined_areas
+CREATE TABLE IF NOT EXISTS feed_data
 (
-    id         bigint generated always as identity primary key,
-    episode_id bigint not null references combined_episodes (id) on delete cascade,
-    severity   text   not null,
-    geometry   geometry
+    event_id     uuid,
+    feed_id      uuid,
+    version      bigint,
+    name         text,
+    description  text,
+    started_at   timestamptz,
+    ended_at     timestamptz,
+    updated_at   timestamptz,
+    observations jsonb,
+    episodes     jsonb,
+
+    UNIQUE (event_id, feed_id, version)
 );
+
+CREATE INDEX ON feed_data (event_id, version);

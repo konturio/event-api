@@ -13,13 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -63,7 +59,7 @@ public class HpSrvSearchJob implements Runnable {
         searchBody.getPagination().setPageSize(20);
 
         eventDataLakeDao.getLatestUpdatedHazard(HP_SRV_SEARCH_PROVIDER)
-                .map(EventDataLakeDto::getUpdatedOn)
+                .map(EventDataLakeDto::getUpdatedAt)
                 .ifPresent(lastUpdateTime -> searchBody.addAndRestriction("GREATER_THAN", "updateDate",
                         convertOffsetDateTimeToEpochMillis(lastUpdateTime)));
 
@@ -96,7 +92,7 @@ public class HpSrvSearchJob implements Runnable {
     private JsonNode obtainHazardsInSchedule(HpSrvSearchBody searchBody) {
         try {
             bucket.asScheduler().consume(1);
-            return hpSrvClient.getAuthorizationTokens(searchBody);
+            return hpSrvClient.searchHazards(searchBody);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -112,25 +108,19 @@ public class HpSrvSearchJob implements Runnable {
             }
 
             String eventId = eventsWithoutAreas.get(i);
-            List<Feature> mags = obtainMagsFeatures(eventId);
-            for (Feature mag : mags) {
-                EventDataLakeDto magDto = PdcEventDataLakeConverter.convertMagData(mag);
-                eventDataLakeDao.storeEventData(magDto);
+            try {
+                JsonNode json = obtainMagsFeatureCollection(eventId);
+                if (!json.isEmpty() && !json.get("features").isEmpty()) {
+                    EventDataLakeDto magDto = PdcEventDataLakeConverter.convertMagData(json, eventId);
+                    eventDataLakeDao.storeEventData(magDto);
+                }
+            } catch (Exception e) {
+                LOG.warn("Exception during hazard mag processing. Hazard Id = '{}'", eventId, e);
             }
         }
     }
 
-    private List<Feature> obtainMagsFeatures(String eventId) {
-        FeatureCollection fc = obtainMagsFeatureCollection(eventId);
-        if (fc == null) {
-            LOG.info("No mags were found for Hazard with id: {}", eventId);
-            return Collections.emptyList();
-        }
-
-        return Arrays.asList(fc.getFeatures());
-    }
-
-    private FeatureCollection obtainMagsFeatureCollection(String eventId) {
+    private JsonNode obtainMagsFeatureCollection(String eventId) {
         try {
             return obtainMagsInSchedule(eventId);
         } catch (RetryableException e) {
@@ -145,7 +135,7 @@ public class HpSrvSearchJob implements Runnable {
         }
     }
 
-    private FeatureCollection obtainMagsInSchedule(String eventId) {
+    private JsonNode obtainMagsInSchedule(String eventId) {
         try {
             bucket.asScheduler().consume(1);
             return hpSrvClient.getMags(eventId);

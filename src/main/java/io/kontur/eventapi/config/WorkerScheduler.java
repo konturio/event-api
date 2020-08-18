@@ -1,8 +1,9 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.normalization.NormalizationJob;
+import io.kontur.eventapi.job.EventCombinationJob;
+import io.kontur.eventapi.job.FeedCompositionJob;
+import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
-import io.kontur.eventapi.recombination.RecombinationJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,23 +18,27 @@ public class WorkerScheduler {
     private final ThreadPoolTaskExecutor taskExecutor;
     private final HpSrvSearchJob hpSrvSearchJob;
     private final NormalizationJob normalizationJob;
-    private final RecombinationJob recombinationJob;
+    private final EventCombinationJob eventCombinationJob;
+    private final FeedCompositionJob feedCompositionJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
     @Value("${scheduler.normalization.enable}")
     private String normalizationEnabled;
-    @Value("${scheduler.recombination.enable}")
-    private String recombinationEnabled;
+    @Value("${scheduler.eventCombination.enable}")
+    private String eventCombinationEnabled;
+    @Value("${scheduler.feedComposition.enable}")
+    private String feedCompositionEnabled;
 
     public WorkerScheduler(ThreadPoolTaskExecutor taskExecutor,
                            HpSrvSearchJob hpSrvSearchJob,
                            NormalizationJob normalizationJob,
-                           RecombinationJob recombinationJob) {
+                           EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob) {
         this.taskExecutor = taskExecutor;
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.normalizationJob = normalizationJob;
-        this.recombinationJob = recombinationJob;
+        this.eventCombinationJob = eventCombinationJob;
+        this.feedCompositionJob = feedCompositionJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -54,12 +59,21 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.recombination.initialDelay}", fixedDelayString = "${scheduler.recombination.fixedDelay}")
-    public void startRecombinationJob() {
-        if (Boolean.parseBoolean(recombinationEnabled)) {
-            taskExecutor.execute(recombinationJob);
+    @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedDelayString = "${scheduler.eventCombination.fixedDelay}")
+    public void startCombinationJob() {
+        if (Boolean.parseBoolean(eventCombinationEnabled)) {
+            taskExecutor.execute(eventCombinationJob);
         } else {
-            LOG.info("Recombination job invocation is skipped");
+            LOG.info("Combination job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
+    public void startFeedCompositionJob() {
+        if (Boolean.parseBoolean(feedCompositionEnabled)) {
+            taskExecutor.execute(feedCompositionJob);
+        } else {
+            LOG.info("Feed Compose job invocation is skipped");
         }
     }
 }

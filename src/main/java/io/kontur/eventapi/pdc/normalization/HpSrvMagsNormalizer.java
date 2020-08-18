@@ -1,29 +1,22 @@
 package io.kontur.eventapi.pdc.normalization;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.dto.EventDataLakeDto;
-import io.kontur.eventapi.dto.NormalizedRecordDto;
+import io.kontur.eventapi.dto.NormalizedObservationsDto;
 import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.WKTWriter;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
-import org.wololo.jts2geojson.GeoJSONReader;
+import org.wololo.geojson.FeatureCollection;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static io.kontur.eventapi.pdc.converter.PdcEventDataLakeConverter.magsDateTimeFormatter;
+import static io.kontur.eventapi.util.JsonUtil.readJson;
+import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class HpSrvMagsNormalizer extends Normalizer {
-
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final GeoJSONReader geoJSONReader = new GeoJSONReader();
-    private final WKTWriter wktWriter = new WKTWriter();
 
     @Override
     public boolean isApplicable(EventDataLakeDto dataLakeDto) {
@@ -31,55 +24,58 @@ public class HpSrvMagsNormalizer extends Normalizer {
     }
 
     @Override
-    public NormalizedRecordDto normalize(EventDataLakeDto dataLakeDto) {
-        NormalizedRecordDto recordDto = new NormalizedRecordDto();
+    public NormalizedObservationsDto normalize(EventDataLakeDto dataLakeDto) {
+        NormalizedObservationsDto normalizedDto = new NormalizedObservationsDto();
+        normalizedDto.setObservationId(dataLakeDto.getObservationId());
+        normalizedDto.setExternalId(dataLakeDto.getExternalId());
+        normalizedDto.setProvider(dataLakeDto.getProvider());
+        normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
+        FeatureCollection fc = readJson(dataLakeDto.getData(), FeatureCollection.class);
 
-        recordDto.setObservationId(dataLakeDto.getObservationId());
-        recordDto.setProvider(dataLakeDto.getProvider());
-        recordDto.setLoadedOn(dataLakeDto.getLoadedOn());
+        if (fc.getFeatures() != null && fc.getFeatures().length > 0) {
+            List<Feature> features = Arrays.asList(fc.getFeatures());
+            features.sort(Comparator.comparing(f -> readDateTime(f.getProperties(), "updateDate")));
 
-        try {
-            Feature feature = mapper.readValue(dataLakeDto.getData(), Feature.class);
+            normalizedDto.setGeometries(writeJson(convertGeometries(features)));
 
-            Geometry geometry = geoJSONReader.read(feature.getGeometry());
-            recordDto.setWktGeometry(wktWriter.write(geometry));
+            Map<String, Object> props = features.get(features.size() - 1).getProperties(); //take last updated feature
+            normalizedDto.setName(readString(props, "hazard.hazardName"));
+            normalizedDto.setEpisodeDescription(convertDescription(props));
+            normalizedDto.setType(readString(props, "hazard.hazardType.typeId"));
+            normalizedDto.setActive(readBoolean(props, "isActive"));
 
-            Map<String, Object> props = feature.getProperties();
+            normalizedDto.setStartedAt(readDateTime(props, "hazard.startDate"));
+            normalizedDto.setEndedAt(readDateTime(props, "hazard.endDate"));
+            normalizedDto.setUpdatedAt(readDateTime(props, "updateDate"));
 
-            recordDto.setMagId(readInt(props, "magId"));
-            String uuid = readString(props, "uuid");
-            if (uuid != null) {
-                recordDto.setMagUuid(UUID.fromString(uuid));
-            }
-            recordDto.setTitle(readString(props, "title"));
-            recordDto.setMagType(readString(props, "magType"));
-            recordDto.setCreator(readString(props, "creator"));
-            recordDto.setActive(readBoolean(props, "isActive"));
-            recordDto.setTypeId(readString(props, "hazard.hazardType.typeId"));
-            recordDto.setExternalId(readString(props, "hazard.hazardId"));
-            recordDto.setHazardName(readString(props, "hazard.hazardName"));
-            recordDto.setCommentText(readString(props, "hazard.commentText"));
-            recordDto.setCreatedOn(readDateTime(props, "hazard.createDate"));
-            recordDto.setStartedOn(readDateTime(props, "hazard.startDate"));
-            recordDto.setEndedOn(readDateTime(props, "hazard.endDate"));
-            recordDto.setLastUpdatedOn(readDateTime(props, "createDate"));
-            recordDto.setUpdatedOn(readDateTime(props, "updateDate"));
-            recordDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
+            normalizedDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
                     readDouble(props, "hazard.latitude")));
-            recordDto.setOrgId(readInt(props, "hazard.orgId"));
-            recordDto.setAutoexpire("Y".equalsIgnoreCase(readString(props, "hazard.autoexpire")));
-            recordDto.setMessageId(readString(props, "hazard.messageId"));
-            recordDto.setMasterIncidentId(readString(props, "hazard.masterIncidentId"));
-            recordDto.setStatus(readString(props, "hazard.status"));
-            String hazardUuid = readString(props, "hazard.uuid");
-            if (hazardUuid != null) {
-                recordDto.setUuid(UUID.fromString(hazardUuid));
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
 
-        return recordDto;
+        return normalizedDto;
+    }
+
+    private FeatureCollection convertGeometries(List<Feature> input) {
+        List<Feature> features = new ArrayList<>(input.size());
+
+        input.forEach(feature -> {
+            Map<String, Object> props = feature.getProperties();
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("description", convertDescription(props));
+            map.put("active", readBoolean(props, "isActive"));
+            map.put("updatedAt", readDateTime(props, "updateDate"));
+
+            features.add(new Feature(feature.getGeometry(), map));
+        });
+
+        return new FeatureCollection(features.toArray(new Feature[0]));
+    }
+
+    private String convertDescription(Map<String, Object> props) {
+        String commentText = readString(props, "hazard.commentText");
+        commentText = commentText != null ? " | " + commentText : "";
+        return readString(props, "title") + commentText;
     }
 
     @Override

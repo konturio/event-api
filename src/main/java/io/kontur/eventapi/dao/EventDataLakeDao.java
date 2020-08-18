@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class EventDataLakeDao {
+public class EventDataLakeDao { //TODO rename to DataLakeDao
 
     private final EventDataLakeMapper mapper;
 

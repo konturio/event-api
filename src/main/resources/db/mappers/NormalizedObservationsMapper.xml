@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.NormalizedObservationsMapper">
+    <insert id="insert">
+        INSERT INTO normalized_observations (
+            observation_id,
+            provider,
+            external_id,
+            <if test='point != null'>
+                point,
+            </if>
+            <if test='geometries != null'>
+                geometries,
+            </if>
+            event_severity,
+            name,
+            description,
+            episode_description,
+            type,
+            active,
+            cost,
+            region,
+            loaded_at,
+            started_at,
+            ended_at,
+            updated_at,
+            source_uri
+        ) VALUES (
+            #{observationId},
+            #{provider},
+            #{externalId},
+            <if test='point != null'>
+                'SRID=4326;${point}'::geometry,
+            </if>
+            <if test='geometries != null'>
+                #{geometries}::jsonb,
+            </if>
+            #{eventSeverity},
+            #{name},
+            #{description},
+            #{episodeDescription},
+            #{type},
+            #{active},
+            #{cost},
+            #{region},
+            #{loadedAt},
+            #{startedAt},
+            #{endedAt},
+            #{updatedAt},
+            #{sourceUri}
+        )
+    </insert>
+
+    <select id="getExternalIdsToUpdate" resultType="String">
+        select distinct(external_id)
+        from normalized_observations no
+        where not exists(select 1 from kontur_events ke where ke.observation_id = no.observation_id)
+    </select>
+
+    <select id="getObservationsByExternalId" resultMap="normalizedObservationsDtoMap">
+        select *
+        from normalized_observations
+        where external_id = #{externalId}
+        order by updated_at
+    </select>
+
+    <select id="getObservations" resultMap="normalizedObservationsDtoMap">
+        select *
+        from normalized_observations
+        <foreach item="obsId" collection="observationIds" separator="," open="where observation_id in (" close=")">
+            #{obsId}
+        </foreach>
+    </select>
+
+    <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.dto.NormalizedObservationsDto">
+        <result property="observationId" column="observation_id"/>
+        <result property="externalId" column="external_id"/>
+        <result property="provider" column="provider"/>
+        <result property="point" column="point"/>
+        <result property="geometries" column="geometries"/>
+        <result property="eventSeverity" column="event_severity"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="episodeDescription" column="episode_description"/>
+        <result property="type" column="type"/>
+        <result property="active" column="active"/>
+        <result property="cost" column="cost"/>
+        <result property="region" column="region"/>
+        <result property="loadedAt" column="loaded_at"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="endedAt" column="ended_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="sourceUri" column="source_uri"/>
+    </resultMap>
+</mapper>
