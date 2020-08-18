@@ -1,4 +1,4 @@
-package io.kontur.eventapi.combination;
+package io.kontur.eventapi.job;
 
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;

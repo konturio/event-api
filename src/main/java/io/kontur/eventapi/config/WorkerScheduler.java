@@ -1,8 +1,8 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.combination.EventCombinationJob;
-import io.kontur.eventapi.feed.FeedCompositionJob;
-import io.kontur.eventapi.normalization.NormalizationJob;
+import io.kontur.eventapi.job.EventCombinationJob;
+import io.kontur.eventapi.job.FeedCompositionJob;
+import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

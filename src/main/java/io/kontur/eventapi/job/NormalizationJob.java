@@ -1,9 +1,10 @@
-package io.kontur.eventapi.normalization;
+package io.kontur.eventapi.job;
 
 import io.kontur.eventapi.dao.EventDataLakeDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dto.EventDataLakeDto;
 import io.kontur.eventapi.dto.NormalizedObservationsDto;
+import io.kontur.eventapi.normalization.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

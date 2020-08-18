@@ -1,4 +1,4 @@
-package io.kontur.eventapi.feed;
+package io.kontur.eventapi.job;
 
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
