@@ -43,3 +43,7 @@ feign:
 mybatis:
   mapper-locations: classpath:db/mappers/*Mapper.xml
   type-handlers-package: io.kontur.eventapi.typehandler
+
+springdoc:
+  swagger-ui:
+    path: 'doc'

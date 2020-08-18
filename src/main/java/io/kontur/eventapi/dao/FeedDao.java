@@ -2,12 +2,16 @@ package io.kontur.eventapi.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
+import io.kontur.eventapi.dto.EventType;
 import io.kontur.eventapi.dto.FeedDataDto;
 import io.kontur.eventapi.dto.FeedDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
@@ -32,7 +36,13 @@ public class FeedDao {
                 feedData.getName(), feedData.getDescription(),
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getEndedAt(),
                 null, episodesJson);
+    }
 
+    public List<FeedDataDto> searchForEvents(OffsetDateTime after, OffsetDateTime before, List<BigDecimal> bbox, String geometry,
+                                             BigDecimal distance, EventType type, int offset, int limit) {
+        return mapper.searchForEvents(
+                UUID.fromString("10f240fa-6116-441b-bb68-6649162ca506"), //TODO define UUID from user roles
+                after, offset, limit);
     }
 
 }
