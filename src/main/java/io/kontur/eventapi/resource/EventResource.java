@@ -1,12 +1,9 @@
 package io.kontur.eventapi.resource;
 
-import io.kontur.eventapi.dto.EventType;
 import io.kontur.eventapi.resource.dto.EventDto;
-import io.kontur.eventapi.resource.dto.LocationSearch;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,18 +32,11 @@ public class EventResource {
             @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"1985-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime after,
-            @Parameter(description = "Includes hazards that were updated before this time. A date-time in ISO8601 format (e.g. \"1985-04-12T23:20:50.52Z\")") @RequestParam(value = "before", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                    OffsetDateTime before,
-            @ParameterObject LocationSearch locationSearch,
-            @Parameter(description = "Event type") @RequestParam(required = false)
-                    EventType type,
-            @Parameter(description = "pagination offset", schema = @Schema(allowableValues = {})) @RequestParam(value = "offset", defaultValue = "0")
+            @Parameter(description = "Pagination offset", example = "0", schema = @Schema(allowableValues = {})) @RequestParam(value = "offset", defaultValue = "0")
                     @Min(0) int offset,
-            @Parameter(description = "Number of records on the page. There will be a default to prevent very large queries.", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
+            @Parameter(description = "Number of records on the page. There will be a default to prevent very large queries.", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
                     @Min(1) @Max(1000) int limit
     ) {
-        return eventResourceService.searchEvents(after, before, locationSearch.getBbox(), locationSearch.getGeometry(),
-                locationSearch.getDistance(), type, offset, limit);
+        return eventResourceService.searchEvents(after, offset, limit);
     }
 }
