@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS feeds
 (
     feed_id     uuid primary key,
     description text,
+    alias       text unique,
     providers   text[],
     roles       text[]
 );
@@ -71,3 +72,4 @@ CREATE TABLE IF NOT EXISTS feed_data
 );
 
 CREATE INDEX ON feed_data (event_id, version);
+create index on feed_data (feed_id);

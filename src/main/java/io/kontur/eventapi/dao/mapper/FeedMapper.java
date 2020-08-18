@@ -19,6 +19,6 @@ public interface FeedMapper {
             OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt,
             @Param("observations") String observations, @Param("episodes") String episodes);
 
-    List<FeedDataDto> searchForEvents(UUID feedId, OffsetDateTime after, int offset, int limit);
+    List<FeedDataDto> searchForEvents(String feedAlias, OffsetDateTime after, int offset, int limit);
 
 }

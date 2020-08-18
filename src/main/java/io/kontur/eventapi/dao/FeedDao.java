@@ -34,10 +34,9 @@ public class FeedDao {
                 null, episodesJson);
     }
 
-    public List<FeedDataDto> searchForEvents(OffsetDateTime after, int offset, int limit) {
-        return mapper.searchForEvents(
-                UUID.fromString("10f240fa-6116-441b-bb68-6649162ca506"), //TODO define UUID from user roles
-                after, offset, limit);
+    public List<FeedDataDto> searchForEvents(String feedAlias, OffsetDateTime after, int offset,
+                                             int limit) {
+        return mapper.searchForEvents(feedAlias, after, offset, limit);
     }
 
 }

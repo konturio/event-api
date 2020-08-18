@@ -15,26 +15,32 @@
     </insert>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
+        WITH feed as (
+            SELECT feed_id
+            FROM feeds
+            WHERE alias = #{feedAlias})
         SELECT *
         FROM feed_data fd,
+            feed f,
             (SELECT event_id, max(version) as version
-             FROM feed_data
-             WHERE feed_id = #{feedId}
+             FROM feed_data fd2,
+                 feed f
+             WHERE fd2.feed_id = f.feed_id
              GROUP BY event_id) t
         WHERE fd.event_id = t.event_id
           AND fd.version = t.version
-          AND feed_id = #{feedId}
+          AND fd.feed_id = f.feed_id
           <if test='after != null'>
             AND updated_at > #{after}
           </if>
         ORDER BY updated_at
-        LIMIT #{limit}
-        OFFSET #{offset};
+        LIMIT #{limit} OFFSET #{offset};
     </select>
 
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.dto.FeedDto">
         <result property="feedId" column="feed_id" />
         <result property="description" column="description"/>
+        <result property="alias" column="alias"/>
         <result property="providers" column="providers" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="roles" column="roles" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
     </resultMap>

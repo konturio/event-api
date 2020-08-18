@@ -29,14 +29,16 @@ public class EventResource {
 
     @GetMapping(path = "/", produces = {APPLICATION_JSON_VALUE})
     public List<EventDto> searchEvents(
+            @Parameter(description = "Feed alias") @RequestParam(value = "feed")
+                    String feed,
             @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"1985-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime after,
             @Parameter(description = "Pagination offset", example = "0", schema = @Schema(allowableValues = {})) @RequestParam(value = "offset", defaultValue = "0")
                     @Min(0) int offset,
-            @Parameter(description = "Number of records on the page. There will be a default to prevent very large queries.", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
+            @Parameter(description = "Number of records on the page. Default value is 20.", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
                     @Min(1) @Max(1000) int limit
     ) {
-        return eventResourceService.searchEvents(after, offset, limit);
+        return eventResourceService.searchEvents(feed, after, offset, limit);
     }
 }

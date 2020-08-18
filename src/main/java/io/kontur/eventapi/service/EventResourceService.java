@@ -19,8 +19,8 @@ public class EventResourceService {
         this.feedDao = feedDao;
     }
 
-    public List<EventDto> searchEvents(OffsetDateTime after, int offset, int limit) {
-        List<FeedDataDto> feedDataDtos = feedDao.searchForEvents(after, offset, limit);
+    public List<EventDto> searchEvents(String feedAlias, OffsetDateTime after, int offset, int limit) {
+        List<FeedDataDto> feedDataDtos = feedDao.searchForEvents(feedAlias, after, offset, limit);
 
         return feedDataDtos.stream()
                 .map(EventDtoConverter::convert)
