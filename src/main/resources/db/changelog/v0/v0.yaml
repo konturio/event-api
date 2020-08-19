@@ -3,3 +3,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 01-create-schema.sql
+- include:
+    relativeToChangelogFile: true
+    file: 02-insert-pdc-feed.sql
