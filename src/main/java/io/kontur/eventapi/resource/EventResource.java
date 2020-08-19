@@ -2,6 +2,7 @@ package io.kontur.eventapi.resource;
 
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.service.EventResourceService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +29,7 @@ public class EventResource {
     }
 
     @GetMapping(path = "/", produces = {APPLICATION_JSON_VALUE})
+    @Operation(tags = "Events")
     public List<EventDto> searchEvents(
             @Parameter(description = "Feed alias") @RequestParam(value = "feed")
                     String feed,
