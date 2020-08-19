@@ -7,6 +7,7 @@ public class FeedDto {
 
     private UUID feedId;
     private String description;
+    private String alias;
     private List<String> providers;
     private List<String> roles;
 
@@ -24,6 +25,14 @@ public class FeedDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public List<String> getProviders() {

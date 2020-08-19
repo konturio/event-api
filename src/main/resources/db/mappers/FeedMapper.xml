@@ -14,11 +14,47 @@
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt}, #{observations}::jsonb, #{episodes}::jsonb)
     </insert>
 
+    <select id="searchForEvents" resultMap="feedDataDtoMap">
+        WITH feed as (
+            SELECT feed_id
+            FROM feeds
+            WHERE alias = #{feedAlias})
+        SELECT *
+        FROM feed_data fd,
+            feed f,
+            (SELECT event_id, max(version) as version
+             FROM feed_data fd2,
+                 feed f
+             WHERE fd2.feed_id = f.feed_id
+             GROUP BY event_id) t
+        WHERE fd.event_id = t.event_id
+          AND fd.version = t.version
+          AND fd.feed_id = f.feed_id
+          <if test='after != null'>
+            AND updated_at > #{after}
+          </if>
+        ORDER BY updated_at
+        LIMIT #{limit} OFFSET #{offset};
+    </select>
+
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.dto.FeedDto">
         <result property="feedId" column="feed_id" />
         <result property="description" column="description"/>
+        <result property="alias" column="alias"/>
         <result property="providers" column="providers" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="roles" column="roles" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
     </resultMap>
 
+    <resultMap id="feedDataDtoMap" type="io.kontur.eventapi.dto.FeedDataDto">
+        <result property="eventId" column="event_id" />
+        <result property="feedId" column="feed_id" />
+        <result property="version" column="version" />
+        <result property="name" column="name" />
+        <result property="description" column="description" />
+        <result property="startedAt" column="started_at" />
+        <result property="endedAt" column="ended_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="observations" column="observations" />
+        <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
+    </resultMap>
 </mapper>

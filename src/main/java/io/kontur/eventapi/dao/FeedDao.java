@@ -1,20 +1,20 @@
 package io.kontur.eventapi.dao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.dto.FeedDataDto;
 import io.kontur.eventapi.dto.FeedDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class FeedDao {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final FeedMapper mapper;
 
     @Autowired
@@ -32,7 +32,11 @@ public class FeedDao {
                 feedData.getName(), feedData.getDescription(),
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getEndedAt(),
                 null, episodesJson);
+    }
 
+    public List<FeedDataDto> searchForEvents(String feedAlias, OffsetDateTime after, int offset,
+                                             int limit) {
+        return mapper.searchForEvents(feedAlias, after, offset, limit);
     }
 
 }

@@ -12,7 +12,7 @@ public enum EventType {
     OTHER("other", "OTR");
 
     private final String value;
-    private final String abbreviation;
+    private final String abbreviation;  //TODO remove abbreviation
 
     EventType(String value, String abbreviation) {
         this.value = value;
@@ -24,6 +24,11 @@ public enum EventType {
     }
     public String getAbbreviation() {
         return abbreviation;
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 
     public static EventType fromString(String name) {
