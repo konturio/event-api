@@ -1,12 +1,20 @@
 server:
   port: 8624
 
+auth0:
+  audience: https://test-apps02.konturlabs.com/events/
+
 spring:
   datasource:
     platform: postgres
     url: 'jdbc:postgresql://localhost:5432/postgres'
     username: postgres
     password: postgres
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://konturlabs.us.auth0.com/
 
 pdc:
   host: 'https://testemops.pdc.org'

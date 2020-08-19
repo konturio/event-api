@@ -20,11 +20,19 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 60000
 
+auth0:
+  audience: localhost
+
 spring:
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     platform: postgres
     url: 'jdbc:tc:postgis12:///event-api'
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://konturlabs.us.auth0.com/
 
 mybatis:
   type-handlers-package: io.kontur.eventapi.typehandler
