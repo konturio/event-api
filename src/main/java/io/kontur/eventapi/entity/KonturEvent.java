@@ -1,16 +1,16 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.entity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class KonturEventDto {
+public class KonturEvent {
 
     private UUID eventId;
     private Long version;
     private List<UUID> observationIds = new ArrayList<>();
 
-    public KonturEventDto(UUID eventId, Long version) {
+    public KonturEvent(UUID eventId, Long version) {
         this.eventId = eventId;
         this.version = version;
     }

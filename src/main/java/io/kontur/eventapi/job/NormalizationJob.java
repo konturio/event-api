@@ -1,9 +1,9 @@
 package io.kontur.eventapi.job;
 
-import io.kontur.eventapi.dao.EventDataLakeDao;
+import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
-import io.kontur.eventapi.dto.EventDataLakeDto;
-import io.kontur.eventapi.dto.NormalizedObservationsDto;
+import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,22 +17,22 @@ public class NormalizationJob implements Runnable {
     private final static Logger LOG = LoggerFactory.getLogger(NormalizationJob.class);
 
     private final List<Normalizer> normalizers;
-    private final EventDataLakeDao eventDataLakeDao;
+    private final DataLakeDao dataLakeDao;
     private final NormalizedObservationsDao normalizedObservationsDao;
 
-    public NormalizationJob(List<Normalizer> normalizers, EventDataLakeDao eventDataLakeDao,
+    public NormalizationJob(List<Normalizer> normalizers, DataLakeDao dataLakeDao,
                             NormalizedObservationsDao normalizedObservationsDao) {
         this.normalizers = normalizers;
-        this.eventDataLakeDao = eventDataLakeDao;
+        this.dataLakeDao = dataLakeDao;
         this.normalizedObservationsDao = normalizedObservationsDao;
     }
 
     @Override
     public void run() {
-        List<EventDataLakeDto> denormalizedEvents = eventDataLakeDao.getDenormalizedEvents();
+        List<DataLake> denormalizedEvents = dataLakeDao.getDenormalizedEvents();
         LOG.info("Normalization job has started. Events to process: {}", denormalizedEvents.size());
 
-        for (EventDataLakeDto denormalizedEvent : denormalizedEvents) {
+        for (DataLake denormalizedEvent : denormalizedEvents) {
             boolean isNormalized = normalize(denormalizedEvent);
             if (!isNormalized) {
                 LOG.info("Event wasn't normalized. Provider: {}, observation: {}", denormalizedEvent.getProvider(),
@@ -43,11 +43,11 @@ public class NormalizationJob implements Runnable {
         LOG.info("Normalization job has finished");
     }
 
-    private boolean normalize(EventDataLakeDto denormalizedEvent) {
+    private boolean normalize(DataLake denormalizedEvent) {
         boolean isNormalized = false;
         for (Normalizer normalizer : normalizers) {
             if (normalizer.isApplicable(denormalizedEvent)) {
-                NormalizedObservationsDto normalizedDto = normalizer.normalize(denormalizedEvent);
+                NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
                 normalizedObservationsDao.insert(normalizedDto);
                 isNormalized = true;
                 break;

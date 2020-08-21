@@ -1,7 +1,7 @@
 package io.kontur.eventapi.pdc.normalization;
 
-import io.kontur.eventapi.dto.EventDataLakeDto;
-import io.kontur.eventapi.dto.NormalizedObservationsDto;
+import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import org.wololo.geojson.FeatureCollection;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-import static io.kontur.eventapi.pdc.converter.PdcEventDataLakeConverter.magsDateTimeFormatter;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.magsDateTimeFormatter;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
@@ -19,13 +19,13 @@ import static io.kontur.eventapi.util.JsonUtil.writeJson;
 public class HpSrvMagsNormalizer extends Normalizer {
 
     @Override
-    public boolean isApplicable(EventDataLakeDto dataLakeDto) {
-        return HpSrvSearchJob.HP_SRV_MAG_PROVIDER.equals(dataLakeDto.getProvider());
+    public boolean isApplicable(DataLake dataLake) {
+        return HpSrvSearchJob.HP_SRV_MAG_PROVIDER.equals(dataLake.getProvider());
     }
 
     @Override
-    public NormalizedObservationsDto normalize(EventDataLakeDto dataLakeDto) {
-        NormalizedObservationsDto normalizedDto = new NormalizedObservationsDto();
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
+        NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
         normalizedDto.setExternalId(dataLakeDto.getExternalId());
         normalizedDto.setProvider(dataLakeDto.getProvider());

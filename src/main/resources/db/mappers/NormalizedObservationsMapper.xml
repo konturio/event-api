@@ -74,7 +74,7 @@
         </foreach>
     </select>
 
-    <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.dto.NormalizedObservationsDto">
+    <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalId" column="external_id"/>
         <result property="provider" column="provider"/>

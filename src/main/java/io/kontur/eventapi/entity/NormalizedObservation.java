@@ -1,10 +1,10 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.entity;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public class NormalizedObservationsDto {
+public class NormalizedObservation {
 
     private UUID observationId;
     private String externalId;

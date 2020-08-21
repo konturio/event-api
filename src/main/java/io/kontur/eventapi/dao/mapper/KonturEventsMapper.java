@@ -1,6 +1,6 @@
 package io.kontur.eventapi.dao.mapper;
 
-import io.kontur.eventapi.dto.KonturEventDto;
+import io.kontur.eventapi.entity.KonturEvent;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,7 +13,7 @@ public interface KonturEventsMapper {
 
     int insert(@Param("eventId") UUID eventId, @Param("version") Long version, @Param("observationId") UUID observationId);
 
-    Optional<KonturEventDto> getLatestEventByExternalId(String externalId);
+    Optional<KonturEvent> getLatestEventByExternalId(String externalId);
 
-    List<KonturEventDto> getNewEventVersionsForFeed(UUID feedId);
+    List<KonturEvent> getNewEventVersionsForFeed(UUID feedId);
 }

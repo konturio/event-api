@@ -1,7 +1,7 @@
 package io.kontur.eventapi.dao.mapper;
 
-import io.kontur.eventapi.dto.FeedDataDto;
-import io.kontur.eventapi.dto.FeedDto;
+import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.Feed;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,13 +12,13 @@ import java.util.UUID;
 @Mapper
 public interface FeedMapper {
 
-    List<FeedDto> getFeeds();
+    List<Feed> getFeeds();
 
     int insertFeedData(
             UUID eventId, UUID feedId, Long version, String name, String description,
             OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt,
             @Param("observations") String observations, @Param("episodes") String episodes);
 
-    List<FeedDataDto> searchForEvents(String feedAlias, OffsetDateTime after, int offset, int limit);
+    List<FeedData> searchForEvents(String feedAlias, OffsetDateTime after, int offset, int limit);
 
 }

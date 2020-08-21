@@ -3,7 +3,7 @@ package io.kontur.eventapi.job;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
-import io.kontur.eventapi.dto.*;
+import io.kontur.eventapi.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -36,21 +36,21 @@ public class FeedCompositionJob implements Runnable {
     @Override
     public void run() {
         LOG.info("Feed Composition job has started.");
-        List<FeedDto> feeds = feedDao.getFeeds();
+        List<Feed> feeds = feedDao.getFeeds();
         feeds.forEach(this::updateFeed);
         LOG.info("Feed Composition job has finished.");
     }
 
-    private void updateFeed(FeedDto feed) {
-        List<KonturEventDto> newEventVersions = eventsDao.getNewEventVersionsForFeed(feed.getFeedId());
+    private void updateFeed(Feed feed) {
+        List<KonturEvent> newEventVersions = eventsDao.getNewEventVersionsForFeed(feed.getFeedId());
         newEventVersions.forEach(event -> createFeedData(event, feed));
     }
 
-    private void createFeedData(KonturEventDto event, FeedDto feed) {
-        List<NormalizedObservationsDto> observations = observationsDao.getObservations(event.getObservationIds());
-        observations.sort(Comparator.comparing(NormalizedObservationsDto::getUpdatedAt));
+    private void createFeedData(KonturEvent event, Feed feed) {
+        List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
+        observations.sort(Comparator.comparing(NormalizedObservation::getUpdatedAt));
 
-        FeedDataDto feedDto = new FeedDataDto(event.getEventId(), feed.getFeedId(), event.getVersion());
+        FeedData feedDto = new FeedData(event.getEventId(), feed.getFeedId(), event.getVersion());
 
         fillFeedData(feedDto, observations);
 
@@ -60,11 +60,11 @@ public class FeedCompositionJob implements Runnable {
         feedDao.insertFeedData(feedDto);
     }
 
-    private void fillFeedData(FeedDataDto feedDto, List<NormalizedObservationsDto> observations) {
+    private void fillFeedData(FeedData feedDto, List<NormalizedObservation> observations) {
         boolean isDataFilled = true;
-        ListIterator<NormalizedObservationsDto> iterator = observations.listIterator(observations.size());
+        ListIterator<NormalizedObservation> iterator = observations.listIterator(observations.size());
         while (iterator.hasPrevious()) {
-            NormalizedObservationsDto observation = iterator.previous();
+            NormalizedObservation observation = iterator.previous();
 
             if (StringUtils.isEmpty(feedDto.getDescription())) {
                 if (!StringUtils.isEmpty(observation.getDescription())) {
@@ -109,11 +109,11 @@ public class FeedCompositionJob implements Runnable {
         }
     }
 
-    private Optional<FeedEpisodeDto> convertObservation(NormalizedObservationsDto observation) {
+    private Optional<FeedEpisode> convertObservation(NormalizedObservation observation) {
         if (observation.getGeometries() == null) {
             return Optional.empty();
         }
-        FeedEpisodeDto feedEpisode = new FeedEpisodeDto();
+        FeedEpisode feedEpisode = new FeedEpisode();
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
         feedEpisode.setType(observation.getType());

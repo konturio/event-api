@@ -1,14 +1,13 @@
 package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.FeedMapper;
-import io.kontur.eventapi.dto.FeedDataDto;
-import io.kontur.eventapi.dto.FeedDto;
+import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.Feed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
@@ -22,11 +21,11 @@ public class FeedDao {
         this.mapper = mapper;
     }
 
-    public List<FeedDto> getFeeds() {
+    public List<Feed> getFeeds() {
         return mapper.getFeeds();
     }
 
-    public void insertFeedData(FeedDataDto feedData) {
+    public void insertFeedData(FeedData feedData) {
         String episodesJson = writeJson(feedData.getEpisodes());
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getDescription(),
@@ -34,8 +33,8 @@ public class FeedDao {
                 null, episodesJson);
     }
 
-    public List<FeedDataDto> searchForEvents(String feedAlias, OffsetDateTime after, int offset,
-                                             int limit) {
+    public List<FeedData> searchForEvents(String feedAlias, OffsetDateTime after, int offset,
+                                          int limit) {
         return mapper.searchForEvents(feedAlias, after, offset, limit);
     }
 

@@ -2,14 +2,14 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.kontur.eventapi.dao.mapper.EventDataLakeMapper">
+<mapper namespace="io.kontur.eventapi.dao.mapper.DataLakeMapper">
 
     <insert id="create" useGeneratedKeys="false">
         INSERT INTO data_lake (observation_id, external_id, updated_at, loaded_at, provider, data)
         VALUES (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data})
     </insert>
 
-    <select id="getLatestUpdatedEventForProvider" resultType="io.kontur.eventapi.dto.EventDataLakeDto">
+    <select id="getLatestUpdatedEventForProvider" resultType="io.kontur.eventapi.entity.DataLake">
         SELECT observation_id as observationId, external_id as externalId, updated_at as updatedAt, loaded_at as loadedAt, provider, data
         FROM data_lake
         WHERE provider = #{provider}
@@ -26,7 +26,7 @@
               )
     </select>
 
-    <select id="getDenormalizedEvents" resultType="io.kontur.eventapi.dto.EventDataLakeDto">
+    <select id="getDenormalizedEvents" resultType="io.kontur.eventapi.entity.DataLake">
         SELECT observation_id as observationId, external_id as externalId, updated_at as updatedAt, loaded_at as loadedAt, provider, data
         FROM data_lake e
         WHERE NOT EXISTS(

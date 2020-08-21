@@ -1,4 +1,4 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.entity;
 
 public enum Severity {
     EXTREME,

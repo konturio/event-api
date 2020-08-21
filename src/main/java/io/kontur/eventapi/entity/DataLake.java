@@ -1,9 +1,9 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.entity;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public class EventDataLakeDto {
+public class DataLake {
 
     private UUID observationId;
     private String externalId;

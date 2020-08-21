@@ -1,9 +1,9 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.entity;
 
 import java.util.List;
 import java.util.UUID;
 
-public class FeedDto {
+public class Feed {
 
     private UUID feedId;
     private String description;

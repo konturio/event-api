@@ -2,7 +2,7 @@ package io.kontur.eventapi.service;
 
 import io.kontur.eventapi.converter.EventDtoConverter;
 import io.kontur.eventapi.dao.FeedDao;
-import io.kontur.eventapi.dto.FeedDataDto;
+import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.resource.dto.EventDto;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +20,9 @@ public class EventResourceService {
     }
 
     public List<EventDto> searchEvents(String feedAlias, OffsetDateTime after, int offset, int limit) {
-        List<FeedDataDto> feedDataDtos = feedDao.searchForEvents(feedAlias, after, offset, limit);
+        List<FeedData> feedData = feedDao.searchForEvents(feedAlias, after, offset, limit);
 
-        return feedDataDtos.stream()
+        return feedData.stream()
                 .map(EventDtoConverter::convert)
                 .collect(Collectors.toList());
     }

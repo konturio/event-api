@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import feign.RetryableException;
 import io.github.bucket4j.Bucket;
-import io.kontur.eventapi.dao.EventDataLakeDao;
-import io.kontur.eventapi.dto.EventDataLakeDto;
+import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.client.HpSrvClient;
-import io.kontur.eventapi.pdc.converter.PdcEventDataLakeConverter;
+import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +27,14 @@ public class HpSrvSearchJob implements Runnable {
 
     private final HpSrvClient hpSrvClient;
     private final Bucket bucket;
-    private final EventDataLakeDao eventDataLakeDao;
+    private final DataLakeDao dataLakeDao;
 
     @Autowired
     public HpSrvSearchJob(HpSrvClient hpSrvClient, Bucket bucket,
-                          EventDataLakeDao eventDataLakeDao) {
+                          DataLakeDao dataLakeDao) {
         this.hpSrvClient = hpSrvClient;
         this.bucket = bucket;
-        this.eventDataLakeDao = eventDataLakeDao;
+        this.dataLakeDao = dataLakeDao;
     }
 
     @Override
@@ -58,16 +58,16 @@ public class HpSrvSearchJob implements Runnable {
         searchBody.getPagination().setOffset(0);
         searchBody.getPagination().setPageSize(20);
 
-        eventDataLakeDao.getLatestUpdatedHazard(HP_SRV_SEARCH_PROVIDER)
-                .map(EventDataLakeDto::getUpdatedAt)
+        dataLakeDao.getLatestUpdatedHazard(HP_SRV_SEARCH_PROVIDER)
+                .map(DataLake::getUpdatedAt)
                 .ifPresent(lastUpdateTime -> searchBody.addAndRestriction("GREATER_THAN", "updateDate",
                         convertOffsetDateTimeToEpochMillis(lastUpdateTime)));
 
         JsonNode pdcHazardDtos = obtainHazards(searchBody);
 
         while (!pdcHazardDtos.isEmpty()) {
-            pdcHazardDtos.forEach(node -> eventDataLakeDao
-                    .storeEventData(PdcEventDataLakeConverter.convertHazardData((ObjectNode) node)));
+            pdcHazardDtos.forEach(node -> dataLakeDao
+                    .storeEventData(PdcDataLakeConverter.convertHazardData((ObjectNode) node)));
 
             searchBody.getPagination().setOffset(searchBody.getPagination().getOffset() + pdcHazardDtos.size());
             pdcHazardDtos = obtainHazards(searchBody);
@@ -99,7 +99,7 @@ public class HpSrvSearchJob implements Runnable {
     }
 
     private void importMags() {
-        List<String> eventsWithoutAreas = eventDataLakeDao.getPdcEventsWithoutAreas();
+        List<String> eventsWithoutAreas = dataLakeDao.getPdcEventsWithoutAreas();
         LOG.info("{} hazards to process", eventsWithoutAreas.size());
 
         for (int i = 0; i < eventsWithoutAreas.size(); i++) {
@@ -111,8 +111,8 @@ public class HpSrvSearchJob implements Runnable {
             try {
                 JsonNode json = obtainMagsFeatureCollection(eventId);
                 if (!json.isEmpty() && !json.get("features").isEmpty()) {
-                    EventDataLakeDto magDto = PdcEventDataLakeConverter.convertMagData(json, eventId);
-                    eventDataLakeDao.storeEventData(magDto);
+                    DataLake magDto = PdcDataLakeConverter.convertMagData(json, eventId);
+                    dataLakeDao.storeEventData(magDto);
                 }
             } catch (Exception e) {
                 LOG.warn("Exception during hazard mag processing. Hazard Id = '{}'", eventId, e);

@@ -1,10 +1,10 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.entity;
 
 import org.wololo.geojson.FeatureCollection;
 
 import java.time.OffsetDateTime;
 
-public class FeedEpisodeDto {
+public class FeedEpisode {
 
     private String name;
     private String description;

@@ -1,6 +1,6 @@
 package io.kontur.eventapi.resource.dto;
 
-import io.kontur.eventapi.dto.FeedEpisodeDto;
+import io.kontur.eventapi.entity.FeedEpisode;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class EventDto {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
-    private List<FeedEpisodeDto> episodes = new ArrayList<>();
+    private List<FeedEpisode> episodes = new ArrayList<>();
 
     public UUID getEventId() {
         return eventId;
@@ -74,11 +74,11 @@ public class EventDto {
         this.updatedAt = updatedAt;
     }
 
-    public List<FeedEpisodeDto> getEpisodes() {
+    public List<FeedEpisode> getEpisodes() {
         return episodes;
     }
 
-    public void setEpisodes(List<FeedEpisodeDto> episodes) {
+    public void setEpisodes(List<FeedEpisode> episodes) {
         this.episodes = episodes;
     }
 }

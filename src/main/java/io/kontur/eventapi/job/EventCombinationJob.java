@@ -2,8 +2,8 @@ package io.kontur.eventapi.job;
 
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
-import io.kontur.eventapi.dto.KonturEventDto;
-import io.kontur.eventapi.dto.NormalizedObservationsDto;
+import io.kontur.eventapi.entity.KonturEvent;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,18 +39,18 @@ public class EventCombinationJob implements Runnable {
     }
 
     private void processEvent(String externalId) {
-        KonturEventDto newEventVersion = createNewEventVersion(externalId);
+        KonturEvent newEventVersion = createNewEventVersion(externalId);
         List<UUID> observations = observationsDao.getObservationsByExternalId(externalId)
                 .stream()
-                .map(NormalizedObservationsDto::getObservationId)
+                .map(NormalizedObservation::getObservationId)
                 .collect(toList());
         newEventVersion.addObservations(observations);
         eventsDao.insertEventVersion(newEventVersion);
     }
 
-    private KonturEventDto createNewEventVersion(String externalId) {
+    private KonturEvent createNewEventVersion(String externalId) {
         return eventsDao.getLatestEventByExternalId(externalId)
-                .map(event -> new KonturEventDto(event.getEventId(), event.getVersion() + 1))
-                .orElseGet(() -> new KonturEventDto(UUID.randomUUID(), 1L));
+                .map(event -> new KonturEvent(event.getEventId(), event.getVersion() + 1))
+                .orElseGet(() -> new KonturEvent(UUID.randomUUID(), 1L));
     }
 }

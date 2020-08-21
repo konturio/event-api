@@ -1,6 +1,6 @@
 package io.kontur.eventapi.dao.mapper;
 
-import io.kontur.eventapi.dto.NormalizedObservationsDto;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -9,11 +9,11 @@ import java.util.UUID;
 @Mapper
 public interface NormalizedObservationsMapper {
 
-    int insert(NormalizedObservationsDto record);
+    int insert(NormalizedObservation record);
 
     List<String> getExternalIdsToUpdate();
 
-    List<NormalizedObservationsDto> getObservationsByExternalId(String externalId);
+    List<NormalizedObservation> getObservationsByExternalId(String externalId);
 
-    List<NormalizedObservationsDto> getObservations(List<UUID> observationIds);
+    List<NormalizedObservation> getObservations(List<UUID> observationIds);
 }

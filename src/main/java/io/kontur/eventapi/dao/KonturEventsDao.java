@@ -1,7 +1,7 @@
 package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.KonturEventsMapper;
-import io.kontur.eventapi.dto.KonturEventDto;
+import io.kontur.eventapi.entity.KonturEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,16 +20,16 @@ public class KonturEventsDao {
         this.mapper = mapper;
     }
 
-    public Optional<KonturEventDto> getLatestEventByExternalId(String externalId) {
+    public Optional<KonturEvent> getLatestEventByExternalId(String externalId) {
         return mapper.getLatestEventByExternalId(externalId);
     }
 
     @Transactional
-    public void insertEventVersion(KonturEventDto event) {
+    public void insertEventVersion(KonturEvent event) {
         event.getObservationIds().forEach(obs -> mapper.insert(event.getEventId(), event.getVersion(), obs));
     }
 
-    public List<KonturEventDto> getNewEventVersionsForFeed(UUID feedId) {
+    public List<KonturEvent> getNewEventVersionsForFeed(UUID feedId) {
         return mapper.getNewEventVersionsForFeed(feedId);
     }
 }

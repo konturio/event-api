@@ -1,7 +1,7 @@
 package io.kontur.eventapi.typehandler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.kontur.eventapi.dto.FeedEpisodeDto;
+import io.kontur.eventapi.entity.FeedEpisode;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.util.StringUtils;
@@ -16,16 +16,16 @@ import java.util.List;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
-public class FeedEpisodeTypeHandler extends BaseTypeHandler<List<FeedEpisodeDto>> {
+public class FeedEpisodeTypeHandler extends BaseTypeHandler<List<FeedEpisode>> {
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, List<FeedEpisodeDto> parameter,
+    public void setNonNullParameter(PreparedStatement ps, int i, List<FeedEpisode> parameter,
                                     JdbcType jdbcType) throws SQLException {
         ps.setObject(i, writeJson(parameter));
     }
 
     @Override
-    public List<FeedEpisodeDto> getNullableResult(ResultSet rs, String columnName) throws SQLException {
+    public List<FeedEpisode> getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String value = rs.getString(columnName);
         if (StringUtils.isEmpty(value)) {
             return Collections.emptyList();
@@ -34,7 +34,7 @@ public class FeedEpisodeTypeHandler extends BaseTypeHandler<List<FeedEpisodeDto>
     }
 
     @Override
-    public List<FeedEpisodeDto> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+    public List<FeedEpisode> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String value = rs.getString(columnIndex);
         if (StringUtils.isEmpty(value)) {
             return Collections.emptyList();
@@ -43,7 +43,7 @@ public class FeedEpisodeTypeHandler extends BaseTypeHandler<List<FeedEpisodeDto>
     }
 
     @Override
-    public List<FeedEpisodeDto> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+    public List<FeedEpisode> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String value = cs.getString(columnIndex);
         if (StringUtils.isEmpty(value)) {
             return Collections.emptyList();

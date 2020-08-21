@@ -1,7 +1,7 @@
 package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.NormalizedObservationsMapper;
-import io.kontur.eventapi.dto.NormalizedObservationsDto;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class NormalizedObservationsDao {
         this.mapper = mapper;
     }
 
-    public int insert(NormalizedObservationsDto record) {
+    public int insert(NormalizedObservation record) {
         return mapper.insert(record);
     }
 
@@ -24,11 +24,11 @@ public class NormalizedObservationsDao {
         return mapper.getExternalIdsToUpdate();
     }
 
-    public List<NormalizedObservationsDto> getObservationsByExternalId(String externalId) {
+    public List<NormalizedObservation> getObservationsByExternalId(String externalId) {
         return mapper.getObservationsByExternalId(externalId);
     }
 
-    public List<NormalizedObservationsDto> getObservations(List<UUID> observationIds) {
+    public List<NormalizedObservation> getObservations(List<UUID> observationIds) {
         return mapper.getObservations(observationIds);
     }
 

@@ -1,11 +1,11 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.entity;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class FeedDataDto {
+public class FeedData {
 
     private UUID eventId;
     private UUID feedId;
@@ -16,9 +16,9 @@ public class FeedDataDto {
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
     private List<UUID> observations = new ArrayList<>();
-    private List<FeedEpisodeDto> episodes = new ArrayList<>();
+    private List<FeedEpisode> episodes = new ArrayList<>();
 
-    public FeedDataDto(UUID eventId, UUID feedId, Long version) {
+    public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;
         this.feedId = feedId;
         this.version = version;
@@ -96,11 +96,11 @@ public class FeedDataDto {
         this.observations = observations;
     }
 
-    public List<FeedEpisodeDto> getEpisodes() {
+    public List<FeedEpisode> getEpisodes() {
         return episodes;
     }
 
-    public void addEpisode(FeedEpisodeDto episode) {
+    public void addEpisode(FeedEpisode episode) {
         episodes.add(episode);
     }
 }
