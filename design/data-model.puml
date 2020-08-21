@@ -1,0 +1,28 @@
+@startuml
+
+entity hazard {
+    id : uuid
+    version: long
+    name: String
+    description: String
+    startedAt: DateTime
+    endedAt: DateTime
+    updatedAt: DateTime
+    episodes
+}
+
+entity episode {
+    name: String
+    description: String
+    type: String
+    active: Boolean
+    severity: String
+    startedAt: DateTime
+    endedAt: DateTime
+    updatedAt: DateTime
+    geometries: FeatureCollection
+}
+
+hazard --{ episode
+
+@enduml

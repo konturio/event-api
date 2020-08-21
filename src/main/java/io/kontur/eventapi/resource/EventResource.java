@@ -30,12 +30,12 @@ public class EventResource {
     }
 
     @GetMapping(path = "/", produces = {APPLICATION_JSON_VALUE})
-    @Operation(tags = "Events")
+    @Operation(tags = "Events", summary = "search for events", description = "Returns events for specified feed name. All events are sorted by update date.")
     @PreAuthorize("hasAuthority('SCOPE_read:'+#feed)")
     public List<EventDto> searchEvents(
-            @Parameter(description = "Feed alias") @RequestParam(value = "feed")
+            @Parameter(description = "Feed name") @RequestParam(value = "feed")
                     String feed,
-            @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"1985-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
+            @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"2020-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime after,
             @Parameter(description = "Pagination offset", example = "0", schema = @Schema(allowableValues = {})) @RequestParam(value = "offset", defaultValue = "0")
