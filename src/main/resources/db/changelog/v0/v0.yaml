@@ -12,3 +12,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 04-update-pdc-feed.sql
+- include:
+    relativeToChangelogFile: true
+    file: 05-rename-pdc-feed.sql
