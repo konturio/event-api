@@ -34,6 +34,7 @@ public class PdcSqsMessageListener {
         JsonNode masterSyncEvents = event.get("syncDa").get("masterSyncEvents");
 
         String type = masterSyncEvents.get("type").asText();
+        LOG.info("SQS Message received: Type: {}", type);
         if ("PING".equals(type)) {
             acknowledgment.acknowledge();
             return;
