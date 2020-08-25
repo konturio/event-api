@@ -1,0 +1,5 @@
+--liquibase formatted sql
+
+--changeset event-api-migrations:04-update-pdc-feed runOnChange:false
+
+update feeds set providers = '{"hpSrvMag", "hpSrvSearch", "pdcSqs"}' where alias = 'pdc';

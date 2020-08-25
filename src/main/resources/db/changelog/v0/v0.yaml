@@ -6,3 +6,9 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 02-insert-pdc-feed.sql
+- include:
+    relativeToChangelogFile: true
+    file: 03-alter-normalized-observations.sql
+- include:
+    relativeToChangelogFile: true
+    file: 04-update-pdc-feed.sql

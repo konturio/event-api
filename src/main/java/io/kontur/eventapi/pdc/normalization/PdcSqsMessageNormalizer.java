@@ -1,0 +1,99 @@
+package io.kontur.eventapi.pdc.normalization;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.normalization.Normalizer;
+import io.kontur.eventapi.util.JsonUtil;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.springframework.stereotype.Component;
+import org.wololo.geojson.Feature;
+import org.wololo.geojson.FeatureCollection;
+import org.wololo.jts2geojson.GeoJSONWriter;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
+import static io.kontur.eventapi.util.JsonUtil.readJson;
+import static io.kontur.eventapi.util.JsonUtil.writeJson;
+
+@Component
+public class PdcSqsMessageNormalizer extends Normalizer {
+
+    private final WKTReader wktReader = new WKTReader();
+    private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
+
+    @Override
+    public boolean isApplicable(DataLake dataLakeDto) {
+        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
+
+        JsonNode sns = JsonUtil.readTree(dataLakeDto.getData()).get("Sns");
+        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
+        JsonNode event = JsonUtil.readTree(message.get("event").asText());
+        String type = event.get("syncDa").get("masterSyncEvents").get("type").asText();
+
+        NormalizedObservation normalizedDto = new NormalizedObservation();
+        normalizedDto.setObservationId(dataLakeDto.getObservationId());
+        normalizedDto.setProvider(dataLakeDto.getProvider());
+        normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
+
+        Map<String, Object> props = readJson(event.get("json").asText(), new TypeReference<>() {
+        });
+        normalizedDto.setUpdatedAt(readDateTime(props, "updateDate"));
+
+        switch (type) {
+            case "MAG":
+                normalizedDto.setActive(readBoolean(props, "isActive"));
+                normalizedDto.setGeometries(writeJson(convertGeometries(props)));
+                normalizedDto.setEpisodeDescription(convertDescription(props));
+                props = (Map<String, Object>) props.get("hazard");
+            case "HAZARD":
+                normalizedDto.setExternalEventId(readString(props, "uuid"));
+
+                normalizedDto.setName(readString(props, "hazardName"));
+                normalizedDto.setDescription(
+                        readString((Map<String, Object>) props.get("hazardDescription"), "description"));
+                normalizedDto.setStartedAt(readDateTime(props, "startDate"));
+                normalizedDto.setEndedAt(readDateTime(props, "endDate"));
+                normalizedDto
+                        .setEventSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId"));
+                normalizedDto.setType(readString((Map<String, Object>) props.get("hazardType"), "typeId"));
+                normalizedDto.setPoint(makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude")));
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected message type: " + type);
+        }
+        return normalizedDto;
+    }
+
+    @SuppressWarnings("unchecked")
+    private FeatureCollection convertGeometries(Map<String, Object> props) {
+        try {
+            Geometry wktGeometry = wktReader.read((String) ((Map<String, Object>) props.get("wkt")).get("text"));
+            org.wololo.geojson.Geometry geoJsonGeometry = geoJSONWriter.write(wktGeometry);
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("description", convertDescription(props));
+            map.put("active", readBoolean(props, "isActive"));
+            map.put("updatedAt", readDateTime(props, "updateDate"));
+            return new FeatureCollection(new Feature[]{new Feature(geoJsonGeometry, map)});
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String convertDescription(Map<String, Object> props) {
+        Map<String, Object> hazardProperties = (Map<String, Object>) props.get("hazard");
+        return readString((Map<String, Object>) hazardProperties.get("hazardDescription"), "description");
+    }
+}

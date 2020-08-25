@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
-import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 @Component
@@ -16,14 +16,14 @@ public class HpSrvSearchNormalizer extends Normalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return HpSrvSearchJob.HP_SRV_SEARCH_PROVIDER.equals(dataLakeDto.getProvider());
+        return HP_SRV_SEARCH_PROVIDER.equals(dataLakeDto.getProvider());
     }
 
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
-        normalizedDto.setExternalId(dataLakeDto.getExternalId());
+        normalizedDto.setExternalEventId(dataLakeDto.getExternalId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
         normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
 

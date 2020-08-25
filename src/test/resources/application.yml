@@ -36,3 +36,7 @@ spring:
 
 mybatis:
   type-handlers-package: io.kontur.eventapi.typehandler
+
+aws:
+  sqs:
+    url:
