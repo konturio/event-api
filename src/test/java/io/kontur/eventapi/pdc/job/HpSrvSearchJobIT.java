@@ -16,7 +16,6 @@ import java.util.List;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled
 @AutoConfigureWireMock(port = 18080, stubs = "classpath:mappings/PdcHazardImportJobIT.json")
 class HpSrvSearchJobIT extends AbstractIntegrationTest {
 
@@ -25,7 +24,7 @@ class HpSrvSearchJobIT extends AbstractIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Test
+//    @Test
     public void uploadTestHazards() throws JsonProcessingException {
         job.run();
 

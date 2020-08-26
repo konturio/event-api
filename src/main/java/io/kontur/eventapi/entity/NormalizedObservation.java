@@ -7,7 +7,7 @@ import java.util.UUID;
 public class NormalizedObservation {
 
     private UUID observationId;
-    private String externalId;
+    private String externalEventId;
     private String provider;
     private String point;
     private String geometries; //TODO use FeatureCollection. Convert to string during insert
@@ -33,12 +33,12 @@ public class NormalizedObservation {
         this.observationId = observationId;
     }
 
-    public String getExternalId() {
-        return externalId;
+    public String getExternalEventId() {
+        return externalEventId;
     }
 
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
+    public void setExternalEventId(String externalEventId) {
+        this.externalEventId = externalEventId;
     }
 
     public String getProvider() {

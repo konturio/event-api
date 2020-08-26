@@ -15,7 +15,7 @@
         WHERE observation_id in (
             SELECT observation_id
             FROM normalized_observations
-            WHERE external_id = #{externalId}
+            WHERE external_event_id = #{externalId}
             )
         ORDER BY version DESC
         LIMIT 1

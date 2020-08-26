@@ -17,8 +17,8 @@
         LIMIT 1
     </select>
 
-    <select id="getPdcHazardsWithoutAreas" resultType="String">
-        SELECT distinct e1.external_id
+    <select id="getPdcHazardsWithoutAreas" resultMap="dataLakeMap">
+        SELECT distinct on (e1.external_id) *
         FROM data_lake e1
         WHERE e1.provider = 'hpSrvSearch'
           AND NOT EXISTS(
@@ -26,11 +26,27 @@
               )
     </select>
 
-    <select id="getDenormalizedEvents" resultType="io.kontur.eventapi.entity.DataLake">
-        SELECT observation_id as observationId, external_id as externalId, updated_at as updatedAt, loaded_at as loadedAt, provider, data
+    <select id="getDenormalizedEvents" resultMap="dataLakeMap">
+        SELECT *
         FROM data_lake e
         WHERE NOT EXISTS(
                 select * from normalized_observations nr where e.observation_id = nr.observation_id
             )
     </select>
+
+    <select id="getDataLakesByExternalId" resultMap="dataLakeMap">
+        SELECT *
+        FROM data_lake
+        WHERE external_id = #{externalId}
+    </select>
+
+    <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
+        <result property="observationId" column="observation_id" />
+        <result property="externalId" column="external_id" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="loadedAt" column="loaded_at" />
+        <result property="provider" column="provider" />
+        <result property="data" column="data" />
+    </resultMap>
+
 </mapper>

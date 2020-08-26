@@ -22,11 +22,15 @@ public class DataLakeDao {
         mapper.create(dataLake);
     }
 
+    public List<DataLake> getDataLakesByExternalId(String externalId) {
+        return mapper.getDataLakesByExternalId(externalId);
+    }
+
     public Optional<DataLake> getLatestUpdatedHazard(String provider) {
         return mapper.getLatestUpdatedEventForProvider(provider);
     }
 
-    public List<String> getPdcEventsWithoutAreas() {
+    public List<DataLake> getPdcEventsWithoutAreas() {
         return mapper.getPdcHazardsWithoutAreas();
     }
 

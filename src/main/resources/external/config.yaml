@@ -33,3 +33,8 @@ scheduler:
     enable: true
     initialDelay: 20000
     fixedDelay: 60000
+
+aws:
+  sqs:
+    enabled: true
+    url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo

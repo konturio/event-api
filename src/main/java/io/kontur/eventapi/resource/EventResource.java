@@ -38,9 +38,9 @@ public class EventResource {
             @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"2020-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime after,
-            @Parameter(description = "Pagination offset", example = "0", schema = @Schema(allowableValues = {})) @RequestParam(value = "offset", defaultValue = "0")
+            @Parameter(description = "Pagination offset. Minimum value is 0", example = "0") @RequestParam(value = "offset", defaultValue = "0")
                     @Min(0) int offset,
-            @Parameter(description = "Number of records on the page. Default value is 20.", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
+            @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
                     @Min(1) @Max(1000) int limit
     ) {
         return eventResourceService.searchEvents(feed, after, offset, limit);

@@ -9,6 +9,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.client.HpSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
+import io.kontur.eventapi.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,12 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
+
 @Component
 public class HpSrvSearchJob implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(HpSrvSearchJob.class);
-    public final static String HP_SRV_SEARCH_PROVIDER = "hpSrvSearch";
-    public final static String HP_SRV_MAG_PROVIDER = "hpSrvMag";
 
     private final HpSrvClient hpSrvClient;
     private final Bucket bucket;
@@ -67,7 +68,7 @@ public class HpSrvSearchJob implements Runnable {
 
         while (!pdcHazardDtos.isEmpty()) {
             pdcHazardDtos.forEach(node -> dataLakeDao
-                    .storeEventData(PdcDataLakeConverter.convertHazardData((ObjectNode) node)));
+                    .storeEventData(PdcDataLakeConverter.convertHpSrvHazardData((ObjectNode) node)));
 
             searchBody.getPagination().setOffset(searchBody.getPagination().getOffset() + pdcHazardDtos.size());
             pdcHazardDtos = obtainHazards(searchBody);
@@ -99,7 +100,7 @@ public class HpSrvSearchJob implements Runnable {
     }
 
     private void importMags() {
-        List<String> eventsWithoutAreas = dataLakeDao.getPdcEventsWithoutAreas();
+        List<DataLake> eventsWithoutAreas = dataLakeDao.getPdcEventsWithoutAreas();
         LOG.info("{} hazards to process", eventsWithoutAreas.size());
 
         for (int i = 0; i < eventsWithoutAreas.size(); i++) {
@@ -107,22 +108,22 @@ public class HpSrvSearchJob implements Runnable {
                 LOG.info("{} hazards to process", eventsWithoutAreas.size() - i);
             }
 
-            String eventId = eventsWithoutAreas.get(i);
+            DataLake dataLake = eventsWithoutAreas.get(i);
             try {
-                JsonNode json = obtainMagsFeatureCollection(eventId);
+                JsonNode json = obtainMagsFeatureCollection(dataLake);
                 if (!json.isEmpty() && !json.get("features").isEmpty()) {
-                    DataLake magDto = PdcDataLakeConverter.convertMagData(json, eventId);
+                    DataLake magDto = PdcDataLakeConverter.convertHpSrvMagData(json, dataLake.getExternalId());
                     dataLakeDao.storeEventData(magDto);
                 }
             } catch (Exception e) {
-                LOG.warn("Exception during hazard mag processing. Hazard Id = '{}'", eventId, e);
+                LOG.warn("Exception during hazard mag processing. Hazard UUID = '{}'", dataLake.getExternalId(), e);
             }
         }
     }
 
-    private JsonNode obtainMagsFeatureCollection(String eventId) {
+    private JsonNode obtainMagsFeatureCollection(DataLake dataLake) {
         try {
-            return obtainMagsInSchedule(eventId);
+            return obtainMagsInSchedule(dataLake);
         } catch (RetryableException e) {
             LOG.warn(e.getMessage());
             //will try once again
@@ -131,17 +132,23 @@ public class HpSrvSearchJob implements Runnable {
             } catch (InterruptedException interruptedException) {
                 throw new RuntimeException(e);
             }
-            return obtainMagsInSchedule(eventId);
+            return obtainMagsInSchedule(dataLake);
         }
     }
 
-    private JsonNode obtainMagsInSchedule(String eventId) {
+    private JsonNode obtainMagsInSchedule(DataLake dataLake) {
         try {
+            String hazardId = getHazardId(dataLake);
             bucket.asScheduler().consume(1);
-            return hpSrvClient.getMags(eventId);
+            return hpSrvClient.getMags(hazardId);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getHazardId(DataLake dataLake) {
+        JsonNode jsonNode = JsonUtil.readTree(dataLake.getData());
+        return jsonNode.get("hazard_ID").asText();
     }
 
     private String convertOffsetDateTimeToEpochMillis(OffsetDateTime dateTime) {

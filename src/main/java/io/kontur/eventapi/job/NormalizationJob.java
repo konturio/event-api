@@ -47,9 +47,13 @@ public class NormalizationJob implements Runnable {
         boolean isNormalized = false;
         for (Normalizer normalizer : normalizers) {
             if (normalizer.isApplicable(denormalizedEvent)) {
-                NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
-                normalizedObservationsDao.insert(normalizedDto);
-                isNormalized = true;
+                try {
+                    NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
+                    normalizedObservationsDao.insert(normalizedDto);
+                    isNormalized = true;
+                } catch (Exception e) {
+                    LOG.warn(e.getMessage(), e);
+                }
                 break;
             }
         }
