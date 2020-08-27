@@ -11,11 +11,11 @@ public class NormalizedObservation {
     private String provider;
     private String point;
     private String geometries; //TODO use FeatureCollection. Convert to string during insert
-    private String eventSeverity;
+    private Severity eventSeverity;
     private String name;
     private String description;
     private String episodeDescription;
-    private String type;
+    private EventType type;
     private Boolean active;
     private BigDecimal cost;
     private String region;
@@ -89,11 +89,11 @@ public class NormalizedObservation {
         this.episodeDescription = episodeDescription;
     }
 
-    public String getType() {
+    public EventType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(EventType type) {
         this.type = type;
     }
 
@@ -105,11 +105,11 @@ public class NormalizedObservation {
         this.active = active;
     }
 
-    public String getEventSeverity() {
+    public Severity getEventSeverity() {
         return eventSeverity;
     }
 
-    public void setEventSeverity(String eventSeverity) {
+    public void setEventSeverity(Severity eventSeverity) {
         this.eventSeverity = eventSeverity;
     }
 

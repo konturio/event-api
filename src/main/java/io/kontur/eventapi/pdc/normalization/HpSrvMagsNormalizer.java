@@ -2,7 +2,7 @@ package io.kontur.eventapi.pdc.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.normalization.Normalizer;
+import io.kontur.eventapi.entity.Severity;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -16,7 +16,7 @@ import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
-public class HpSrvMagsNormalizer extends Normalizer {
+public class HpSrvMagsNormalizer extends PDCHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLake) {
@@ -41,7 +41,8 @@ public class HpSrvMagsNormalizer extends Normalizer {
             Map<String, Object> props = features.get(features.size() - 1).getProperties(); //take last updated feature
             normalizedDto.setName(readString(props, "hazard.hazardName"));
             normalizedDto.setEpisodeDescription(convertDescription(props));
-            normalizedDto.setType(readString(props, "hazard.hazardType.typeId"));
+            normalizedDto.setType(defineType(readString(props, "hazard.hazardType.typeId")));
+            normalizedDto.setEventSeverity(Severity.UNKNOWN);
             normalizedDto.setActive(readBoolean(props, "isActive"));
 
             normalizedDto.setStartedAt(readDateTime(props, "hazard.startDate"));

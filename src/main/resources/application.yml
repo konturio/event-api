@@ -25,18 +25,18 @@ pdc:
 
 scheduler:
   hpSrvImport:
-    enable: true
+    enable: false
     initialDelay: 1000
   normalization:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
   eventCombination:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
 
@@ -61,5 +61,5 @@ springdoc:
 
 aws:
   sqs:
-    enabled: true
+    enabled: false
     url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo

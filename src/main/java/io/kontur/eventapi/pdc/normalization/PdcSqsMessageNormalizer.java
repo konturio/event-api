@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.util.JsonUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
@@ -22,7 +21,7 @@ import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
-public class PdcSqsMessageNormalizer extends Normalizer {
+public class PdcSqsMessageNormalizer extends PDCHazardNormalizer {
 
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
@@ -64,9 +63,9 @@ public class PdcSqsMessageNormalizer extends Normalizer {
                         readString((Map<String, Object>) props.get("hazardDescription"), "description"));
                 normalizedDto.setStartedAt(readDateTime(props, "startDate"));
                 normalizedDto.setEndedAt(readDateTime(props, "endDate"));
-                normalizedDto
-                        .setEventSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId"));
-                normalizedDto.setType(readString((Map<String, Object>) props.get("hazardType"), "typeId"));
+                normalizedDto.setEventSeverity(
+                        defineSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId")));
+                normalizedDto.setType(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")));
                 normalizedDto.setPoint(makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude")));
                 break;
             default:
