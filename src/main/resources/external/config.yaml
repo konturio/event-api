@@ -19,7 +19,7 @@ pdc:
 
 scheduler:
   hpSrvImport:
-    enable: true
+    enable: false
     initialDelay: 1000
   normalization:
     enable: true

@@ -8,9 +8,9 @@ public class FeedEpisode {
 
     private String name;
     private String description;
-    private String type;
+    private EventType type;
     private Boolean active;
-    private String severity;
+    private Severity severity;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
@@ -32,11 +32,11 @@ public class FeedEpisode {
         this.description = description;
     }
 
-    public String getType() {
+    public EventType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(EventType type) {
         this.type = type;
     }
 
@@ -48,11 +48,11 @@ public class FeedEpisode {
         this.active = active;
     }
 
-    public String getSeverity() {
+    public Severity getSeverity() {
         return severity;
     }
 
-    public void setSeverity(String severity) {
+    public void setSeverity(Severity severity) {
         this.severity = severity;
     }
 
