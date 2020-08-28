@@ -6,16 +6,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -31,7 +32,7 @@ public class EventResource {
 
     @GetMapping(path = "/", produces = {APPLICATION_JSON_VALUE})
     @Operation(tags = "Events", summary = "search for events", description = "Returns events for specified feed name. All events are sorted by update date.")
-    @PreAuthorize("hasAuthority('SCOPE_read:'+#feed)")
+    @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
     public List<EventDto> searchEvents(
             @Parameter(description = "Feed name") @RequestParam(value = "feed")
                     String feed,
@@ -44,5 +45,21 @@ public class EventResource {
                     @Min(1) @Max(1000) int limit
     ) {
         return eventResourceService.searchEvents(feed, after, offset, limit);
+    }
+
+    @GetMapping(path = "/raw-data/{observationId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+    @Operation(tags = "Events", summary = "returns raw data", description = "Returns raw data which was used to combine events and episodes.")
+    @PreAuthorize("hasAuthority('SCOPE_read:raw-data')")
+    public ResponseEntity<String> rawData(@Parameter(description = "Observation UUID. May be gathered from event's 'observations' field") @PathVariable UUID observationId) {
+        String rawData = eventResourceService.getRawData(observationId);
+        if (StringUtils.isEmpty(rawData)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (rawData.trim().startsWith("<")) {
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_XML).body(rawData);
+        } else {
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(rawData);
+        }
     }
 }

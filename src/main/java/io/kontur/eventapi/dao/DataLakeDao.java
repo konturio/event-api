@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class DataLakeDao {
@@ -36,5 +37,9 @@ public class DataLakeDao {
 
     public List<DataLake> getDenormalizedEvents() {
         return mapper.getDenormalizedEvents();
+    }
+
+    public DataLake getDataLakeByObservationId(UUID observationId) {
+        return mapper.getDataLakeByObservationId(observationId);
     }
 }

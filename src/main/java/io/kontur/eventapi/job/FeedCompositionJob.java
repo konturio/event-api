@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 
@@ -62,6 +63,12 @@ public class FeedCompositionJob implements Runnable {
 
     private void fillFeedData(FeedData feedDto, List<NormalizedObservation> observations) {
         boolean isDataFilled = true;
+
+        feedDto.setObservations(observations
+                .stream()
+                .map(NormalizedObservation::getObservationId)
+                .collect(Collectors.toList()));
+
         ListIterator<NormalizedObservation> iterator = observations.listIterator(observations.size());
         while (iterator.hasPrevious()) {
             NormalizedObservation observation = iterator.previous();
@@ -101,7 +108,6 @@ public class FeedCompositionJob implements Runnable {
                     isDataFilled = false;
                 }
             }
-            //        feedDto.setObservations(event.getObservationIds());  TODO
 
             if (isDataFilled) {
                 break;

@@ -40,6 +40,12 @@
         WHERE external_id = #{externalId}
     </select>
 
+    <select id="getDataLakeByObservationId" resultMap="dataLakeMap">
+        SELECT *
+        FROM data_lake
+        WHERE observation_id = #{observationId}
+    </select>
+
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
         <result property="observationId" column="observation_id" />
         <result property="externalId" column="external_id" />
