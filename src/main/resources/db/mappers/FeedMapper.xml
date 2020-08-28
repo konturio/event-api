@@ -11,7 +11,8 @@
 
     <insert id="insertFeedData" useGeneratedKeys="false">
         insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes)
-        values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt}, #{observations}::jsonb, #{episodes}::jsonb)
+        values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt},
+                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb)
     </insert>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
@@ -54,7 +55,7 @@
         <result property="startedAt" column="started_at" />
         <result property="endedAt" column="ended_at" />
         <result property="updatedAt" column="updated_at" />
-        <result property="observations" column="observations" />
+        <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
         <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
     </resultMap>
 </mapper>

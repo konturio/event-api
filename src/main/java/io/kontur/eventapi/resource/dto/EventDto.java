@@ -16,6 +16,7 @@ public class EventDto {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
+    private List<UUID> observations;
     private List<FeedEpisode> episodes = new ArrayList<>();
 
     public UUID getEventId() {
@@ -72,6 +73,14 @@ public class EventDto {
 
     public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<UUID> getObservations() {
+        return observations;
+    }
+
+    public void setObservations(List<UUID> observations) {
+        this.observations = observations;
     }
 
     public List<FeedEpisode> getEpisodes() {

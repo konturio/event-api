@@ -30,7 +30,7 @@ public class FeedDao {
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getDescription(),
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getEndedAt(),
-                null, episodesJson);
+                feedData.getObservations(), episodesJson);
     }
 
     public List<FeedData> searchForEvents(String feedAlias, OffsetDateTime after, int offset,

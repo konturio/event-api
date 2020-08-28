@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Mapper
 public interface DataLakeMapper {
@@ -18,4 +19,6 @@ public interface DataLakeMapper {
     List<DataLake> getDenormalizedEvents();
 
     List<DataLake> getDataLakesByExternalId(String externalId);
+
+    DataLake getDataLakeByObservationId(UUID observationId);
 }

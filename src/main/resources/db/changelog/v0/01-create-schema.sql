@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:01-create-schema runOnChange:true
+--changeset event-api-migrations:01-create-schema runOnChange:false
 CREATE TABLE IF NOT EXISTS data_lake
 (
     observation_id uuid unique,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS kontur_events
 (
     event_id       uuid,
     version        bigint,
-    observation_id uuid references normalized_observations (observation_id),
+    observation_id uuid,
 
     UNIQUE (event_id, version, observation_id)
 );
@@ -65,11 +65,11 @@ CREATE TABLE IF NOT EXISTS feed_data
     started_at   timestamptz,
     ended_at     timestamptz,
     updated_at   timestamptz,
-    observations jsonb,
+    observations uuid[],
     episodes     jsonb,
 
     UNIQUE (event_id, feed_id, version)
 );
 
 CREATE INDEX ON feed_data (event_id, version);
-create index on feed_data (feed_id);
+CREATE INDEX on feed_data (feed_id);
