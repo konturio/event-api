@@ -6,18 +6,18 @@ pdc:
 scheduler:
   hpSrvImport:
     enable: false
-    initialDelay: 1000
+    initialDelay: 999999
   normalization:
     enable: false
-    initialDelay: 1000
+    initialDelay: 999999
     fixedDelay: 60000
   eventCombination:
     enable: false
-    initialDelay: 1000
+    initialDelay: 999999
     fixedDelay: 60000
   feedComposition:
     enable: false
-    initialDelay: 1000
+    initialDelay: 999999
     fixedDelay: 60000
 
 auth0:
@@ -39,4 +39,4 @@ mybatis:
 
 aws:
   sqs:
-    url:
+    url: LocalStack-test-queue

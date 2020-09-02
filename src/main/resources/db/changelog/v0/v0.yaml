@@ -15,3 +15,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 05-rename-pdc-feed.sql
+- include:
+    relativeToChangelogFile: true
+    file: 06-add-constraints.sql

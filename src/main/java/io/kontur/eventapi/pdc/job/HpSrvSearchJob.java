@@ -1,14 +1,13 @@
 package io.kontur.eventapi.pdc.job;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import feign.RetryableException;
 import io.github.bucket4j.Bucket;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.client.HpSrvClient;
-import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
+import io.kontur.eventapi.pdc.service.HpSrvService;
 import io.kontur.eventapi.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +28,15 @@ public class HpSrvSearchJob implements Runnable {
     private final HpSrvClient hpSrvClient;
     private final Bucket bucket;
     private final DataLakeDao dataLakeDao;
+    private final HpSrvService hpSrvService;
 
     @Autowired
     public HpSrvSearchJob(HpSrvClient hpSrvClient, Bucket bucket,
-                          DataLakeDao dataLakeDao) {
+                          DataLakeDao dataLakeDao, HpSrvService hpSrvService) {
         this.hpSrvClient = hpSrvClient;
         this.bucket = bucket;
         this.dataLakeDao = dataLakeDao;
+        this.hpSrvService = hpSrvService;
     }
 
     @Override
@@ -67,8 +68,7 @@ public class HpSrvSearchJob implements Runnable {
         JsonNode pdcHazardDtos = obtainHazards(searchBody);
 
         while (!pdcHazardDtos.isEmpty()) {
-            pdcHazardDtos.forEach(node -> dataLakeDao
-                    .storeEventData(PdcDataLakeConverter.convertHpSrvHazardData((ObjectNode) node)));
+            pdcHazardDtos.forEach(hpSrvService::saveHazard);
 
             searchBody.getPagination().setOffset(searchBody.getPagination().getOffset() + pdcHazardDtos.size());
             pdcHazardDtos = obtainHazards(searchBody);
@@ -109,14 +109,12 @@ public class HpSrvSearchJob implements Runnable {
             }
 
             DataLake dataLake = eventsWithoutAreas.get(i);
+            String externalId = dataLake.getExternalId();
             try {
                 JsonNode json = obtainMagsFeatureCollection(dataLake);
-                if (!json.isEmpty() && !json.get("features").isEmpty()) {
-                    DataLake magDto = PdcDataLakeConverter.convertHpSrvMagData(json, dataLake.getExternalId());
-                    dataLakeDao.storeEventData(magDto);
-                }
+                hpSrvService.saveMag(externalId, json);
             } catch (Exception e) {
-                LOG.warn("Exception during hazard mag processing. Hazard UUID = '{}'", dataLake.getExternalId(), e);
+                LOG.warn("Exception during hazard mag processing. Hazard UUID = '{}'", externalId, e);
             }
         }
     }
