@@ -13,6 +13,7 @@ import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 
 import java.io.IOException;
 
+import static io.kontur.eventapi.test.AwsTestConfig.SQS_QUEUE_NAME;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.given;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +68,7 @@ class PdcSqsMessageListenerIT extends AbstractIntegrationTest {
 
     private String sendMessageFromFileAndWaitForListenerToRead(String fileName) throws IOException {
         String message = IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
-        queueMessagingTemplate.convertAndSend(QUEUE_NAME, message);
+        queueMessagingTemplate.convertAndSend(SQS_QUEUE_NAME, message);
 
         given().await()
                 .atMost(5, SECONDS)
