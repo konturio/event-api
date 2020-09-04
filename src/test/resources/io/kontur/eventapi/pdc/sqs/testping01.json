@@ -1,0 +1,18 @@
+{
+  "EventSource": "aws:sns",
+  "EventVersion": "1.0",
+  "EventSubscriptionArn": "arn:aws:sns:us-west-1:509149105254:pdc-test-publiccloud-sns:1f6b3ff5-5d76-40e4-9f04-7a1e90c4bdf3",
+  "Sns": {
+    "Type": "Notification",
+    "MessageId": "e494ca13-5281-5ace-9ee7-9da83c086d57",
+    "TopicArn": "arn:aws:sns:us-west-1:509149105254:pdc-test-publiccloud-sns",
+    "Subject": null,
+    "Message": "{\"hashvalue\":\"05ce497bdd06a632e206f1c09bb033797344200bf4701fc4269ba4f6354074f1\",\"event\":\"{\\\"ObjectType\\\":\\\"EventPing\\\",\\\"syncDa\\\":{\\\"masterSyncDa\\\":{\\\"daId\\\":\\\"ALL\\\"},\\\"masterSyncEvents\\\":{\\\"type\\\":\\\"PING\\\",\\\"uuid\\\":\\\"PING\\\",\\\"action\\\":\\\"UPSERT\\\",\\\"createtms\\\":1598123081799,\\\"fromMasterSyncDa\\\":{\\\"daId\\\":\\\"CLOUD\\\"},\\\"sourceMasterSyncDa\\\":{\\\"daId\\\":\\\"CLOUD\\\"}},\\\"daSyncId\\\":2150787},\\\"json\\\":\\\"NULL\\\",\\\"key\\\":null,\\\"information\\\":null}\"}",
+    "Timestamp": "2020-08-22T19:04:41.837Z",
+    "SignatureVersion": "1",
+    "Signature": "Y+kVF1VxjhGwt8VFplLxJ9Ds2hsZTIrSCriHC2BrG9lXKU9mTtUvURZV+tHPdqiqQfwRtJdaK+RTAt7fdUZhjEGncaBPl7cd+D+83E2GBVUbyNpBqCAgz8uffulsPNTJwkKaSE4RrBaACnwx8aRzFpUpsi9kJy3jJjOwGznLe+q10m+0eVKQtBs0OAEcPSZd5ya/KBeNMiTI+H9R1vuhjy7J4kXq93HN5awppVhaH1JldKH3+ZUpn8sQx4Tir/OhXbVQPrQKeF7Wns/Z7fZicnxtsTYcho6RCxZzSlAy+q8jgFYj98i4cz+LA7Rus38MZW9URXwqF93oN3XjsgUNzA==",
+    "SigningCertUrl": "https://sns.us-west-1.amazonaws.com/SimpleNotificationService-a86cb10b4e1f29c941702d737128f7b6.pem",
+    "UnsubscribeUrl": "https://sns.us-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-1:509149105254:pdc-test-publiccloud-sns:1f6b3ff5-5d76-40e4-9f04-7a1e90c4bdf3",
+    "MessageAttributes": {}
+  }
+}

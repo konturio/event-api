@@ -1,9 +1,7 @@
 package io.kontur.eventapi.pdc.sqs;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.kontur.eventapi.dao.DataLakeDao;
-import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
+import io.kontur.eventapi.pdc.service.PdcSqsService;
 import io.kontur.eventapi.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,38 +15,42 @@ public class PdcSqsMessageListener {
 
     private final Logger LOG = LoggerFactory.getLogger(PdcSqsMessageListener.class);
 
-    private final DataLakeDao dataLakeDao;
+    private final PdcSqsService sqsService;
 
-    public PdcSqsMessageListener(DataLakeDao dataLakeDao) {
-        this.dataLakeDao = dataLakeDao;
+    public PdcSqsMessageListener(PdcSqsService sqsService) {
+        this.sqsService = sqsService;
     }
 
     @SqsListener(value = "${aws.sqs.url}", deletionPolicy = SqsMessageDeletionPolicy.NEVER)
     public void read(String sqsMessage, Acknowledgment acknowledgment) {
         LOG.debug("Message received: {}", sqsMessage);
 
-        JsonNode root = JsonUtil.readTree(sqsMessage);
-        JsonNode sns = root.get("Sns");
-        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
-        JsonNode event = JsonUtil.readTree(message.get("event").asText());
-        JsonNode masterSyncEvents = event.get("syncDa").get("masterSyncEvents");
+        JsonNode sns = JsonUtil.readTree(sqsMessage).get("Sns");
 
-        String type = masterSyncEvents.get("type").asText();
-        LOG.info("SQS Message received: Type: {}", type);
+        String type = getProductType(sns);
         if ("PING".equals(type)) {
             acknowledgment.acknowledge();
             return;
         } else if ("PRODUCT".equals(type)) {
-            return; //skip products until it is clear how to handle them
+            acknowledgment.acknowledge();
+            return; //TODO skip products until it is clear how to handle them
         }
 
-        String messageId = sns.get("MessageId").asText();
-
-        if (dataLakeDao.getDataLakesByExternalId(messageId).isEmpty()) {
-            DataLake dataLake = PdcDataLakeConverter.convertSQSMessage(sqsMessage, type, messageId);
-            dataLakeDao.storeEventData(dataLake);
-        }
+        String messageId = getMessageId(sns);
+        sqsService.saveMessage(sqsMessage, type, messageId);
         acknowledgment.acknowledge();
+    }
+
+    private String getProductType(JsonNode sns) {
+        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
+        JsonNode event = JsonUtil.readTree(message.get("event").asText());
+        JsonNode masterSyncEvents = event.get("syncDa").get("masterSyncEvents");
+
+        return masterSyncEvents.get("type").asText();
+    }
+
+    private String getMessageId(JsonNode sns) {
+        return sns.get("MessageId").asText();
     }
 
 }

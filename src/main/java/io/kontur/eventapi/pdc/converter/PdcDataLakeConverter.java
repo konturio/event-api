@@ -17,7 +17,7 @@ public class PdcDataLakeConverter {
     public final static String PDC_SQS_PROVIDER = "pdcSqs";
     public final static DateTimeFormatter magsDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-    public static DataLake convertHpSrvHazardData(ObjectNode node) {
+    public static DataLake convertHpSrvHazardData(JsonNode node) {
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
         dataLake.setExternalId(node.get("uuid").asText());

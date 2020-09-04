@@ -22,7 +22,7 @@ class WorkerSchedulerIT extends AbstractIntegrationTest {
     private HpSrvSearchJob hpSrvSearchJob;
 
     @AfterEach
-    public void reset_mocks() {
+    public void resetMocks() {
         Mockito.reset(hpSrvSearchJob);
     }
 
