@@ -27,7 +27,7 @@ spring:
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     platform: postgres
-    url: 'jdbc:tc:postgis12:///event-api'
+    url: 'jdbc:tc:postgis12:///event-api?TC_INITSCRIPT=db/init_db.sql'
   security:
     oauth2:
       resourceserver:
@@ -35,8 +35,13 @@ spring:
           issuer-uri: https://konturlabs.us.auth0.com/
 
 mybatis:
+  mapper-locations: classpath:db/mappers/*Mapper.xml
   type-handlers-package: io.kontur.eventapi.typehandler
 
 aws:
   sqs:
     url: LocalStack-test-queue
+
+logging:
+  level:
+    root: warn

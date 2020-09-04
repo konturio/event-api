@@ -1,5 +1,0 @@
-## Database Changelog
-databaseChangeLog:
-- include:
-    relativeToChangelogFile: true
-    file: 01-create-schema.sql
