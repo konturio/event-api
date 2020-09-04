@@ -8,7 +8,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(AwsTestConfig.class)
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest {
 
     public static final LocalStackContainer localStack;
 

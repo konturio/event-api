@@ -26,8 +26,7 @@ class WorkerSchedulerIT extends AbstractIntegrationTest {
         Mockito.reset(hpSrvSearchJob);
     }
 
-    @Test
-    @Disabled
+//    @Test
     public void startHpSrvSearchJob() throws InterruptedException {
         ReflectionTestUtils.setField(scheduler, "hpSrvImportEnabled", "true");
         scheduler.startPdcHazardImport();
@@ -37,8 +36,7 @@ class WorkerSchedulerIT extends AbstractIntegrationTest {
         verify(hpSrvSearchJob, times(1)).run();
     }
 
-    @Test
-    @Disabled
+//    @Test
     public void skipHpSrvSearchJobInvocation() throws InterruptedException {
         ReflectionTestUtils.setField(scheduler, "hpSrvImportEnabled", "false");
         scheduler.startPdcHazardImport();
