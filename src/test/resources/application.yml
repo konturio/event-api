@@ -44,4 +44,4 @@ aws:
 
 logging:
   level:
-    root: warn
+    root: info
