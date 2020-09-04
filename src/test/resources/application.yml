@@ -10,15 +10,15 @@ scheduler:
   normalization:
     enable: false
     initialDelay: 999999
-    fixedDelay: 60000
+    fixedDelay: 999999
   eventCombination:
     enable: false
     initialDelay: 999999
-    fixedDelay: 60000
+    fixedDelay: 999999
   feedComposition:
     enable: false
     initialDelay: 999999
-    fixedDelay: 60000
+    fixedDelay: 999999
 
 auth0:
   audience: localhost

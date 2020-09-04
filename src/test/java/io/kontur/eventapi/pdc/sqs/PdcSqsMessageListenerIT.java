@@ -6,6 +6,7 @@ import io.kontur.eventapi.pdc.service.PdcSqsService;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -45,7 +46,8 @@ class PdcSqsMessageListenerIT extends AbstractIntegrationTest {
         Mockito.reset(sqsMessageListener);
     }
 
-//    @Test
+    @Test
+    @Disabled
     public void testReceiveHazard() throws IOException {
         String json = sendMessageFromFileAndWaitForListenerToRead("testhazard01.json");
         LOG.debug("------ PdcSqsMessageListener testReceiveHazard id: {}", sqsMessageListener);
@@ -54,7 +56,8 @@ class PdcSqsMessageListenerIT extends AbstractIntegrationTest {
         verify(amazonSQSAsync, times(1)).deleteMessageAsync(any(DeleteMessageRequest.class));
     }
 
-//    @Test
+    @Test
+    @Disabled
     public void testReceiveMag() throws IOException {
         String json = sendMessageFromFileAndWaitForListenerToRead("testmag01.json");
         LOG.debug("------ PdcSqsMessageListener testReceiveMag id: {}", sqsMessageListener);
@@ -63,7 +66,8 @@ class PdcSqsMessageListenerIT extends AbstractIntegrationTest {
         verify(amazonSQSAsync, times(1)).deleteMessageAsync(any(DeleteMessageRequest.class));
     }
 
-//    @Test
+    @Test
+    @Disabled
     public void testReceivePing() throws IOException {
         sendMessageFromFileAndWaitForListenerToRead("testping01.json");
         LOG.debug("------ PdcSqsMessageListener testReceivePing id: {}", sqsMessageListener);
@@ -72,7 +76,8 @@ class PdcSqsMessageListenerIT extends AbstractIntegrationTest {
         verify(amazonSQSAsync, times(1)).deleteMessageAsync(any(DeleteMessageRequest.class));
     }
 
-//    @Test
+    @Test
+    @Disabled
     public void testReceiveProduct() throws IOException {
         sendMessageFromFileAndWaitForListenerToRead("testproduct01.json");
         LOG.debug("------ PdcSqsMessageListener testReceiveProduct id: {}", sqsMessageListener);
@@ -86,6 +91,11 @@ class PdcSqsMessageListenerIT extends AbstractIntegrationTest {
         String message = IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
         queueMessagingTemplate.convertAndSend(SQS_QUEUE_NAME, message);
 
+//        try {
+//            this.wait(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         given().await()
                 .atMost(5, SECONDS)
                 .untilAsserted(() -> verify(sqsMessageListener).read(anyString(), any()));
