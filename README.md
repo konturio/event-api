@@ -1,3 +1,15 @@
+## Profiles
+
+Available profiles:
+- `develop` - Disables JWT authorization
+- `awsSqsDisabled` - Disables AWS SQS integration
+
+Profiles can be activated several ways:
+- using system parameter `-Dspring.profiles.active={profile_name}`
+- using environment variable `export spring_profiles_active={profile_name}`
+
+Several profiles can be activated at once via `,` separator: `profile1,profile2`
+
 ## Installation
 
 #### Requirements
