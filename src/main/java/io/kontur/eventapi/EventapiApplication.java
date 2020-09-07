@@ -3,7 +3,6 @@ package io.kontur.eventapi;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.aws.messaging.config.annotation.EnableSqs;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -11,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableFeignClients
 @MapperScan("io.kontur.eventapi.dao.mapper")
-@EnableSqs
 public class EventapiApplication {
 
 	public static void main(String[] args) {

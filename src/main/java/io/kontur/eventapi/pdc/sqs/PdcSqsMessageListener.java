@@ -5,7 +5,6 @@ import io.kontur.eventapi.pdc.service.PdcSqsService;
 import io.kontur.eventapi.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.aws.messaging.listener.Acknowledgment;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.stereotype.Component;
@@ -21,24 +20,21 @@ public class PdcSqsMessageListener {
         this.sqsService = sqsService;
     }
 
-    @SqsListener(value = "${aws.sqs.url}", deletionPolicy = SqsMessageDeletionPolicy.NEVER)
-    public void read(String sqsMessage, Acknowledgment acknowledgment) {
+    @SqsListener(value = "${aws.sqs.url}", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
+    public void read(String sqsMessage) {
         LOG.debug("Message received: {}", sqsMessage);
 
         JsonNode sns = JsonUtil.readTree(sqsMessage).get("Sns");
 
         String type = getProductType(sns);
         if ("PING".equals(type)) {
-            acknowledgment.acknowledge();
             return;
         } else if ("PRODUCT".equals(type)) {
-            acknowledgment.acknowledge();
             return; //TODO skip products until it is clear how to handle them
         }
 
         String messageId = getMessageId(sns);
         sqsService.saveMessage(sqsMessage, type, messageId);
-        acknowledgment.acknowledge();
     }
 
     private String getProductType(JsonNode sns) {
