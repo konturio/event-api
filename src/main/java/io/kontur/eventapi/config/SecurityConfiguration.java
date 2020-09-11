@@ -43,7 +43,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-//                .antMatchers("/actuator", "/actuator/**").hasAuthority("SCOPE_read:actuator") TODO temporarily disabled
+                .antMatchers("/actuator", "/actuator/**").permitAll() //TODO security temporarily disabled
+//                .antMatchers("/actuator", "/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyRequest().authenticated()
                 .and()
                 .oauth2ResourceServer().jwt();
