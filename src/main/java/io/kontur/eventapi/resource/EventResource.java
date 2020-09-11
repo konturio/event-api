@@ -49,7 +49,7 @@ public class EventResource {
         return eventResourceService.searchEvents(feed, after, offset, limit);
     }
 
-    @GetMapping(path = "/raw-data/{observationId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+    @GetMapping(path = "/observations/{observationId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
     @Operation(tags = "Events", summary = "returns raw data", description = "Returns raw data which was used to combine events and episodes.")
     @PreAuthorize("hasAuthority('SCOPE_read:raw-data')")
     public ResponseEntity<String> rawData(@Parameter(description = "Observation UUID. May be gathered from event's 'observations' field") @PathVariable UUID observationId) {
