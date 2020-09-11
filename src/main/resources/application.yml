@@ -72,5 +72,7 @@ aws:
 management:
   endpoint:
     health:
+      cache:
+        time-to-live: 10s
       show-details: always
       show-components: always
