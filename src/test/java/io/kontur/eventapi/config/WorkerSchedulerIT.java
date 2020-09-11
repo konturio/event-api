@@ -3,15 +3,17 @@ package io.kontur.eventapi.config;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.*;
 
 class WorkerSchedulerIT extends AbstractIntegrationTest {
 
@@ -27,13 +29,17 @@ class WorkerSchedulerIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void startHpSrvSearchJob() throws InterruptedException {
+    public void startHpSrvSearchJob() {
         ReflectionTestUtils.setField(scheduler, "hpSrvImportEnabled", "true");
         scheduler.startPdcHazardImport();
 
-        Thread.sleep(10);
-
-        verify(hpSrvSearchJob, times(1)).run();
+        await()
+                .atMost(1, TimeUnit.SECONDS)
+                .ignoreException(WantedButNotInvoked.class)
+                .until(() -> {
+                    verify(hpSrvSearchJob, times(1)).run();
+                    return true;
+                });
     }
 
     @Test
@@ -41,9 +47,9 @@ class WorkerSchedulerIT extends AbstractIntegrationTest {
         ReflectionTestUtils.setField(scheduler, "hpSrvImportEnabled", "false");
         scheduler.startPdcHazardImport();
 
-        Thread.sleep(10);
+        Thread.sleep(100);
 
-        verify(hpSrvSearchJob, times(0)).run();
+        verify(hpSrvSearchJob, never()).run();
     }
 
 }
