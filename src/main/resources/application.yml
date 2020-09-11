@@ -17,6 +17,11 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: https://konturlabs.us.auth0.com/
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
 
 pdc:
   host: 'https://testemops.pdc.org'
@@ -63,3 +68,9 @@ aws:
   sqs:
     enabled: false
     url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
