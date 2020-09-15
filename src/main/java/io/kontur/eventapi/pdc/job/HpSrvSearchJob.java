@@ -55,15 +55,7 @@ public class HpSrvSearchJob implements Runnable {
     }
 
     private void importHazards() {
-        HpSrvSearchBody searchBody = new HpSrvSearchBody();
-        searchBody.getOrder().getOrderList().put("updateDate", "ASC");
-        searchBody.getPagination().setOffset(0);
-        searchBody.getPagination().setPageSize(20);
-
-        dataLakeDao.getLatestUpdatedHazard(HP_SRV_SEARCH_PROVIDER)
-                .map(DataLake::getUpdatedAt)
-                .ifPresent(lastUpdateTime -> searchBody.addAndRestriction("GREATER_THAN", "updateDate",
-                        convertOffsetDateTimeToEpochMillis(lastUpdateTime)));
+        HpSrvSearchBody searchBody = generateHazardSearchBody();
 
         JsonNode pdcHazardDtos = obtainHazards(searchBody);
 
@@ -75,9 +67,22 @@ public class HpSrvSearchJob implements Runnable {
         }
     }
 
+    private HpSrvSearchBody generateHazardSearchBody() {
+        HpSrvSearchBody searchBody = new HpSrvSearchBody();
+        searchBody.getOrder().getOrderList().put("updateDate", "ASC");
+        searchBody.getPagination().setOffset(0);
+        searchBody.getPagination().setPageSize(20);
+
+        dataLakeDao.getLatestUpdatedHazard(HP_SRV_SEARCH_PROVIDER)
+                .map(DataLake::getUpdatedAt)
+                .ifPresent(lastUpdateTime -> searchBody.addAndRestriction("GREATER_THAN", "updateDate",
+                        convertOffsetDateTimeToEpochMillis(lastUpdateTime)));
+        return searchBody;
+    }
+
     private JsonNode obtainHazards(HpSrvSearchBody searchBody) {
         try {
-            return obtainHazardsInSchedule(searchBody);
+            return obtainHazardsScheduled(searchBody);
         } catch (RetryableException e) {
             LOG.warn(e.getMessage());
             //will try once again
@@ -86,11 +91,11 @@ public class HpSrvSearchJob implements Runnable {
             } catch (InterruptedException interruptedException) {
                 throw new RuntimeException(e);
             }
-            return obtainHazardsInSchedule(searchBody);
+            return obtainHazardsScheduled(searchBody);
         }
     }
 
-    private JsonNode obtainHazardsInSchedule(HpSrvSearchBody searchBody) {
+    private JsonNode obtainHazardsScheduled(HpSrvSearchBody searchBody) {
         try {
             bucket.asScheduler().consume(1);
             return hpSrvClient.searchHazards(searchBody);
@@ -121,7 +126,7 @@ public class HpSrvSearchJob implements Runnable {
 
     private JsonNode obtainMagsFeatureCollection(DataLake dataLake) {
         try {
-            return obtainMagsInSchedule(dataLake);
+            return obtainMagsScheduled(dataLake);
         } catch (RetryableException e) {
             LOG.warn(e.getMessage());
             //will try once again
@@ -130,11 +135,11 @@ public class HpSrvSearchJob implements Runnable {
             } catch (InterruptedException interruptedException) {
                 throw new RuntimeException(e);
             }
-            return obtainMagsInSchedule(dataLake);
+            return obtainMagsScheduled(dataLake);
         }
     }
 
-    private JsonNode obtainMagsInSchedule(DataLake dataLake) {
+    private JsonNode obtainMagsScheduled(DataLake dataLake) {
         try {
             String hazardId = getHazardId(dataLake);
             bucket.asScheduler().consume(1);
