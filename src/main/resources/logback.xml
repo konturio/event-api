@@ -29,9 +29,19 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
+    <appender name="FILE-STAT" class="ch.qos.logback.core.FileAppender">
+        <file>log/event-api-stat.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
     <root level="info">
         <appender-ref ref="FILE-AUDIT" />
         <appender-ref ref="FILE-ERROR" />
+        <appender-ref ref="FILE-STAT" />
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
