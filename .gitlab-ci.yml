@@ -28,21 +28,21 @@ build:
     paths:
       - '*.zip'
 
-#deploy-sonic:
-#  tags:
-#    - kontur
-#    - ansible
-#  stage: deploy
-#  script: >
-#    ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
-#    path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
-#    --limit=sonic_event_api ansible/deploy.yml
-#  environment:
-#    name: TEST sonic
-#    url: https://test-apps.konturlabs.com/events/
-#  when: manual
-#  dependencies:
-#    - build
+deploy-sonic:
+  tags:
+    - kontur
+    - ansible
+  stage: deploy
+  script: >
+    ansible-playbook -vD -e "version=$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID
+    path_to_dist=$(find $CI_PROJECT_DIR -maxdepth 1 -name \*.zip -print -quit)"
+    --limit=sonic_event_api ansible/deploy.yml
+  environment:
+    name: TEST sonic
+    url: https://test-apps.konturlabs.com/events/
+  when: manual
+  dependencies:
+    - build
 
 deploy-zigzag:
   tags:
