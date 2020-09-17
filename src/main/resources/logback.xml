@@ -29,6 +29,18 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
+    <appender name="FILE-STAT-HPSRV-REQUEST" class="ch.qos.logback.core.FileAppender">
+        <file>log/event-api-stat-hprsv-request.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="STATISTIC-HPSRV-REQUEST" level="DEBUG" additivity="true">
+        <appender-ref ref="FILE-STAT-HPSRV-REQUEST"/>
+    </logger>
     <root level="info">
         <appender-ref ref="FILE-AUDIT" />
         <appender-ref ref="FILE-ERROR" />
