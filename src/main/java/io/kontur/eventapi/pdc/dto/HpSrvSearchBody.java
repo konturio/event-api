@@ -78,6 +78,14 @@ public class HpSrvSearchBody {
         public void setPageSize(Integer pageSize) {
             this.pageSize = pageSize;
         }
+
+        @Override
+        public String toString() {
+            return "Pagination{" +
+                    "offset=" + offset +
+                    ", pageSize=" + pageSize +
+                    '}';
+        }
     }
 
     public static class Order {
@@ -91,5 +99,21 @@ public class HpSrvSearchBody {
         public void setOrderList(Map<String, String> orderList) {
             this.orderList = orderList;
         }
+
+        @Override
+        public String toString() {
+            return "Order{" +
+                    "orderList=" + orderList +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "HpSrvSearchBody{" +
+                "order=" + order +
+                ", pagination=" + pagination +
+                ", restrictions=" + restrictions +
+                '}';
     }
 }
