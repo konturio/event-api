@@ -94,7 +94,7 @@ public class HpSrvSearchJob implements Runnable {
     private JsonNode obtainHazardsInSchedule(HpSrvSearchBody searchBody) {
         try {
             bucket.asScheduler().consume(1);
-            LOG_STAT.info("{}", searchBody.toString());
+            LOG_STAT.debug(searchBody.toString());
             return hpSrvClient.searchHazards(searchBody);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
