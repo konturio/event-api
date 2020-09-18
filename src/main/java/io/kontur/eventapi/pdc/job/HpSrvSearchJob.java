@@ -71,6 +71,7 @@ public class HpSrvSearchJob implements Runnable {
     private HpSrvSearchBody generateHazardSearchBody() {
         HpSrvSearchBody searchBody = new HpSrvSearchBody();
         searchBody.getOrder().getOrderList().put("updateDate", "ASC");
+        searchBody.getOrder().getOrderList().put("hazardId", "ASC");
         searchBody.getPagination().setOffset(0);
         searchBody.getPagination().setPageSize(20);
 
@@ -99,7 +100,7 @@ public class HpSrvSearchJob implements Runnable {
     private JsonNode obtainHazardsScheduled(HpSrvSearchBody searchBody) {
         try {
             bucket.asScheduler().consume(1);
-            LOG_STAT.debug(searchBody.toString());
+            LOG_STAT.debug("hazards requestBody - {}", searchBody.toString());
             return hpSrvClient.searchHazards(searchBody);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -145,6 +146,7 @@ public class HpSrvSearchJob implements Runnable {
         try {
             String hazardId = getHazardId(dataLake);
             bucket.asScheduler().consume(1);
+            LOG_STAT.debug("mags hazardId - {}", hazardId);
             return hpSrvClient.getMags(hazardId);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

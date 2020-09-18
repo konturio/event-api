@@ -10,7 +10,7 @@
         },
         "bodyPatterns": [
           {
-            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":0,\"pagesize\":20},\"restrictions\":[]}"
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\",\"hazardId\":\"ASC\"}},\"pagination\":{\"offset\":0,\"pagesize\":20},\"restrictions\":[]}"
           }
         ]
       },
@@ -32,7 +32,7 @@
         },
         "bodyPatterns": [
           {
-            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":3,\"pagesize\":20},\"restrictions\":[]}"
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\",\"hazardId\":\"ASC\"}},\"pagination\":{\"offset\":3,\"pagesize\":20},\"restrictions\":[]}"
           }
         ]
       },
@@ -54,7 +54,7 @@
         },
         "bodyPatterns": [
           {
-            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":5,\"pagesize\":20},\"restrictions\":[]}"
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\",\"hazardId\":\"ASC\"}},\"pagination\":{\"offset\":5,\"pagesize\":20},\"restrictions\":[]}"
           }
         ]
       },
@@ -76,7 +76,7 @@
         },
         "bodyPatterns": [
           {
-            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\"}},\"pagination\":{\"offset\":0,\"pagesize\":20},\"restrictions\":[[ {\n  \"updateDate\" : \"1594975736787\",\n  \"searchType\" : \"GREATER_THAN\"\n} ]]}"
+            "equalToJson": "{\"order\":{\"orderlist\":{\"updateDate\":\"ASC\",\"hazardId\":\"ASC\"}},\"pagination\":{\"offset\":0,\"pagesize\":20},\"restrictions\":[[ {\n  \"updateDate\" : \"1594975736787\",\n  \"searchType\" : \"GREATER_THAN\"\n} ]]}"
           }
         ]
       },
