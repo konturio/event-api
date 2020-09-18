@@ -2,10 +2,7 @@ package io.kontur.eventapi.pdc.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HpSrvSearchBody {
 
@@ -90,7 +87,7 @@ public class HpSrvSearchBody {
 
     public static class Order {
         @JsonProperty("orderlist")
-        private Map<String, String> orderList = new HashMap<>();
+        private Map<String, String> orderList = new LinkedHashMap<>();
 
         public Map<String, String> getOrderList() {
             return orderList;

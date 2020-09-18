@@ -71,6 +71,7 @@ public class HpSrvSearchJob implements Runnable {
     private HpSrvSearchBody generateHazardSearchBody() {
         HpSrvSearchBody searchBody = new HpSrvSearchBody();
         searchBody.getOrder().getOrderList().put("updateDate", "ASC");
+        searchBody.getOrder().getOrderList().put("hazardId", "ASC");
         searchBody.getPagination().setOffset(0);
         searchBody.getPagination().setPageSize(20);
 
