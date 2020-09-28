@@ -24,7 +24,6 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARC
 public class HpSrvSearchJob implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(HpSrvSearchJob.class);
-    private final static Logger LOG_STAT = LoggerFactory.getLogger("STATISTIC-HPSRV-REQUEST");
 
     private final HpSrvClient hpSrvClient;
     private final Bucket bucket;
@@ -100,7 +99,6 @@ public class HpSrvSearchJob implements Runnable {
     private JsonNode obtainHazardsScheduled(HpSrvSearchBody searchBody) {
         try {
             bucket.asScheduler().consume(1);
-            LOG_STAT.debug("hazards requestBody - {}", searchBody.toString());
             return hpSrvClient.searchHazards(searchBody);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -146,7 +144,6 @@ public class HpSrvSearchJob implements Runnable {
         try {
             String hazardId = getHazardId(dataLake);
             bucket.asScheduler().consume(1);
-            LOG_STAT.debug("mags hazardId - {}", hazardId);
             return hpSrvClient.getMags(hazardId);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
