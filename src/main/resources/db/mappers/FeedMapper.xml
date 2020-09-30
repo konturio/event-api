@@ -10,8 +10,8 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes)
-        values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt},
+        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, updated_by_source_at, observations, episodes)
+        values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt}, #{updatedBySourceAt},
                 #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb)
     </insert>
 
@@ -32,9 +32,9 @@
           AND fd.version = t.version
           AND fd.feed_id = f.feed_id
           <if test='after != null'>
-            AND updated_at > #{after}
+            AND updated_by_source_at > #{after}
           </if>
-        ORDER BY updated_at
+        ORDER BY updated_by_source_at
         LIMIT #{limit} OFFSET #{offset};
     </select>
 

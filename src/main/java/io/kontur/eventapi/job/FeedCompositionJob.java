@@ -49,7 +49,7 @@ public class FeedCompositionJob implements Runnable {
 
     private void createFeedData(KonturEvent event, Feed feed) {
         List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
-        observations.sort(Comparator.comparing(NormalizedObservation::getUpdatedAt));
+        observations.sort(Comparator.comparing(NormalizedObservation::getUpdatedBySourceAt));
 
         FeedData feedDto = new FeedData(event.getEventId(), feed.getFeedId(), event.getVersion());
 
@@ -101,9 +101,16 @@ public class FeedCompositionJob implements Runnable {
                     isDataFilled = false;
                 }
             }
+            if (feedDto.getUpdatedBySourceAt() == null) {
+                if (observation.getUpdatedBySourceAt() != null) {
+                    feedDto.setUpdatedBySourceAt(observation.getUpdatedBySourceAt());
+                } else {
+                    isDataFilled = false;
+                }
+            }
             if (feedDto.getUpdatedAt() == null) {
-                if (observation.getUpdatedAt() != null) {
-                    feedDto.setUpdatedAt(observation.getUpdatedAt());
+                if (observation.getLoadedAt() != null) {
+                    feedDto.setUpdatedAt(observation.getLoadedAt());
                 } else {
                     isDataFilled = false;
                 }
@@ -127,7 +134,8 @@ public class FeedCompositionJob implements Runnable {
         feedEpisode.setSeverity(observation.getEventSeverity());
         feedEpisode.setStartedAt(observation.getStartedAt());
         feedEpisode.setEndedAt(observation.getEndedAt());
-        feedEpisode.setUpdatedAt(observation.getUpdatedAt());
+        feedEpisode.setUpdatedBySourceAt(observation.getUpdatedBySourceAt());
+        feedEpisode.setUpdatedAt(observation.getLoadedAt());
         feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
         return Optional.of(feedEpisode);
     }

@@ -15,6 +15,7 @@ public class FeedData {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
+    private OffsetDateTime updatedBySourceAt;
     private List<UUID> observations = new ArrayList<>();
     private List<FeedEpisode> episodes = new ArrayList<>();
 
@@ -80,12 +81,12 @@ public class FeedData {
         this.endedAt = endedAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
+    public OffsetDateTime getUpdatedBySourceAt() {
+        return updatedBySourceAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedBySourceAt(OffsetDateTime updatedBySourceAt) {
+        this.updatedBySourceAt = updatedBySourceAt;
     }
 
     public List<UUID> getObservations() {
@@ -102,5 +103,13 @@ public class FeedData {
 
     public void addEpisode(FeedEpisode episode) {
         episodes.add(episode);
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

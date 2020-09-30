@@ -22,7 +22,7 @@ public class NormalizedObservation {
     private OffsetDateTime loadedAt;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
-    private OffsetDateTime updatedAt;
+    private OffsetDateTime updatedBySourceAt;
     private String sourceUri;
 
     public UUID getObservationId() {
@@ -153,12 +153,12 @@ public class NormalizedObservation {
         this.endedAt = endedAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
+    public OffsetDateTime getUpdatedBySourceAt() {
+        return updatedBySourceAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedBySourceAt(OffsetDateTime updatedBySourceAt) {
+        this.updatedBySourceAt = updatedBySourceAt;
     }
 
     public String getSourceUri() {

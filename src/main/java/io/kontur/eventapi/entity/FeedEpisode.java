@@ -13,7 +13,9 @@ public class FeedEpisode {
     private Severity severity;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
+    private OffsetDateTime updatedBySourceAt;
     private OffsetDateTime updatedAt;
+
     private FeatureCollection geometries;
 
     public String getName() {
@@ -72,12 +74,12 @@ public class FeedEpisode {
         this.endedAt = endedAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
+    public OffsetDateTime getUpdatedBySourceAt() {
+        return updatedBySourceAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedBySourceAt(OffsetDateTime updatedBySourceAt) {
+        this.updatedBySourceAt = updatedBySourceAt;
     }
 
     public FeatureCollection getGeometries() {
@@ -86,5 +88,13 @@ public class FeedEpisode {
 
     public void setGeometries(FeatureCollection geometries) {
         this.geometries = geometries;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

@@ -1,0 +1,3 @@
+
+alter table normalized_observations
+rename column updated_at to updated_by_source_at
