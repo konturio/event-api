@@ -8,14 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 @Component
 public class WorkerScheduler {
 
     private final Logger LOG = LoggerFactory.getLogger(WorkerScheduler.class);
-    private final ThreadPoolTaskExecutor taskExecutor;
     private final HpSrvSearchJob hpSrvSearchJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
@@ -30,11 +28,9 @@ public class WorkerScheduler {
     @Value("${scheduler.feedComposition.enable}")
     private String feedCompositionEnabled;
 
-    public WorkerScheduler(ThreadPoolTaskExecutor taskExecutor,
-                           HpSrvSearchJob hpSrvSearchJob,
+    public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob,
                            NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob) {
-        this.taskExecutor = taskExecutor;
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
@@ -44,34 +40,34 @@ public class WorkerScheduler {
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
     public void startPdcHazardImport() {
         if (Boolean.parseBoolean(hpSrvImportEnabled)) {
-            taskExecutor.execute(hpSrvSearchJob);
+            hpSrvSearchJob.run();
         } else {
             LOG.info("HpSrv import job invocation is skipped");
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedDelayString = "${scheduler.normalization.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedRateString = "${scheduler.normalization.fixedDelay}")
     public void startNormalization() {
         if (Boolean.parseBoolean(normalizationEnabled)) {
-            taskExecutor.execute(normalizationJob);
+            normalizationJob.run();
         } else {
             LOG.info("Normalization job invocation is skipped");
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedDelayString = "${scheduler.eventCombination.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedRateString = "${scheduler.eventCombination.fixedDelay}")
     public void startCombinationJob() {
         if (Boolean.parseBoolean(eventCombinationEnabled)) {
-            taskExecutor.execute(eventCombinationJob);
+            eventCombinationJob.run();
         } else {
             LOG.info("Combination job invocation is skipped");
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedRateString = "${scheduler.feedComposition.fixedDelay}")
     public void startFeedCompositionJob() {
         if (Boolean.parseBoolean(feedCompositionEnabled)) {
-            taskExecutor.execute(feedCompositionJob);
+            feedCompositionJob.run();
         } else {
             LOG.info("Feed Compose job invocation is skipped");
         }
