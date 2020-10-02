@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper
@@ -21,4 +22,5 @@ public interface FeedMapper {
 
     List<FeedData> searchForEvents(String feedAlias, OffsetDateTime after, int offset, int limit);
 
+    Optional<FeedData> getFeedDataByUpdatedAt(OffsetDateTime updatedAt);
 }

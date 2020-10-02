@@ -38,6 +38,14 @@
         LIMIT #{limit} OFFSET #{offset};
     </select>
 
+    <select id="getFeedDataByUpdatedAt" resultMap="feedDataDtoMap">
+        SELECT *
+        FROM feed_data
+        WHERE updated_at = #{updatedAt}
+        LIMIT 1
+    </select>
+
+
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">
         <result property="feedId" column="feed_id" />
         <result property="description" column="description"/>
@@ -55,6 +63,7 @@
         <result property="startedAt" column="started_at" />
         <result property="endedAt" column="ended_at" />
         <result property="updatedAt" column="updated_at" />
+        <result property="updatedBySourceAt" column="updated_by_source_at" />
         <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
         <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
     </resultMap>

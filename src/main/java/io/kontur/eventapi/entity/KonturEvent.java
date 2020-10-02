@@ -42,4 +42,13 @@ public class KonturEvent {
     public void addObservations(List<UUID> observations) {
         this.observationIds.addAll(observations);
     }
+
+    @Override
+    public String toString() {
+        return "KonturEvent{" +
+                "eventId=" + eventId +
+                ", version=" + version +
+                ", observationIds=" + observationIds +
+                '}';
+    }
 }

@@ -168,4 +168,24 @@ public class NormalizedObservation {
     public void setSourceUri(String sourceUri) {
         this.sourceUri = sourceUri;
     }
+
+    @Override
+    public String toString() {
+        return "NormalizedObservation{" +
+                "observationId=" + observationId +
+                ", externalEventId='" + externalEventId + '\'' +
+                ", provider='" + provider + '\'' +
+                ", eventSeverity=" + eventSeverity +
+                ", episodeDescription='" + episodeDescription + '\'' +
+                ", type=" + type +
+                ", active=" + active +
+                ", cost=" + cost +
+                ", region='" + region + '\'' +
+                ", loadedAt=" + loadedAt +
+                ", startedAt=" + startedAt +
+                ", endedAt=" + endedAt +
+                ", updatedBySourceAt=" + updatedBySourceAt +
+                ", sourceUri='" + sourceUri + '\'' +
+                '}';
+    }
 }

@@ -112,4 +112,19 @@ public class FeedData {
     public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "FeedData{" +
+                "eventId=" + eventId +
+                ", feedId=" + feedId +
+                ", version=" + version +
+                ", startedAt=" + startedAt +
+                ", endedAt=" + endedAt +
+                ", updatedAt=" + updatedAt +
+                ", updatedBySourceAt=" + updatedBySourceAt +
+                ", observations=" + observations +
+                ", episodes=" + episodes +
+                '}';
+    }
 }
