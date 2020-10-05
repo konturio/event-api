@@ -14,6 +14,8 @@ public class FeedEpisode {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
+    private OffsetDateTime sourceUpdatedAt;
+
     private FeatureCollection geometries;
 
     public String getName() {
@@ -72,6 +74,14 @@ public class FeedEpisode {
         this.endedAt = endedAt;
     }
 
+    public FeatureCollection getGeometries() {
+        return geometries;
+    }
+
+    public void setGeometries(FeatureCollection geometries) {
+        this.geometries = geometries;
+    }
+
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
@@ -80,11 +90,27 @@ public class FeedEpisode {
         this.updatedAt = updatedAt;
     }
 
-    public FeatureCollection getGeometries() {
-        return geometries;
+    public OffsetDateTime getSourceUpdatedAt() {
+        return sourceUpdatedAt;
     }
 
-    public void setGeometries(FeatureCollection geometries) {
-        this.geometries = geometries;
+    public void setSourceUpdatedAt(OffsetDateTime sourceUpdatedAt) {
+        this.sourceUpdatedAt = sourceUpdatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "FeedEpisode{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", active=" + active +
+                ", severity=" + severity +
+                ", startedAt=" + startedAt +
+                ", endedAt=" + endedAt +
+                ", updatedAt=" + updatedAt +
+                ", sourceUpdatedAt=" + sourceUpdatedAt +
+                ", geometries=" + geometries +
+                '}';
     }
 }

@@ -1,0 +1,68 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.36,
+              42.86
+            ],
+            [
+              -71.36,
+              43.15
+            ],
+            [
+              -70.95,
+              43.15
+            ],
+            [
+              -70.95,
+              42.86
+            ],
+            [
+              -71.36,
+              42.86
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "magId": 16095,
+        "uuid": "996d6b0a-ce18-47d9-9bd2-b1b8fe5d967a",
+        "title": "Automated Flood SmartAlert Area [ 2020-07-14 21:05:23 GMT ]",
+        "createDate": "2020-07-14T21:05:26.591+0000",
+        "magType": "Calculated",
+        "creator": "d2p2",
+        "isActive": true,
+        "hazard.hazardType.typeId": "FLOOD",
+        "hazard.hazardType.typeName": "Flood",
+        "hazard.hazardType.typeDescription": "Flood",
+        "hazard.hazardType.typeDisplayOrder": 0,
+        "hazard.hazardType.typeIcon": "flood.png",
+        "hazard.hazardId": 2950,
+        "hazard.hazardName": "Flood - Boston, MA--NH--RI Region, United States",
+        "hazard.commentText": "FLOODIPAWS-WARNING-2020-Boston, MA--NH--RI",
+        "hazard.createDate": "2020-07-14T21:04:39.818+0000",
+        "hazard.creator": "DisasterAWARE (Automated)",
+        "hazard.startDate": "2020-07-14T20:56:00.000+0000",
+        "hazard.endDate": "2020-07-15T00:00:00.000+0000",
+        "hazard.lastUpdate": "2020-07-15T00:00:21.530+0000",
+        "hazard.latitude": 43.0008,
+        "hazard.longitude": -71.1717,
+        "hazard.orgId": -1,
+        "hazard.autoexpire": "Y",
+        "hazard.updateDate": "2020-07-14T21:04:38.798+0000",
+        "hazard.messageId": "1028.1594760425505",
+        "hazard.masterIncidentId": "1052.257100.647665.1",
+        "hazard.status": "E",
+        "hazard.uuid": "0457178b-45c1-492f-bbc1-61ca14389a31",
+        "updateDate": "2020-07-14T21:05:26.591+0000"
+      },
+      "id": "fid.0"
+    }
+  ]
+}

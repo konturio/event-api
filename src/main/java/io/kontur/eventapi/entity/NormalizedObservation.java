@@ -22,7 +22,7 @@ public class NormalizedObservation {
     private OffsetDateTime loadedAt;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
-    private OffsetDateTime updatedAt;
+    private OffsetDateTime sourceUpdatedAt;
     private String sourceUri;
 
     public UUID getObservationId() {
@@ -153,12 +153,12 @@ public class NormalizedObservation {
         this.endedAt = endedAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
+    public OffsetDateTime getSourceUpdatedAt() {
+        return sourceUpdatedAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setSourceUpdatedAt(OffsetDateTime sourceUpdatedAt) {
+        this.sourceUpdatedAt = sourceUpdatedAt;
     }
 
     public String getSourceUri() {
@@ -167,5 +167,29 @@ public class NormalizedObservation {
 
     public void setSourceUri(String sourceUri) {
         this.sourceUri = sourceUri;
+    }
+
+    @Override
+    public String toString() {
+        return "NormalizedObservation{" +
+                "observationId=" + observationId +
+                ", externalEventId='" + externalEventId + '\'' +
+                ", provider='" + provider + '\'' +
+                ", point='" + point + '\'' +
+                ", geometries='" + geometries + '\'' +
+                ", eventSeverity=" + eventSeverity +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", episodeDescription='" + episodeDescription + '\'' +
+                ", type=" + type +
+                ", active=" + active +
+                ", cost=" + cost +
+                ", region='" + region + '\'' +
+                ", loadedAt=" + loadedAt +
+                ", startedAt=" + startedAt +
+                ", endedAt=" + endedAt +
+                ", sourceUpdatedAt=" + sourceUpdatedAt +
+                ", sourceUri='" + sourceUri + '\'' +
+                '}';
     }
 }
