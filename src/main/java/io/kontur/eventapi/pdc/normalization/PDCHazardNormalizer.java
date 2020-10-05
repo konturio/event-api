@@ -26,7 +26,7 @@ public abstract class PDCHazardNormalizer extends Normalizer {
             "WATCH", Severity.SEVERE,
             "ADVISORY", Severity.MODERATE,
             "INFORMATION", Severity.MINOR,
-            "TERMINATION", Severity.MINOR
+            "TERMINATION", Severity.TERMINATION
     );
 
     protected Severity defineSeverity(String severityId) {

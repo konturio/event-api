@@ -5,5 +5,6 @@ public enum Severity {
     SEVERE,
     MODERATE,
     MINOR,
+    TERMINATION,
     UNKNOWN
 }

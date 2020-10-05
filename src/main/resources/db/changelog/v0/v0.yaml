@@ -21,3 +21,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 07-rename-field-in-normalized-obs.sql
+- include:
+    relativeToChangelogFile: true
+    file: 08-clear-events-after-severities-redefinition.sql
