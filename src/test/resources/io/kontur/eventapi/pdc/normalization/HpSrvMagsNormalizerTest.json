@@ -1,0 +1,51 @@
+{
+  "type": "FeatureCollection",
+  "features": [{
+    "type": "Feature",
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-74.46, 40.59],
+          [-74.46, 40.8],
+          [-73.99, 40.8],
+          [-73.99, 40.59],
+          [-74.46, 40.59]
+        ]
+      ]
+    },
+    "properties": {
+      "magId": 26367,
+      "uuid": "9b2538fd-2b6b-498d-94a6-896fd55e3ca8",
+      "title": "Automated Flood SmartAlert Area [ 2020-07-22 22:51:20 GMT ]",
+      "createDate": "2020-07-22T22:51:23.232+0000",
+      "magType": "Calculated",
+      "creator": "d2p2",
+      "isActive": false,
+      "hazard.hazardType.typeId": "FLOOD",
+      "hazard.hazardType.typeName": "Flood",
+      "hazard.hazardType.typeDescription": "Flood",
+      "hazard.hazardType.typeDisplayOrder": 0,
+      "hazard.hazardType.typeIcon": "flood.png",
+      "hazard.hazardId": 3408,
+      "hazard.hazardName": "Flood - New York--Newark, NY--NJ--CT Region, United States",
+      "hazard.commentText": "FLOODIPAWS-WARNING-2020-New York--Newark, NY--NJ--CT",
+      "hazard.createDate": "2020-07-22T22:50:55.089+0000",
+      "hazard.creator": "DisasterAWARE (Automated)",
+      "hazard.startDate": "2020-07-22T22:42:00.000+0000",
+      "hazard.endDate": "2020-07-23T01:00:00.000+0000",
+      "hazard.lastUpdate": "2020-07-23T01:00:19.585+0000",
+      "hazard.latitude": 40.6929,
+      "hazard.longitude": -73.9405,
+      "hazard.orgId": -1,
+      "hazard.autoexpire": "Y",
+      "hazard.updateDate": "2020-07-23T00:43:42.861+0000",
+      "hazard.messageId": "1028.1595457977552",
+      "hazard.masterIncidentId": "1052.257981.649540.1",
+      "hazard.status": "E",
+      "hazard.uuid": "bd6bfd50-a743-4959-88ee-72cf6809ae76",
+      "updateDate": "2020-07-22T22:51:23.232+0000"
+    },
+    "id": "fid.0"
+  }]
+}
