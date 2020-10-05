@@ -45,7 +45,7 @@ class HpSrvMagsNormalizerTest {
         assertEquals(EventType.FLOOD, obs.getType());
         assertEquals(1595457720000L, obs.getStartedAt().toInstant().toEpochMilli());
         assertEquals(1595466000000L, obs.getEndedAt().toInstant().toEpochMilli());
-        assertEquals(1595458283232L, obs.getUpdatedAt().toInstant().toEpochMilli());
+        assertEquals(1595458283232L, obs.getSourceUpdatedAt().toInstant().toEpochMilli());
         FeatureCollection fc = readJson(obs.getGeometries(), FeatureCollection.class);
         assertEquals(1, fc.getFeatures().length);
         assertEquals(

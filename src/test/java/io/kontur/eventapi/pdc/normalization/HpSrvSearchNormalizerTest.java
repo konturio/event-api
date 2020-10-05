@@ -40,7 +40,7 @@ class HpSrvSearchNormalizerTest {
         assertEquals(EventType.FLOOD, obs.getType());
         assertEquals(1590590340000L, obs.getStartedAt().toInstant().toEpochMilli());
         assertEquals(1590675541253L, obs.getEndedAt().toInstant().toEpochMilli());
-        assertEquals(1590590813468L, obs.getUpdatedAt().toInstant().toEpochMilli());
+        assertEquals(1590590813468L, obs.getSourceUpdatedAt().toInstant().toEpochMilli());
         assertEquals(dataLake.getLoadedAt(), obs.getLoadedAt());
     }
 
