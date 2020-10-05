@@ -13,7 +13,6 @@ public class FeedEpisode {
     private Severity severity;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
-    private OffsetDateTime updatedBySourceAt;
     private OffsetDateTime updatedAt;
 
     private FeatureCollection geometries;
@@ -72,14 +71,6 @@ public class FeedEpisode {
 
     public void setEndedAt(OffsetDateTime endedAt) {
         this.endedAt = endedAt;
-    }
-
-    public OffsetDateTime getUpdatedBySourceAt() {
-        return updatedBySourceAt;
-    }
-
-    public void setUpdatedBySourceAt(OffsetDateTime updatedBySourceAt) {
-        this.updatedBySourceAt = updatedBySourceAt;
     }
 
     public FeatureCollection getGeometries() {

@@ -21,6 +21,3 @@ databaseChangeLog:
 - include:
       relativeToChangelogFile: true
       file: 07-rename-field-in-normalized-obs.sql
-- include:
-      relativeToChangelogFile: true
-      file: 08-add-column-feed-data.sql

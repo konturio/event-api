@@ -17,10 +17,8 @@ public interface FeedMapper {
 
     int insertFeedData(
             UUID eventId, UUID feedId, Long version, String name, String description,
-            OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt, OffsetDateTime updatedBySourceAt,
+            OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt,
             @Param("observations") List<UUID> observations, @Param("episodes") String episodes);
 
     List<FeedData> searchForEvents(String feedAlias, OffsetDateTime after, int offset, int limit);
-
-    Optional<FeedData> getFeedDataByUpdatedAt(OffsetDateTime updatedAt);
 }

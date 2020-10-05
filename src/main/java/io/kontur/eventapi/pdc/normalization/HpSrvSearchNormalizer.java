@@ -34,7 +34,7 @@ public class HpSrvSearchNormalizer extends PDCHazardNormalizer {
         normalizedDto.setType(defineType(readString(props, "type_ID")));
         normalizedDto.setStartedAt(readDateTime(props, "start_Date"));
         normalizedDto.setEndedAt(readDateTime(props, "end_Date"));
-        normalizedDto.setUpdatedBySourceAt(readDateTime(props, "update_Date"));
+        normalizedDto.setSourceUpdatedAt(readDateTime(props, "update_Date"));
         normalizedDto.setPoint(makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude")));
 
         return normalizedDto;

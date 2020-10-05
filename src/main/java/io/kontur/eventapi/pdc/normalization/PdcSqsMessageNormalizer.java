@@ -47,7 +47,7 @@ public class PdcSqsMessageNormalizer extends PDCHazardNormalizer {
 
         Map<String, Object> props = readJson(event.get("json").asText(), new TypeReference<>() {
         });
-        normalizedDto.setUpdatedBySourceAt(readDateTime(props, "updateDate"));
+        normalizedDto.setSourceUpdatedAt(readDateTime(props, "updateDate"));
 
         switch (type) {
             case "MAG":
