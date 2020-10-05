@@ -59,35 +59,4 @@ public class DataLake {
     public void setData(String data) {
         this.data = data;
     }
-
-    public DataLake() {
-    }
-
-    public DataLake(UUID observationId, String externalId, OffsetDateTime updatedAt, OffsetDateTime loadedAt, String provider, String data) {
-        this.observationId = observationId;
-        this.externalId = externalId;
-        this.updatedAt = updatedAt;
-        this.loadedAt = loadedAt;
-        this.provider = provider;
-        this.data = data;
-    }
-
-    public DataLake(UUID observationId, String externalId, OffsetDateTime loadedAt, String provider, String data) {
-        this.observationId = observationId;
-        this.externalId = externalId;
-        this.loadedAt = loadedAt;
-        this.provider = provider;
-        this.data = data;
-    }
-
-    @Override
-    public String toString() {
-        return "DataLake{" +
-                "observationId=" + observationId +
-                ", externalId='" + externalId + '\'' +
-                ", updatedAt=" + updatedAt +
-                ", loadedAt=" + loadedAt +
-                ", provider='" + provider + '\'' +
-                '}';
-    }
 }

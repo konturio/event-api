@@ -19,5 +19,5 @@ databaseChangeLog:
     relativeToChangelogFile: true
     file: 06-add-constraints.sql
 - include:
-      relativeToChangelogFile: true
-      file: 07-rename-field-in-normalized-obs.sql
+    relativeToChangelogFile: true
+    file: 07-rename-field-in-normalized-obs.sql
