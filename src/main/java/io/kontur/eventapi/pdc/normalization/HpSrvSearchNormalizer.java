@@ -22,12 +22,12 @@ public class HpSrvSearchNormalizer extends PDCHazardNormalizer {
     public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
-        normalizedDto.setExternalEventId(dataLakeDto.getExternalId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
         normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
 
         Map<String, Object> props = readJson(dataLakeDto.getData(), new TypeReference<>() {});
 
+        normalizedDto.setExternalEventId(readString(props, "uuid"));
         normalizedDto.setEventSeverity(defineSeverity(readString(props, "severity_ID")));
         normalizedDto.setName(readString(props, "hazard_Name"));
         normalizedDto.setDescription(readString(props, "description"));

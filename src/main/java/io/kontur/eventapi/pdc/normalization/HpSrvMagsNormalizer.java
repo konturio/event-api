@@ -27,7 +27,6 @@ public class HpSrvMagsNormalizer extends PDCHazardNormalizer {
     public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
-        normalizedDto.setExternalEventId(dataLakeDto.getExternalId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
         normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
         FeatureCollection fc = readJson(dataLakeDto.getData(), FeatureCollection.class);
@@ -39,6 +38,7 @@ public class HpSrvMagsNormalizer extends PDCHazardNormalizer {
             normalizedDto.setGeometries(writeJson(convertGeometries(features)));
 
             Map<String, Object> props = features.get(features.size() - 1).getProperties(); //take last updated feature
+            normalizedDto.setExternalEventId(readString(props, "hazard.uuid"));
             normalizedDto.setName(readString(props, "hazard.hazardName"));
             normalizedDto.setEpisodeDescription(convertDescription(props));
             normalizedDto.setType(defineType(readString(props, "hazard.hazardType.typeId")));
