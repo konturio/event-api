@@ -28,20 +28,26 @@ pdc:
   user: 'eventapi'
   password: 'zvgusf48D'
 
+gdacs:
+  host: 'https://www.gdacs.org/xml/gdacs_cap.xml'
+
 scheduler:
   hpSrvImport:
-    enable: false
+    enable: true
+    initialDelay: 1000
+  gdacsImport:
+    enable: true
     initialDelay: 1000
   normalization:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
   eventCombination:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
 
@@ -54,6 +60,13 @@ feign:
         loggerLevel: headers
         requestInterceptors:
           - feign.auth.BasicAuthRequestInterceptor
+      gdacsBasicAuth:
+        connectTimeout: 60000
+        readTimeout: 60000
+        loggerLevel: headers
+        requestInterceptors:
+          - feign.auth.BasicAuthRequestInterceptor
+
 
 mybatis:
   mapper-locations: classpath:db/mappers/*Mapper.xml
