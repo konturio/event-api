@@ -12,6 +12,9 @@ spring:
     url: 'jdbc:postgresql://localhost:5432/postgres'
     username: postgres
     password: postgres
+    hikari:
+      register-mbeans: true
+      pool-name: HikariPool-1
   security:
     oauth2:
       resourceserver:
@@ -70,6 +73,13 @@ aws:
     url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo
 
 management:
+  health:
+    ping:
+      enabled: false
+    diskspace:
+      enabled: false
+    refresh:
+      enabled: false
   endpoint:
     health:
       cache:
