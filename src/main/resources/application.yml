@@ -73,6 +73,10 @@ aws:
     url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo
 
 management:
+  metrics:
+    export:
+      simple:
+        enabled: false
   health:
     ping:
       enabled: false
@@ -86,3 +90,7 @@ management:
         time-to-live: 10s
       show-details: always
       show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
