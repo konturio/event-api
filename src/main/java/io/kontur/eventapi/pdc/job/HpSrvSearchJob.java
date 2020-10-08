@@ -9,6 +9,7 @@ import io.kontur.eventapi.pdc.client.HpSrvClient;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
 import io.kontur.eventapi.pdc.service.HpSrvService;
 import io.kontur.eventapi.util.JsonUtil;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class HpSrvSearchJob implements Runnable {
     }
 
     @Override
+    @Timed(value = "job.pdc.hpSrv", longTask = true)
     public void run() {
         LOG.info("PDC hazards import job has started");
 

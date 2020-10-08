@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.*;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,7 @@ public class FeedCompositionJob implements Runnable {
     }
 
     @Override
+    @Timed("job.feedComposition")
     public void run() {
         LOG.info("Feed Composition job has started.");
         List<Feed> feeds = feedDao.getFeeds();

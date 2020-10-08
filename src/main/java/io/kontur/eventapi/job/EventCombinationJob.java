@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.KonturEvent;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ public class EventCombinationJob implements Runnable {
     }
 
     @Override
+    @Timed("job.eventCombination")
     public void run() {
         List<String> externalIds = observationsDao.getExternalIdsToUpdate();
 
