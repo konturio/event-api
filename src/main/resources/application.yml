@@ -29,7 +29,7 @@ pdc:
   password: 'zvgusf48D'
 
 gdacs:
-  host: 'https://www.gdacs.org/xml/gdacs_cap.xml'
+  host: 'https://www.gdacs.org'
 
 scheduler:
   hpSrvImport:
@@ -38,6 +38,7 @@ scheduler:
   gdacsImport:
     enable: true
     initialDelay: 1000
+    fixedRate: 300000
   normalization:
     enable: true
     initialDelay: 1000
