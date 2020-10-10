@@ -50,7 +50,7 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedRateString = "${scheduler.gdacsImport.fixedRate}")
+    @Scheduled(initialDelayString = "${scheduler.gdacsImport.initialDelay}", fixedRateString = "${scheduler.gdacsImport.fixedRate}")
     public void startGdacsImport() {
         if (Boolean.parseBoolean(gdacsImportEnabled)) {
             gdacsSearchJob.run();

@@ -33,22 +33,22 @@ gdacs:
 
 scheduler:
   hpSrvImport:
-    enable: true
+    enable: false
     initialDelay: 1000
   gdacsImport:
     enable: true
     initialDelay: 1000
     fixedRate: 300000
   normalization:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
   eventCombination:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
 
@@ -61,13 +61,6 @@ feign:
         loggerLevel: headers
         requestInterceptors:
           - feign.auth.BasicAuthRequestInterceptor
-      gdacsBasicAuth:
-        connectTimeout: 60000
-        readTimeout: 60000
-        loggerLevel: headers
-        requestInterceptors:
-          - feign.auth.BasicAuthRequestInterceptor
-
 
 mybatis:
   mapper-locations: classpath:db/mappers/*Mapper.xml

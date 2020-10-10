@@ -1,13 +1,13 @@
 package io.kontur.eventapi.gdacs.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
-import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.dto.AlertForInsertDataLake;
 import io.kontur.eventapi.gdacs.service.GdacsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -21,13 +21,14 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
 @Component
 public class GdacsSearchJob implements Runnable {
+
+    private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
 
     private final GdacsClient gdacsClient;
     private final DataLakeDao dataLakeDao;
@@ -43,35 +44,36 @@ public class GdacsSearchJob implements Runnable {
     @Override
     public void run() {
         try {
+            LOG.info("Gdacs import job has started");
             String xml = gdacsClient.getXml();
             List<String> links = getLinks(xml);
             List<String> alerts = getAlerts(links);
-            List<AlertForInsertDataLake> alertsForDataLakeSorted = getAlertsForDateLake(alerts);
-            saveAlerts(alertsForDataLakeSorted);
+            List<AlertForInsertDataLake> alertsForDataLake = getAlertsForDateLake(alerts);
+            saveAlerts(alertsForDataLake);
+            LOG.info("Gdacs import job has finished");
         } catch (IOException | ParserConfigurationException | SAXException | XPathExpressionException e) {
-            e.printStackTrace();
+            LOG.warn("Gdacs import job has failed", e);
         }
     }
 
-    private List<String> getLinks(String xml) throws ParserConfigurationException, IOException, SAXException {
-        var documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        var document = documentBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
-        var rssNode = document.getDocumentElement();
-        var channelNode = rssNode.getFirstChild();
-        var channelChildNodes = channelNode.getChildNodes();
+    private List<String> getLinks(String xml) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         var links = new ArrayList<String>();
 
-        for (int i = 0; i < channelChildNodes.getLength(); i++) {
-            Node nodeInChannel = channelChildNodes.item(i);
-            if (nodeInChannel.getNodeName().equals("item")) {
-                NodeList itemsXml = nodeInChannel.getChildNodes();
-                for (int j = 0; j < itemsXml.getLength(); j++) {
-                    Node nodeInItem = itemsXml.item(j);
-                    if (nodeInItem.getNodeName().equals("link")) {
-                        links.add(nodeInItem.getTextContent().replace("https://www.gdacs.org", ""));
-                    }
-                }
-            }
+        var builderFactory = DocumentBuilderFactory.newInstance();
+        var builder = builderFactory.newDocumentBuilder();
+        var inputStream = new ByteArrayInputStream(xml.getBytes());
+        var xmlDocument = builder.parse(inputStream);
+        var xPath = XPathFactory.newInstance().newXPath();
+
+        String pathToItems = "/rss/channel/item";
+
+        var itemNodeList = (NodeList) xPath.compile(pathToItems).evaluate(xmlDocument, XPathConstants.NODESET);
+
+        for(int i = 0; i < itemNodeList.getLength(); i++){
+            int indexOfItems = i + 1;
+            String pathToLink = "/rss/channel/item[" + indexOfItems + "]/link/text()";
+            var link = (String) xPath.compile(pathToLink).evaluate(xmlDocument, XPathConstants.STRING);
+            links.add(link.replace("https://www.gdacs.org", ""));
         }
         return links;
     }
@@ -79,52 +81,62 @@ public class GdacsSearchJob implements Runnable {
     private List<String> getAlerts(List<String> links) {
         return links.stream()
                 .map(gdacsClient::getAlertByLink)
-                .map(a -> a.substring(1))
+                .map(alert -> alert.startsWith("\uFEFF") ? alert.substring(1) : alert)
                 .collect(toList());
     }
 
     private List<AlertForInsertDataLake> getAlertsForDateLake(List<String> alerts) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         var alertsForDataLake = new ArrayList<AlertForInsertDataLake>();
+
         var builderFactory = DocumentBuilderFactory.newInstance();
         var builder = builderFactory.newDocumentBuilder();
 
-        for(String alert: alerts) {
+        String pathToExternalId = "/alert/identifier/text()";
+        String pathToDateModified = "/alert/info/parameter";
+
+        for (String alert : alerts) {
             var inputStream = new ByteArrayInputStream(alert.getBytes());
             var xmlDocument = builder.parse(inputStream);
             var xPath = XPathFactory.newInstance().newXPath();
 
-            String pathToExternalId = "/alert/identifier/text()";
-            String pathToDateModified = "/alert/info/parameter[19]/value/text()";
-
             var externalId = (String) xPath.compile(pathToExternalId).evaluate(xmlDocument, XPathConstants.STRING);
-            var updateDateString = (String) xPath.compile(pathToDateModified).evaluate(xmlDocument, XPathConstants.STRING);
+            var parameterNodeList = (NodeList) xPath.compile(pathToDateModified).evaluate(xmlDocument, XPathConstants.NODESET);
 
-            var updateDateOffset = ZonedDateTime
-                    .parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
-                    .toOffsetDateTime();
+            for (int i = 0; i < parameterNodeList.getLength(); i++) {
+                int indexOfParameters = i + 1;
+                String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
+                var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
 
-            alertsForDataLake.add(new AlertForInsertDataLake(
-                    updateDateOffset,
-                    externalId,
-                    alert
-            ));
+                if (valueName.equals("datemodified")) {
+                    String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
+                    var updateDateString = (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
+
+                    var updateDateOffset = ZonedDateTime
+                            .parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
+                            .toOffsetDateTime();
+
+                    alertsForDataLake.add(new AlertForInsertDataLake(
+                            updateDateOffset,
+                            externalId,
+                            alert
+                    ));
+                    break;
+                }
+            }
         }
-        alertsForDataLake.sort(Comparator.comparing(AlertForInsertDataLake::getUpdateDate));
         return alertsForDataLake;
     }
 
-    private void saveAlerts(List<AlertForInsertDataLake> alerts){
-
+    private void saveAlerts(List<AlertForInsertDataLake> alerts) {
         alerts.forEach(alert -> {
             var dataLakes = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(
                     alert.getExternalId(),
                     alert.getUpdateDate()
             );
-            if(dataLakes.isEmpty()){
+            if (dataLakes.isEmpty()) {
                 gdacsService.saveGdacs(alert);
             }
         });
-
     }
 }
 

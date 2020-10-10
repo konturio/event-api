@@ -9,11 +9,11 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Component
-public class GdacsDataLakeCoverter {
+public class GdacsDataLakeConverter {
 
     public final static String GDACS_PROVIDER = "gdacs";
 
-    public DataLake covertGdacs(AlertForInsertDataLake alert){
+    public DataLake convertGdacs(AlertForInsertDataLake alert){
         return new DataLake(
                 UUID.randomUUID(),
                 alert.getExternalId(),
