@@ -1,5 +1,7 @@
 package io.kontur.eventapi.gdacs.job;
 
+import com.google.common.base.Strings;
+import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.dto.AlertForInsertDataLake;
@@ -20,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +59,7 @@ public class GdacsSearchJob implements Runnable {
         }
     }
 
-    private List<String> getLinks(String xml) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    List<String> getLinks(String xml) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         var links = new ArrayList<String>();
 
         var builderFactory = DocumentBuilderFactory.newInstance();
@@ -78,14 +81,25 @@ public class GdacsSearchJob implements Runnable {
         return links;
     }
 
-    private List<String> getAlerts(List<String> links) {
-        return links.stream()
-                .map(gdacsClient::getAlertByLink)
+    List<String> getAlerts(List<String> links) {
+        return links.parallelStream()
+                .map(this::getAlertAfterHandleException)
+                .filter(alert -> !alert.isEmpty())
+                .filter(alert -> !alert.contains("<!DOCTYPE html"))
                 .map(alert -> alert.startsWith("\uFEFF") ? alert.substring(1) : alert)
                 .collect(toList());
     }
 
-    private List<AlertForInsertDataLake> getAlertsForDateLake(List<String> alerts) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    private String getAlertAfterHandleException(String link){
+        try {
+            return gdacsClient.getAlertByLink(link);
+        } catch (FeignException e){
+            LOG.warn("Alert by link https://testemops.pdc.org{} not found", link);
+        }
+        return "";
+    }
+
+    List<AlertForInsertDataLake> getAlertsForDateLake(List<String> alerts) throws ParserConfigurationException {
         var alertsForDataLake = new ArrayList<AlertForInsertDataLake>();
 
         var builderFactory = DocumentBuilderFactory.newInstance();
@@ -95,39 +109,46 @@ public class GdacsSearchJob implements Runnable {
         String pathToDateModified = "/alert/info/parameter";
 
         for (String alert : alerts) {
-            var inputStream = new ByteArrayInputStream(alert.getBytes());
-            var xmlDocument = builder.parse(inputStream);
-            var xPath = XPathFactory.newInstance().newXPath();
 
-            var externalId = (String) xPath.compile(pathToExternalId).evaluate(xmlDocument, XPathConstants.STRING);
-            var parameterNodeList = (NodeList) xPath.compile(pathToDateModified).evaluate(xmlDocument, XPathConstants.NODESET);
+            try {
+                var inputStream = new ByteArrayInputStream(alert.getBytes());
+                var xmlDocument = builder.parse(inputStream);
+                var xPath = XPathFactory.newInstance().newXPath();
 
-            for (int i = 0; i < parameterNodeList.getLength(); i++) {
-                int indexOfParameters = i + 1;
-                String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
-                var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
+                var externalId = (String) xPath.compile(pathToExternalId).evaluate(xmlDocument, XPathConstants.STRING);
+                if(Strings.isNullOrEmpty(externalId)) continue;
 
-                if (valueName.equals("datemodified")) {
-                    String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
-                    var updateDateString = (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
+                var parameterNodeList = (NodeList) xPath.compile(pathToDateModified).evaluate(xmlDocument, XPathConstants.NODESET);
 
-                    var updateDateOffset = ZonedDateTime
-                            .parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
-                            .toOffsetDateTime();
+                for (int i = 0; i < parameterNodeList.getLength(); i++) {
+                    int indexOfParameters = i + 1;
+                    String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
+                    var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
 
-                    alertsForDataLake.add(new AlertForInsertDataLake(
-                            updateDateOffset,
-                            externalId,
-                            alert
-                    ));
-                    break;
+                    if (valueName.equals("datemodified")) {
+                        String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
+                        var updateDateString = (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
+
+                        var updateDateOffset = ZonedDateTime
+                                .parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
+                                .toOffsetDateTime();
+
+                        alertsForDataLake.add(new AlertForInsertDataLake(
+                                updateDateOffset,
+                                externalId,
+                                alert
+                        ));
+                        break;
+                    }
                 }
+            } catch (IOException | SAXException | XPathExpressionException | DateTimeParseException e){
+                LOG.warn("Alert is not valid: {}", alert);
             }
         }
         return alertsForDataLake;
     }
 
-    private void saveAlerts(List<AlertForInsertDataLake> alerts) {
+    void saveAlerts(List<AlertForInsertDataLake> alerts) {
         alerts.forEach(alert -> {
             var dataLakes = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(
                     alert.getExternalId(),
