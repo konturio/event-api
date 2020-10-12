@@ -12,6 +12,9 @@ spring:
     url: 'jdbc:postgresql://localhost:5432/postgres'
     username: postgres
     password: postgres
+    hikari:
+      register-mbeans: true
+      pool-name: HikariPool-1
   security:
     oauth2:
       resourceserver:
@@ -33,15 +36,15 @@ scheduler:
     enable: false
     initialDelay: 1000
   normalization:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
   eventCombination:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
 
