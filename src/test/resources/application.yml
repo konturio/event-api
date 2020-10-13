@@ -3,10 +3,17 @@ pdc:
   user: u1
   password: p1
 
+gdacs:
+  host: 'https://www.gdacs.org'
+
 scheduler:
   hpSrvImport:
     enable: false
     initialDelay: 999999
+  gdacsImport:
+    enable: false
+    initialDelay: 999999
+    fixedRate: 999999
   normalization:
     enable: false
     initialDelay: 999999

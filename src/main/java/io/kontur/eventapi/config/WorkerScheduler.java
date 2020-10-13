@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
@@ -15,12 +16,15 @@ public class WorkerScheduler {
 
     private final Logger LOG = LoggerFactory.getLogger(WorkerScheduler.class);
     private final HpSrvSearchJob hpSrvSearchJob;
+    private final GdacsSearchJob gdacsSearchJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
+    @Value("${scheduler.gdacsImport.enable}")
+    private String gdacsImportEnabled;
     @Value("${scheduler.normalization.enable}")
     private String normalizationEnabled;
     @Value("${scheduler.eventCombination.enable}")
@@ -28,10 +32,10 @@ public class WorkerScheduler {
     @Value("${scheduler.feedComposition.enable}")
     private String feedCompositionEnabled;
 
-    public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob,
-                           NormalizationJob normalizationJob,
+    public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
+        this.gdacsSearchJob = gdacsSearchJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
@@ -43,6 +47,15 @@ public class WorkerScheduler {
             hpSrvSearchJob.run();
         } else {
             LOG.info("HpSrv import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.gdacsImport.initialDelay}", fixedRateString = "${scheduler.gdacsImport.fixedRate}")
+    public void startGdacsImport() {
+        if (Boolean.parseBoolean(gdacsImportEnabled)) {
+            gdacsSearchJob.run();
+        } else {
+            LOG.info("Gdacs import job invocation is skipped");
         }
     }
 

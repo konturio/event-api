@@ -28,10 +28,17 @@ pdc:
   user: 'eventapi'
   password: 'zvgusf48D'
 
+gdacs:
+  host: 'https://www.gdacs.org'
+
 scheduler:
   hpSrvImport:
     enable: false
     initialDelay: 1000
+  gdacsImport:
+    enable: true
+    initialDelay: 1000
+    fixedRate: 300000
   normalization:
     enable: false
     initialDelay: 1000

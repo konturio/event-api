@@ -136,6 +136,13 @@
 			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!--cap parsing-->
+		<dependency>
+			<groupId>com.google.publicalerts</groupId>
+			<artifactId>cap-library</artifactId>
+			<version>r13</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
