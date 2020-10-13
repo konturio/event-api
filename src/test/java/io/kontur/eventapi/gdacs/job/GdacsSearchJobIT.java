@@ -30,10 +30,10 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testNumberOfLinks() throws ParserConfigurationException, SAXException, XPathExpressionException, IOException {
+    public void testNumberOfItems() throws ParserConfigurationException, SAXException, XPathExpressionException, IOException {
         String xml = readMessageFromFile("gdacs.xml");
-        int linksCount = 65;
-        assertEquals(linksCount, gdacsSearchJob.getLinks(xml).size());
+        int itemsCount = 65;
+        assertEquals(itemsCount, gdacsSearchJob.getLinks(xml).size());
     }
 
     @Test
@@ -44,6 +44,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
                 "",
                 "               ",
                 "/contentdata/resources/EQ/1239035/cap_1239035.xml",
+                "/contentdata/resources/EQ/1239035/cap_9999999.xml",
                 "/"
         );
         int alertCount = 2;
@@ -51,7 +52,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testAlerts() throws IOException, ParserConfigurationException {
+    public void testAlerts() throws IOException, ParserConfigurationException, XPathExpressionException {
         var listOfAlerts = List.of(
                 readMessageFromFile("alert01_valid.xml"),
                 readMessageFromFile("alert02_without_identifier.xml"),
@@ -66,35 +67,45 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
 
     @Test
     public void testSaveAlerts(){
-        var dateModified = OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 1, 1), ZoneOffset.UTC);
+        var dateModified = OffsetDateTime.of(
+                LocalDateTime.of(2020, 1, 1, 1, 1),
+                ZoneOffset.UTC
+        );
         String externalId = "GDACS_EQ_1239039_1337379";
         String data = "<alert></alert>";
-        int indexDataLakes = 1;
+        int expectedListSize = 1;
 
         gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
                 dateModified,
                 externalId,
                 data
         )));
-        var dataLakes = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateModified);
-        assertEquals(indexDataLakes, dataLakes.size());
 
         gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
-                dateModified.minusDays(1),
+                dateModified,
                 externalId,
                 data
         )));
-        var dataLakesAfterFirstUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateModified.minusDays(1));
-        assertEquals(indexDataLakes, dataLakesAfterFirstUpdate.size());
+        var dataLakesAfterFirstUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateModified);
+        assertEquals(expectedListSize, dataLakesAfterFirstUpdate.size());
 
-        indexDataLakes = 2;
+        var datePlusDay = dateModified.plusDays(1);
         gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
-                dateModified.plusDays(1),
+                datePlusDay,
                 externalId,
                 data
         )));
-        var dataLakesAfterSecondUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateModified);
-        assertEquals(indexDataLakes, dataLakesAfterSecondUpdate.size());
+        var dataLakesAfterSecondUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, datePlusDay);
+        assertEquals(expectedListSize, dataLakesAfterSecondUpdate.size());
+
+        var dateMinusDay = dateModified.minusDays(1);
+        gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
+                dateMinusDay,
+                externalId,
+                data
+        )));
+        var dataLakesAfterThirdUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateMinusDay);
+        assertEquals(expectedListSize, dataLakesAfterThirdUpdate.size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

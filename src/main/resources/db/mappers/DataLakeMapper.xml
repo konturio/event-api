@@ -50,7 +50,7 @@
         SELECT *
         FROM data_lake
         WHERE external_id = #{externalId}
-          AND updated_at >= #{updatedAt}
+          AND updated_at = #{updatedAt}
     </select>
 
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
