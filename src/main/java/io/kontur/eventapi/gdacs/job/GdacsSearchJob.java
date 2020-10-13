@@ -1,11 +1,11 @@
 package io.kontur.eventapi.gdacs.job;
 
-import com.google.common.base.Strings;
 import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.dto.AlertForInsertDataLake;
 import io.kontur.eventapi.gdacs.service.GdacsService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -53,7 +54,7 @@ public class GdacsSearchJob implements Runnable {
             String xml = gdacsClient.getXml();
             List<String> links = getLinks(xml);
             List<String> alerts = getAlerts(links);
-            List<AlertForInsertDataLake> alertsForDataLake = getAlertsForDateLake(alerts);
+            List<AlertForInsertDataLake> alertsForDataLake = getAlertsForDataLake(alerts);
             saveAlerts(alertsForDataLake);
             LOG.info("Gdacs import job has finished");
         } catch (IOException | ParserConfigurationException | SAXException | XPathExpressionException e) {
@@ -87,21 +88,20 @@ public class GdacsSearchJob implements Runnable {
         return links.stream()
                 .map(this::getAlertAfterHandleException)
                 .filter(not(String::isEmpty))
-                .filter(alert -> alert.contains("<alert"))
                 .map(alert -> alert.startsWith("\uFEFF") ? alert.substring(1) : alert)
                 .collect(toList());
     }
 
     private String getAlertAfterHandleException(String link) {
         try {
-             return gdacsClient.getAlertByLink(link);
+            return gdacsClient.getAlertByLink(link);
         } catch (FeignException e) {
             LOG.warn("Alert by link https://www.gdacs.org{} not found", link);
         }
         return "";
     }
 
-    List<AlertForInsertDataLake> getAlertsForDateLake(List<String> alerts) throws ParserConfigurationException, XPathExpressionException {
+    List<AlertForInsertDataLake> getAlertsForDataLake(List<String> alertXmlList) throws ParserConfigurationException, XPathExpressionException {
         var alertsForDataLake = new ArrayList<AlertForInsertDataLake>();
 
         var builderFactory = DocumentBuilderFactory.newInstance();
@@ -114,33 +114,46 @@ public class GdacsSearchJob implements Runnable {
         var xPathExpressionToExternalId = xPath.compile(pathToExternalId);
         var xPathExpressionToParameters = xPath.compile(pathToDateModified);
 
-        for (String alert : alerts) {
-            var alertDataLakeOptional = parseAlert(builder, xPath, xPathExpressionToExternalId, xPathExpressionToParameters, alert);
+        for (String alertXml : alertXmlList) {
+            var alertDataLakeOptional = parseAlert(builder, xPath, xPathExpressionToExternalId, xPathExpressionToParameters, alertXml);
             alertDataLakeOptional.ifPresent(alertsForDataLake::add);
         }
         return alertsForDataLake;
     }
 
-    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder, XPath xPath, XPathExpression xPathExpressionToExternalId, XPathExpression xPathExpressionToParameters, String alert) {
+    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder, XPath xPath, XPathExpression xPathExpressionToExternalId, XPathExpression xPathExpressionToParameters, String alertXml) {
         try {
-            var inputStream = new ByteArrayInputStream(alert.getBytes());
+            var inputStream = new ByteArrayInputStream(alertXml.getBytes());
             var xmlDocument = builder.parse(inputStream);
 
             var externalId = (String) xPathExpressionToExternalId.evaluate(xmlDocument, XPathConstants.STRING);
-            if (Strings.isNullOrEmpty(externalId)) {
+            if (StringUtils.isEmpty(externalId)) {
+                LOG.warn("Alerts xml does not have identifier: {}", alertXml);
                 return Optional.empty();
             }
 
             var parameterNodeList = (NodeList) xPathExpressionToParameters.evaluate(xmlDocument, XPathConstants.NODESET);
+            var updateDateOptional = parseUpdateDateTime(xPath, xmlDocument, parameterNodeList);
 
-            return parseParameters(xPath, alert, xmlDocument, externalId, parameterNodeList);
-        } catch (IOException | SAXException | XPathExpressionException | DateTimeParseException e) {
-            LOG.warn("Alert is not valid: {}", alert);
-            return Optional.empty();
+            if (updateDateOptional.isPresent()) {
+                return Optional.of(new AlertForInsertDataLake(
+                        updateDateOptional.get(),
+                        externalId,
+                        alertXml
+                ));
+            } else {
+                LOG.warn("Alerts xml does not have parameter datemodified: {}", alertXml);
+            }
+
+        } catch (IOException | SAXException | XPathExpressionException e) {
+            LOG.warn("Alerts xml is not valid and can not be parsed: {}", alertXml);
+        } catch (DateTimeParseException e) {
+            LOG.warn("Alerts xml value of parameter datemodified can not be parsed: {}", alertXml);
         }
+        return Optional.empty();
     }
 
-    private Optional<AlertForInsertDataLake> parseParameters(XPath xPath, String alert, Document xmlDocument, String externalId, NodeList parameterNodeList) throws XPathExpressionException {
+    private Optional<OffsetDateTime> parseUpdateDateTime(XPath xPath, Document xmlDocument, NodeList parameterNodeList) throws XPathExpressionException, DateTimeParseException {
         for (int i = 0; i < parameterNodeList.getLength(); i++) {
             int indexOfParameters = i + 1;
             String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
@@ -150,16 +163,9 @@ public class GdacsSearchJob implements Runnable {
                 String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
                 var updateDateString = (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
 
-                var updateDateOffset = ZonedDateTime
-                        .parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
-                        .toOffsetDateTime();
-
-                var parsedAlert = new AlertForInsertDataLake(
-                        updateDateOffset,
-                        externalId,
-                        alert
+                return Optional.of(ZonedDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
+                        .toOffsetDateTime()
                 );
-                return Optional.of(parsedAlert);
             }
         }
         return Optional.empty();

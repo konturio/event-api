@@ -41,11 +41,8 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         var listOfLinks = List.of(
                 "/contentdata/resources/EQ/1239039/cap_1239039.xml",
                 "dsfsfsrf",
-                "",
-                "               ",
                 "/contentdata/resources/EQ/1239035/cap_1239035.xml",
-                "/contentdata/resources/EQ/1239035/cap_9999999.xml",
-                "/"
+                "/contentdata/resources/EQ/1239035/cap_9999999.xml"
         );
         int alertCount = 2;
         assertEquals(alertCount, gdacsSearchJob.getAlerts(listOfLinks).size());
@@ -62,7 +59,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         );
 
         int alertCount = 2;
-        assertEquals(alertCount, gdacsSearchJob.getAlertsForDateLake(listOfAlerts).size());
+        assertEquals(alertCount, gdacsSearchJob.getAlertsForDataLake(listOfAlerts).size());
     }
 
     @Test
