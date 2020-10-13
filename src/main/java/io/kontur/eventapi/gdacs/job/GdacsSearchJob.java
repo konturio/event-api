@@ -21,7 +21,6 @@ import javax.xml.xpath.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -163,8 +162,8 @@ public class GdacsSearchJob implements Runnable {
                 String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
                 var updateDateString = (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
 
-                return Optional.of(ZonedDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
-                        .toOffsetDateTime()
+                return Optional.of(
+                        OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
                 );
             }
         }
