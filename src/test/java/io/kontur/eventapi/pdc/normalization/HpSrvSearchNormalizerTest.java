@@ -46,7 +46,7 @@ class HpSrvSearchNormalizerTest {
 
     private DataLake createDataLakeObject() throws IOException {
         String json = readMessageFromFile("HpSrvSearchNormalizerTest.json");
-        return PdcDataLakeConverter.convertHpSrvHazardData(new ObjectMapper().readTree(json));
+        return new PdcDataLakeConverter().convertHpSrvHazardData(new ObjectMapper().readTree(json));
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

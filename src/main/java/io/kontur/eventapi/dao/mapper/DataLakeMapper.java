@@ -14,7 +14,7 @@ public interface DataLakeMapper {
 
     Optional<DataLake> getLatestUpdatedEventForProvider(String provider);
 
-    List<DataLake> getPdcHazardsWithoutAreas();
+    List<DataLake> getPdcHpSrvHazardsWithoutAreas();
 
     List<DataLake> getDenormalizedEvents();
 

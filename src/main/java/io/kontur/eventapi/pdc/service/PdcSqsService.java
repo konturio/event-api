@@ -9,14 +9,17 @@ import org.springframework.stereotype.Component;
 public class PdcSqsService {
 
     private final DataLakeDao dataLakeDao;
+    private final PdcDataLakeConverter pdcDataLakeConverter;
 
-    public PdcSqsService(DataLakeDao dataLakeDao) {
+    public PdcSqsService(DataLakeDao dataLakeDao,
+                         PdcDataLakeConverter pdcDataLakeConverter) {
         this.dataLakeDao = dataLakeDao;
+        this.pdcDataLakeConverter = pdcDataLakeConverter;
     }
 
     public  void saveMessage(String sqsMessage, String type, String messageId) {
         if (dataLakeDao.getDataLakesByExternalId(messageId).isEmpty()) {
-            DataLake dataLake = PdcDataLakeConverter.convertSQSMessage(sqsMessage, type, messageId);
+            DataLake dataLake = pdcDataLakeConverter.convertSQSMessage(sqsMessage, type, messageId);
             dataLakeDao.storeEventData(dataLake);
         }
     }
