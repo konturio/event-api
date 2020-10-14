@@ -3,6 +3,7 @@ package io.kontur.eventapi.pdc.converter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.kontur.eventapi.entity.DataLake;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -10,6 +11,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+@Component
 public class PdcDataLakeConverter {
 
     public final static String HP_SRV_SEARCH_PROVIDER = "hpSrvSearch";
@@ -17,7 +19,7 @@ public class PdcDataLakeConverter {
     public final static String PDC_SQS_PROVIDER = "pdcSqs";
     public final static DateTimeFormatter magsDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-    public static DataLake convertHpSrvHazardData(JsonNode node) {
+    public DataLake convertHpSrvHazardData(JsonNode node) {
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
         dataLake.setExternalId(node.get("uuid").asText());
@@ -28,7 +30,7 @@ public class PdcDataLakeConverter {
         return dataLake;
     }
 
-    public static DataLake convertHpSrvMagData(JsonNode jsonNode, String eventId) {
+    public DataLake convertHpSrvMagData(JsonNode jsonNode, String eventId) {
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
         dataLake.setExternalId(eventId);
@@ -39,7 +41,7 @@ public class PdcDataLakeConverter {
         return dataLake;
     }
 
-    public static DataLake convertSQSMessage(String messageJson, String type, String messageId) {
+    public DataLake convertSQSMessage(String messageJson, String type, String messageId) {
         if (!"HAZARD".equals(type) && !"MAG".equals(type)) {
             throw new IllegalStateException("Unexpected SQS message type: " + type);
         }
@@ -54,7 +56,7 @@ public class PdcDataLakeConverter {
         return dataLake;
     }
 
-    private static OffsetDateTime getDateTimeFromMillis(JsonNode node) {
+    private OffsetDateTime getDateTimeFromMillis(JsonNode node) {
         return OffsetDateTime.ofInstant(Instant.ofEpochMilli(node.asLong()), ZoneOffset.UTC);
     }
 }

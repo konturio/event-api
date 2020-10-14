@@ -57,7 +57,7 @@ class HpSrvMagsNormalizerTest {
 
     private DataLake createDataLakeObject() throws IOException {
         String json = readMessageFromFile("HpSrvMagsNormalizerTest.json");
-        return PdcDataLakeConverter
+        return new PdcDataLakeConverter()
                 .convertHpSrvMagData(new ObjectMapper().readTree(json), "bd6bfd50-a743-4959-88ee-72cf6809ae76");
     }
 

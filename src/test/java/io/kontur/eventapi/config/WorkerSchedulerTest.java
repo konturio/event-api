@@ -3,6 +3,7 @@ package io.kontur.eventapi.config;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
+import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -14,15 +15,17 @@ import static org.mockito.Mockito.*;
 class WorkerSchedulerTest {
 
     private final HpSrvSearchJob hpSrvSearchJob = mock(HpSrvSearchJob.class);
+    private final HpSrvMagsJob hpSrvMagsJob = mock(HpSrvMagsJob.class);
     private final NormalizationJob normalizationJob = mock(NormalizationJob.class);
     private final EventCombinationJob eventCombinationJob = mock(EventCombinationJob.class);
     private final FeedCompositionJob feedCompositionJob = mock(FeedCompositionJob.class);
-    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, normalizationJob, eventCombinationJob,
-            feedCompositionJob);
+    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, normalizationJob,
+            eventCombinationJob, feedCompositionJob);
 
     @AfterEach
     public void resetMocks() {
         Mockito.reset(hpSrvSearchJob);
+        Mockito.reset(hpSrvMagsJob);
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
         Mockito.reset(feedCompositionJob);
@@ -42,6 +45,22 @@ class WorkerSchedulerTest {
         scheduler.startPdcHazardImport();
 
         verify(hpSrvSearchJob, never()).run();
+    }
+
+    @Test
+    public void startHpSrvMagsImportJob() {
+        ReflectionTestUtils.setField(scheduler, "hpSrvMagsImportEnabled", "true");
+        scheduler.startPdcMagsImport();
+
+        verify(hpSrvMagsJob, times(1)).run();
+    }
+
+    @Test
+    public void skipHpSrvMagsImportJob() {
+        ReflectionTestUtils.setField(scheduler, "hpSrvMagsImportEnabled", "false");
+        scheduler.startPdcMagsImport();
+
+        verify(hpSrvMagsJob, never()).run();
     }
 
     @Test
