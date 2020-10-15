@@ -46,11 +46,21 @@ public class FeedCompositionJob implements Runnable {
 
     private void updateFeed(Feed feed) {
         List<KonturEvent> newEventVersions = eventsDao.getNewEventVersionsForFeed(feed.getFeedId());
+        LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), newEventVersions.size()));
         newEventVersions.forEach(event -> createFeedData(event, feed));
     }
 
     private void createFeedData(KonturEvent event, Feed feed) {
         List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
+
+        if (event.getObservationIds().size() != observations.size()) {
+            LOG.info(String.format(
+                    "Feed Data creation for event '%s' with version '%s' was skipped due to missed normalized observations. " +
+                            "Expected number of observations %s, actual %s",
+                    event.getEventId(), event.getVersion(), event.getObservationIds().size(), observations.size()));
+            return;
+        }
+
         observations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
 
         FeedData feedDto = new FeedData(event.getEventId(), feed.getFeedId(), event.getVersion());
@@ -64,8 +74,6 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private void fillFeedData(FeedData feedDto, List<NormalizedObservation> observations) {
-        boolean isDataFilled = true;
-
         feedDto.setObservations(observations
                 .stream()
                 .map(NormalizedObservation::getObservationId)
@@ -73,6 +81,7 @@ public class FeedCompositionJob implements Runnable {
 
         ListIterator<NormalizedObservation> iterator = observations.listIterator(observations.size());
         while (iterator.hasPrevious()) {
+            boolean isDataFilled = true;
             NormalizedObservation observation = iterator.previous();
 
             if (StringUtils.isEmpty(feedDto.getDescription())) {

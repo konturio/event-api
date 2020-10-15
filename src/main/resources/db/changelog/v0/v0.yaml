@@ -24,3 +24,9 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 08-clear-events-after-severities-redefinition.sql
+- include:
+    relativeToChangelogFile: true
+    file: 09-clear-hpsrv-hazards-and-feed-data.sql
+- include:
+    relativeToChangelogFile: true
+    file: 10-alter-kontur-events-add-provider.sql
