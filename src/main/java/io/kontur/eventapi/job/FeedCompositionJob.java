@@ -51,7 +51,7 @@ public class FeedCompositionJob implements Runnable {
 
     private void createFeedData(KonturEvent event, Feed feed) {
         List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
-        observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
+        observations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
 
         FeedData feedDto = new FeedData(event.getEventId(), feed.getFeedId(), event.getVersion());
 

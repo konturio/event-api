@@ -18,6 +18,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FeedCompositionJobIT extends AbstractIntegrationTest {
@@ -41,40 +42,61 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
     @Test
     public void testUpdateDates() throws IOException {
-        String externalEventUUId = "0457178b-45c1-492f-bbc1-61ca14389a31";
-
-        String hazardData = readMessageFromFile("hpsrvhazard.json");
         String hazardsProvider = "hpSrvSearch";
-        var hazardasLoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2020, 2, 2, 2, 2),
-                ZoneOffset.UTC
-        );
-        var hazardsObservationId = UUID.fromString("8ac2acda-0ef7-4976-876b-580b82c29bea");
-
-        FeedData firstFeed = createFeed(externalEventUUId, hazardsObservationId, hazardasLoadTime, hazardsProvider, hazardData);
-
-        String magsData = readMessageFromFile("magsdata.json");
         String magsProvider = "hpSrvMag";
-        var magsLoadTime = OffsetDateTime.of(
+        String externalEventUUId01 = "0457178b-45c1-492f-bbc1-61ca14389a31";
+        String externalEventUUId = "01ee0b34-d7e2-479e-a46f-0f68f181a66e";
+
+        String hazardData01 = readMessageFromFile("hpsrvhazard01.json");
+        var hazardsLoadTime01 = OffsetDateTime.of(
                 LocalDateTime.of(2020, 1, 1, 1, 1),
                 ZoneOffset.UTC
         );
-        var magsObservationId = UUID.fromString("10248c2c-c22f-4c35-a7ed-c9b36646ced4");
+        var hazardsObservationId01 = UUID.fromString("8ac2acda-0ef7-4976-876b-580b82c29bea");
 
-        FeedData secondFeed = createFeed(externalEventUUId, magsObservationId, magsLoadTime, magsProvider, magsData);
-        FeedEpisode episode = secondFeed.getEpisodes().get(0);
+        String hazardData = readMessageFromFile("hpsrvhazard02.json");
+        var hazardsLoadTime = OffsetDateTime.of(
+                LocalDateTime.of(2020, 4, 25, 2, 31, 25),
+                ZoneOffset.UTC
+        );
+        var hazardsObservationId = UUID.fromString("fa104aaf-60fb-4544-9b4d-7015e7dedc1d");
 
-        NormalizedObservation magNormalizedObservation = normalizedObservationsMapper.getObservationsByExternalId(externalEventUUId)
+        FeedData hazardFeed01 = createFeed(externalEventUUId01, hazardsObservationId01, hazardsLoadTime01, hazardsProvider, hazardData01);
+        FeedData hazardFeed02 = createFeed(externalEventUUId, hazardsObservationId, hazardsLoadTime, hazardsProvider, hazardData);
+
+        String magsData01 = readMessageFromFile("magsdata01.json");
+        var magsLoadTime01 = OffsetDateTime.of(
+                LocalDateTime.of(2020, 2, 2, 2, 2),
+                ZoneOffset.UTC
+        );
+        var magsObservationId01 = UUID.fromString("10248c2c-c22f-4c35-a7ed-c9b36646ced4");
+
+        String magsData02 = readMessageFromFile("magsdata02.json");
+        var magsLoadTime02 = OffsetDateTime.of(
+                LocalDateTime.of(2020, 9, 30, 10, 32, 46),
+                ZoneOffset.UTC
+        );
+        var magsObservationId02 = UUID.fromString("00600d61-81e0-42d0-a4d6-fd42971d8906");
+
+        FeedData magsFeed01 = createFeed(externalEventUUId01, magsObservationId01, magsLoadTime01, magsProvider, magsData01);
+        FeedEpisode episode01 = magsFeed01.getEpisodes().get(0);
+
+        FeedData magsFeed02 = createFeed(externalEventUUId, magsObservationId02, magsLoadTime02, magsProvider, magsData02);
+
+        NormalizedObservation magNormalizedObservation01 = normalizedObservationsMapper.getObservationsByExternalId(externalEventUUId01)
                 .stream()
                 .filter(obs -> obs.getProvider().equals(magsProvider))
                 .findFirst()
                 .orElseThrow();
 
-        assertTrue(hazardasLoadTime.isEqual(firstFeed.getUpdatedAt()));
-        assertTrue(magsLoadTime.isEqual(secondFeed.getUpdatedAt()));
+        assertTrue(hazardsLoadTime01.isEqual(hazardFeed01.getUpdatedAt()));
+        assertTrue(magsLoadTime01.isEqual(magsFeed01.getUpdatedAt()));
+        assertTrue(magsFeed01.getUpdatedAt().isAfter(hazardFeed01.getUpdatedAt()));
 
-        assertTrue(episode.getUpdatedAt().isEqual(magsLoadTime));
-        assertTrue(episode.getSourceUpdatedAt().isEqual(magNormalizedObservation.getSourceUpdatedAt()));
+        assertTrue(episode01.getUpdatedAt().isEqual(magsLoadTime01));
+        assertTrue(episode01.getSourceUpdatedAt().isEqual(magNormalizedObservation01.getSourceUpdatedAt()));
+
+        assertFalse(hazardFeed02.getUpdatedAt().isEqual(magsFeed02.getUpdatedAt()));
     }
 
     private FeedData createFeed(String externalEventUUId, UUID observationID, OffsetDateTime loadedTime, String provider, String data) {
