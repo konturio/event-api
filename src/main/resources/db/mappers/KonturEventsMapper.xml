@@ -5,8 +5,10 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.KonturEventsMapper">
 
     <insert id="insert" useGeneratedKeys="false">
-        INSERT INTO kontur_events (event_id, version, observation_id)
-        VALUES (#{eventId}, #{version}, #{observationId})
+        INSERT INTO kontur_events (event_id, version, provider, observation_id)
+        VALUES (#{eventId}, #{version},
+                (select provider from data_lake where observation_id = #{observationId}),
+                #{observationId})
     </insert>
 
     <select id="getLatestEventByExternalId" resultMap="konturEventDtoMap" >
@@ -24,14 +26,12 @@
     <select id="getNewEventVersionsForFeed" resultMap="konturEventDtoMap">
         select ke.event_id, ke.version, array_agg(ke.observation_id) as observation_ids
         from kontur_events ke,
-             feeds f,
-             normalized_observations no
+             feeds f
         where not exists(select 1
                          from feed_data fd
                          where fd.event_id = ke.event_id
                            and fd.version = ke.version)
-          and ke.observation_id = no.observation_id
-          and no.provider = ANY (f.providers)
+          and ke.provider = ANY (f.providers)
           and f.feed_id = #{uuid}
         group by ke.event_id, ke.version
     </select>
