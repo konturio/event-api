@@ -34,6 +34,11 @@ public class EventResourceService {
                 .collect(Collectors.toList());
     }
 
+    public int obtainTotalElementsNumber(String feedAlias, List<EventType> eventTypes,
+                                            OffsetDateTime after) {
+        return feedDao.obtainTotalElementsNumber(feedAlias, eventTypes, after);
+    }
+
     public String getRawData(UUID observationId) {
         DataLake dataLake = dataLakeDao.getDataLakeByObservationId(observationId);
         if (dataLake == null) {

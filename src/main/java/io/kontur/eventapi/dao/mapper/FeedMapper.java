@@ -22,4 +22,6 @@ public interface FeedMapper {
 
     List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes,
                                    OffsetDateTime after, int offset, int limit);
+
+    int obtainTotalElementsNumber(String feedAlias, List<EventType> eventTypes, OffsetDateTime after);
 }

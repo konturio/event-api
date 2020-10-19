@@ -1,6 +1,7 @@
 package io.kontur.eventapi.resource;
 
 import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +37,7 @@ public class EventResource {
     @GetMapping(path = "/", produces = {APPLICATION_JSON_VALUE})
     @Operation(tags = "Events", summary = "search for events", description = "Returns events for specified feed name. All events are sorted by update date.")
     @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
-    public List<EventDto> searchEvents(
+    public DataPaginationDTO searchEvents(
             @Parameter(description = "Feed name") @RequestParam(value = "feed")
                     String feed,
             @Parameter(description = "Filters events by type. More than one can be chosen at once") @RequestParam(value = "types", defaultValue = "")
@@ -49,7 +50,9 @@ public class EventResource {
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
                     @Min(1) @Max(1000) int limit
     ) {
-        return eventResourceService.searchEvents(feed, eventTypes, after, offset, limit);
+        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, offset, limit);
+        int totalElements = eventResourceService.obtainTotalElementsNumber(feed, eventTypes, after);
+        return new DataPaginationDTO(events, totalElements, offset);
     }
 
     @GetMapping(path = "/observations/{observationId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })

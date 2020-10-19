@@ -41,4 +41,10 @@ public class FeedDao {
         return mapper.searchForEvents(feedAlias, eventTypes, after, offset, limit);
     }
 
+    public int obtainTotalElementsNumber(String feedAlias,
+                                          List<EventType> eventTypes,
+                                          OffsetDateTime after) {
+        return mapper.obtainTotalElementsNumber(feedAlias, eventTypes, after);
+    }
+
 }
