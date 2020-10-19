@@ -18,12 +18,12 @@ import java.time.ZoneOffset;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GdacsNormalizerIt extends AbstractIntegrationTest {
+public class GdacsNormalizerIT extends AbstractIntegrationTest {
 
     private final GdacsNormalizer gdacsNormalizer;
 
     @Autowired
-    public GdacsNormalizerIt(GdacsNormalizer gdacsNormalizer) {
+    public GdacsNormalizerIT(GdacsNormalizer gdacsNormalizer) {
         this.gdacsNormalizer = gdacsNormalizer;
     }
 
