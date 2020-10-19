@@ -28,13 +28,13 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void isApplicable() throws IOException {
+    public void isApplicable() throws IOException {
         DataLake dataLake = createDataLakeObject();
         assertTrue(gdacsNormalizer.isApplicable(dataLake));
     }
 
     @Test
-    void normalize() throws IOException {
+    public void normalize() throws IOException {
         var dataLake = createDataLakeObject();
         var observation = gdacsNormalizer.normalize(dataLake);
 
