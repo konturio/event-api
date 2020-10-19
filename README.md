@@ -63,6 +63,7 @@ pdc:
 
 There are 4 jobs collecting the data.
 - `hpSrvImport` - collects the raw data from PDC's Hazard and Product service (HpSrv); 
+- `gdacsImport` - collects the raw data from Gdacs; 
 - `normalization` - normalizes the raw data;
 - `eventCombination` - combines episodes from normalized records into Kontur events;
 - `feedComposition` - creates customer feeds from normalized episodes.
@@ -72,6 +73,10 @@ scheduler:
   hpSrvImport:
     enable: true
     initialDelay: 1000
+  gdacsImport:
+    enable: true
+    initialDelay: 1000
+    fixedRate: 300000
   normalization:
     enable: true
     initialDelay: 1000
