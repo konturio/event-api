@@ -27,6 +27,8 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
+
 @Component
 public class GdacsNormalizer extends Normalizer {
 
@@ -59,7 +61,7 @@ public class GdacsNormalizer extends Normalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return true;
+        return GDACS_PROVIDER.equals(dataLakeDto.getProvider());
     }
 
     @Override
