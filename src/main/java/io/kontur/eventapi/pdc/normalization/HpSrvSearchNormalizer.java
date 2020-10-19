@@ -46,6 +46,7 @@ public class HpSrvSearchNormalizer extends PDCHazardNormalizer {
         normalizedDto.setEventSeverity(defineSeverity(readString(props, "severity_ID")));
         normalizedDto.setName(readString(props, "hazard_Name"));
         normalizedDto.setDescription(readString(props, "description"));
+        normalizedDto.setEpisodeDescription(readString(props, "description"));
         normalizedDto.setType(defineType(readString(props, "type_ID")));
         normalizedDto.setStartedAt(readDateTime(props, "start_Date"));
         normalizedDto.setEndedAt(readDateTime(props, "end_Date"));

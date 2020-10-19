@@ -30,3 +30,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 10-alter-kontur-events-add-provider.sql
+- include:
+    relativeToChangelogFile: true
+    file: 11-clear-sqs-and-feed-data.sql

@@ -1,5 +1,6 @@
 package io.kontur.eventapi.resource;
 
+import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,8 @@ public class EventResource {
     public List<EventDto> searchEvents(
             @Parameter(description = "Feed name") @RequestParam(value = "feed")
                     String feed,
+            @Parameter(description = "Filters events by type. More than one can be chosen at once") @RequestParam(value = "types", defaultValue = "")
+                    List<EventType> eventTypes,
             @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"2020-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime after,
@@ -46,7 +49,7 @@ public class EventResource {
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
                     @Min(1) @Max(1000) int limit
     ) {
-        return eventResourceService.searchEvents(feed, after, offset, limit);
+        return eventResourceService.searchEvents(feed, eventTypes, after, offset, limit);
     }
 
     @GetMapping(path = "/observations/{observationId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })

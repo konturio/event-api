@@ -8,6 +8,8 @@ import io.kontur.eventapi.util.JsonUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -22,6 +24,8 @@ import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class PdcSqsMessageNormalizer extends PDCHazardNormalizer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PdcSqsMessageNormalizer.class);
 
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
@@ -53,6 +57,7 @@ public class PdcSqsMessageNormalizer extends PDCHazardNormalizer {
             case "MAG":
                 normalizedDto.setActive(readBoolean(props, "isActive"));
                 normalizedDto.setGeometries(writeJson(convertGeometries(props)));
+                normalizedDto.setDescription(convertDescription(props));
                 normalizedDto.setEpisodeDescription(convertDescription(props));
                 props = (Map<String, Object>) props.get("hazard");
             case "HAZARD":
@@ -61,12 +66,22 @@ public class PdcSqsMessageNormalizer extends PDCHazardNormalizer {
                 normalizedDto.setName(readString(props, "hazardName"));
                 normalizedDto.setDescription(
                         readString((Map<String, Object>) props.get("hazardDescription"), "description"));
+                normalizedDto.setEpisodeDescription(
+                        readString((Map<String, Object>) props.get("hazardDescription"), "description"));
                 normalizedDto.setStartedAt(readDateTime(props, "startDate"));
                 normalizedDto.setEndedAt(readDateTime(props, "endDate"));
                 normalizedDto.setEventSeverity(
                         defineSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId")));
                 normalizedDto.setType(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")));
-                normalizedDto.setPoint(makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude")));
+                String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
+                normalizedDto.setPoint(pointWkt);
+
+                try {
+                    normalizedDto.setGeometries(writeJson(convertGeometry(pointWkt, props)));
+                } catch (ParseException e) {
+                    LOG.warn(e.getMessage(), e);
+                }
+
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected message type: " + type);
@@ -88,6 +103,19 @@ public class PdcSqsMessageNormalizer extends PDCHazardNormalizer {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private FeatureCollection convertGeometry(String point, Map<String, Object> props) throws ParseException {
+        org.wololo.geojson.Geometry geometry = geoJSONWriter.write(wktReader.read(point));
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("description", readString((Map<String, Object>) props.get("hazardDescription"), "description"));
+        map.put("updatedAt", readDateTime(props, "updateDate"));
+
+        Feature feature = new Feature(geometry, map);
+
+        return new FeatureCollection(new Feature[] {feature});
     }
 
     @SuppressWarnings("unchecked")

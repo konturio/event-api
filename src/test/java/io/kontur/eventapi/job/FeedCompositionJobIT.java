@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
@@ -91,6 +92,7 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
         return feedMapper.searchForEvents(
                 "pdc-v0",
+                Collections.emptyList(),
                 loadedTime.minusDays(1),
                 0,
                 1
