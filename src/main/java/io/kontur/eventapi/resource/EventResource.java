@@ -40,7 +40,7 @@ public class EventResource {
     @Operation(tags = "Events", summary = "search for events", description = "Returns events for specified feed name. All events are sorted by update date. <br> This method returns results using a cursor-based pagination approach:" +
             "<ul><li>It accepts after and limit parameters.</li>" +
             "<li>If you don't pass an after parameter the default value retrieves the first portion (or \"page\") of results.</li>" +
-            "<li>Paginated responses include a top-level responseMetadata object that includes a nextAfterValue when there are additional results to be retrieved.</li>" +
+            "<li>Paginated responses include a top-level responseMetadata object that includes a nextAfterValue.</li>" +
             "<li>On your next call to the same method, set the after parameter equal to the nextAfterValue value you received on the last request to retrieve the next portion of the collection.</li>" +
             "<li>nextAfterValue equals to the latest updatedAt event value on the page.</li></ul>")
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DataPaginationDTO.class)))
