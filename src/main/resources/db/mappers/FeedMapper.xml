@@ -16,26 +16,38 @@
     </insert>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        WITH feed as (
-            SELECT feed_id
-            FROM feeds
-            WHERE alias = #{feedAlias})
-        SELECT *
+        WITH feed as (SELECT feed_id
+                      FROM feeds
+                      WHERE alias = #{feedAlias}),
+            feed_version as (SELECT event_id, max(version) as version
+                             FROM feed_data fd2,
+                                 feed f
+                             WHERE fd2.feed_id = f.feed_id
+                             GROUP BY event_id),
+            type_match as (select distinct tm.event_id, tm.version
+                           from feed_data tm,
+                                <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty()">
+                                    jsonb_array_elements(episodes) arr(episode),
+                                </if>
+                               feed_version
+                           where feed_version.event_id = tm.event_id
+                             and feed_version.version = tm.version
+                             <foreach item="eventType" collection="eventTypes" separator="," open="and episode ->> 'type' in (" close=")">
+                                 #{eventType}
+                             </foreach>
+                )
+        SELECT fd.*
         FROM feed_data fd,
             feed f,
-            (SELECT event_id, max(version) as version
-             FROM feed_data fd2,
-                 feed f
-             WHERE fd2.feed_id = f.feed_id
-             GROUP BY event_id) t
-        WHERE fd.event_id = t.event_id
-          AND fd.version = t.version
-          AND fd.feed_id = f.feed_id
+            type_match
+        WHERE fd.feed_id = f.feed_id
+          AND fd.event_id = type_match.event_id
+          AND fd.version = type_match.version
           <if test='after != null'>
-            AND updated_at > #{after}
+              AND fd.updated_at > #{after}
           </if>
-        ORDER BY updated_at
-        LIMIT #{limit} OFFSET #{offset};
+        ORDER BY fd.updated_at ASC
+        LIMIT #{limit};
     </select>
 
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">

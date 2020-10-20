@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.*;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,7 @@ public class FeedCompositionJob implements Runnable {
     }
 
     @Override
+    @Timed("job.feedComposition")
     public void run() {
         LOG.info("Feed Composition job has started.");
         List<Feed> feeds = feedDao.getFeeds();
@@ -44,12 +46,22 @@ public class FeedCompositionJob implements Runnable {
 
     private void updateFeed(Feed feed) {
         List<KonturEvent> newEventVersions = eventsDao.getNewEventVersionsForFeed(feed.getFeedId());
+        LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), newEventVersions.size()));
         newEventVersions.forEach(event -> createFeedData(event, feed));
     }
 
     private void createFeedData(KonturEvent event, Feed feed) {
         List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
-        observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
+
+        if (event.getObservationIds().size() != observations.size()) {
+            LOG.info(String.format(
+                    "Feed Data creation for event '%s' with version '%s' was skipped due to missed normalized observations. " +
+                            "Expected number of observations %s, actual %s",
+                    event.getEventId(), event.getVersion(), event.getObservationIds().size(), observations.size()));
+            return;
+        }
+
+        observations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
 
         FeedData feedDto = new FeedData(event.getEventId(), feed.getFeedId(), event.getVersion());
 
@@ -62,8 +74,6 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private void fillFeedData(FeedData feedDto, List<NormalizedObservation> observations) {
-        boolean isDataFilled = true;
-
         feedDto.setObservations(observations
                 .stream()
                 .map(NormalizedObservation::getObservationId)
@@ -71,6 +81,7 @@ public class FeedCompositionJob implements Runnable {
 
         ListIterator<NormalizedObservation> iterator = observations.listIterator(observations.size());
         while (iterator.hasPrevious()) {
+            boolean isDataFilled = true;
             NormalizedObservation observation = iterator.previous();
 
             if (StringUtils.isEmpty(feedDto.getDescription())) {

@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ public class NormalizationJob implements Runnable {
     }
 
     @Override
+    @Timed(value = "job.normalization")
     public void run() {
         List<DataLake> denormalizedEvents = dataLakeDao.getDenormalizedEvents();
         LOG.info("Normalization job has started. Events to process: {}", denormalizedEvents.size());

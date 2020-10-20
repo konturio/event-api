@@ -12,6 +12,9 @@ spring:
     url: 'jdbc:postgresql://localhost:5432/postgres'
     username: postgres
     password: postgres
+    hikari:
+      register-mbeans: true
+      pool-name: HikariPool-1
   security:
     oauth2:
       resourceserver:
@@ -35,6 +38,10 @@ scheduler:
   hpSrvImport:
     enable: false
     initialDelay: 1000
+  hpSrvMagsImport:
+    enable: true
+    initialDelay: 10000
+    fixedDelay: 600000
   gdacsImport:
     enable: true
     initialDelay: 1000
@@ -44,11 +51,11 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 60000
   eventCombination:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
 
@@ -78,9 +85,24 @@ aws:
     url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo
 
 management:
+  metrics:
+    export:
+      simple:
+        enabled: false
+  health:
+    ping:
+      enabled: false
+    diskspace:
+      enabled: false
+    refresh:
+      enabled: false
   endpoint:
     health:
       cache:
         time-to-live: 10s
       show-details: always
       show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus

@@ -17,7 +17,7 @@
         LIMIT 1
     </select>
 
-    <select id="getPdcHazardsWithoutAreas" resultMap="dataLakeMap">
+    <select id="getPdcHpSrvHazardsWithoutAreas" resultMap="dataLakeMap">
         SELECT distinct on (e1.external_id) *
         FROM data_lake e1
         WHERE e1.provider = 'hpSrvSearch'

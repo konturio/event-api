@@ -3,6 +3,7 @@ package io.kontur.eventapi.pdc.sqs;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.kontur.eventapi.pdc.service.PdcSqsService;
 import io.kontur.eventapi.util.JsonUtil;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
@@ -21,6 +22,7 @@ public class PdcSqsMessageListener {
     }
 
     @SqsListener(value = "${aws.sqs.url}", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
+    @Timed(value = "pdc.sqsListener")
     public void read(String sqsMessage) {
         LOG.debug("Message received: {}", sqsMessage);
 

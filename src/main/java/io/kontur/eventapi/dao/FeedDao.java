@@ -1,6 +1,7 @@
 package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.FeedMapper;
+import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.Feed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,9 @@ public class FeedDao {
                 feedData.getObservations(), episodesJson);
     }
 
-    public List<FeedData> searchForEvents(String feedAlias, OffsetDateTime after, int offset,
-                                          int limit) {
-        return mapper.searchForEvents(feedAlias, after, offset, limit);
+    public List<FeedData> searchForEvents(String feedAlias,
+                                          List<EventType> eventTypes,
+                                          OffsetDateTime after, int limit) {
+        return mapper.searchForEvents(feedAlias, eventTypes, after, limit);
     }
-
 }

@@ -24,3 +24,18 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 08-clear-events-after-severities-redefinition.sql
+- include:
+    relativeToChangelogFile: true
+    file: 09-clear-hpsrv-hazards-and-feed-data.sql
+- include:
+    relativeToChangelogFile: true
+    file: 10-alter-kontur-events-add-provider.sql
+- include:
+    relativeToChangelogFile: true
+    file: 11-clear-sqs-and-feed-data.sql
+- include:
+    relativeToChangelogFile: true
+    file: 12-add-unique-loaded-at-constraint.sql
+- include:
+    relativeToChangelogFile: true
+    file: 13-clear-sqs-and-feed-data.sql

@@ -32,8 +32,8 @@ public class DataLakeDao {
         return mapper.getLatestUpdatedEventForProvider(provider);
     }
 
-    public List<DataLake> getPdcEventsWithoutAreas() {
-        return mapper.getPdcHazardsWithoutAreas();
+    public List<DataLake> getPdcHpSrvHazardsWithoutAreas() {
+        return mapper.getPdcHpSrvHazardsWithoutAreas();
     }
 
     public List<DataLake> getDenormalizedEvents() {

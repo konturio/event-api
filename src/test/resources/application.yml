@@ -10,6 +10,10 @@ scheduler:
   hpSrvImport:
     enable: false
     initialDelay: 999999
+  hpSrvMagsImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
   gdacsImport:
     enable: false
     initialDelay: 999999

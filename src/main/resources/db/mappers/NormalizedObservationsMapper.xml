@@ -63,7 +63,7 @@
         select *
         from normalized_observations
         where external_event_id = #{externalEventId}
-        order by source_updated_at
+        order by loaded_at
     </select>
 
     <select id="getObservations" resultMap="normalizedObservationsDtoMap">

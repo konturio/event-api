@@ -6,7 +6,7 @@ import io.kontur.eventapi.normalization.Normalizer;
 
 import java.util.Map;
 
-public abstract class PDCHazardNormalizer extends Normalizer {
+public abstract class PdcHazardNormalizer extends Normalizer {
 
     private static final Map<String, EventType> typeMap = Map.of(
             "FLOOD", EventType.FLOOD,

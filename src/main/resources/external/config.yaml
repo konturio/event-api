@@ -21,6 +21,10 @@ scheduler:
   hpSrvImport:
     enable: false
     initialDelay: 1000
+  hpSrvMagsImport:
+    enable: true
+    initialDelay: 10000
+    fixedDelay: 600000
   normalization:
     enable: true
     initialDelay: 1000

@@ -83,6 +83,20 @@ public class HpSrvSearchBody {
                     ", pageSize=" + pageSize +
                     '}';
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pagination that = (Pagination) o;
+            return Objects.equals(offset, that.offset) &&
+                    Objects.equals(pageSize, that.pageSize);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(offset, pageSize);
+        }
     }
 
     public static class Order {
@@ -103,6 +117,19 @@ public class HpSrvSearchBody {
                     "orderList=" + orderList +
                     '}';
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Order order = (Order) o;
+            return Objects.equals(orderList, order.orderList);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(orderList);
+        }
     }
 
     @Override
@@ -112,5 +139,20 @@ public class HpSrvSearchBody {
                 ", pagination=" + pagination +
                 ", restrictions=" + restrictions +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HpSrvSearchBody that = (HpSrvSearchBody) o;
+        return Objects.equals(order, that.order) &&
+                Objects.equals(pagination, that.pagination) &&
+                Objects.equals(restrictions, that.restrictions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(order, pagination, restrictions);
     }
 }
