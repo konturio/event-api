@@ -16,7 +16,7 @@ import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
-public class HpSrvMagsNormalizer extends PDCHazardNormalizer {
+public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLake) {

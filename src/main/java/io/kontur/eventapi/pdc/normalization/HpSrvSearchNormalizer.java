@@ -21,7 +21,7 @@ import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
-public class HpSrvSearchNormalizer extends PDCHazardNormalizer {
+public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
 
     private static final Logger LOG = LoggerFactory.getLogger(HpSrvSearchNormalizer.class);
 

@@ -36,3 +36,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 12-add-unique-loaded-at-constraint.sql
+- include:
+    relativeToChangelogFile: true
+    file: 13-clear-sqs-and-feed-data.sql
