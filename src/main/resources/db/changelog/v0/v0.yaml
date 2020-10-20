@@ -39,3 +39,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 13-clear-sqs-and-feed-data.sql
+- include:
+    relativeToChangelogFile: true
+    file: 14-insert-gdacs-feed.sql
