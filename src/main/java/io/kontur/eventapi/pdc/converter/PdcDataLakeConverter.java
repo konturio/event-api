@@ -1,8 +1,8 @@
 package io.kontur.eventapi.pdc.converter;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.util.DateTimeUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -25,7 +25,7 @@ public class PdcDataLakeConverter {
         dataLake.setExternalId(node.get("uuid").asText());
         dataLake.setUpdatedAt(getDateTimeFromMillis(node.get("update_Date")));
         dataLake.setProvider(HP_SRV_SEARCH_PROVIDER);
-        dataLake.setLoadedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setData(node.toString());
         return dataLake;
     }
@@ -35,7 +35,7 @@ public class PdcDataLakeConverter {
         dataLake.setObservationId(UUID.randomUUID());
         dataLake.setExternalId(eventId);
         dataLake.setProvider(HP_SRV_MAG_PROVIDER);
-        dataLake.setLoadedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
 
         dataLake.setData(jsonNode.toString());
         return dataLake;
@@ -49,7 +49,7 @@ public class PdcDataLakeConverter {
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
         dataLake.setProvider(PDC_SQS_PROVIDER);
-        dataLake.setLoadedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setData(messageJson);
         dataLake.setExternalId(messageId);
 

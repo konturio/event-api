@@ -36,9 +36,7 @@ public class FeedDao {
 
     public List<FeedData> searchForEvents(String feedAlias,
                                           List<EventType> eventTypes,
-                                          OffsetDateTime after, int offset,
-                                          int limit) {
-        return mapper.searchForEvents(feedAlias, eventTypes, after, offset, limit);
+                                          OffsetDateTime after, int limit) {
+        return mapper.searchForEvents(feedAlias, eventTypes, after, limit);
     }
-
 }
