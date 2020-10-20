@@ -41,7 +41,6 @@ public class GdacsNormalizer extends Normalizer {
         this.gdacsClient = gdacsClient;
     }
 
-
     private static final Map<String, EventType> typeMap = Map.of(
             "Drought area", EventType.DROUGHT,
             "Earthquake", EventType.EARTHQUAKE,
@@ -56,8 +55,6 @@ public class GdacsNormalizer extends Normalizer {
             "Severe", Severity.SEVERE,
             "Extreme", Severity.EXTREME
     );
-
-
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -80,7 +77,7 @@ public class GdacsNormalizer extends Normalizer {
         } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
             LOG.warn("Alert can not be parsed {}", dataLakeDto.getObservationId());
             throw new RuntimeException(e);
-        } catch (FeignException e){
+        } catch (FeignException e) {
             LOG.warn("Did not found geometry for alert {}", dataLakeDto.getObservationId());
             throw new IllegalArgumentException(e);
         }
@@ -88,7 +85,8 @@ public class GdacsNormalizer extends Normalizer {
         return normalizedObservation;
     }
 
-    private void parseData(NormalizedObservation normalizedObservation, DataLake dataLakeDto) throws ParserConfigurationException,
+    private void parseData(NormalizedObservation normalizedObservation,
+                           DataLake dataLakeDto) throws ParserConfigurationException,
             IOException, SAXException, XPathExpressionException, FeignException {
 
         var builderFactory = DocumentBuilderFactory.newInstance();
@@ -112,21 +110,23 @@ public class GdacsNormalizer extends Normalizer {
         normalizedObservation.setType(typeMap.getOrDefault(event, EventType.OTHER));
         normalizedObservation.setEventSeverity(severityMap.getOrDefault(severity, Severity.UNKNOWN));
 
-        var parameterNodeList = (NodeList) xPath.compile(pathToParameters).evaluate(xmlDocument, XPathConstants.NODESET);
+        var parameterNodeList = (NodeList) xPath.compile(pathToParameters)
+                .evaluate(xmlDocument, XPathConstants.NODESET);
         setDataFromParameters(normalizedObservation, parameterNodeList, xmlDocument, xPath, event);
     }
 
-    private void setDataFromParameters(NormalizedObservation normalizedObservation, NodeList parameterNodeList, Document xmlDocument,
+    private void setDataFromParameters(NormalizedObservation normalizedObservation, NodeList parameterNodeList,
+                                       Document xmlDocument,
                                        XPath xPath, String event) throws XPathExpressionException, FeignException {
         String eventid = "";
         String currentepisodeid = "";
         String eventtype = "";
-        for(int i = 0; i < parameterNodeList.getLength(); i++){
+        for (int i = 0; i < parameterNodeList.getLength(); i++) {
             int indexOfParameters = i + 1;
             String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
             var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
 
-            switch (valueName){
+            switch (valueName) {
                 case "country":
                     String country = getValue(indexOfParameters, xmlDocument, xPath);
                     String name = event + " in " + country;
@@ -161,7 +161,7 @@ public class GdacsNormalizer extends Normalizer {
         return (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
     }
 
-    private OffsetDateTime parseFromString(String value){
+    private OffsetDateTime parseFromString(String value) {
         return OffsetDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME);
     }
 }
