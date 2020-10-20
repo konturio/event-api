@@ -26,17 +26,12 @@ public class EventResourceService {
     }
 
     public List<EventDto> searchEvents(String feedAlias, List<EventType> eventTypes,
-                                       OffsetDateTime after, int offset, int limit) {
-        List<FeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, after, offset, limit);
+                                       OffsetDateTime after, int limit) {
+        List<FeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, after, limit);
 
         return feedData.stream()
                 .map(EventDtoConverter::convert)
                 .collect(Collectors.toList());
-    }
-
-    public int obtainTotalElementsNumber(String feedAlias, List<EventType> eventTypes,
-                                            OffsetDateTime after) {
-        return feedDao.obtainTotalElementsNumber(feedAlias, eventTypes, after);
     }
 
     public String getRawData(UUID observationId) {

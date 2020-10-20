@@ -21,7 +21,5 @@ public interface FeedMapper {
             @Param("observations") List<UUID> observations, @Param("episodes") String episodes);
 
     List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes,
-                                   OffsetDateTime after, int offset, int limit);
-
-    int obtainTotalElementsNumber(String feedAlias, List<EventType> eventTypes, OffsetDateTime after);
+                                   OffsetDateTime after, int limit);
 }

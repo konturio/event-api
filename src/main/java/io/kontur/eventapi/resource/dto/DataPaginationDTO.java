@@ -1,26 +1,23 @@
 package io.kontur.eventapi.resource.dto;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public class DataPaginationDTO {
 
     public List<EventDto> data;
-    public Pagination page;
+    public PageMetadata pageMetadata;
 
-    public DataPaginationDTO(List<EventDto> data, int totalElements, int offset) {
+    public DataPaginationDTO(List<EventDto> data, OffsetDateTime nextAfterValue) {
         this.data = data;
-        this.page = new Pagination(data.size(), totalElements, offset);
+        this.pageMetadata = new PageMetadata(nextAfterValue);
     }
 
-    public static class Pagination {
-        public int pageSize;
-        public int totalElements;
-        public int offset;
+    public static class PageMetadata {
+        public final OffsetDateTime nextAfterValue;
 
-        public Pagination(int pageSize, int totalElements, int offset) {
-            this.pageSize = pageSize;
-            this.totalElements = totalElements;
-            this.offset = offset;
+        public PageMetadata(OffsetDateTime nextAfterValue) {
+            this.nextAfterValue = nextAfterValue;
         }
     }
 

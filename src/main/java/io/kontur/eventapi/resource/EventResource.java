@@ -6,7 +6,9 @@ import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +37,16 @@ public class EventResource {
     }
 
     @GetMapping(path = "/", produces = {APPLICATION_JSON_VALUE})
-    @Operation(tags = "Events", summary = "search for events", description = "Returns events for specified feed name. All events are sorted by update date.")
+    @Operation(tags = "Events", summary = "search for events", description = "Returns events for specified feed name. All events are sorted by update date. <br> This method returns results using a cursor-based pagination approach:" +
+            "<ul><li>It accepts after and limit parameters.</li>" +
+            "<li>If you don't pass an after parameter the default value retrieves the first portion (or \"page\") of results.</li>" +
+            "<li>Paginated responses include a top-level responseMetadata object that includes a nextAfterValue when there are additional results to be retrieved.</li>" +
+            "<li>On your next call to the same method, set the after parameter equal to the nextAfterValue value you received on the last request to retrieve the next portion of the collection.</li>" +
+            "<li>nextAfterValue equals to the latest updatedAt event value on the page.</li></ul>")
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DataPaginationDTO.class)))
+    @ApiResponse(responseCode = "204", description = "No content. Try to check filters values.", content = @Content())
     @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
-    public DataPaginationDTO searchEvents(
+    public ResponseEntity<DataPaginationDTO> searchEvents(
             @Parameter(description = "Feed name") @RequestParam(value = "feed")
                     String feed,
             @Parameter(description = "Filters events by type. More than one can be chosen at once") @RequestParam(value = "types", defaultValue = "")
@@ -45,14 +54,14 @@ public class EventResource {
             @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"2020-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime after,
-            @Parameter(description = "Pagination offset. Minimum value is 0", example = "0") @RequestParam(value = "offset", defaultValue = "0")
-                    @Min(0) int offset,
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
                     @Min(1) @Max(1000) int limit
     ) {
-        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, offset, limit);
-        int totalElements = eventResourceService.obtainTotalElementsNumber(feed, eventTypes, after);
-        return new DataPaginationDTO(events, totalElements, offset);
+        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, limit);
+        if (events.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(new DataPaginationDTO(events, events.get(events.size() - 1).getUpdatedAt()));
     }
 
     @GetMapping(path = "/observations/{observationId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
