@@ -49,15 +49,7 @@
           <if test='after != null'>
               AND fd.updated_at > #{after}
           </if>
-          <choose>
-              <when test='sortOrder.toString().equals("DESC")'>
-                  ORDER BY fd.updated_at DESC
-              </when>
-              <otherwise>
-                  ORDER BY fd.updated_at ASC
-              </otherwise>
-          </choose>
-
+        ORDER BY fd.updated_at ${sortOrder}
         LIMIT #{limit};
     </select>
 
