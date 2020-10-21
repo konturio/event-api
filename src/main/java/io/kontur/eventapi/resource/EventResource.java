@@ -2,6 +2,7 @@ package io.kontur.eventapi.resource;
 
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.Severity;
+import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.service.EventResourceService;
@@ -59,13 +60,13 @@ public class EventResource {
                     OffsetDateTime after,
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
                     @Min(1) @Max(1000) int limit,
-            @Parameter(description = "Sort selection. Ascending by default. Default value is false") @RequestParam(value = "desc", defaultValue = "false") boolean desc
+            @Parameter(description = "Sort selection. Ascending by default. Default value is ASC") @RequestParam(value = "sortOrder", defaultValue = "ASC") SortOrder sortOrder
     ) {
-        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, limit, severities, desc);
+        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, limit, severities, sortOrder);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        if (desc) {
+        if (sortOrder.equals(SortOrder.DESC)) {
             return ResponseEntity.ok(new DataPaginationDTO(events, events.get(0).getUpdatedAt()));
         } else {
             return ResponseEntity.ok(new DataPaginationDTO(events, events.get(events.size() - 1).getUpdatedAt()));
