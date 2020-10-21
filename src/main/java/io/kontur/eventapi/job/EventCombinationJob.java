@@ -34,6 +34,14 @@ public class EventCombinationJob implements Runnable {
         LOG.info("Combination job has started. Events to process: {}", externalIds.size());
 
         for (String externalId : externalIds) {
+            //TODO all new event updates are combined into one new version at job start.
+            // We have in a new version all updates since last job start.
+            // E.g. job stars every minute - new event version created from observations that were created for the last minute.
+            // job stars every 15 minute - new event version created from observations that were created for the 15 last minutes.
+            // ----- Job needs to be rewritten so that no matter how often we run the job it closest observations together into a new version.
+            // For instance observation were loaded at 10:15:41, 10:15:53, 10:16:10, 10:18:05, 10:22:30 ->
+            // -> we would like to have 3 version, where: 1 version - 10:15:41, 10:15:53, 10:16:10; 2 version - v1 + 10:18:05; 3 version - v2 + 10:22:30
+
             processEvent(externalId);
         }
 
