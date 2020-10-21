@@ -94,7 +94,9 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
                 "pdc-v0",
                 Collections.emptyList(),
                 loadedTime.minusDays(1),
-                1
+                1,
+                Collections.emptyList(),
+                false
         ).get(0);
     }
 

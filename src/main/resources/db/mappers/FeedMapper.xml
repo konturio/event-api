@@ -26,7 +26,7 @@
                              GROUP BY event_id),
             type_match as (select distinct tm.event_id, tm.version
                            from feed_data tm,
-                                <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty()">
+                                <if test="(eventTypes!=null &amp;&amp; !eventTypes.isEmpty()) || (severities!=null &amp;&amp; !severities.isEmpty())"  >
                                     jsonb_array_elements(episodes) arr(episode),
                                 </if>
                                feed_version
@@ -34,6 +34,9 @@
                              and feed_version.version = tm.version
                              <foreach item="eventType" collection="eventTypes" separator="," open="and episode ->> 'type' in (" close=")">
                                  #{eventType}
+                             </foreach>
+                             <foreach item="severity" collection="severities" separator="," open="and episode ->> 'severity' in (" close=")">
+                                 #{severity}
                              </foreach>
                 )
         SELECT fd.*
@@ -46,7 +49,15 @@
           <if test='after != null'>
               AND fd.updated_at > #{after}
           </if>
-        ORDER BY fd.updated_at ASC
+          <choose>
+              <when test='desc'>
+                  ORDER BY fd.updated_at DESC
+              </when>
+              <otherwise>
+                  ORDER BY fd.updated_at ASC
+              </otherwise>
+          </choose>
+
         LIMIT #{limit};
     </select>
 
