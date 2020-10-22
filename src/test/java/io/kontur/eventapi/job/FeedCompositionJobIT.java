@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.mapper.DataLakeMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -94,7 +95,9 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
                 "pdc-v0",
                 Collections.emptyList(),
                 loadedTime.minusDays(1),
-                1
+                1,
+                Collections.emptyList(),
+                SortOrder.ASC
         ).get(0);
     }
 
