@@ -23,11 +23,10 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
+import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 @Component
 public class GdacsNormalizer extends Normalizer {
@@ -134,11 +133,11 @@ public class GdacsNormalizer extends Normalizer {
                     break;
                 case "fromdate":
                     String fromDate = getValue(indexOfParameters, xmlDocument, xPath);
-                    normalizedObservation.setStartedAt(parseFromString(fromDate));
+                    normalizedObservation.setStartedAt(parseDateTimeFromString(fromDate));
                     break;
                 case "todate":
                     String toDate = getValue(indexOfParameters, xmlDocument, xPath);
-                    normalizedObservation.setEndedAt(parseFromString(toDate));
+                    normalizedObservation.setEndedAt(parseDateTimeFromString(toDate));
                     break;
                 case "eventid":
                     eventid = getValue(indexOfParameters, xmlDocument, xPath);
@@ -159,9 +158,5 @@ public class GdacsNormalizer extends Normalizer {
     private String getValue(int indexOfParameters, Document xmlDocument, XPath xPath) throws XPathExpressionException {
         String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
         return (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
-    }
-
-    private OffsetDateTime parseFromString(String value) {
-        return OffsetDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME);
     }
 }
