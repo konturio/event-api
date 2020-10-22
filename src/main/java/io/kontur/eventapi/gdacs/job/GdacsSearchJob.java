@@ -5,6 +5,8 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.dto.AlertForInsertDataLake;
 import io.kontur.eventapi.gdacs.service.GdacsService;
+import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.annotation.Timed;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 
@@ -34,6 +37,8 @@ import static java.util.stream.Collectors.toList;
 public class GdacsSearchJob implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
+
+    public static OffsetDateTime XML_PUB_DATE = DateTimeUtil.uniqueOffsetDateTime();
 
     private final GdacsClient gdacsClient;
     private final DataLakeDao dataLakeDao;
@@ -47,6 +52,7 @@ public class GdacsSearchJob implements Runnable {
     }
 
     @Override
+    @Timed(value = "job.gdacs.gdacsSearchJob", longTask = true)
     public void run() {
         try {
             LOG.info("Gdacs import job has started");
@@ -71,8 +77,12 @@ public class GdacsSearchJob implements Runnable {
         var xPath = XPathFactory.newInstance().newXPath();
 
         String pathToItems = "/rss/channel/item";
+        String pathToPubDate = "/rss/channel/pubDate/text()";
 
         var itemNodeList = (NodeList) xPath.compile(pathToItems).evaluate(xmlDocument, XPathConstants.NODESET);
+        var pubDateString = (String) xPath.compile(pathToPubDate).evaluate(xmlDocument, XPathConstants.STRING);
+
+        XML_PUB_DATE = parseDateTimeFromString(pubDateString);
 
         for (int i = 0; i < itemNodeList.getLength(); i++) {
             int indexOfItems = i + 1;
