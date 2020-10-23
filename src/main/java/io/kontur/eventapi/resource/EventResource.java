@@ -1,11 +1,11 @@
 package io.kontur.eventapi.resource;
 
 import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.EventDto;
-import io.kontur.eventapi.resource.dto.FeedDataDto;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -91,11 +91,12 @@ public class EventResource {
     }
 
     @GetMapping(path = "/event", produces = {MediaType.APPLICATION_JSON_VALUE})
-    @Operation(tags = "Events", summary = "returns event", description = "Returns last event by eventId anf feed alias.")
+    @Operation(tags = "Events", summary = "returns event", description = "Returns event by version or latest by default, event id and feed alias.")
     @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
-    public ResponseEntity<FeedDataDto> getLastEventById(@Parameter(description = "Feed name") @RequestParam(value = "feed") String feed,
-                                                        @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId) {
-        return eventResourceService.getLastEventById(eventId, feed)
+    public ResponseEntity<FeedData> getLastEventById(@Parameter(description = "Feed name") @RequestParam(value = "feed") String feed,
+                                                     @Parameter(description = "Version") @RequestParam(value = "version", required = false) Long version,
+                                                     @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

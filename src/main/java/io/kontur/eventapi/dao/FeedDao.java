@@ -39,7 +39,7 @@ public class FeedDao {
         return mapper.searchForEvents(feedAlias, eventTypes, after, limit, severities, sortOrder);
     }
 
-    public Optional<FeedData> getLastEventById(UUID eventId, String feed) {
-        return mapper.getLastEventById(eventId, feed);
+    public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
+        return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version);
     }
 }

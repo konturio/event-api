@@ -22,5 +22,5 @@ public interface FeedMapper {
     List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime after, int limit,
                                    List<Severity> severities, SortOrder sortOrder);
 
-    Optional<FeedData> getLastEventById(UUID eventId, String feedAlias);
+    Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, Long version);
 }

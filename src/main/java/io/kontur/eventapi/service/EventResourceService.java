@@ -5,7 +5,6 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EventDto;
-import io.kontur.eventapi.resource.dto.FeedDataDto;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -42,17 +41,7 @@ public class EventResourceService {
         return dataLake.getData();
     }
 
-    public Optional<FeedDataDto> getLastEventById(UUID eventId, String feed) {
-        return feedDao.getLastEventById(eventId, feed)
-                .map(event -> createFeedDataDto(event, feed))
-                .or(Optional::empty);
-    }
-
-    private FeedDataDto createFeedDataDto(FeedData feedData, String feed){
-        return new FeedDataDto(
-                feedData,
-                feedData.getVersion(),
-                feed
-        );
+    public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
+        return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version);
     }
 }
