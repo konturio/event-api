@@ -1,6 +1,7 @@
 package io.kontur.eventapi.resource;
 
 import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
@@ -73,7 +74,7 @@ public class EventResource {
         }
     }
 
-    @GetMapping(path = "/observations/{observationId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(path = "/observations/{observationId}",  produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @Operation(tags = "Events", summary = "returns raw data", description = "Returns raw data which was used to combine events and episodes.")
     @PreAuthorize("hasAuthority('SCOPE_read:raw-data')")
     public ResponseEntity<String> rawData(@Parameter(description = "Observation UUID. May be gathered from event's 'observations' field") @PathVariable UUID observationId) {
@@ -87,5 +88,16 @@ public class EventResource {
         } else {
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(rawData);
         }
+    }
+
+    @GetMapping(path = "/event", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(tags = "Events", summary = "returns event", description = "Returns event by its version, id and feed alias. If no version is provided the latest event version is returned.")
+    @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
+    public ResponseEntity<FeedData> getLastEventById(@Parameter(description = "Feed name") @RequestParam(value = "feed") String feed,
+                                                     @Parameter(description = "Version") @RequestParam(value = "version", required = false) Long version,
+                                                     @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }

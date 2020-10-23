@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,5 +39,9 @@ public class EventResourceService {
             return null;
         }
         return dataLake.getData();
+    }
+
+    public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
+        return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version);
     }
 }

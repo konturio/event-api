@@ -53,6 +53,27 @@
         LIMIT #{limit};
     </select>
 
+    <select id="getEventByEventIdAndByVersionOrLast" resultMap="feedDataDtoMap">
+        WITH feed as (SELECT feed_id
+                      FROM feeds
+                      WHERE alias = #{feedAlias})
+        SELECT fd.*
+        FROM feed_data fd,
+             feed f
+        WHERE fd.event_id = #{eventId}
+          AND f.feed_id = fd.feed_id
+        <choose>
+            <when test="version != null">
+                AND fd.version = #{version}
+            </when>
+            <otherwise>
+                ORDER BY version DESC
+                LIMIT 1
+            </otherwise>
+        </choose>
+
+    </select>
+
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">
         <result property="feedId" column="feed_id" />
         <result property="description" column="description"/>
