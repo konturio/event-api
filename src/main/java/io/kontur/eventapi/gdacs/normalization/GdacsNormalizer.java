@@ -41,7 +41,7 @@ public class GdacsNormalizer extends Normalizer {
     }
 
     private static final Map<String, EventType> typeMap = Map.of(
-            "Drought area", EventType.DROUGHT,
+            "Drought", EventType.DROUGHT,
             "Earthquake", EventType.EARTHQUAKE,
             "Flood", EventType.FLOOD,
             "Tropical Cyclone", EventType.CYCLONE,
