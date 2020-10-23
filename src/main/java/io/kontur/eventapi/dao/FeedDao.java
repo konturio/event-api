@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
@@ -35,5 +37,9 @@ public class FeedDao {
     public List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime after, int limit,
                                           List<Severity> severities, SortOrder sortOrder) {
         return mapper.searchForEvents(feedAlias, eventTypes, after, limit, severities, sortOrder);
+    }
+
+    public Optional<FeedData> getLastEventById(UUID eventId, String feed) {
+        return mapper.getLastEventById(eventId, feed);
     }
 }

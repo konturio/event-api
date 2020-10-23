@@ -5,6 +5,7 @@ import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.resource.dto.FeedDataDto;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -73,7 +74,7 @@ public class EventResource {
         }
     }
 
-    @GetMapping(path = "/observations/{observationId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(path = "/observations/{observationId}",  produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @Operation(tags = "Events", summary = "returns raw data", description = "Returns raw data which was used to combine events and episodes.")
     @PreAuthorize("hasAuthority('SCOPE_read:raw-data')")
     public ResponseEntity<String> rawData(@Parameter(description = "Observation UUID. May be gathered from event's 'observations' field") @PathVariable UUID observationId) {
@@ -87,5 +88,15 @@ public class EventResource {
         } else {
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(rawData);
         }
+    }
+
+    @GetMapping(path = "/event", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(tags = "Events", summary = "returns event", description = "Returns last event by eventId anf feed alias.")
+    @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
+    public ResponseEntity<FeedDataDto> getLastEventById(@Parameter(description = "Feed name") @RequestParam(value = "feed") String feed,
+                                                        @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId) {
+        return eventResourceService.getLastEventById(eventId, feed)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }
