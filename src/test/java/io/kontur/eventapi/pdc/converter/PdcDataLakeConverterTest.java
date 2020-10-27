@@ -3,11 +3,13 @@ package io.kontur.eventapi.pdc.converter;
 import io.kontur.eventapi.util.JsonUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PdcDataLakeConverterTest {
 
@@ -25,12 +27,21 @@ class PdcDataLakeConverterTest {
         //then
         compareFeatureCollections(JsonUtil.readJson(dataLakeData1, FeatureCollection.class),
                 JsonUtil.readJson(dataLakes.get(0).getData(), FeatureCollection.class));
+
+        compareFeatureCollections(JsonUtil.readJson(dataLakeData2, FeatureCollection.class),
+                JsonUtil.readJson(dataLakes.get(1).getData(), FeatureCollection.class));
     }
 
     private void compareFeatureCollections(FeatureCollection expected, FeatureCollection actual) {
         assertEquals(expected.getFeatures().length, actual.getFeatures().length);
-        //TODO check whether both FC are equal
-//        expected.getFeatures().
+
+        Feature expectedFeatures = expected.getFeatures()[0];
+        Feature actualFeatures = actual.getFeatures()[0];
+        
+        assertEquals(expectedFeatures.getGeometry().toString(), actualFeatures.getGeometry().toString());
+        assertEquals(expectedFeatures.getProperties().size(), actualFeatures.getProperties().size());
+        assertEquals(expectedFeatures.getProperties().keySet(), actualFeatures.getProperties().keySet());
+        assertTrue(expectedFeatures.getProperties().values().containsAll(actualFeatures.getProperties().values()));
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
