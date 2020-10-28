@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class StringArrayTypeHandler  extends BaseTypeHandler<List<String>> {
+public class StringArrayTypeHandler extends BaseTypeHandler<List<String>> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, List<String> parameter, JdbcType jdbcType) throws SQLException {

@@ -13,7 +13,7 @@ public interface KonturEventsMapper {
 
     int insert(@Param("eventId") UUID eventId, @Param("version") Long version, @Param("observationId") UUID observationId);
 
-    List<KonturEvent> getLatestEventByExternalId(String externalId);
+    Optional<KonturEvent> getLatestEventByExternalId(String externalId);
 
     List<KonturEvent> getNewEventVersionsForFeed(UUID feedId);
 }

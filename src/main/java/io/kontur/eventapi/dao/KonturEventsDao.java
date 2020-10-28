@@ -26,7 +26,7 @@ public class KonturEventsDao {
         this.mapper = mapper;
     }
 
-    public List<KonturEvent> getLatestEventByExternalId(String externalId) {
+    public Optional<KonturEvent> getLatestEventByExternalId(String externalId) {
         try {
             return mapper.getLatestEventByExternalId(externalId);
         } catch (Exception e) {

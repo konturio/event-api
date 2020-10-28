@@ -19,7 +19,7 @@ public class KonturEvent {
     public KonturEvent(UUID eventId, Long version, List<UUID> observationIds) {
         this.eventId = eventId;
         this.version = version;
-        this.observationIds = observationIds;
+        this.observationIds.addAll(observationIds);
     }
 
     public UUID getEventId() {

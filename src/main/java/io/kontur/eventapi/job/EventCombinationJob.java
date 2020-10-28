@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
@@ -33,7 +34,7 @@ public class EventCombinationJob implements Runnable {
 
         LOG.info("Combination job has started. Events to process: {}", externalIds.size());
 
-         for (String externalId : externalIds) {
+        for (String externalId : externalIds) {
 //            TODO all new event updates are combined into one new version at job start.
 //             We have in a new version all updates since last job start.
 //             E.g. job stars every minute - new event version created from observations that were created for the last minute.
@@ -57,13 +58,13 @@ public class EventCombinationJob implements Runnable {
                         .noneMatch(id -> obs.getObservationId().equals(id)))
                 .collect(toList());
 
-        if(!filteredObservations.isEmpty()){
+        if (!filteredObservations.isEmpty()) {
             var loadedDate = filteredObservations.get(0).getLoadedAt();
-            for(NormalizedObservation observation: filteredObservations){
-                if(loadedDate.plusMinutes(1).isAfter(observation.getLoadedAt())){
+            for (NormalizedObservation observation : filteredObservations) {
+                if (loadedDate.plusMinutes(1).isAfter(observation.getLoadedAt())) {
                     try {
                         newEventVersion.addObservations(observation.getObservationId());
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         LOG.warn("observationID = {}", observation.getObservationId());
                         LOG.warn("observations in event = {}", newEventVersion.getObservationIds());
                         LOG.warn(e.getLocalizedMessage());
@@ -76,12 +77,8 @@ public class EventCombinationJob implements Runnable {
     }
 
     private KonturEvent createNewEventVersion(String externalId) {
-        List<KonturEvent> events = eventsDao.getLatestEventByExternalId(externalId);
-        if(events.isEmpty()) return new KonturEvent(UUID.randomUUID(), 1L);
-        else return new KonturEvent(
-                events.get(0).getEventId(),
-                events.get(0).getVersion() + 1,
-                events.get(0).getObservationIds()
-        );
+        Optional<KonturEvent> event = eventsDao.getLatestEventByExternalId(externalId);
+        return event.map(e -> new KonturEvent(e.getEventId(), e.getVersion() + 1, e.getObservationIds()))
+                .orElseGet(() -> new KonturEvent(UUID.randomUUID(), 1L));
     }
 }
