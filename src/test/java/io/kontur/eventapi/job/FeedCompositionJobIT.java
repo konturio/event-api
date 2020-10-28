@@ -98,6 +98,11 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         ).get(0);
     }
 
+    @Test
+    public void testSavedMags(){
+        String eventUUID = "0457178b-45c1-492f-bbc1-61ca14389a31";
+    }
+
     private String readMessageFromFile(String fileName) throws IOException {
         return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
     }

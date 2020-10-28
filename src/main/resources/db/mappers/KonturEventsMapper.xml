@@ -12,13 +12,14 @@
     </insert>
 
     <select id="getLatestEventByExternalId" resultMap="konturEventDtoMap" >
-        SELECT *
+        SELECT event_id, version, array_agg(observation_id) as observation_ids
         FROM kontur_events
         WHERE observation_id in (
             SELECT observation_id
             FROM normalized_observations
             WHERE external_event_id = #{externalId}
             )
+        GROUP BY event_id, version
         ORDER BY version DESC
         LIMIT 1
     </select>
