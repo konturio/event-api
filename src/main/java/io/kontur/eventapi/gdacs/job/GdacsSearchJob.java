@@ -117,65 +117,68 @@ public class GdacsSearchJob implements Runnable {
         var builder = builderFactory.newDocumentBuilder();
         var xPath = XPathFactory.newInstance().newXPath();
 
-        String pathToExternalId = "/alert/identifier/text()";
         String pathToDateModified = "/alert/info/parameter";
 
-        var xPathExpressionToExternalId = xPath.compile(pathToExternalId);
         var xPathExpressionToParameters = xPath.compile(pathToDateModified);
 
         for (String alertXml : alertXmlList) {
-            var alertDataLakeOptional = parseAlert(builder, xPath, xPathExpressionToExternalId, xPathExpressionToParameters, alertXml);
+            var alertDataLakeOptional = parseAlert(builder, xPath, xPathExpressionToParameters, alertXml);
             alertDataLakeOptional.ifPresent(alertsForDataLake::add);
         }
         return alertsForDataLake;
     }
 
-    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder, XPath xPath, XPathExpression xPathExpressionToExternalId, XPathExpression xPathExpressionToParameters, String alertXml) {
+    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder, XPath xPath, XPathExpression xPathExpressionToParameters, String alertXml) {
+        var alertForDataLake = new AlertForInsertDataLake();
         try {
             var inputStream = new ByteArrayInputStream(alertXml.getBytes());
             var xmlDocument = builder.parse(inputStream);
-
-            var externalId = (String) xPathExpressionToExternalId.evaluate(xmlDocument, XPathConstants.STRING);
-            if (StringUtils.isEmpty(externalId)) {
-                LOG.warn("Alerts xml does not have identifier: {}", alertXml);
-                return Optional.empty();
-            }
-
             var parameterNodeList = (NodeList) xPathExpressionToParameters.evaluate(xmlDocument, XPathConstants.NODESET);
-            var updateDateOptional = parseUpdateDateTime(xPath, xmlDocument, parameterNodeList);
+            String eventId = "";
+            String eventType = "";
 
-            if (updateDateOptional.isPresent()) {
-                return Optional.of(new AlertForInsertDataLake(
-                        updateDateOptional.get(),
-                        externalId,
-                        alertXml
-                ));
-            } else {
-                LOG.warn("Alerts xml does not have parameter datemodified: {}", alertXml);
+
+            for (int i = 0; i < parameterNodeList.getLength(); i++) {
+                int indexOfParameters = i + 1;
+                String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
+                var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
+                String pathToValue = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
+
+                switch (valueName) {
+                    case "datemodified":
+                        var updateDateString = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
+                        if (StringUtils.isEmpty(updateDateString)) {
+                            LOG.warn("Alerts xml does not have updateDate: {}", alertXml);
+                            return Optional.empty();
+                        }
+                        alertForDataLake.setUpdateDate(
+                                OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
+                        );
+                        break;
+                    case "eventid":
+                        eventId = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
+                        if (StringUtils.isEmpty(eventId)) {
+                            LOG.warn("Alerts xml does not have eventid: {}", alertXml);
+                            return Optional.empty();
+                        }
+                        break;
+                    case "eventtype":
+                        eventType = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
+                        if (StringUtils.isEmpty(eventType)) {
+                            LOG.warn("Alerts xml does not have eventtype: {}", alertXml);
+                            return Optional.empty();
+                        }
+                        break;
+                }
             }
+            String externalId = eventType + "_" + eventId;
+            alertForDataLake.setExternalId(externalId);
+            return Optional.of(alertForDataLake);
 
         } catch (IOException | SAXException | XPathExpressionException e) {
             LOG.warn("Alerts xml is not valid and can not be parsed: {}", alertXml);
         } catch (DateTimeParseException e) {
             LOG.warn("Alerts xml value of parameter datemodified can not be parsed: {}", alertXml);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<OffsetDateTime> parseUpdateDateTime(XPath xPath, Document xmlDocument, NodeList parameterNodeList) throws XPathExpressionException, DateTimeParseException {
-        for (int i = 0; i < parameterNodeList.getLength(); i++) {
-            int indexOfParameters = i + 1;
-            String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
-            var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
-
-            if (valueName.equals("datemodified")) {
-                String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
-                var updateDateString = (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
-
-                return Optional.of(
-                        OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
-                );
-            }
         }
         return Optional.empty();
     }
