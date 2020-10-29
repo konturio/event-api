@@ -68,7 +68,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
                 LocalDateTime.of(2020, 1, 1, 1, 1),
                 ZoneOffset.UTC
         );
-        String externalId = "GDACS_EQ_1239039_1337379";
+        String externalId = "EQ_1239039";
         String data = "<alert></alert>";
         int expectedListSize = 1;
 

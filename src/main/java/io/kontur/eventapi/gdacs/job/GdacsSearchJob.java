@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -136,7 +135,7 @@ public class GdacsSearchJob implements Runnable {
             var parameterNodeList = (NodeList) xPathExpressionToParameters.evaluate(xmlDocument, XPathConstants.NODESET);
             String eventId = "";
             String eventType = "";
-
+            String updateDateString = "";
 
             for (int i = 0; i < parameterNodeList.getLength(); i++) {
                 int indexOfParameters = i + 1;
@@ -146,31 +145,26 @@ public class GdacsSearchJob implements Runnable {
 
                 switch (valueName) {
                     case "datemodified":
-                        var updateDateString = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
-                        if (StringUtils.isEmpty(updateDateString)) {
-                            LOG.warn("Alerts xml does not have updateDate: {}", alertXml);
-                            return Optional.empty();
-                        }
-                        alertForDataLake.setUpdateDate(
-                                OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
-                        );
+                        updateDateString = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
                         break;
                     case "eventid":
                         eventId = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
-                        if (StringUtils.isEmpty(eventId)) {
-                            LOG.warn("Alerts xml does not have eventid: {}", alertXml);
-                            return Optional.empty();
-                        }
                         break;
                     case "eventtype":
                         eventType = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
-                        if (StringUtils.isEmpty(eventType)) {
-                            LOG.warn("Alerts xml does not have eventtype: {}", alertXml);
-                            return Optional.empty();
-                        }
                         break;
                 }
+
             }
+            if (StringUtils.isEmpty(eventType) || StringUtils.isEmpty(eventId) || StringUtils.isEmpty(updateDateString)) {
+                LOG.warn("Alerts xml does not have parameter: {}", alertXml);
+                return Optional.empty();
+            }
+
+            alertForDataLake.setUpdateDate(
+                    OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
+            );
+
             String externalId = eventType + "_" + eventId;
             alertForDataLake.setExternalId(externalId);
             return Optional.of(alertForDataLake);
