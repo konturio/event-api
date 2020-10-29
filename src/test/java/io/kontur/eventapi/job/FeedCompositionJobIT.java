@@ -117,12 +117,12 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
                 LocalDateTime.of(2020, 10, 1, 1, 3), ZoneOffset.UTC);
 
         createNormalizations(externalId, hazardsLoadTime, HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard02.json"));
+        eventCombinationJob.run();
         var eventOptionalVersion1 = konturEventsDao.getLatestEventByExternalId(externalId);
         assertTrue(eventOptionalVersion1.isPresent());
         assertEquals(1, eventOptionalVersion1.get().getObservationIds().size());
 
         createNormalizations(externalId, mags01LoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata02.json"));
-        eventCombinationJob.run();
         createNormalizations(externalId, mags02LoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata03.json"));
         eventCombinationJob.run();
         var eventOptionalVersion2 = konturEventsDao.getLatestEventByExternalId(externalId);
