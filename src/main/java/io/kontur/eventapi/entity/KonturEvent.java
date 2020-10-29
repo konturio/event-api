@@ -16,12 +16,6 @@ public class KonturEvent {
         this.version = version;
     }
 
-    public KonturEvent(UUID eventId, Long version, List<UUID> observationIds) {
-        this.eventId = eventId;
-        this.version = version;
-        this.observationIds.addAll(observationIds);
-    }
-
     public UUID getEventId() {
         return eventId;
     }
