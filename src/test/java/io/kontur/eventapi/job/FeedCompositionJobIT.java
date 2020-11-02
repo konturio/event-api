@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -109,6 +110,13 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
     @Test
     public void testSavedMags() throws IOException {
         String externalId = "996d6b0a-ce18-47d9-9bd2-b1b8fe5d967a";
+
+        var pdcFeed = feedMapper.getFeeds()
+                .stream()
+                .filter(feed -> feed.getAlias().equals("pdc-v0"))
+                .findFirst()
+                .orElseThrow();
+
         var hazardsLoadTime = OffsetDateTime.of(
                 LocalDateTime.of(2020, 10, 1, 1, 1, 1), ZoneOffset.UTC);
         var mags01LoadTime = OffsetDateTime.of(
@@ -125,14 +133,13 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         createNormalizations(externalId, mags01LoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata02.json"));
         createNormalizations(externalId, mags02LoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata03.json"));
         eventCombinationJob.run();
-        var eventOptionalVersion2 = konturEventsDao.getLatestEventByExternalId(externalId);
-        assertTrue(eventOptionalVersion2.isPresent());
-        assertEquals(2, eventOptionalVersion2.get().getObservationIds().size());
 
-        eventCombinationJob.run();
-        var eventOptionalVersion3 = konturEventsDao.getLatestEventByExternalId(externalId);
-        assertTrue(eventOptionalVersion3.isPresent());
-        assertEquals(3, eventOptionalVersion3.get().getObservationIds().size());
+        var eventList = konturEventsDao.getNewEventVersionsForFeed(pdcFeed.getFeedId())
+                .stream()
+                .filter(event -> event.getEventId().equals(eventOptionalVersion1.get().getEventId()))
+                .collect(toList());
+
+        assertEquals(3, eventList.size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

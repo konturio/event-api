@@ -38,28 +38,25 @@ public class EventCombinationJob implements Runnable {
     private void processEvent(String externalId) {
         var normalizedObservations = observationsDao.getObservationsToCreateNewEventsByExternalId(externalId);
         var newEventVersion = createNewEventVersion(externalId);
+        boolean doSaveOnlyToOneEvent = true;
 
         if (!normalizedObservations.isEmpty()) {
             var loadedDate = normalizedObservations.get(0).getLoadedAt();
             for (NormalizedObservation observation : normalizedObservations) {
                 if (loadedDate.plusMinutes(1).isAfter(observation.getLoadedAt())) {
-                    try {
-                        newEventVersion.addObservations(observation.getObservationId());
-                    } catch (Exception e) {
-                        LOG.warn("observationID = {}", observation.getObservationId());
-                        LOG.warn("observations in event = {}", newEventVersion.getObservationIds());
-                        LOG.warn(e.getLocalizedMessage());
-                    }
-
+                    newEventVersion.addObservations(observation.getObservationId());
+                } else {
+                    doSaveOnlyToOneEvent = false;
                 }
             }
             eventsDao.insertEventVersion(newEventVersion);
         }
+        if(!doSaveOnlyToOneEvent) processEvent(externalId);
     }
 
     private KonturEvent createNewEventVersion(String externalId) {
         var eventOptional = eventsDao.getLatestEventByExternalId(externalId);
-        if (eventOptional.isPresent()){
+        if (eventOptional.isPresent()) {
             var event = eventOptional.get();
             var konturEvent = new KonturEvent(event.getEventId(), event.getVersion() + 1);
             konturEvent.setObservationIds(event.getObservationIds());
