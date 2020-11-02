@@ -39,10 +39,6 @@ public class PdcDataLakeConverter {
         FeatureCollection fc = JsonUtil.readJson(jsonNode.toString(), FeatureCollection.class);
         List<DataLake> result = new ArrayList<>(fc.getFeatures().length);
 
-
-        //TODO conversion wasn't tested on real data
-
-
         for (Feature feature : fc.getFeatures()) {
             DataLake dataLake = new DataLake();
             dataLake.setObservationId(UUID.randomUUID());
