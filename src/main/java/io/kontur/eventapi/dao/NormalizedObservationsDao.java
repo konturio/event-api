@@ -24,8 +24,8 @@ public class NormalizedObservationsDao {
         return mapper.getExternalIdsToUpdate();
     }
 
-    public List<NormalizedObservation> getObservationsByExternalId(String externalId) {
-        return mapper.getObservationsByExternalId(externalId);
+    public List<NormalizedObservation> getObservationsToCreateNewEventsByExternalId(String externalId) {
+        return mapper.getObservationsToCreateNewEventsByExternalId(externalId);
     }
 
     public List<NormalizedObservation> getObservations(List<UUID> observationIds) {

@@ -12,9 +12,9 @@
     </insert>
 
     <select id="getLatestEventByExternalId" resultMap="konturEventDtoMap" >
-        SELECT event_id, version, array_agg(observation_id)::uuid[] as observation_ids
+        SELECT event_id, version, array_agg(observation_id)::uuid[] AS observation_ids
         FROM kontur_events
-        WHERE observation_id in (
+        WHERE observation_id IN (
             SELECT observation_id
             FROM normalized_observations
             WHERE external_event_id = #{externalId}
@@ -25,16 +25,16 @@
     </select>
 
     <select id="getNewEventVersionsForFeed" resultMap="konturEventDtoMap">
-        select ke.event_id, ke.version, array_agg(ke.observation_id)::uuid[] as observation_ids
-        from kontur_events ke,
+        SELECT ke.event_id, ke.version, array_agg(ke.observation_id)::uuid[] AS observation_ids
+        FROM kontur_events ke,
              feeds f
-        where not exists(select 1
-                         from feed_data fd
-                         where fd.event_id = ke.event_id
-                           and fd.version = ke.version)
-          and ke.provider = ANY (f.providers)
-          and f.feed_id = #{uuid}
-        group by ke.event_id, ke.version
+        WHERE NOT exists(SELECT 1
+                         FROM feed_data fd
+                         WHERE fd.event_id = ke.event_id
+                           AND fd.version = ke.version)
+          AND ke.provider = ANY (f.providers)
+          AND f.feed_id = #{uuid}
+        GROUP BY ke.event_id, ke.version
     </select>
 
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">

@@ -2,7 +2,6 @@ package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.KonturEventsMapper;
 import io.kontur.eventapi.entity.KonturEvent;
-import io.kontur.eventapi.job.FeedCompositionJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 public class KonturEventsDao {

@@ -9,11 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
 
 @Component
 public class EventCombinationJob implements Runnable {
@@ -39,18 +36,12 @@ public class EventCombinationJob implements Runnable {
     }
 
     private void processEvent(String externalId) {
-        var normalizedObservations = observationsDao.getObservationsByExternalId(externalId);
+        var normalizedObservations = observationsDao.getObservationsToCreateNewEventsByExternalId(externalId);
         var newEventVersion = createNewEventVersion(externalId);
 
-        List<NormalizedObservation> filteredObservations = normalizedObservations.stream()
-                .filter(obs -> newEventVersion.getObservationIds().stream()
-                        .noneMatch(id -> obs.getObservationId().equals(id)))
-                .sorted(Comparator.comparing(NormalizedObservation::getLoadedAt))
-                .collect(toList());
-
-        if (!filteredObservations.isEmpty()) {
-            var loadedDate = filteredObservations.get(0).getLoadedAt();
-            for (NormalizedObservation observation : filteredObservations) {
+        if (!normalizedObservations.isEmpty()) {
+            var loadedDate = normalizedObservations.get(0).getLoadedAt();
+            for (NormalizedObservation observation : normalizedObservations) {
                 if (loadedDate.plusMinutes(1).isAfter(observation.getLoadedAt())) {
                     try {
                         newEventVersion.addObservations(observation.getObservationId());
