@@ -33,7 +33,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
     public void testNumberOfItems() throws ParserConfigurationException, SAXException, XPathExpressionException, IOException {
         String xml = readMessageFromFile("gdacs.xml");
         int itemsCount = 65;
-        assertEquals(itemsCount, gdacsSearchJob.getLinks(xml).size());
+        assertEquals(itemsCount, gdacsSearchJob.getLinksAndPubDate(xml).size());
     }
 
     @Test

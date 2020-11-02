@@ -18,7 +18,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -56,7 +59,7 @@ public class GdacsSearchJob implements Runnable {
         try {
             LOG.info("Gdacs import job has started");
             String xml = gdacsClient.getXml();
-            List<String> links = getLinks(xml);
+            List<String> links = getLinksAndPubDate(xml);
             List<String> alerts = getAlerts(links);
             List<AlertForInsertDataLake> alertsForDataLake = getAlertsForDataLake(alerts);
             saveAlerts(alertsForDataLake);
@@ -66,7 +69,7 @@ public class GdacsSearchJob implements Runnable {
         }
     }
 
-    List<String> getLinks(String xml) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    List<String> getLinksAndPubDate(String xml) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         var links = new ArrayList<String>();
 
         var builderFactory = DocumentBuilderFactory.newInstance();
@@ -75,18 +78,16 @@ public class GdacsSearchJob implements Runnable {
         var xmlDocument = builder.parse(inputStream);
         var xPath = XPathFactory.newInstance().newXPath();
 
-        String pathToItems = "/rss/channel/item";
+        String pathToLinks = "/rss/channel/item/link/text()";
         String pathToPubDate = "/rss/channel/pubDate/text()";
 
-        var itemNodeList = (NodeList) xPath.compile(pathToItems).evaluate(xmlDocument, XPathConstants.NODESET);
+        var linkNodeList = (NodeList) xPath.compile(pathToLinks).evaluate(xmlDocument, XPathConstants.NODESET);
         var pubDateString = (String) xPath.compile(pathToPubDate).evaluate(xmlDocument, XPathConstants.STRING);
 
         XML_PUB_DATE = parseDateTimeFromString(pubDateString);
 
-        for (int i = 0; i < itemNodeList.getLength(); i++) {
-            int indexOfItems = i + 1;
-            String pathToLink = "/rss/channel/item[" + indexOfItems + "]/link/text()";
-            var link = (String) xPath.compile(pathToLink).evaluate(xmlDocument, XPathConstants.STRING);
+        for (int i = 0; i < linkNodeList.getLength(); i++) {
+            String link = linkNodeList.item(i).getNodeValue();
             links.add(link.replace("https://www.gdacs.org", ""));
         }
         return links;
@@ -121,14 +122,13 @@ public class GdacsSearchJob implements Runnable {
         var xPathExpressionToParameters = xPath.compile(pathToDateModified);
 
         for (String alertXml : alertXmlList) {
-            var alertDataLakeOptional = parseAlert(builder, xPath, xPathExpressionToParameters, alertXml);
+            var alertDataLakeOptional = parseAlert(builder, xPathExpressionToParameters, alertXml);
             alertDataLakeOptional.ifPresent(alertsForDataLake::add);
         }
         return alertsForDataLake;
     }
 
-    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder, XPath xPath, XPathExpression xPathExpressionToParameters, String alertXml) {
-        var alertForDataLake = new AlertForInsertDataLake();
+    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder, XPathExpression xPathExpressionToParameters, String alertXml) {
         try {
             var inputStream = new ByteArrayInputStream(alertXml.getBytes());
             var xmlDocument = builder.parse(inputStream);
@@ -138,20 +138,16 @@ public class GdacsSearchJob implements Runnable {
             String updateDateString = "";
 
             for (int i = 0; i < parameterNodeList.getLength(); i++) {
-                int indexOfParameters = i + 1;
-                String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
-                var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
-                String pathToValue = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
-
+                String valueName = parameterNodeList.item(i).getChildNodes().item(1).getTextContent();
                 switch (valueName) {
                     case "datemodified":
-                        updateDateString = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
+                        updateDateString = parameterNodeList.item(i).getChildNodes().item(3).getTextContent();
                         break;
                     case "eventid":
-                        eventId = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
+                        eventId = parameterNodeList.item(i).getChildNodes().item(3).getTextContent();
                         break;
                     case "eventtype":
-                        eventType = (String) xPath.compile(pathToValue).evaluate(xmlDocument, XPathConstants.STRING);
+                        eventType = parameterNodeList.item(i).getChildNodes().item(3).getTextContent();
                         break;
                 }
 
@@ -161,13 +157,12 @@ public class GdacsSearchJob implements Runnable {
                 return Optional.empty();
             }
 
-            alertForDataLake.setUpdateDate(
-                    OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME)
-            );
-
             String externalId = eventType + "_" + eventId;
-            alertForDataLake.setExternalId(externalId);
-            return Optional.of(alertForDataLake);
+            return Optional.of(new AlertForInsertDataLake(
+                    OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME),
+                    externalId,
+                    alertXml
+            ));
 
         } catch (IOException | SAXException | XPathExpressionException e) {
             LOG.warn("Alerts xml is not valid and can not be parsed: {}", alertXml);
