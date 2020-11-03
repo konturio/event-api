@@ -138,16 +138,16 @@ public class GdacsSearchJob implements Runnable {
             String updateDateString = "";
 
             for (int i = 0; i < parameterNodeList.getLength(); i++) {
-                String valueName = parameterNodeList.item(i).getChildNodes().item(1).getTextContent();
+                String valueName = getValueNameByParameterName(parameterNodeList, i);
                 switch (valueName) {
                     case "datemodified":
-                        updateDateString = parameterNodeList.item(i).getChildNodes().item(3).getTextContent();
+                        updateDateString = getValueByParameterName(parameterNodeList, i);
                         break;
                     case "eventid":
-                        eventId = parameterNodeList.item(i).getChildNodes().item(3).getTextContent();
+                        eventId = getValueByParameterName(parameterNodeList, i);
                         break;
                     case "eventtype":
-                        eventType = parameterNodeList.item(i).getChildNodes().item(3).getTextContent();
+                        eventType = getValueByParameterName(parameterNodeList, i);
                         break;
                 }
 
@@ -170,6 +170,28 @@ public class GdacsSearchJob implements Runnable {
             LOG.warn("Alerts xml value of parameter datemodified can not be parsed: {}", alertXml);
         }
         return Optional.empty();
+    }
+
+    private String getValueNameByParameterName(NodeList parameterNodeList, int index){
+        var childNodes = parameterNodeList.item(index).getChildNodes();
+        for(int i = 0; i < childNodes.getLength(); i++){
+            var node = childNodes.item(i);
+            if(node.getNodeName().equals("valueName")){
+                return node.getTextContent();
+            }
+        }
+        return "";
+    }
+
+    private String getValueByParameterName(NodeList parameterNodeList, int index){
+        var childNodes = parameterNodeList.item(index).getChildNodes();
+        for(int i = 0; i < childNodes.getLength(); i++){
+            var node = childNodes.item(i);
+            if(node.getNodeName().equals("value")){
+                return node.getTextContent();
+            }
+        }
+        return "";
     }
 
     void saveAlerts(List<AlertForInsertDataLake> alerts) {
