@@ -39,13 +39,12 @@ scheduler:
     enable: false
     initialDelay: 1000
   hpSrvMagsImport:
-    enable: true
+    enable: false
     initialDelay: 10000
     fixedDelay: 600000
   gdacsImport:
     enable: true
-    initialDelay: 1000
-    fixedRate: 300000
+    cron: 30 0/5 * * * *
   normalization:
     enable: true
     initialDelay: 1000
