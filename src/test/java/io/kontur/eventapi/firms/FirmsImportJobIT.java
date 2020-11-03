@@ -34,18 +34,18 @@ public class FirmsImportJobIT extends AbstractIntegrationTest {
     @Test
     public void testNormalImport() throws IOException {
         //given
-        Mockito.when(firmsClient.getModisData()).thenReturn(readMessageFromFile("firms.modis-c6.csv"));
-        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readMessageFromFile("firms.suomi-npp-viirs-c2.csv"));
-        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readMessageFromFile("firms.noaa-20-viirs-c2.csv"));
+        Mockito.when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6.csv"));
+        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
+        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
         //when
         firmsImportJob.run();
 
         //then
         //check modis-c6
-        List<DataLake> dataLakes = dataLakeDao.getDataLakesByExternalId("e78338918b55f933f6bc3f5d3f235a73");
-        assertEquals(1, dataLakes.size());
-        DataLake dataLake = dataLakes.get(0);
+        List<DataLake> modisDataLakes = dataLakeDao.getDataLakesByExternalId("e78338918b55f933f6bc3f5d3f235a73");
+        assertEquals(1, modisDataLakes.size());
+        DataLake dataLake = modisDataLakes.get(0);
         assertEquals("e78338918b55f933f6bc3f5d3f235a73", dataLake.getExternalId());
         assertEquals("firms.modis-c6", dataLake.getProvider());
         assertEquals(OffsetDateTime.parse("2020-11-02T12:50Z"), dataLake.getUpdatedAt());
@@ -81,18 +81,18 @@ public class FirmsImportJobIT extends AbstractIntegrationTest {
     public void testImportUpdates() throws IOException {
         //given
         // import first time
-        Mockito.when(firmsClient.getModisData()).thenReturn(readMessageFromFile("firms.modis-c6.csv"));
-        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readMessageFromFile("firms.suomi-npp-viirs-c2.csv"));
-        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readMessageFromFile("firms.noaa-20-viirs-c2.csv"));
+        Mockito.when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6.csv"));
+        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
+        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
         firmsImportJob.run();
 
         Mockito.reset(firmsClient);
 
         //new data available for modis
-        Mockito.when(firmsClient.getModisData()).thenReturn(readMessageFromFile("firms.modis-c6.update.csv"));
-        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readMessageFromFile("firms.suomi-npp-viirs-c2.csv"));
-        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readMessageFromFile("firms.noaa-20-viirs-c2.csv"));
+        Mockito.when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6.update.csv"));
+        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
+        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
         //when import second time
         firmsImportJob.run();
@@ -103,9 +103,9 @@ public class FirmsImportJobIT extends AbstractIntegrationTest {
         assertEquals(1, dataLakes.size());
 
         //new data is imported
-        List<DataLake> newdataLakes = dataLakeDao.getDataLakesByExternalId("78d8da2dad1cbfa2882b9d8cb628c939");
-        assertEquals(1, newdataLakes.size());
-        DataLake newdataLake = newdataLakes.get(0);
+        List<DataLake> newDataLakes = dataLakeDao.getDataLakesByExternalId("78d8da2dad1cbfa2882b9d8cb628c939");
+        assertEquals(1, newDataLakes.size());
+        DataLake newdataLake = newDataLakes.get(0);
         assertEquals("78d8da2dad1cbfa2882b9d8cb628c939", newdataLake.getExternalId());
         assertEquals("firms.modis-c6", newdataLake.getProvider());
         assertEquals(OffsetDateTime.parse("2020-11-02T12:59Z"), newdataLake.getUpdatedAt());
@@ -115,7 +115,7 @@ public class FirmsImportJobIT extends AbstractIntegrationTest {
     }
 
 
-    private String readMessageFromFile(String fileName) throws IOException {
+    private String readCsv(String fileName) throws IOException {
         return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
     }
 
