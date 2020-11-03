@@ -8,6 +8,9 @@ public class AlertForInsertDataLake {
     private String externalId;
     private String data;
 
+    public AlertForInsertDataLake() {
+    }
+
     public AlertForInsertDataLake(OffsetDateTime updateDate, String externalId, String data) {
         this.updateDate = updateDate;
         this.externalId = externalId;

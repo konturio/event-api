@@ -18,10 +18,6 @@
 		<description>On 10/12/2020 6:06:56 AM, an earthquake occurred in Guatemala potentially affecting 6480000 people within 100km. The earthquake had Magnitude 5.1M, Depth:100.49km.</description>
 		<web>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1239035</web>
 		<parameter>
-			<valueName>eventid</valueName>
-			<value>1239035</value>
-		</parameter>
-		<parameter>
 			<valueName>currentepisodeid</valueName>
 			<value>1337371</value>
 		</parameter>
@@ -40,10 +36,6 @@
 		<parameter>
 			<valueName>todate</valueName>
 			<value>Mon, 12 Oct 2020 06:06:56 GMT</value>
-		</parameter>
-		<parameter>
-			<valueName>eventtype</valueName>
-			<value>EQ</value>
 		</parameter>
 		<parameter>
 			<valueName>alertlevel</valueName>
