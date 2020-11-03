@@ -6,6 +6,7 @@ import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
+import io.kontur.eventapi.viirs.jobs.FirmsImportJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,14 +22,16 @@ class WorkerSchedulerTest {
     private final EventCombinationJob eventCombinationJob = mock(EventCombinationJob.class);
     private final FeedCompositionJob feedCompositionJob = mock(FeedCompositionJob.class);
     private final GdacsSearchJob gdacsSearchJob = mock(GdacsSearchJob.class);
+    private final FirmsImportJob firmsImportJob = mock(FirmsImportJob.class);
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
-            feedCompositionJob);
+            feedCompositionJob, firmsImportJob);
 
     @AfterEach
     public void resetMocks() {
         Mockito.reset(hpSrvSearchJob);
         Mockito.reset(hpSrvMagsJob);
         Mockito.reset(gdacsSearchJob);
+        Mockito.reset(firmsImportJob);
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
         Mockito.reset(feedCompositionJob);
@@ -73,6 +76,15 @@ class WorkerSchedulerTest {
 
         verify(gdacsSearchJob, times(1)).run();
     }
+
+    @Test
+    public void startFirmsSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "firmsImportEnabled", "true");
+        scheduler.startFirmsImport();
+
+        verify(firmsImportJob, times(1)).run();
+    }
+
 
     @Test
     public void startNormalizationJob() {
