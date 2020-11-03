@@ -6,6 +6,7 @@ import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
+import io.kontur.eventapi.viirs.jobs.FirmsImportJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ public class WorkerScheduler {
     private final HpSrvSearchJob hpSrvSearchJob;
     private final HpSrvMagsJob hpSrvMagsJob;
     private final GdacsSearchJob gdacsSearchJob;
+    private final FirmsImportJob firmsImportJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
@@ -29,6 +31,8 @@ public class WorkerScheduler {
     private String hpSrvMagsImportEnabled;
     @Value("${scheduler.gdacsImport.enable}")
     private String gdacsImportEnabled;
+    @Value("${scheduler.firmsImport.enable}")
+    private String firmsImportEnabled;
     @Value("${scheduler.normalization.enable}")
     private String normalizationEnabled;
     @Value("${scheduler.eventCombination.enable}")
@@ -38,13 +42,15 @@ public class WorkerScheduler {
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
-                           EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob) {
+                           EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
+                           FirmsImportJob firmsImportJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
+        this.firmsImportJob = firmsImportJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -71,6 +77,15 @@ public class WorkerScheduler {
             gdacsSearchJob.run();
         } else {
             LOG.info("Gdacs import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.firmsImport.initialDelay}", fixedRateString = "${scheduler.firmsImport.fixedRate}")
+    public void startFirmsImport() {
+        if (Boolean.parseBoolean(firmsImportEnabled)) {
+            firmsImportJob.run();
+        } else {
+            LOG.info("Firms import job invocation is skipped");
         }
     }
 

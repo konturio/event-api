@@ -18,6 +18,10 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedRate: 999999
+  firmsImport:
+    enable: false
+    initialDelay: 999999
+    fixedRate: 999999
   normalization:
     enable: false
     initialDelay: 999999
