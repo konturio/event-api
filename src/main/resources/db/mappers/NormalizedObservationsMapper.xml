@@ -8,6 +8,7 @@
             observation_id,
             provider,
             external_event_id,
+            external_unique_event_id,
             <if test='point != null'>
                 point,
             </if>
@@ -31,6 +32,7 @@
             #{observationId},
             #{provider},
             #{externalEventId},
+            #{externalUniqueEventId},
             <if test='point != null'>
                 'SRID=4326;${point}'::geometry,
             </if>
@@ -77,9 +79,20 @@
         </foreach>
     </select>
 
+    <select id="getObservationByUniqueExternalIdAndSourceUpdatedDate" resultMap="normalizedObservationsDtoMap">
+        SELECT *
+        FROM normalized_observations no
+        WHERE no.external_unique_event_id = #{uniqueExternalId}
+          AND DATE_TRUNC('second', no.source_updated_at) = #{sourceUpdatedAt}
+          AND observation_id != #{observationId}
+        ORDER BY loaded_at desc
+        LIMIT 1
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>
+        <result property="externalUniqueEventId" column="external_unique_event_id"/>
         <result property="provider" column="provider"/>
         <result property="point" column="point"/>
         <result property="geometries" column="geometries"/>

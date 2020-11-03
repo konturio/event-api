@@ -8,6 +8,7 @@ public class NormalizedObservation {
 
     private UUID observationId;
     private String externalEventId;
+    private String externalUniqueEventId;
     private String provider;
     private String point;
     private String geometries; //TODO use FeatureCollection. Convert to string during insert
@@ -39,6 +40,14 @@ public class NormalizedObservation {
 
     public void setExternalEventId(String externalEventId) {
         this.externalEventId = externalEventId;
+    }
+
+    public String getExternalUniqueEventId() {
+        return externalUniqueEventId;
+    }
+
+    public void setExternalUniqueEventId(String externalUniqueEventId) {
+        this.externalUniqueEventId = externalUniqueEventId;
     }
 
     public String getProvider() {
@@ -167,29 +176,5 @@ public class NormalizedObservation {
 
     public void setSourceUri(String sourceUri) {
         this.sourceUri = sourceUri;
-    }
-
-    @Override
-    public String toString() {
-        return "NormalizedObservation{" +
-                "observationId=" + observationId +
-                ", externalEventId='" + externalEventId + '\'' +
-                ", provider='" + provider + '\'' +
-                ", point='" + point + '\'' +
-                ", geometries='" + geometries + '\'' +
-                ", eventSeverity=" + eventSeverity +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", episodeDescription='" + episodeDescription + '\'' +
-                ", type=" + type +
-                ", active=" + active +
-                ", cost=" + cost +
-                ", region='" + region + '\'' +
-                ", loadedAt=" + loadedAt +
-                ", startedAt=" + startedAt +
-                ", endedAt=" + endedAt +
-                ", sourceUpdatedAt=" + sourceUpdatedAt +
-                ", sourceUri='" + sourceUri + '\'' +
-                '}';
     }
 }

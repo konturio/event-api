@@ -3,7 +3,9 @@ package io.kontur.eventapi.dao.mapper;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper
@@ -16,4 +18,6 @@ public interface NormalizedObservationsMapper {
     List<NormalizedObservation> getObservationsToCreateNewEventsByExternalId(String externalId);
 
     List<NormalizedObservation> getObservations(List<UUID> observationIds);
+
+    Optional<NormalizedObservation> getObservationByUniqueExternalIdAndSourceUpdatedDate(OffsetDateTime sourceUpdatedAt, String uniqueExternalId, UUID observationId);
 }

@@ -17,10 +17,10 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -144,6 +144,43 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
     private String readMessageFromFile(String fileName) throws IOException {
         return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
+    }
+
+    @Test
+    public void testDuplicateInSQS() throws IOException {
+        String externalId = "0c653cb4-4a9e-4506-b2c8-a1e14e4dc049";
+        var hazardLoadTime = OffsetDateTime.of(
+                LocalDateTime.of(2024, 10, 1, 1, 1), ZoneOffset.UTC);
+        var magsLoadTime = OffsetDateTime.of(
+                LocalDateTime.of(2024, 10, 1, 1, 2), ZoneOffset.UTC);
+        var sqsLoadTime = OffsetDateTime.of(
+                LocalDateTime.of(2024, 10, 1, 1, 3, 1), ZoneOffset.UTC);
+
+        createNormalizations(externalId, hazardLoadTime, HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard04.json"));
+
+        eventCombinationJob.run();
+        feedCompositionJob.run();
+
+        List<FeedData> feed1 = feedMapper.searchForEvents(
+                "pdc-v0",
+                Collections.emptyList(),
+                hazardLoadTime.minusDays(1),
+                1
+        );
+
+        createNormalizations(externalId, magsLoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata04.json"));
+        createNormalizations(externalId, sqsLoadTime, PDC_SQS_PROVIDER, readMessageFromFile("sqsdata04.json"));
+
+        eventCombinationJob.run();
+        feedCompositionJob.run();
+
+        List<FeedData> feed = feedMapper.searchForEvents(
+                "pdc-v0",
+                Collections.emptyList(),
+                hazardLoadTime.minusDays(1),
+                1
+        );
+        assertEquals(2, feed.get(0).getEpisodes().size());
     }
 
 }
