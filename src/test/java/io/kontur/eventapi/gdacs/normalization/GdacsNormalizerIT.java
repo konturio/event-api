@@ -39,7 +39,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         var observation = gdacsNormalizer.normalize(dataLake);
 
         String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
-        String name = "Earthquake in Mexico";
+        String name = "Green earthquake alert (Magnitude 4.9M, Depth:28.99km) in Mexico 12/10/2020 07:03 UTC, About 13000 people within 100km.";
 
         var fromDate = OffsetDateTime.of(
                 LocalDateTime.of(2020, 10, 12, 7, 3, 7),
