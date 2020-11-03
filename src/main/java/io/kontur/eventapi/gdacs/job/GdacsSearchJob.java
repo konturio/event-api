@@ -117,21 +117,26 @@ public class GdacsSearchJob implements Runnable {
         var builder = builderFactory.newDocumentBuilder();
         var xPath = XPathFactory.newInstance().newXPath();
 
+        String pathToExternalId = "/alert/identifier/text()";
         String pathToDateModified = "/alert/info/parameter";
 
+        var externalIdExpression = xPath.compile(pathToExternalId);
         var xPathExpressionToParameters = xPath.compile(pathToDateModified);
 
         for (String alertXml : alertXmlList) {
-            var alertDataLakeOptional = parseAlert(builder, xPathExpressionToParameters, alertXml);
+            var alertDataLakeOptional = parseAlert(builder, externalIdExpression, xPathExpressionToParameters, alertXml);
             alertDataLakeOptional.ifPresent(alertsForDataLake::add);
         }
         return alertsForDataLake;
     }
 
-    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder, XPathExpression xPathExpressionToParameters, String alertXml) {
+    private Optional<AlertForInsertDataLake> parseAlert(DocumentBuilder builder,
+                                                        XPathExpression externalIdExpression,
+                                                        XPathExpression xPathExpressionToParameters, String alertXml) {
         try {
             var inputStream = new ByteArrayInputStream(alertXml.getBytes());
             var xmlDocument = builder.parse(inputStream);
+            var externalId = (String) externalIdExpression.evaluate(xmlDocument, XPathConstants.STRING);
             var parameterNodeList = (NodeList) xPathExpressionToParameters.evaluate(xmlDocument, XPathConstants.NODESET);
             String eventId = "";
             String eventType = "";
@@ -157,7 +162,6 @@ public class GdacsSearchJob implements Runnable {
                 return Optional.empty();
             }
 
-            String externalId = eventType + "_" + eventId;
             return Optional.of(new AlertForInsertDataLake(
                     OffsetDateTime.parse(updateDateString, DateTimeFormatter.RFC_1123_DATE_TIME),
                     externalId,
@@ -196,10 +200,7 @@ public class GdacsSearchJob implements Runnable {
 
     void saveAlerts(List<AlertForInsertDataLake> alerts) {
         alerts.forEach(alert -> {
-            var dataLakes = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(
-                    alert.getExternalId(),
-                    alert.getUpdateDate()
-            );
+            var dataLakes = dataLakeDao.getDataLakesByExternalId(alert.getExternalId());
             if (dataLakes.isEmpty()) {
                 gdacsService.saveGdacs(alert);
             }

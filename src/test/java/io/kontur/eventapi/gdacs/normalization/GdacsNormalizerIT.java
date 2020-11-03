@@ -50,7 +50,9 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
                 ZoneOffset.UTC
         );
 
-        assertEquals(dataLake.getExternalId(), observation.getExternalEventId());
+        assertNotEquals(dataLake.getExternalId(), observation.getExternalEventId());
+        assertEquals("EQ_1239039", observation.getExternalEventId());
+
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());

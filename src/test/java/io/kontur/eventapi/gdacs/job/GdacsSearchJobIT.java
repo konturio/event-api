@@ -83,26 +83,8 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
                 externalId,
                 data
         )));
-        var dataLakesAfterFirstUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateModified);
-        assertEquals(expectedListSize, dataLakesAfterFirstUpdate.size());
 
-        var datePlusDay = dateModified.plusDays(1);
-        gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
-                datePlusDay,
-                externalId,
-                data
-        )));
-        var dataLakesAfterSecondUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, datePlusDay);
-        assertEquals(expectedListSize, dataLakesAfterSecondUpdate.size());
-
-        var dateMinusDay = dateModified.minusDays(1);
-        gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
-                dateMinusDay,
-                externalId,
-                data
-        )));
-        var dataLakesAfterThirdUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateMinusDay);
-        assertEquals(expectedListSize, dataLakesAfterThirdUpdate.size());
+        assertEquals(expectedListSize, dataLakeDao.getDataLakesByExternalId(externalId).size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

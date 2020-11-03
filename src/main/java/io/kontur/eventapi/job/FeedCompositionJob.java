@@ -54,7 +54,7 @@ public class FeedCompositionJob implements Runnable {
         List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
 
         if (event.getObservationIds().size() != observations.size()) {
-            LOG.info(String.format(
+            LOG.debug(String.format(
                     "Feed Data creation for event '%s' with version '%s' was skipped due to missed normalized observations. " +
                             "Expected number of observations %s, actual %s",
                     event.getEventId(), event.getVersion(), event.getObservationIds().size(), observations.size()));

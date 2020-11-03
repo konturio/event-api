@@ -65,7 +65,6 @@ public class GdacsNormalizer extends Normalizer {
         var normalizedObservation = new NormalizedObservation();
 
         normalizedObservation.setProvider(dataLakeDto.getProvider());
-        normalizedObservation.setExternalEventId(dataLakeDto.getExternalId());
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
@@ -150,6 +149,7 @@ public class GdacsNormalizer extends Normalizer {
         }
 
         String geometry = gdacsClient.getGeometryByLink(eventtype, eventid, currentepisodeid);
+        normalizedObservation.setExternalEventId(eventtype + "_" + eventid);
         normalizedObservation.setGeometries(geometry);
     }
 
