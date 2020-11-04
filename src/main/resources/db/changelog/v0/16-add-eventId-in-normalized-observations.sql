@@ -2,4 +2,4 @@
 
 --changeset event-api-migrations:16-add-eventId-in-normalized-observations:false
 
-alter table normalized_observations add column external_unique_event_id text;
+alter table normalized_observations add column external_episode_id text;

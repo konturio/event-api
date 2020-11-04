@@ -40,7 +40,7 @@ class HpSrvSearchNormalizerTest {
         assertEquals(dataLake.getObservationId(), obs.getObservationId());
         assertEquals(dataLake.getProvider(), obs.getProvider());
         assertEquals("d26f0681-70e2-48b2-83eb-c8b9d8ef69fe", obs.getExternalEventId());
-        assertEquals("d26f0681-70e2-48b2-83eb-c8b9d8ef69fe", obs.getExternalUniqueEventId());
+        assertEquals("d26f0681-70e2-48b2-83eb-c8b9d8ef69fe", obs.getExternalEpisodeId());
         assertEquals(Severity.EXTREME, obs.getEventSeverity());
         assertEquals("Flood - Huron, SD Region, United States", obs.getName());
         assertEquals("The National Weather Service (NWS) ...", obs.getDescription());

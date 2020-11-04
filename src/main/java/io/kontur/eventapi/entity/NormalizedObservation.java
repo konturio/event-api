@@ -8,7 +8,7 @@ public class NormalizedObservation {
 
     private UUID observationId;
     private String externalEventId;
-    private String externalUniqueEventId;
+    private String externalEpisodeId;
     private String provider;
     private String point;
     private String geometries; //TODO use FeatureCollection. Convert to string during insert
@@ -42,12 +42,12 @@ public class NormalizedObservation {
         this.externalEventId = externalEventId;
     }
 
-    public String getExternalUniqueEventId() {
-        return externalUniqueEventId;
+    public String getExternalEpisodeId() {
+        return externalEpisodeId;
     }
 
-    public void setExternalUniqueEventId(String externalUniqueEventId) {
-        this.externalUniqueEventId = externalUniqueEventId;
+    public void setExternalEpisodeId(String externalEpisodeId) {
+        this.externalEpisodeId = externalEpisodeId;
     }
 
     public String getProvider() {

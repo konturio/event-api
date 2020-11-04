@@ -66,7 +66,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
 
     @SuppressWarnings("unchecked")
     private void convertMagTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props, String uniqueExternalId) {
-        normalizedDto.setExternalUniqueEventId(uniqueExternalId);
+        normalizedDto.setExternalEpisodeId(uniqueExternalId);
         convertHazardTypeProperties(normalizedDto, (Map<String, Object>) props.get("hazard"));
         normalizedDto.setActive(readBoolean(props, "isActive"));
         normalizedDto.setGeometries(writeJson(convertGeometries(props)));
@@ -87,8 +87,8 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
         normalizedDto.setPoint(pointWkt);
 
-        if(normalizedDto.getExternalUniqueEventId() == null) {
-            normalizedDto.setExternalUniqueEventId(readString(props, "uuid"));
+        if(normalizedDto.getExternalEpisodeId() == null) {
+            normalizedDto.setExternalEpisodeId(readString(props, "uuid"));
         }
 
         try {

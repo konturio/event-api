@@ -130,7 +130,7 @@ public class FeedCompositionJob implements Runnable {
     private Optional<FeedEpisode> convertObservation(NormalizedObservation observation, FeedData feedDto) {
         var duplicateObservationOpt = observationsDao.getObservationByUniqueExternalIdAndSourceUpdatedDate(
                 observation.getSourceUpdatedAt().truncatedTo(ChronoUnit.SECONDS),
-                observation.getExternalUniqueEventId(),
+                observation.getExternalEpisodeId(),
                 observation.getObservationId());
         if(duplicateObservationOpt.isPresent()){
             var konturEventOpt = eventsDao.getEventByIdEvenAndVersionAndIdObservation(
