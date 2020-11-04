@@ -1,6 +1,5 @@
 package io.kontur.eventapi.firms.normalization;
 
-import io.kontur.eventapi.TestUtil;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.firms.FirmsUtil;
@@ -14,6 +13,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
+import static io.kontur.eventapi.TestUtil.readFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FirmsNormalizerIT extends AbstractIntegrationTest {
@@ -54,7 +54,7 @@ public class FirmsNormalizerIT extends AbstractIntegrationTest {
         assertEquals(FirmsUtil.MODIS_PROVIDER, observation.getProvider());
         assertEquals(EventType.WILDFIRE, observation.getType());
         assertEquals("POINT(133.141 -2.443)", observation.getPoint());
-        assertEquals(TestUtil.readMessageFromFile(this, "firms.geometries.json"), observation.getGeometries());
+        assertEquals(readFile(this, "firms.geometries.json"), observation.getGeometries());
 
         assertNull(observation.getEventSeverity());
         assertNull(observation.getName());

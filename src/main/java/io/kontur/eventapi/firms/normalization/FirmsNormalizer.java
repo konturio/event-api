@@ -71,7 +71,8 @@ public class FirmsNormalizer extends Normalizer {
     }
 
     private String createWrtPolygon(Double longitude, Double latitude) {
-        List<GeoCoord> h3Polygon = h3.h3ToGeoBoundary(h3.geoToH3(latitude, longitude, 8));
+        long h3Index = h3.geoToH3(latitude, longitude, 8);
+        List<GeoCoord> h3Polygon = h3.h3ToGeoBoundary(h3Index);
 
         h3Polygon.add(h3Polygon.get(0));//wrt polygon must be closed
         String wrtPolygon = h3Polygon.stream()

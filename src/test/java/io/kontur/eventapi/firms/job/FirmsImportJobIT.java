@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import static io.kontur.eventapi.TestUtil.readFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -116,7 +117,7 @@ public class FirmsImportJobIT extends AbstractIntegrationTest {
 
 
     private String readCsv(String fileName) throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
+        return readFile(this,fileName);
     }
 
 }
