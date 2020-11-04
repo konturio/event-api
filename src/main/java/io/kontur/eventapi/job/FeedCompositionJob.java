@@ -128,24 +128,7 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private Optional<FeedEpisode> convertObservation(NormalizedObservation observation, FeedData feedDto) {
-        var duplicateObservationOpt = observationsDao.getObservationByUniqueExternalIdAndSourceUpdatedDate(
-                observation.getSourceUpdatedAt().truncatedTo(ChronoUnit.SECONDS),
-                observation.getExternalEpisodeId(),
-                observation.getObservationId());
-        if(duplicateObservationOpt.isPresent()){
-            var konturEventOpt = eventsDao.getEventByIdEvenAndVersionAndIdObservation(
-                    feedDto.getEventId(),
-                    feedDto.getVersion() - 1,
-                    observation.getObservationId()
-            );
-
-            if(konturEventOpt.isPresent()){
-                return Optional.empty();
-            }
-
-        }
-
-        if (observation.getGeometries() == null) {
+        if (observation.getGeometries() == null || doesObservationHaveDuplicateThatSavedInPreviousEvent(observation, feedDto)) {
             return Optional.empty();
         }
         FeedEpisode feedEpisode = new FeedEpisode();
@@ -161,5 +144,20 @@ public class FeedCompositionJob implements Runnable {
         feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
         return Optional.of(feedEpisode);
     }
-
+    
+    private boolean doesObservationHaveDuplicateThatSavedInPreviousEvent(NormalizedObservation observation, FeedData feedDto){
+        var duplicateObservationOpt = observationsDao.getDuplicateObservation(
+                observation.getSourceUpdatedAt().truncatedTo(ChronoUnit.SECONDS),
+                observation.getExternalEpisodeId(),
+                observation.getObservationId());
+        
+        if(duplicateObservationOpt.isPresent()){
+            var konturEventOpt = eventsDao.getEventByIdEvenAndVersionAndIdObservation(
+                    feedDto.getEventId(),
+                    feedDto.getVersion() - 1,
+                    observation.getObservationId());
+            return konturEventOpt.isPresent();
+        }
+        return false;
+    }
 }

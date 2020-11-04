@@ -26,16 +26,16 @@ public class NormalizedObservationsDao {
         return mapper.getExternalIdsToUpdate();
     }
 
-    public List<NormalizedObservation> getObservationsToCreateNewEventsByExternalId(String externalId) {
-        return mapper.getObservationsToCreateNewEventsByExternalId(externalId);
+    public List<NormalizedObservation> getNotCombinedObservationsByExternalId(String externalId) {
+        return mapper.getNotCombinedObservationsByExternalId(externalId);
     }
 
     public List<NormalizedObservation> getObservations(List<UUID> observationIds) {
         return mapper.getObservations(observationIds);
     }
 
-    public Optional<NormalizedObservation> getObservationByUniqueExternalIdAndSourceUpdatedDate(OffsetDateTime sourceUpdatedAt, String uniqueExternalId, UUID observationId){
-        return mapper.getObservationByUniqueExternalIdAndSourceUpdatedDate(sourceUpdatedAt, uniqueExternalId, observationId);
+    public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime sourceUpdatedAt, String externalEpisodeId, UUID observationId){
+        return mapper.getDuplicateObservation(sourceUpdatedAt, externalEpisodeId, observationId);
     }
 
 }

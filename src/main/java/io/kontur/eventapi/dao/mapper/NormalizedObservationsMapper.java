@@ -15,9 +15,9 @@ public interface NormalizedObservationsMapper {
 
     List<String> getExternalIdsToUpdate();
 
-    List<NormalizedObservation> getObservationsToCreateNewEventsByExternalId(String externalId);
+    List<NormalizedObservation> getNotCombinedObservationsByExternalId(String externalId);
 
     List<NormalizedObservation> getObservations(List<UUID> observationIds);
 
-    Optional<NormalizedObservation> getObservationByUniqueExternalIdAndSourceUpdatedDate(OffsetDateTime sourceUpdatedAt, String externalEpisodeId, UUID observationId);
+    Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime sourceUpdatedAt, String externalEpisodeId, UUID observationId);
 }

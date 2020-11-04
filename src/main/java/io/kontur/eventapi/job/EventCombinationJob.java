@@ -36,14 +36,14 @@ public class EventCombinationJob implements Runnable {
     }
 
     private void processEvent(String externalId) {
-        var normalizedObservations = observationsDao.getObservationsToCreateNewEventsByExternalId(externalId);
+        var normalizedObservations = observationsDao.getNotCombinedObservationsByExternalId(externalId);
         var newEventVersion = createNewEventVersion(externalId);
         boolean doSaveOnlyToOneEvent = true;
 
         if (!normalizedObservations.isEmpty()) {
-            var loadedDate = normalizedObservations.get(0).getLoadedAt();
+            var limitOfTimeToOneEvent = normalizedObservations.get(0).getLoadedAt().plusMinutes(1);
             for (NormalizedObservation observation : normalizedObservations) {
-                if (loadedDate.plusMinutes(1).isAfter(observation.getLoadedAt())) {
+                if (limitOfTimeToOneEvent.isAfter(observation.getLoadedAt())) {
                     newEventVersion.addObservations(observation.getObservationId());
                 } else {
                     doSaveOnlyToOneEvent = false;

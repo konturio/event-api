@@ -32,7 +32,7 @@
             #{observationId},
             #{provider},
             #{externalEventId},
-            #{externalUniqueEventId},
+            #{externalEpisodeId},
             <if test='point != null'>
                 'SRID=4326;${point}'::geometry,
             </if>
@@ -61,7 +61,7 @@
         WHERE NOT exists(SELECT 1 FROM kontur_events ke WHERE ke.observation_id = no.observation_id)
     </select>
 
-    <select id="getObservationsToCreateNewEventsByExternalId" resultMap="normalizedObservationsDtoMap">
+    <select id="getNotCombinedObservationsByExternalId" resultMap="normalizedObservationsDtoMap">
         SELECT *
         FROM normalized_observations no
         WHERE NOT exists(
@@ -79,7 +79,7 @@
         </foreach>
     </select>
 
-    <select id="getObservationByUniqueExternalIdAndSourceUpdatedDate" resultMap="normalizedObservationsDtoMap">
+    <select id="getDuplicateObservation" resultMap="normalizedObservationsDtoMap">
         SELECT *
         FROM normalized_observations no
         WHERE no.external_episode_id = #{externalEpisodeId}
