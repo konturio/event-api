@@ -20,7 +20,7 @@ import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
@@ -57,6 +57,9 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         assertEquals(hazardsLoadTime, feedV1.getEpisodes().get(0).getUpdatedAt());
         assertEquals(Instant.ofEpochMilli(1594760678798L),
                 feedV1.getEpisodes().get(0).getSourceUpdatedAt().toInstant());
+
+        assertFalse(feedV1.getEpisodes().isEmpty());
+        assertFalse(feedV1.getEpisodes().get(0).getObservations().isEmpty());
 
         //given
         var magsLoadTime = OffsetDateTime.of(

@@ -141,6 +141,7 @@ public class FeedCompositionJob implements Runnable {
         feedEpisode.setUpdatedAt(observation.getLoadedAt());
         feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
         feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
+        feedEpisode.addObservation(List.of(observation.getObservationId()));
         return Optional.of(feedEpisode);
     }
 
