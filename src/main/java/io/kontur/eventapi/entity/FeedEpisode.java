@@ -122,7 +122,7 @@ public class FeedEpisode {
         return observations;
     }
 
-    public void addObservation(List<UUID> observations) {
-        this.observations.addAll(observations);
+    public void addObservation(UUID observations) {
+        this.observations.add(observations);
     }
 }
