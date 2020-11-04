@@ -6,7 +6,7 @@ import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
-import io.kontur.eventapi.viirs.jobs.FirmsImportJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

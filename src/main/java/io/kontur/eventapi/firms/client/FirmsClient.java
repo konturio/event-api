@@ -1,4 +1,4 @@
-package io.kontur.eventapi.viirs.client;
+package io.kontur.eventapi.firms.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

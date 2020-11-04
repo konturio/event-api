@@ -6,7 +6,7 @@ import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
-import io.kontur.eventapi.viirs.jobs.FirmsImportJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

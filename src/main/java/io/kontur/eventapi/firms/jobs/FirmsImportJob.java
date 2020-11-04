@@ -1,9 +1,9 @@
-package io.kontur.eventapi.viirs.jobs;
+package io.kontur.eventapi.firms.jobs;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.util.DateTimeUtil;
-import io.kontur.eventapi.viirs.client.FirmsClient;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -18,20 +18,15 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Map;
+import java.util.UUID;
+
+import static io.kontur.eventapi.firms.FirmsUtil.*;
 
 @Component
 public class FirmsImportJob implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(FirmsImportJob.class);
-
-    private final static String MODIS_PROVIDER = "firms.modis-c6";
-    private final static String SUOMI_PROVIDER = "firms.suomi-npp-viirs-c2";
-    private final static String NOAA_PROVIDER = "firms.noaa-20-viirs-c2";
-
-    public static final String CSV_SEPARATOR = ",";
 
     private final static DateTimeFormatter FIRMS_DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.HOUR_OF_DAY, 2)
@@ -90,13 +85,4 @@ public class FirmsImportJob implements Runnable {
                 LocalTime.parse(collect.get("acq_time"), FIRMS_DATE_TIME_FORMATTER),
                 ZoneOffset.UTC);
     }
-
-    private Map<String, String> parseRow(String csvHeader, String csvRow) {
-        String[] csvRows = csvRow.split(CSV_SEPARATOR);
-        String[] csvHeaders = csvHeader.split(CSV_SEPARATOR);
-
-        return IntStream.range(0, csvHeaders.length).boxed()
-                .collect(Collectors.toMap(i -> csvHeaders[i], i -> csvRows[i]));
-    }
-
 }

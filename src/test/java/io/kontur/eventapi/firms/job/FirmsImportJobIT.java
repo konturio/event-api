@@ -1,10 +1,10 @@
-package io.kontur.eventapi.firms;
+package io.kontur.eventapi.firms.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
-import io.kontur.eventapi.viirs.client.FirmsClient;
-import io.kontur.eventapi.viirs.jobs.FirmsImportJob;
+import io.kontur.eventapi.firms.client.FirmsClient;
+import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
