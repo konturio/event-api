@@ -17,5 +17,5 @@ public interface KonturEventsMapper {
 
     List<KonturEvent> getNewEventVersionsForFeed(UUID feedId);
 
-    Optional<KonturEvent> getEventByIdEvenAndVersionAndIdObservation(UUID eventId, Long version, UUID observationId);
+    Optional<KonturEvent> getEventByIdEventAndVersionAndIdObservation(UUID eventId, Long version, UUID observationId);
 }

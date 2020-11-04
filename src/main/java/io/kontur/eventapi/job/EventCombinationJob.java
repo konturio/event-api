@@ -30,12 +30,12 @@ public class EventCombinationJob implements Runnable {
         List<String> externalIds = observationsDao.getExternalIdsToUpdate();
 
         LOG.info("Combination job has started. Events to process: {}", externalIds.size());
-        externalIds.forEach(this::processEvent);
+        externalIds.forEach(this::generateEvents);
         LOG.info("Combination job has finished");
 
     }
 
-    private void processEvent(String externalId) {
+    private void generateEvents(String externalId) {
         var normalizedObservations = observationsDao.getNotCombinedObservationsByExternalId(externalId);
         var newEventVersion = createNewEventVersion(externalId);
         boolean doSaveOnlyToOneEvent = true;
@@ -51,7 +51,7 @@ public class EventCombinationJob implements Runnable {
             }
             eventsDao.insertEventVersion(newEventVersion);
         }
-        if(!doSaveOnlyToOneEvent) processEvent(externalId);
+        if(!doSaveOnlyToOneEvent) generateEvents(externalId);
     }
 
     private KonturEvent createNewEventVersion(String externalId) {

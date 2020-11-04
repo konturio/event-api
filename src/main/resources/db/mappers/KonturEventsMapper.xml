@@ -37,7 +37,7 @@
         GROUP BY ke.event_id, ke.version
     </select>
 
-    <select id="getEventByIdEvenAndVersionAndIdObservation" resultMap="konturEventDtoMap">
+    <select id="getEventByIdEventAndVersionAndIdObservation" resultMap="konturEventDtoMap">
         SELECT * FROM kontur_events
         WHERE event_id = #{eventId}
           AND version = #{version}

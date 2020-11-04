@@ -161,13 +161,6 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        List<FeedData> feed1 = feedMapper.searchForEvents(
-                "pdc-v0",
-                Collections.emptyList(),
-                hazardLoadTime.minusDays(1),
-                1
-        );
-
         createNormalizations(externalId, magsLoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata04.json"));
         createNormalizations(externalId, sqsLoadTime, PDC_SQS_PROVIDER, readMessageFromFile("sqsdata04.json"));
 

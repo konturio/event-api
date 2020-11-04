@@ -81,11 +81,13 @@
 
     <select id="getDuplicateObservation" resultMap="normalizedObservationsDtoMap">
         SELECT *
-        FROM normalized_observations no
-        WHERE no.external_episode_id = #{externalEpisodeId}
-          AND DATE_TRUNC('second', no.source_updated_at) = #{sourceUpdatedAt}
+        FROM normalized_observations
+        WHERE external_episode_id = #{externalEpisodeId}
+        <if test="loadedAt!=null">
+            AND loaded_at &lt;= #{loadedAt}
+        </if>
           AND observation_id != #{observationId}
-        ORDER BY loaded_at desc
+        ORDER BY loaded_at DESC
         LIMIT 1
     </select>
 

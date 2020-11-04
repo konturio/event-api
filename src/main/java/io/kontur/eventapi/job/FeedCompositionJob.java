@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.FeatureCollection;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -144,18 +143,18 @@ public class FeedCompositionJob implements Runnable {
         feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
         return Optional.of(feedEpisode);
     }
-    
-    private boolean doesObservationHaveDuplicateThatSavedInPreviousEvent(NormalizedObservation observation, FeedData feedDto){
+
+    private boolean doesObservationHaveDuplicateThatSavedInPreviousEvent(NormalizedObservation observation, FeedData feedDto) {
         var duplicateObservationOpt = observationsDao.getDuplicateObservation(
-                observation.getSourceUpdatedAt().truncatedTo(ChronoUnit.SECONDS),
+                observation.getLoadedAt(),
                 observation.getExternalEpisodeId(),
                 observation.getObservationId());
-        
-        if(duplicateObservationOpt.isPresent()){
-            var konturEventOpt = eventsDao.getEventByIdEvenAndVersionAndIdObservation(
+
+        if (duplicateObservationOpt.isPresent()) {
+            var konturEventOpt = eventsDao.getEventByIdEventAndVersionAndIdObservation(
                     feedDto.getEventId(),
                     feedDto.getVersion() - 1,
-                    observation.getObservationId());
+                    duplicateObservationOpt.get().getObservationId());
             return konturEventOpt.isPresent();
         }
         return false;

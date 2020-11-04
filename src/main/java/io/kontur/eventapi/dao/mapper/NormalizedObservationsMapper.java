@@ -19,5 +19,5 @@ public interface NormalizedObservationsMapper {
 
     List<NormalizedObservation> getObservations(List<UUID> observationIds);
 
-    Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime sourceUpdatedAt, String externalEpisodeId, UUID observationId);
+    Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId);
 }
