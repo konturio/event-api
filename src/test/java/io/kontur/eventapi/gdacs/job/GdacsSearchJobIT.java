@@ -1,7 +1,13 @@
 package io.kontur.eventapi.gdacs.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.gdacs.dto.AlertForInsertDataLake;
+import io.kontur.eventapi.job.EventCombinationJob;
+import io.kontur.eventapi.job.FeedCompositionJob;
+import io.kontur.eventapi.job.NormalizationJob;
+import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.service.EventResourceService;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -22,11 +28,19 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
 
     private final GdacsSearchJob gdacsSearchJob;
     private final DataLakeDao dataLakeDao;
+    private final NormalizationJob normalizationJob;
+    private final EventCombinationJob eventCombinationJob;
+    private final FeedCompositionJob feedCompositionJob;
+    private final EventResourceService eventResourceService;
 
     @Autowired
-    public GdacsSearchJobIT(GdacsSearchJob gdacsSearchJob, DataLakeDao dataLakeDao) {
+    public GdacsSearchJobIT(GdacsSearchJob gdacsSearchJob, DataLakeDao dataLakeDao, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, EventResourceService eventResourceService) {
         this.gdacsSearchJob = gdacsSearchJob;
         this.dataLakeDao = dataLakeDao;
+        this.normalizationJob = normalizationJob;
+        this.eventCombinationJob = eventCombinationJob;
+        this.feedCompositionJob = feedCompositionJob;
+        this.eventResourceService = eventResourceService;
     }
 
     @Test
@@ -90,11 +104,11 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testSentParameter() throws IOException, XPathExpressionException, ParserConfigurationException {
-        String alert01 = readMessageFromFile("alert01_valid.xml");
-        String id01 = "GDACS_EQ_1239039_1337379";
-        String alert02 = readMessageFromFile("alert02_valid.xml");
-        String id02 = "GDACS_EQ_1239035_1337371";
+    public void testSortingAlertsAndEventBySentParameter() throws IOException, XPathExpressionException, ParserConfigurationException {
+        String alert01 = readMessageFromFile("alert_for_test_sorting_by_sent_v1.xml");
+        String id01 = "GDACS_TC_1000738_16";
+        String alert02 = readMessageFromFile("alert_for_test_sorting_by_sent_v2.xml");
+        String id02 = "GDACS_TC_1000738_19";
 
         var alerts = List.of(alert01, alert02);
         var alertsForDataLake = gdacsSearchJob.getSortedBySentAlertsForDataLake(alerts);
@@ -104,6 +118,19 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
 //        second alert was sending earlier
         assertEquals(id02, alertsForDataLake.get(0).getExternalId());
         assertEquals(id01, alertsForDataLake.get(1).getExternalId());
+
+        gdacsSearchJob.saveAlerts(alertsForDataLake);
+        normalizationJob.run();
+        eventCombinationJob.run();
+        feedCompositionJob.run();
+
+        List<EventDto> events = eventResourceService.searchEvents("gdacs", List.of(), OffsetDateTime.now().minusYears(10), 1, List.of(), SortOrder.ASC);
+        String expectedDescriptionOfLatestEpisode = "From 31/10/2020 to 04/11/2020, a Tropical Storm (maximum wind speed of 241 km/h) ETA-20 was active in Atlantic. The cyclone affects these countries: Nicaragua, Honduras (vulnerability Medium). Estimated population affected by category 1 (120 km/h) wind speeds or higher is 0.126 million.";
+        String actualDescriptionOfLatestEpisode = events.get(0).getEpisodes().get(events.get(0).getEpisodes().size() - 1).getDescription();
+
+        assertFalse(events.isEmpty());
+        assertEquals(expectedDescriptionOfLatestEpisode, actualDescriptionOfLatestEpisode);
+
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
