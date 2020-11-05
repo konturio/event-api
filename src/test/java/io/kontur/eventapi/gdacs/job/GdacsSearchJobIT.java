@@ -96,12 +96,12 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         String alert02 = readMessageFromFile("alert02_valid.xml");
         String id02 = "GDACS_EQ_1239035_1337371";
 
-//        second alert was sending earlier
         var alerts = List.of(alert01, alert02);
         var alertsForDataLake = gdacsSearchJob.getSortedBySentAlertsForDataLake(alerts);
 
         assertFalse(alertsForDataLake.isEmpty());
 
+//        second alert was sending earlier
         assertEquals(id02, alertsForDataLake.get(0).getExternalId());
         assertEquals(id01, alertsForDataLake.get(1).getExternalId());
     }
