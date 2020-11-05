@@ -63,29 +63,29 @@ public class FirmsNormalizer extends Normalizer {
 
         normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
 
-        String wrtPolygon = createWrtPolygon(longitude, latitude);
-        String geometry = writeJson(createGeometry(wrtPolygon, dataLakeDto.getUpdatedAt()));
+        String wktPolygon = createWktPolygon(longitude, latitude);
+        String geometry = writeJson(createGeometry(wktPolygon, dataLakeDto.getUpdatedAt()));
         normalizedObservation.setGeometries(geometry);
 
         return normalizedObservation;
     }
 
-    private String createWrtPolygon(Double longitude, Double latitude) {
+    private String createWktPolygon(Double longitude, Double latitude) {
         long h3Index = h3.geoToH3(latitude, longitude, 8);
         List<GeoCoord> h3Polygon = h3.h3ToGeoBoundary(h3Index);
 
-        h3Polygon.add(h3Polygon.get(0));//wrt polygon must be closed
-        String wrtPolygon = h3Polygon.stream()
+        h3Polygon.add(h3Polygon.get(0));//wkt polygon must be closed
+        String wktPolygon = h3Polygon.stream()
                 .map(geoCoord -> geoCoord.lng + " " + geoCoord.lat)
                 .collect(Collectors.joining(",", "POLYGON ((", "))"));
 
-        return wrtPolygon;
+        return wktPolygon;
     }
 
-    private FeatureCollection createGeometry(String wrtPolygon, OffsetDateTime updatedAt) {
+    private FeatureCollection createGeometry(String wktPolygon, OffsetDateTime updatedAt) {
         Geometry geometry;
         try {
-            geometry = geoJSONWriter.write(wktReader.read(wrtPolygon));
+            geometry = geoJSONWriter.write(wktReader.read(wktPolygon));
         } catch (ParseException e) {
             throw new RuntimeException("can not create Geometry", e);
         }
