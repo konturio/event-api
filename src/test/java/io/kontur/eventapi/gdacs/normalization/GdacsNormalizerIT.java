@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +80,8 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         var alert = new AlertForInsertDataLake(
                 OffsetDateTime.of(LocalDateTime.of(2020, 10, 12, 9, 33, 22), ZoneOffset.UTC),
                 "GDACS_EQ_1239039_1337379",
-                readMessageFromFile()
+                readMessageFromFile(),
+                OffsetDateTime.parse("2020-10-12T05:03:07-00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         );
         return new GdacsDataLakeConverter().convertGdacs(alert);
     }

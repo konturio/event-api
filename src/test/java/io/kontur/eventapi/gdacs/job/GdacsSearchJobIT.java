@@ -16,7 +16,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GdacsSearchJobIT extends AbstractIntegrationTest {
 
@@ -59,7 +59,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         );
 
         int alertCount = 2;
-        assertEquals(alertCount, gdacsSearchJob.getAlertsForDataLake(listOfAlerts).size());
+        assertEquals(alertCount, gdacsSearchJob.getSortedBySentAlertsForDataLake(listOfAlerts).size());
     }
 
     @Test
@@ -75,16 +75,35 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
                 dateModified,
                 externalId,
-                data
+                data,
+                dateModified.plusSeconds(1)
         )));
 
         gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
                 dateModified,
                 externalId,
-                data
+                data,
+                dateModified.plusSeconds(2)
         )));
 
         assertEquals(expectedListSize, dataLakeDao.getDataLakesByExternalId(externalId).size());
+    }
+
+    @Test
+    public void testSentParameter() throws IOException, XPathExpressionException, ParserConfigurationException {
+        String alert01 = readMessageFromFile("alert01_valid.xml");
+        String id01 = "GDACS_EQ_1239039_1337379";
+        String alert02 = readMessageFromFile("alert02_valid.xml");
+        String id02 = "GDACS_EQ_1239035_1337371";
+
+//        second alert was sending earlier
+        var alerts = List.of(alert01, alert02);
+        var alertsForDataLake = gdacsSearchJob.getSortedBySentAlertsForDataLake(alerts);
+
+        assertFalse(alertsForDataLake.isEmpty());
+
+        assertEquals(id02, alertsForDataLake.get(0).getExternalId());
+        assertEquals(id01, alertsForDataLake.get(1).getExternalId());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
