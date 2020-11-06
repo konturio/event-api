@@ -114,8 +114,6 @@ public class GdacsSearchJob implements Runnable {
                     gdacsService.saveGdacs(alert, GDACS_PROVIDER);
                     alert.setData(geometry.get());
                     gdacsService.saveGdacs(alert, GDACS_ALERT_GEOMETRY);
-                } else {
-                    LOG.warn("Geometry for gdacs alert has not found. identifier = {}", alert.getIdentifier());
                 }
             }
         }
@@ -123,9 +121,11 @@ public class GdacsSearchJob implements Runnable {
 
     private Optional<String> getGeometryToAlert(String eventType, String eventId, String currentEpisodeId, String externalId) {
         try {
-            return Optional.of(gdacsClient.getGeometryByLink(eventType, eventId, currentEpisodeId));
+            return Optional.of(
+                    gdacsClient.getGeometryByLink(eventType, eventId, currentEpisodeId)
+            );
         } catch (FeignException e) {
-            LOG.warn("Did not found geometry for alert {}", externalId);
+            LOG.warn("Geometry for gdacs alert has not found. identifier = {}", externalId);
         }
         return Optional.empty();
     }
