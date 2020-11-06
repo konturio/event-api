@@ -29,7 +29,7 @@ import java.util.Optional;
 import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 @Component
-public class GdacsAlertParser {
+public class GdacsAlertXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
 

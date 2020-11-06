@@ -3,7 +3,7 @@ package io.kontur.eventapi.gdacs.job;
 import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
-import io.kontur.eventapi.gdacs.converter.GdacsAlertParser;
+import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.util.DateTimeUtil;
@@ -37,10 +37,10 @@ public class GdacsSearchJob implements Runnable {
     private final GdacsClient gdacsClient;
     private final DataLakeDao dataLakeDao;
     private final GdacsService gdacsService;
-    private final GdacsAlertParser gdacsAlertParser;
+    private final GdacsAlertXmlParser gdacsAlertParser;
 
     @Autowired
-    public GdacsSearchJob(GdacsClient gdacsClient, DataLakeDao dataLakeDao, GdacsService gdacsService, GdacsAlertParser gdacsAlertParser) {
+    public GdacsSearchJob(GdacsClient gdacsClient, DataLakeDao dataLakeDao, GdacsService gdacsService, GdacsAlertXmlParser gdacsAlertParser) {
         this.gdacsClient = gdacsClient;
         this.dataLakeDao = dataLakeDao;
         this.gdacsService = gdacsService;
@@ -101,13 +101,13 @@ public class GdacsSearchJob implements Runnable {
     }
 
     private void saveAlerts(List<ParsedAlert> alerts) {
-        for(ParsedAlert alert: alerts){
+        for (ParsedAlert alert : alerts) {
             var dataLakes = dataLakeDao.getDataLakesByExternalId(alert.getIdentifier());
             if (dataLakes.isEmpty()) {
                 var geometry = getGeometryToAlert(alert.getEventType(), alert.getEventId(),
                         alert.getCurrentEpisodeId(), alert.getIdentifier());
 
-                if(geometry.isPresent()){
+                if (geometry.isPresent()) {
                     gdacsService.saveGdacs(alert, GDACS_PROVIDER);
                     alert.setData(geometry.get());
                     gdacsService.saveGdacs(alert, GDACS_ALERT_GEOMETRY);
@@ -116,7 +116,7 @@ public class GdacsSearchJob implements Runnable {
         }
     }
 
-    private Optional<String> getGeometryToAlert(String eventType, String eventId, String currentEpisodeId, String externalId){
+    private Optional<String> getGeometryToAlert(String eventType, String eventId, String currentEpisodeId, String externalId) {
         try {
             return Optional.of(gdacsClient.getGeometryByLink(eventType, eventId, currentEpisodeId));
         } catch (FeignException e) {

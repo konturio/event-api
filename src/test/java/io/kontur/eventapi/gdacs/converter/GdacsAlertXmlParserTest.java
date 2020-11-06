@@ -12,16 +12,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GdacsAlertParserTest {
+class GdacsAlertXmlParserTest {
 
     @Test
     public void testNumberOfItems() throws ParserConfigurationException, SAXException, XPathExpressionException, IOException {
         String xml = readMessageFromFile("gdacs.xml");
         int itemsCount = 65;
-        assertEquals(itemsCount, new GdacsAlertParser().getLinks(xml).size());
+        assertEquals(itemsCount, new GdacsAlertXmlParser().getLinks(xml).size());
     }
 
-        @Test
+    @Test
     public void testAlerts() throws IOException, ParserConfigurationException, XPathExpressionException {
         var listOfAlerts = List.of(
                 readMessageFromFile("alert01_valid.xml"),
@@ -32,7 +32,7 @@ class GdacsAlertParserTest {
         );
 
         int alertCount = 2;
-        assertEquals(alertCount, new GdacsAlertParser().getParsedAlertsToGdacsSearchJob(listOfAlerts).size());
+        assertEquals(alertCount, new GdacsAlertXmlParser().getParsedAlertsToGdacsSearchJob(listOfAlerts).size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

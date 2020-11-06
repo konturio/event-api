@@ -5,7 +5,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
-import io.kontur.eventapi.gdacs.converter.GdacsAlertParser;
+import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.slf4j.Logger;
@@ -27,11 +27,11 @@ public class GdacsNormalizer extends Normalizer {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsNormalizer.class);
 
-    private final GdacsAlertParser parser;
+    private final GdacsAlertXmlParser parser;
     private final DataLakeDao dataLakeDao;
 
     @Autowired
-    public GdacsNormalizer(GdacsAlertParser parser, DataLakeDao dataLakeDao) {
+    public GdacsNormalizer(GdacsAlertXmlParser parser, DataLakeDao dataLakeDao) {
         this.parser = parser;
         this.dataLakeDao = dataLakeDao;
     }
@@ -65,7 +65,7 @@ public class GdacsNormalizer extends Normalizer {
         try {
             var parsedAlert = parser.getParsedAlertToNormalization(dataLakeDto.getData());
             var geometry = getGeometryFromDataLake(dataLakeDto.getExternalId());
-            if (geometry.isPresent()){
+            if (geometry.isPresent()) {
                 normalizedObservation.setGeometries(geometry.get());
                 getDataFromParsedAlert(normalizedObservation, parsedAlert);
                 return normalizedObservation;
