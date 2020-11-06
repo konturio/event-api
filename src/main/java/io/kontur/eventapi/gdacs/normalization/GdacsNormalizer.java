@@ -60,21 +60,21 @@ public class GdacsNormalizer extends Normalizer {
     public NormalizedObservation normalize(DataLake dataLakeDto) {
         var normalizedObservation = new NormalizedObservation();
         try {
-            var parsedAlert = parser.getParsedAlertToNormalization(dataLakeDto.getData());
             var geometry = getGeometryFromDataLake(dataLakeDto.getExternalId());
             if (geometry.isPresent()) {
+                var parsedAlert = parser.getParsedAlertToNormalization(dataLakeDto.getData());
                 normalizedObservation.setActive(true);
                 setDataFromDataLakeDto(normalizedObservation, dataLakeDto);
                 normalizedObservation.setGeometries(geometry.get());
                 getDataFromParsedAlert(normalizedObservation, parsedAlert);
                 return normalizedObservation;
             }
-
+            LOG.warn("Gdacs alert geometry has not found in data_lake, observationId = {}", dataLakeDto.getObservationId());
+            return null;
         } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
             LOG.warn("Alert can not be parsed {}", dataLakeDto.getObservationId());
             throw new RuntimeException(e);
         }
-        throw new RuntimeException();
     }
 
     private void setDataFromDataLakeDto(NormalizedObservation normalizedObservation, DataLake dataLakeDto) {

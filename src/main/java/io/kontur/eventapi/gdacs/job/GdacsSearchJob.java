@@ -115,7 +115,7 @@ public class GdacsSearchJob implements Runnable {
                     alert.setData(geometry.get());
                     gdacsService.saveGdacs(alert, GDACS_ALERT_GEOMETRY);
                 } else {
-                    LOG.warn("Geometry for gdacs alert has not found. identifier {}", alert.getIdentifier());
+                    LOG.warn("Geometry for gdacs alert has not found. identifier = {}", alert.getIdentifier());
                 }
             }
         }
