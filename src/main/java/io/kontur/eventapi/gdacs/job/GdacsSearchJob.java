@@ -104,13 +104,18 @@ public class GdacsSearchJob implements Runnable {
         for (ParsedAlert alert : alerts) {
             var dataLakes = dataLakeDao.getDataLakesByExternalId(alert.getIdentifier());
             if (dataLakes.isEmpty()) {
-                var geometry = getGeometryToAlert(alert.getEventType(), alert.getEventId(),
-                        alert.getCurrentEpisodeId(), alert.getIdentifier());
+                var geometry = getGeometryToAlert(
+                        alert.getEventType(),
+                        alert.getEventId(),
+                        alert.getCurrentEpisodeId(),
+                        alert.getIdentifier());
 
                 if (geometry.isPresent()) {
                     gdacsService.saveGdacs(alert, GDACS_PROVIDER);
                     alert.setData(geometry.get());
                     gdacsService.saveGdacs(alert, GDACS_ALERT_GEOMETRY);
+                } else {
+                    LOG.warn("Geometry for gdacs alert has not found. identifier {}", alert.getIdentifier());
                 }
             }
         }
