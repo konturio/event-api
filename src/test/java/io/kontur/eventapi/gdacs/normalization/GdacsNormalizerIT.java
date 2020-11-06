@@ -8,10 +8,7 @@ import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -24,7 +21,6 @@ import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_ALERT_GEOMETRY;
 import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GdacsNormalizerIT extends AbstractIntegrationTest {
 
     private final GdacsNormalizer gdacsNormalizer;
@@ -39,17 +35,15 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(1)
     public void isApplicable() throws IOException {
-        var parsedAlert = getParsedAlert();
-        saveAlertInDB(parsedAlert);
         var dataLake = getDataLake();
         assertTrue(gdacsNormalizer.isApplicable(dataLake));
     }
 
     @Test
-    @Order(2)
     public void normalize() throws IOException {
+        var parsedAlert = getParsedAlert();
+        saveAlertInDB(parsedAlert);
         var dataLake = getDataLake();
         var observation = gdacsNormalizer.normalize(dataLake);
 
