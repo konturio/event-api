@@ -4,10 +4,14 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter;
-import io.kontur.eventapi.gdacs.dto.AlertForInsertDataLake;
+import io.kontur.eventapi.gdacs.dto.ParsedAlert;
+import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -16,27 +20,37 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
+import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_ALERT_GEOMETRY;
+import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GdacsNormalizerIT extends AbstractIntegrationTest {
 
     private final GdacsNormalizer gdacsNormalizer;
+    private final GdacsService gdacsService;
+    private final GdacsDataLakeConverter gdacsDataLakeConverter;
 
     @Autowired
-    public GdacsNormalizerIT(GdacsNormalizer gdacsNormalizer) {
+    public GdacsNormalizerIT(GdacsNormalizer gdacsNormalizer, GdacsService gdacsService, GdacsDataLakeConverter gdacsDataLakeConverter) {
         this.gdacsNormalizer = gdacsNormalizer;
+        this.gdacsService = gdacsService;
+        this.gdacsDataLakeConverter = gdacsDataLakeConverter;
     }
 
     @Test
+    @Order(1)
     public void isApplicable() throws IOException {
-        DataLake dataLake = createDataLakeObject();
+        var parsedAlert = getParsedAlert();
+        saveAlertInDB(parsedAlert);
+        var dataLake = getDataLake();
         assertTrue(gdacsNormalizer.isApplicable(dataLake));
     }
 
     @Test
+    @Order(2)
     public void normalize() throws IOException {
-        var dataLake = createDataLakeObject();
+        var dataLake = getDataLake();
         var observation = gdacsNormalizer.normalize(dataLake);
 
         String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
@@ -76,14 +90,24 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         assertNotNull(observation.getGeometries());
     }
 
-    private DataLake createDataLakeObject() throws IOException {
-        var alert = new AlertForInsertDataLake(
-                OffsetDateTime.of(LocalDateTime.of(2020, 10, 12, 9, 33, 22), ZoneOffset.UTC),
-                "GDACS_EQ_1239039_1337379",
-                readMessageFromFile(),
-                OffsetDateTime.parse("2020-10-12T05:03:07-00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        );
-        return new GdacsDataLakeConverter().convertGdacs(alert);
+    private ParsedAlert getParsedAlert() throws IOException {
+        var parsedAlert = new ParsedAlert();
+        parsedAlert.setIdentifier("GDACS_EQ_1239039_1337379");
+        parsedAlert.setDateModified(OffsetDateTime.of(LocalDateTime.of(2020, 10, 12, 9, 33, 22), ZoneOffset.UTC));
+        parsedAlert.setSent(OffsetDateTime.parse("2020-10-12T05:03:07-00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        parsedAlert.setData(readMessageFromFile());
+        return parsedAlert;
+    }
+
+    private DataLake getDataLake() throws IOException {
+        var parsedAlert = getParsedAlert();
+        return gdacsDataLakeConverter.convertGdacs(parsedAlert, GDACS_PROVIDER);
+    }
+
+    private void saveAlertInDB(ParsedAlert parsedAlert) {
+        gdacsService.saveGdacs(parsedAlert, GDACS_PROVIDER);
+        parsedAlert.setData("{}");
+        gdacsService.saveGdacs(parsedAlert, GDACS_ALERT_GEOMETRY);
     }
 
     private String readMessageFromFile() throws IOException {

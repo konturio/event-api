@@ -47,4 +47,8 @@ public class DataLakeDao {
     public List<DataLake> getDataLakeByExternalIdAndUpdateDate(String externalId, OffsetDateTime updatedAt){
         return mapper.getDataLakeByExternalIdAndUpdateDate(externalId,updatedAt);
     }
+
+    public Optional<DataLake> getDataLakeWithGeometryForGdacs(String externalId){
+        return mapper.getDataLakeWithGeometryForGdacs(externalId);
+    }
 }

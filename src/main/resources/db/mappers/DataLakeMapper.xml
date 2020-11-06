@@ -32,6 +32,7 @@
         WHERE NOT EXISTS(
                 select * from normalized_observations nr where e.observation_id = nr.observation_id
             )
+          AND e.provider != 'gdacs_alert_geometry'
     </select>
 
     <select id="getDataLakesByExternalId" resultMap="dataLakeMap">
@@ -51,6 +52,13 @@
         FROM data_lake
         WHERE external_id = #{externalId}
           AND updated_at = #{updatedAt}
+    </select>
+
+    <select id="getDataLakeWithGeometryForGdacs" resultMap="dataLakeMap">
+        SELECT *
+        FROM data_lake
+        WHERE external_id = #{externalId}
+          AND provider = 'gdacs_alert_geometry'
     </select>
 
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">

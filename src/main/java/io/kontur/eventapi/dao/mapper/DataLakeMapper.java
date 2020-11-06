@@ -24,4 +24,6 @@ public interface DataLakeMapper {
     DataLake getDataLakeByObservationId(UUID observationId);
 
     List<DataLake> getDataLakeByExternalIdAndUpdateDate(String externalId, OffsetDateTime updatedAt);
+
+    Optional<DataLake> getDataLakeWithGeometryForGdacs(String externalId);
 }

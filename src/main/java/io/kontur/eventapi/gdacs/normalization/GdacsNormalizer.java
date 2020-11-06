@@ -1,43 +1,39 @@
 package io.kontur.eventapi.gdacs.normalization;
 
-import feign.FeignException;
+import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
-import io.kontur.eventapi.gdacs.client.GdacsClient;
+import io.kontur.eventapi.gdacs.converter.GdacsAlertParser;
+import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
-import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
-import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
+import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_PROVIDER;
 
 @Component
 public class GdacsNormalizer extends Normalizer {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsNormalizer.class);
 
-    private final GdacsClient gdacsClient;
+    private final GdacsAlertParser parser;
+    private final DataLakeDao dataLakeDao;
 
     @Autowired
-    public GdacsNormalizer(GdacsClient gdacsClient) {
-        this.gdacsClient = gdacsClient;
+    public GdacsNormalizer(GdacsAlertParser parser, DataLakeDao dataLakeDao) {
+        this.parser = parser;
+        this.dataLakeDao = dataLakeDao;
     }
 
     private static final Map<String, EventType> typeMap = Map.of(
@@ -63,98 +59,49 @@ public class GdacsNormalizer extends Normalizer {
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
         var normalizedObservation = new NormalizedObservation();
+        normalizedObservation.setActive(true);
+        setDataFromDataLakeDto(normalizedObservation, dataLakeDto);
 
+        try {
+            var parsedAlert = parser.getParsedAlertToNormalization(dataLakeDto.getData());
+            var geometry = getGeometryFromDataLake(dataLakeDto.getExternalId());
+            if (geometry.isPresent()){
+                normalizedObservation.setGeometries(geometry.get());
+                getDataFromParsedAlert(normalizedObservation, parsedAlert);
+                return normalizedObservation;
+            }
+
+        } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
+            LOG.warn("Alert can not be parsed {}", dataLakeDto.getObservationId());
+            throw new RuntimeException(e);
+        }
+        throw new RuntimeException();
+    }
+
+    private void setDataFromDataLakeDto(NormalizedObservation normalizedObservation, DataLake dataLakeDto) {
         normalizedObservation.setProvider(dataLakeDto.getProvider());
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
-
-        normalizedObservation.setActive(true);
-        try {
-            parseData(normalizedObservation, dataLakeDto);
-        } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
-            LOG.warn("Alert can not be parsed {}", dataLakeDto.getObservationId());
-            throw new RuntimeException(e);
-        } catch (FeignException e) {
-            LOG.warn("Did not found geometry for alert {}", dataLakeDto.getObservationId());
-            throw new IllegalArgumentException(e);
-        }
-
-        return normalizedObservation;
     }
 
-    private void parseData(NormalizedObservation normalizedObservation,
-                           DataLake dataLakeDto) throws ParserConfigurationException,
-            IOException, SAXException, XPathExpressionException, FeignException {
-
-        var builderFactory = DocumentBuilderFactory.newInstance();
-        var builder = builderFactory.newDocumentBuilder();
-        var inputStream = new ByteArrayInputStream(dataLakeDto.getData().getBytes());
-        var xmlDocument = builder.parse(inputStream);
-        var xPath = XPathFactory.newInstance().newXPath();
-
-        String pathToEvent = "/alert/info/event/text()";
-        String pathToHeadline = "/alert/info/headline/text()";
-        String pathToSeverity = "/alert/info/severity/text()";
-        String pathToDescription = "/alert/info/description/text()";
-        String pathToParameters = "/alert/info/parameter";
-
-        var event = (String) xPath.compile(pathToEvent).evaluate(xmlDocument, XPathConstants.STRING);
-        var headline = (String) xPath.compile(pathToHeadline).evaluate(xmlDocument, XPathConstants.STRING);
-        var severity = (String) xPath.compile(pathToSeverity).evaluate(xmlDocument, XPathConstants.STRING);
-        var description = (String) xPath.compile(pathToDescription).evaluate(xmlDocument, XPathConstants.STRING);
-
-        normalizedObservation.setName(headline);
-        normalizedObservation.setDescription(description);
-        normalizedObservation.setEpisodeDescription(description);
-
-        normalizedObservation.setType(typeMap.getOrDefault(event, EventType.OTHER));
-        normalizedObservation.setEventSeverity(severityMap.getOrDefault(severity, Severity.UNKNOWN));
-
-        var parameterNodeList = (NodeList) xPath.compile(pathToParameters)
-                .evaluate(xmlDocument, XPathConstants.NODESET);
-        setDataFromParameters(normalizedObservation, parameterNodeList, xmlDocument, xPath);
+    private Optional<String> getGeometryFromDataLake(String externalId) {
+        var dataLake = dataLakeDao.getDataLakeWithGeometryForGdacs(externalId);
+        return dataLake.map(DataLake::getData);
     }
 
-    private void setDataFromParameters(NormalizedObservation normalizedObservation, NodeList parameterNodeList,
-                                       Document xmlDocument,
-                                       XPath xPath) throws XPathExpressionException, FeignException {
-        String eventid = "";
-        String currentepisodeid = "";
-        String eventtype = "";
-        for (int i = 0; i < parameterNodeList.getLength(); i++) {
-            int indexOfParameters = i + 1;
-            String pathToValueName = "/alert/info/parameter[" + indexOfParameters + "]/valueName/text()";
-            var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
+    private void getDataFromParsedAlert(NormalizedObservation normalizedObservation, ParsedAlert parsedAlert) {
 
-            switch (valueName) {
-                case "fromdate":
-                    String fromDate = getValue(indexOfParameters, xmlDocument, xPath);
-                    normalizedObservation.setStartedAt(parseDateTimeFromString(fromDate));
-                    break;
-                case "todate":
-                    String toDate = getValue(indexOfParameters, xmlDocument, xPath);
-                    normalizedObservation.setEndedAt(parseDateTimeFromString(toDate));
-                    break;
-                case "eventid":
-                    eventid = getValue(indexOfParameters, xmlDocument, xPath);
-                    break;
-                case "currentepisodeid":
-                    currentepisodeid = getValue(indexOfParameters, xmlDocument, xPath);
-                    break;
-                case "eventtype":
-                    eventtype = getValue(indexOfParameters, xmlDocument, xPath);
-                    break;
-            }
-        }
+        normalizedObservation.setName(parsedAlert.getHeadLine());
+        normalizedObservation.setDescription(parsedAlert.getDescription());
+        normalizedObservation.setEpisodeDescription(parsedAlert.getDescription());
+        normalizedObservation.setType(typeMap.getOrDefault(parsedAlert.getEvent(), EventType.OTHER));
+        normalizedObservation.setEventSeverity(severityMap.getOrDefault(parsedAlert.getSeverity(), Severity.UNKNOWN));
 
-        String geometry = gdacsClient.getGeometryByLink(eventtype, eventid, currentepisodeid);
-        normalizedObservation.setExternalEventId(eventtype + "_" + eventid);
-        normalizedObservation.setGeometries(geometry);
-    }
+        normalizedObservation.setExternalEventId(parsedAlert.getEventType() + "_" + parsedAlert.getEventId());
 
-    private String getValue(int indexOfParameters, Document xmlDocument, XPath xPath) throws XPathExpressionException {
-        String pathToUpdateDate = "/alert/info/parameter[" + indexOfParameters + "]/value/text()";
-        return (String) xPath.compile(pathToUpdateDate).evaluate(xmlDocument, XPathConstants.STRING);
+        normalizedObservation.setStartedAt(parsedAlert.getFromDate());
+        normalizedObservation.setEndedAt(parsedAlert.getToDate());
+
     }
 }
