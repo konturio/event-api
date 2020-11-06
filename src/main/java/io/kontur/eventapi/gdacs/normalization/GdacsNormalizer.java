@@ -59,13 +59,12 @@ public class GdacsNormalizer extends Normalizer {
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
         var normalizedObservation = new NormalizedObservation();
-        normalizedObservation.setActive(true);
-        setDataFromDataLakeDto(normalizedObservation, dataLakeDto);
-
         try {
             var parsedAlert = parser.getParsedAlertToNormalization(dataLakeDto.getData());
             var geometry = getGeometryFromDataLake(dataLakeDto.getExternalId());
             if (geometry.isPresent()) {
+                normalizedObservation.setActive(true);
+                setDataFromDataLakeDto(normalizedObservation, dataLakeDto);
                 normalizedObservation.setGeometries(geometry.get());
                 getDataFromParsedAlert(normalizedObservation, parsedAlert);
                 return normalizedObservation;
