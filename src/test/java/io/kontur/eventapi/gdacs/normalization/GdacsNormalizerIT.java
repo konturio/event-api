@@ -17,8 +17,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_ALERT_GEOMETRY;
-import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_PROVIDER;
+import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GdacsNormalizerIT extends AbstractIntegrationTest {
@@ -95,13 +94,12 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
 
     private DataLake getDataLake() throws IOException {
         var parsedAlert = getParsedAlert();
-        return gdacsDataLakeConverter.convertGdacs(parsedAlert, GDACS_PROVIDER);
+        return gdacsDataLakeConverter.convertGdacs(parsedAlert);
     }
 
     private void saveAlertInDB(ParsedAlert parsedAlert) {
-        gdacsService.saveGdacs(parsedAlert, GDACS_PROVIDER);
-        parsedAlert.setData("{}");
-        gdacsService.saveGdacs(parsedAlert, GDACS_ALERT_GEOMETRY);
+        gdacsService.saveGdacs(parsedAlert);
+        gdacsService.saveGdacsGeometry(parsedAlert, "{}");
     }
 
     private String readMessageFromFile() throws IOException {

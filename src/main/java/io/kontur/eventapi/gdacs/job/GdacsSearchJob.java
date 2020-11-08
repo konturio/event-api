@@ -31,8 +31,6 @@ public class GdacsSearchJob implements Runnable {
     private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
 
     public static OffsetDateTime XML_PUB_DATE = DateTimeUtil.uniqueOffsetDateTime();
-    public final static String GDACS_PROVIDER = "gdacs";
-    public final static String GDACS_ALERT_GEOMETRY = "gdacs_alert_geometry";
 
     private final GdacsClient gdacsClient;
     private final DataLakeDao dataLakeDao;
@@ -111,9 +109,8 @@ public class GdacsSearchJob implements Runnable {
                         alert.getIdentifier());
 
                 if (geometry.isPresent()) {
-                    gdacsService.saveGdacs(alert, GDACS_PROVIDER);
-                    alert.setData(geometry.get());
-                    gdacsService.saveGdacs(alert, GDACS_ALERT_GEOMETRY);
+                    gdacsService.saveGdacs(alert);
+                    gdacsService.saveGdacsGeometry(alert, geometry.get());
                 }
             }
         }

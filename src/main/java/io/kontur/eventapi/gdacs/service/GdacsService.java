@@ -19,8 +19,12 @@ public class GdacsService {
         this.dataLakeCoverter = dataLakeCoverter;
     }
 
-    public void saveGdacs(ParsedAlert alert, String provider){
-        DataLake dataLake = dataLakeCoverter.convertGdacs(alert, provider);
+    public void saveGdacs(ParsedAlert alert){
+        DataLake dataLake = dataLakeCoverter.convertGdacs(alert);
+        dataLakeDao.storeEventData(dataLake);
+    }
+    public void saveGdacsGeometry(ParsedAlert alert, String geometry){
+        DataLake dataLake = dataLakeCoverter.convertGdacsWithGeometry(alert, geometry);
         dataLakeDao.storeEventData(dataLake);
     }
 }

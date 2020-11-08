@@ -20,7 +20,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.kontur.eventapi.gdacs.job.GdacsSearchJob.GDACS_PROVIDER;
+import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
+
 
 @Component
 public class GdacsNormalizer extends Normalizer {

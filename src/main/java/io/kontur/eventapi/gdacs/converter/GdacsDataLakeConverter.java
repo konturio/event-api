@@ -10,14 +10,29 @@ import java.util.UUID;
 @Component
 public class GdacsDataLakeConverter {
 
-    public DataLake convertGdacs(ParsedAlert alert, String provider){
+    public final static String GDACS_PROVIDER = "gdacs";
+    public final static String GDACS_ALERT_GEOMETRY = "gdacs_alert_geometry";
+
+    public DataLake convertGdacs(ParsedAlert alert){
+        var dataLake = convertCommonData(alert);
+        dataLake.setProvider(GDACS_PROVIDER);
+        dataLake.setData(alert.getData());
+        return dataLake;
+    }
+
+    public DataLake convertGdacsWithGeometry(ParsedAlert alert, String geometry){
+        var dataLake = convertCommonData(alert);
+        dataLake.setProvider(GDACS_ALERT_GEOMETRY);
+        dataLake.setData(geometry);
+        return dataLake;
+    }
+
+    private DataLake convertCommonData(ParsedAlert alert){
         return new DataLake(
                 UUID.randomUUID(),
                 alert.getIdentifier(),
                 alert.getDateModified(),
-                DateTimeUtil.uniqueOffsetDateTime(),
-                provider,
-                alert.getData()
+                DateTimeUtil.uniqueOffsetDateTime()
         );
     }
 }
