@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,15 +36,15 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
 
     @Test
     public void isApplicable() throws IOException {
-        var dataLake = getDataLake();
-        assertTrue(gdacsNormalizer.isApplicable(dataLake));
+        assertTrue(gdacsNormalizer.isApplicable(getDataLakeList().get(0)));
+        assertFalse(gdacsNormalizer.isApplicable(getDataLakeList().get(1)));
     }
 
     @Test
     public void normalize() throws IOException {
-        var parsedAlert = getParsedAlert();
-        saveAlertInDB(parsedAlert);
-        var dataLake = getDataLake();
+        var dataLakeList = getDataLakeList();
+        gdacsService.saveGdacs(dataLakeList);
+        var dataLake = getDataLakeList().get(0);
         var observation = gdacsNormalizer.normalize(dataLake);
 
         String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
@@ -83,23 +84,17 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         assertNotNull(observation.getGeometries());
     }
 
-    private ParsedAlert getParsedAlert() throws IOException {
+    private List<DataLake> getDataLakeList() throws IOException {
         var parsedAlert = new ParsedAlert();
         parsedAlert.setIdentifier("GDACS_EQ_1239039_1337379");
         parsedAlert.setDateModified(OffsetDateTime.of(LocalDateTime.of(2020, 10, 12, 9, 33, 22), ZoneOffset.UTC));
         parsedAlert.setSent(OffsetDateTime.parse("2020-10-12T05:03:07-00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         parsedAlert.setData(readMessageFromFile());
-        return parsedAlert;
-    }
 
-    private DataLake getDataLake() throws IOException {
-        var parsedAlert = getParsedAlert();
-        return gdacsDataLakeConverter.convertGdacs(parsedAlert);
-    }
-
-    private void saveAlertInDB(ParsedAlert parsedAlert) {
-        gdacsService.saveGdacs(parsedAlert);
-        gdacsService.saveGdacsGeometry(parsedAlert, "{}");
+        return List.of(
+                gdacsDataLakeConverter.convertGdacs(parsedAlert),
+                gdacsDataLakeConverter.convertGdacsWithGeometry(parsedAlert, "{}")
+        );
     }
 
     private String readMessageFromFile() throws IOException {

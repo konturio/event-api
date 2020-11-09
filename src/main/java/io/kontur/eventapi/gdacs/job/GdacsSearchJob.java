@@ -1,8 +1,5 @@
 package io.kontur.eventapi.gdacs.job;
 
-import feign.FeignException;
-import io.kontur.eventapi.dao.DataLakeDao;
-import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.gdacs.service.GdacsService;
@@ -21,7 +18,6 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -53,7 +49,8 @@ public class GdacsSearchJob implements Runnable {
                 var links = getLinks(xml);
                 var alerts = gdacsService.getAlerts(links);
                 var parsedAlerts = getSortedParsedAlerts(alerts);
-                gdacsService.saveAlerts(parsedAlerts);
+                var dataLakes = gdacsService.getDataLakes(parsedAlerts);
+                gdacsService.saveGdacs(dataLakes);
             }
             LOG.info("Gdacs import job has finished");
         } catch (DateTimeParseException e) {
@@ -78,35 +75,6 @@ public class GdacsSearchJob implements Runnable {
                 .sorted(Comparator.comparing(ParsedAlert::getSent))
                 .collect(toList());
     }
-
-//    private void saveAlerts(List<ParsedAlert> alerts) {
-//        for (ParsedAlert alert : alerts) {
-//            var dataLakes = dataLakeDao.getDataLakesByExternalId(alert.getIdentifier());
-//            if (dataLakes.isEmpty()) {
-//                var geometry = getGeometryToAlert(
-//                        alert.getEventType(),
-//                        alert.getEventId(),
-//                        alert.getCurrentEpisodeId(),
-//                        alert.getIdentifier());
-//
-//                if (geometry.isPresent()) {
-//                    gdacsService.saveGdacs(alert);
-//                    gdacsService.saveGdacsGeometry(alert, geometry.get());
-//                }
-//            }
-//        }
-//    }
-//
-//    private Optional<String> getGeometryToAlert(String eventType, String eventId, String currentEpisodeId, String externalId) {
-//        try {
-//            return Optional.of(
-//                    gdacsClient.getGeometryByLink(eventType, eventId, currentEpisodeId)
-//            );
-//        } catch (FeignException e) {
-//            LOG.warn("Geometry for gdacs alert has not found. identifier = {}", externalId);
-//        }
-//        return Optional.empty();
-//    }
 }
 
 

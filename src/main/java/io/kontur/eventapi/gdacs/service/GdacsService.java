@@ -6,12 +6,12 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
-import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +23,13 @@ public class GdacsService {
     private final static Logger LOG = LoggerFactory.getLogger(GdacsService.class);
 
     private final DataLakeDao dataLakeDao;
-    private final GdacsDataLakeConverter dataLakeCoverter;
+    private final GdacsDataLakeConverter dataLakeConverter;
     private final GdacsClient gdacsClient;
 
     @Autowired
-    public GdacsService(DataLakeDao dataLakeDao, GdacsDataLakeConverter dataLakeCoverter, GdacsClient gdacsClient) {
+    public GdacsService(DataLakeDao dataLakeDao, GdacsDataLakeConverter dataLakeConverter, GdacsClient gdacsClient) {
         this.dataLakeDao = dataLakeDao;
-        this.dataLakeCoverter = dataLakeCoverter;
+        this.dataLakeConverter = dataLakeConverter;
         this.gdacsClient = gdacsClient;
     }
 
@@ -60,10 +60,11 @@ public class GdacsService {
         return Optional.empty();
     }
 
-    public void saveAlerts(List<ParsedAlert> alerts) {
+    public List<DataLake> getDataLakes(List<ParsedAlert> alerts) {
+        var dataLakes = new ArrayList<DataLake>();
         for (ParsedAlert alert : alerts) {
-            var dataLakes = dataLakeDao.getDataLakesByExternalId(alert.getIdentifier());
-            if (dataLakes.isEmpty()) {
+            var dataLakesByExternalId = dataLakeDao.getDataLakesByExternalId(alert.getIdentifier());
+            if (dataLakesByExternalId.isEmpty()) {
                 var geometry = getGeometryToAlert(
                         alert.getEventType(),
                         alert.getEventId(),
@@ -71,20 +72,12 @@ public class GdacsService {
                         alert.getIdentifier());
 
                 if (geometry.isPresent()) {
-                    saveGdacs(alert);
-                    saveGdacsGeometry(alert, geometry.get());
+                    dataLakes.add(dataLakeConverter.convertGdacs(alert));
+                    dataLakes.add(dataLakeConverter.convertGdacsWithGeometry(alert, geometry.get()));
                 }
             }
         }
-    }
-
-    public void saveGdacs(ParsedAlert alert){
-        DataLake dataLake = dataLakeCoverter.convertGdacs(alert);
-        dataLakeDao.storeEventData(dataLake);
-    }
-    public void saveGdacsGeometry(ParsedAlert alert, String geometry){
-        DataLake dataLake = dataLakeCoverter.convertGdacsWithGeometry(alert, geometry);
-        dataLakeDao.storeEventData(dataLake);
+        return dataLakes;
     }
 
     private Optional<String> getGeometryToAlert(String eventType, String eventId, String currentEpisodeId, String externalId) {
@@ -97,4 +90,10 @@ public class GdacsService {
         }
         return Optional.empty();
     }
+
+    public void saveGdacs(List<DataLake> dataLakes){
+        dataLakes.forEach(dataLakeDao::storeEventData);
+    }
+
+
 }
