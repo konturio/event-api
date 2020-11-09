@@ -158,18 +158,18 @@ public class FeedCompositionJob implements Runnable {
                     observation.getExternalEpisodeId(),
                     observation.getObservationId(),
                     PDC_SQS_PROVIDER);
-            if (duplicateSQSMagObservationOpt.isPresent()){
+            if (duplicateSQSMagObservationOpt.isPresent()) {
                 return Optional.of(duplicateSQSMagObservationOpt.get().getObservationId());
             }
         }
         return Optional.empty();
     }
 
-    private void addObservationIdIfDuplicate(NormalizedObservation observation, FeedData feedDto, UUID savedDuplicateObservationId){
+    private void addObservationIdIfDuplicate(NormalizedObservation observation, FeedData feedDto, UUID savedDuplicateObservationId) {
         feedDto.getEpisodes().forEach(episode -> {
             boolean hasDuplicateObservation = episode.getObservations().stream()
                     .anyMatch(episodeObs -> episodeObs.equals(savedDuplicateObservationId));
-            if(hasDuplicateObservation){
+            if (hasDuplicateObservation) {
                 episode.addObservation(observation.getObservationId());
             }
         });
