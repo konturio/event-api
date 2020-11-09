@@ -91,7 +91,7 @@ public class GdacsService {
         return Optional.empty();
     }
 
-    public void saveGdacs(List<DataLake> dataLakes){
+    public void saveGdacs(List<DataLake> dataLakes) {
         dataLakes.forEach(dataLakeDao::storeEventData);
     }
 
