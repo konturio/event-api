@@ -183,7 +183,7 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testOrderingNormalization() throws IOException {
+    public void testOrderNormalization() throws IOException {
 
         var latestUpdatedDate = OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 20, 54, 26), ZoneOffset.UTC);
 
