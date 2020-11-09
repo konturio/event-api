@@ -34,8 +34,8 @@ public class NormalizedObservationsDao {
         return mapper.getObservations(observationIds);
     }
 
-    public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId){
-        return mapper.getDuplicateObservation(loadedAt, externalEpisodeId, observationId);
+    public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider){
+        return mapper.getDuplicateObservation(loadedAt, externalEpisodeId, observationId, provider);
     }
 
 }

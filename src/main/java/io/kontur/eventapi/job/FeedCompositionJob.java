@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.FeatureCollection;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.util.JsonUtil.readJson;
@@ -127,9 +124,16 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private Optional<FeedEpisode> convertObservation(NormalizedObservation observation, FeedData feedDto) {
-        if (observation.getGeometries() == null || doesObservationHaveDuplicateThatSavedInPreviousEvent(observation, feedDto)) {
+        if (observation.getGeometries() == null) {
             return Optional.empty();
         }
+
+        var savedDuplicateObservationId = doesObservationHaveDuplicateThatSavedInPreviousEvent(observation);
+        if (savedDuplicateObservationId.isPresent()) {
+            addObservationIdIfDuplicate(observation, feedDto, savedDuplicateObservationId.get());
+            return Optional.empty();
+        }
+
         FeedEpisode feedEpisode = new FeedEpisode();
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
@@ -145,19 +149,27 @@ public class FeedCompositionJob implements Runnable {
         return Optional.of(feedEpisode);
     }
 
-    private boolean doesObservationHaveDuplicateThatSavedInPreviousEvent(NormalizedObservation observation, FeedData feedDto) {
-        var duplicateObservationOpt = observationsDao.getDuplicateObservation(
-                observation.getLoadedAt(),
-                observation.getExternalEpisodeId(),
-                observation.getObservationId());
-
-        if (duplicateObservationOpt.isPresent()) {
-            var konturEventOpt = eventsDao.getEventByIdEventAndVersionAndIdObservation(
-                    feedDto.getEventId(),
-                    feedDto.getVersion() - 1,
-                    duplicateObservationOpt.get().getObservationId());
-            return konturEventOpt.isPresent();
+    private Optional<UUID> doesObservationHaveDuplicateThatSavedInPreviousEvent(NormalizedObservation observation) {
+        if (observation.getProvider().equals("hpSrvMag")) {
+            var duplicateSQSMagObservationOpt = observationsDao.getDuplicateObservation(
+                    observation.getLoadedAt(),
+                    observation.getExternalEpisodeId(),
+                    observation.getObservationId(),
+                    "pdcSqs");
+            if (duplicateSQSMagObservationOpt.isPresent()){
+                return Optional.of(duplicateSQSMagObservationOpt.get().getObservationId());
+            }
         }
-        return false;
+        return Optional.empty();
+    }
+
+    private void addObservationIdIfDuplicate(NormalizedObservation observation, FeedData feedDto, UUID savedDuplicateObservationId){
+        feedDto.getEpisodes().forEach(episode -> {
+            boolean hasDuplicateObservation = episode.getObservations().stream()
+                    .anyMatch(episodeObs -> episodeObs.equals(savedDuplicateObservationId));
+            if(hasDuplicateObservation){
+                episode.addObservation(observation.getObservationId());
+            }
+        });
     }
 }

@@ -83,10 +83,9 @@
         SELECT *
         FROM normalized_observations
         WHERE external_episode_id = #{externalEpisodeId}
-        <if test="loadedAt!=null">
-            AND loaded_at &lt;= #{loadedAt}
-        </if>
+          AND loaded_at &lt;= #{loadedAt}
           AND observation_id != #{observationId}
+          AND provider = #{provider}
         ORDER BY loaded_at DESC
         LIMIT 1
     </select>

@@ -17,7 +17,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
@@ -150,33 +149,39 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testDuplicateInSQS() throws IOException {
+    public void testMagDuplicate() throws IOException {
         String externalId = "0c653cb4-4a9e-4506-b2c8-a1e14e4dc049";
+        var startTimeForSearchingFeed = OffsetDateTime.now();
+
         var hazardLoadTime = OffsetDateTime.of(
                 LocalDateTime.of(2024, 10, 1, 1, 1), ZoneOffset.UTC);
-        var magsLoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2024, 10, 1, 1, 2), ZoneOffset.UTC);
         var sqsLoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2024, 10, 1, 1, 3, 1), ZoneOffset.UTC);
+                LocalDateTime.of(2024, 10, 1, 1, 2), ZoneOffset.UTC);
+        var magsLoadTime = OffsetDateTime.of(
+                LocalDateTime.of(2024, 10, 1, 1, 2, 1), ZoneOffset.UTC);
 
         createNormalizations(externalId, hazardLoadTime, HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard04.json"));
 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        createNormalizations(externalId, magsLoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata04.json"));
         createNormalizations(externalId, sqsLoadTime, PDC_SQS_PROVIDER, readMessageFromFile("sqsdata04.json"));
+        createNormalizations(externalId, magsLoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata04.json"));
 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        List<FeedData> feed = feedMapper.searchForEvents(
+        FeedData feed = feedMapper.searchForEvents(
                 "pdc-v0",
                 Collections.emptyList(),
-                hazardLoadTime.minusDays(1),
+                startTimeForSearchingFeed,
                 1
-        );
-        assertEquals(2, feed.get(0).getEpisodes().size());
+        ).get(0);
+        assertEquals(2, feed.getEpisodes().size());
+
+        boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
+                .anyMatch(episode -> episode.getObservations().size() > 1);
+        assertTrue(oneEpisodeForTwoObservation);
     }
 
 }
