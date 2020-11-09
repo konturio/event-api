@@ -14,6 +14,8 @@ import org.wololo.geojson.FeatureCollection;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 @Component
@@ -150,12 +152,12 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private Optional<UUID> doesObservationHaveDuplicateThatSavedInPreviousEvent(NormalizedObservation observation) {
-        if (observation.getProvider().equals("hpSrvMag")) {
+        if (observation.getProvider().equals(HP_SRV_MAG_PROVIDER)) {
             var duplicateSQSMagObservationOpt = observationsDao.getDuplicateObservation(
                     observation.getLoadedAt(),
                     observation.getExternalEpisodeId(),
                     observation.getObservationId(),
-                    "pdcSqs");
+                    PDC_SQS_PROVIDER);
             if (duplicateSQSMagObservationOpt.isPresent()){
                 return Optional.of(duplicateSQSMagObservationOpt.get().getObservationId());
             }
