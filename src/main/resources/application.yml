@@ -48,7 +48,7 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
 

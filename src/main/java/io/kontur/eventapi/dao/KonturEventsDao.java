@@ -2,6 +2,8 @@ package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.KonturEventsMapper;
 import io.kontur.eventapi.entity.KonturEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,8 @@ import java.util.UUID;
 @Component
 public class KonturEventsDao {
 
+    private static final Logger LOG = LoggerFactory.getLogger(KonturEventsMapper.class);
+
     private final KonturEventsMapper mapper;
 
     @Autowired
@@ -21,7 +25,13 @@ public class KonturEventsDao {
     }
 
     public Optional<KonturEvent> getLatestEventByExternalId(String externalId) {
-        return mapper.getLatestEventByExternalId(externalId);
+        try {
+            return mapper.getLatestEventByExternalId(externalId);
+        } catch (Exception e) {
+            LOG.warn("externalId = {}", externalId);
+            LOG.warn(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     @Transactional
@@ -31,5 +41,9 @@ public class KonturEventsDao {
 
     public List<KonturEvent> getNewEventVersionsForFeed(UUID feedId) {
         return mapper.getNewEventVersionsForFeed(feedId);
+    }
+
+    public Optional<KonturEvent> getEventByIdEventAndVersionAndIdObservation(UUID eventId, Long version, UUID observationId){
+        return mapper.getEventByIdEventAndVersionAndIdObservation(eventId, version, observationId);
     }
 }

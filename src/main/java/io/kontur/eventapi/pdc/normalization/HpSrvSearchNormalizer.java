@@ -43,6 +43,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         Map<String, Object> props = readJson(dataLakeDto.getData(), new TypeReference<>() {});
 
         normalizedDto.setExternalEventId(readString(props, "uuid"));
+        normalizedDto.setExternalEpisodeId(readString(props, "uuid"));
         normalizedDto.setEventSeverity(defineSeverity(readString(props, "severity_ID")));
         normalizedDto.setName(readString(props, "hazard_Name"));
         normalizedDto.setDescription(readString(props, "description"));
