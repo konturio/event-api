@@ -130,7 +130,7 @@ public class FeedCompositionJob implements Runnable {
             return Optional.empty();
         }
 
-        var savedDuplicateObservationId = doesObservationHaveDuplicateThatSavedInPreviousEvent(observation);
+        var savedDuplicateObservationId = getSavedDuplicateSqsObservationId(observation);
         if (savedDuplicateObservationId.isPresent()) {
             addObservationIdIfDuplicate(observation, feedDto, savedDuplicateObservationId.get());
             return Optional.empty();
@@ -151,7 +151,7 @@ public class FeedCompositionJob implements Runnable {
         return Optional.of(feedEpisode);
     }
 
-    private Optional<UUID> doesObservationHaveDuplicateThatSavedInPreviousEvent(NormalizedObservation observation) {
+    private Optional<UUID> getSavedDuplicateSqsObservationId(NormalizedObservation observation) {
         if (observation.getProvider().equals(HP_SRV_MAG_PROVIDER)) {
             var duplicateSQSMagObservationOpt = observationsDao.getDuplicateObservation(
                     observation.getLoadedAt(),
