@@ -166,12 +166,13 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private void addObservationIdIfDuplicate(NormalizedObservation observation, FeedData feedDto, UUID savedDuplicateObservationId) {
-        feedDto.getEpisodes().forEach(episode -> {
+        for (FeedEpisode episode : feedDto.getEpisodes()) {
             boolean hasDuplicateObservation = episode.getObservations().stream()
                     .anyMatch(episodeObs -> episodeObs.equals(savedDuplicateObservationId));
             if (hasDuplicateObservation) {
                 episode.addObservation(observation.getObservationId());
+                return;
             }
-        });
+        }
     }
 }
