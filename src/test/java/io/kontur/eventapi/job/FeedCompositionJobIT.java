@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.mapper.DataLakeMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
@@ -17,6 +18,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
@@ -144,10 +146,6 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         assertEquals(3, eventList.size());
     }
 
-    private String readMessageFromFile(String fileName) throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
-    }
-
     @Test
     public void testMagDuplicate() throws IOException {
         String externalId = "0c653cb4-4a9e-4506-b2c8-a1e14e4dc049";
@@ -182,6 +180,55 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
                 .anyMatch(episode -> episode.getObservations().size() > 1);
         assertTrue(oneEpisodeForTwoObservation);
+    }
+
+    @Test
+    public void testOrderingNormalization() throws IOException {
+
+        var latestUpdatedDate = OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 20, 54, 26), ZoneOffset.UTC);
+
+        var sqsDataLake01 = new DataLake();
+        sqsDataLake01.setObservationId(UUID.fromString("12ab7440-779b-46c7-8f40-448780cd31e1"));
+        sqsDataLake01.setExternalId("6f7c4ea0-a295-5964-ac80-197d6dd73ad7");
+        sqsDataLake01.setProvider(PDC_SQS_PROVIDER);
+        sqsDataLake01.setLoadedAt(OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 20, 54, 22), ZoneOffset.UTC));
+        sqsDataLake01.setData(readMessageFromFile("SQSDataTestOrder01.json"));
+        dataLakeMapper.create(sqsDataLake01);
+
+        var sqsDataLake02 = new DataLake();
+        sqsDataLake02.setObservationId(UUID.fromString("39f665ef-4400-4acb-8ccb-5c9c3a2d2346"));
+        sqsDataLake02.setExternalId("d6557e52-8a91-56fb-b46c-298f73ff99a3");
+        sqsDataLake02.setProvider(PDC_SQS_PROVIDER);
+        sqsDataLake02.setLoadedAt(latestUpdatedDate);
+        sqsDataLake02.setData(readMessageFromFile("SQSDataTestOrder02.json"));
+        dataLakeMapper.create(sqsDataLake02);
+
+        var loadHpSrvHazardLoadTime = OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 10, 10, 33), ZoneOffset.UTC);
+        var hpSrvHazardDataLake = new DataLake();
+        hpSrvHazardDataLake.setObservationId(UUID.fromString("40052d98-6380-4b59-84f8-c6e733a64979"));
+        hpSrvHazardDataLake.setExternalId("f01fa876-6955-43bf-895c-37dfca330803");
+        hpSrvHazardDataLake.setProvider(HP_SRV_SEARCH_PROVIDER);
+        hpSrvHazardDataLake.setLoadedAt(loadHpSrvHazardLoadTime);
+        hpSrvHazardDataLake.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 8, 56, 9), ZoneOffset.UTC));
+        hpSrvHazardDataLake.setData(readMessageFromFile("HpSrvSearchTestOrder.json"));
+        dataLakeMapper.create(hpSrvHazardDataLake);
+
+        normalizationJob.run();
+        eventCombinationJob.run();
+
+        feedCompositionJob.run();
+
+        FeedData feed = feedMapper.searchForEvents(
+                "pdc-v0",
+                List.of(EventType.WILDFIRE),
+                loadHpSrvHazardLoadTime,
+                1
+        ).get(0);
+        assertEquals(latestUpdatedDate, feed.getUpdatedAt());
+    }
+
+    private String readMessageFromFile(String fileName) throws IOException {
+        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
     }
 
 }
