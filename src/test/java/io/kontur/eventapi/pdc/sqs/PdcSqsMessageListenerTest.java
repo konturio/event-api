@@ -1,7 +1,6 @@
 package io.kontur.eventapi.pdc.sqs;
 
 import io.kontur.eventapi.pdc.service.PdcSqsService;
-import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
