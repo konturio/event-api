@@ -8,6 +8,7 @@
             observation_id,
             provider,
             external_event_id,
+            external_episode_id,
             <if test='point != null'>
                 point,
             </if>
@@ -31,6 +32,7 @@
             #{observationId},
             #{provider},
             #{externalEventId},
+            #{externalEpisodeId},
             <if test='point != null'>
                 'SRID=4326;${point}'::geometry,
             </if>
@@ -54,29 +56,44 @@
     </insert>
 
     <select id="getExternalIdsToUpdate" resultType="String">
-        select distinct(external_event_id)
-        from normalized_observations no
-        where not exists(select 1 from kontur_events ke where ke.observation_id = no.observation_id)
+        SELECT DISTINCT (external_event_id)
+        FROM normalized_observations no
+        WHERE NOT exists(SELECT 1 FROM kontur_events ke WHERE ke.observation_id = no.observation_id)
     </select>
 
-    <select id="getObservationsByExternalId" resultMap="normalizedObservationsDtoMap">
-        select *
-        from normalized_observations
-        where external_event_id = #{externalEventId}
-        order by loaded_at
+    <select id="getNotCombinedObservationsByExternalId" resultMap="normalizedObservationsDtoMap">
+        SELECT *
+        FROM normalized_observations no
+        WHERE NOT exists(
+                SELECT distinct (ke.observation_id) FROM kontur_events ke
+                WHERE no.observation_id = ke.observation_id)
+          AND no.external_event_id = #{externalEventId}
+        ORDER BY no.loaded_at
     </select>
 
     <select id="getObservations" resultMap="normalizedObservationsDtoMap">
-        select *
-        from normalized_observations
+        SELECT *
+        FROM normalized_observations
         <foreach item="obsId" collection="observationIds" separator="," open="where observation_id in (" close=")">
             #{obsId}
         </foreach>
     </select>
 
+    <select id="getDuplicateObservation" resultMap="normalizedObservationsDtoMap">
+        SELECT *
+        FROM normalized_observations
+        WHERE external_episode_id = #{externalEpisodeId}
+          AND loaded_at &lt;= #{loadedAt}
+          AND observation_id != #{observationId}
+          AND provider = #{provider}
+        ORDER BY loaded_at DESC
+        LIMIT 1
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>
+        <result property="externalEpisodeId" column="external_episode_id"/>
         <result property="provider" column="provider"/>
         <result property="point" column="point"/>
         <result property="geometries" column="geometries"/>

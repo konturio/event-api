@@ -36,6 +36,7 @@ class HpSrvMagsNormalizerTest {
         assertEquals(dataLake.getProvider(), obs.getProvider());
         assertEquals(dataLake.getLoadedAt(), obs.getLoadedAt());
         assertEquals("bd6bfd50-a743-4959-88ee-72cf6809ae76", obs.getExternalEventId());
+        assertEquals("9b2538fd-2b6b-498d-94a6-896fd55e3ca8", obs.getExternalEpisodeId());
         assertEquals(Severity.UNKNOWN, obs.getEventSeverity());
         assertEquals("Flood - New York--Newark, NY--NJ--CT Region, United States", obs.getName());
         assertNull(obs.getDescription());
@@ -58,7 +59,8 @@ class HpSrvMagsNormalizerTest {
     private DataLake createDataLakeObject() throws IOException {
         String json = readMessageFromFile("HpSrvMagsNormalizerTest.json");
         return new PdcDataLakeConverter()
-                .convertHpSrvMagData(new ObjectMapper().readTree(json), "bd6bfd50-a743-4959-88ee-72cf6809ae76");
+                .convertHpSrvMagData(new ObjectMapper().readTree(json), "bd6bfd50-a743-4959-88ee-72cf6809ae76")
+                .get(0);
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

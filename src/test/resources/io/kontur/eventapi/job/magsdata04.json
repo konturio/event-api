@@ -1,0 +1,68 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -91.2822,
+              43.52
+            ],
+            [
+              -92.2637,
+              42.6782
+            ],
+            [
+              -93.7851,
+              44.1641
+            ],
+            [
+              -91.2822,
+              43.7
+            ],
+            [
+              -91.2822,
+              43.52
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "magId": 3432159,
+        "uuid": "1638ef77-f066-4801-8012-38e7d1702bf7",
+        "title": "autotest mag id 3432159 hazard_uuid 0c653cb4-4a9e-4506-b2c8-a1e14e4dc049",
+        "createDate": "2020-10-20T14:13:40.627+0000",
+        "magType": "Calculated",
+        "creator": "d2p2",
+        "isActive": false,
+        "hazard.hazardType.typeId": "VOLCANO",
+        "hazard.hazardType.typeName": "VOLCANO",
+        "hazard.hazardType.typeDescription": "VOLCANO",
+        "hazard.hazardType.typeDisplayOrder": 0,
+        "hazard.hazardType.typeIcon": "volcano.png",
+        "hazard.hazardId": 4994210,
+        "hazard.hazardName": "test_create_hazard 4994210",
+        "hazard.commentText": "hpsrv mag comment text 666",
+        "hazard.createDate": "2020-08-01T20:00:00.000+0000",
+        "hazard.creator": "DisasterAWARE (Automated)",
+        "hazard.startDate": "2020-09-01T20:00:00.000+0000",
+        "hazard.endDate": "2020-10-01T20:00:00.000+0000",
+        "hazard.lastUpdate": "2020-10-20T14:13:40.627+0000",
+        "hazard.latitude": 14.473,
+        "hazard.longitude": -90.88,
+        "hazard.orgId": -1,
+        "hazard.autoexpire": "Y",
+        "hazard.updateDate": "2020-10-20T14:13:40.627+0000",
+        "hazard.messageId": "130.1589574150599",
+        "hazard.masterIncidentId": "130.1589574150599.1",
+        "hazard.status": "E",
+        "hazard.uuid": "0c653cb4-4a9e-4506-b2c8-a1e14e4dc049",
+        "updateDate": "2020-10-20T07:14:51.000+0000"
+      },
+      "id": "fid.0"
+    }
+  ]
+}

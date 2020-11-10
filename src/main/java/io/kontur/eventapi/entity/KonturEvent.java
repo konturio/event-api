@@ -9,6 +9,7 @@ public class KonturEvent {
     private UUID eventId;
     private Long version;
     private List<UUID> observationIds = new ArrayList<>();
+    private String provider;
 
     public KonturEvent(UUID eventId, Long version) {
         this.eventId = eventId;
@@ -39,8 +40,16 @@ public class KonturEvent {
         this.version = version;
     }
 
-    public void addObservations(List<UUID> observations) {
-        this.observationIds.addAll(observations);
+    public void addObservations(UUID observations) {
+        this.observationIds.add(observations);
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     @Override
@@ -49,6 +58,7 @@ public class KonturEvent {
                 "eventId=" + eventId +
                 ", version=" + version +
                 ", observationIds=" + observationIds +
+                ", provider='" + provider + '\'' +
                 '}';
     }
 }

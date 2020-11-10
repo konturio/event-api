@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -90,14 +91,15 @@ class HpSrvServiceTest {
         ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("features", new ObjectMapper().createObjectNode().put("1", 1));
         DataLake dataLake = new DataLake();
-        when(pdcDataLakeConverter.convertHpSrvMagData(node, "exId1")).thenReturn(dataLake);
+        DataLake dataLake2 = new DataLake();
+        when(pdcDataLakeConverter.convertHpSrvMagData(node, "exId1")).thenReturn(List.of(dataLake, dataLake2));
 
         //when
         hpSrvService.saveMag("exId1", node);
 
         //then
         verify(pdcDataLakeConverter, times(1)).convertHpSrvMagData(node, "exId1");
-        verify(dataLakeDao, times(1)).storeEventData(dataLake);
+        verify(dataLakeDao, times(2)).storeEventData(any(DataLake.class));
     }
 
     @Test
