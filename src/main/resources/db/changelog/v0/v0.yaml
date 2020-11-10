@@ -48,3 +48,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 16-add-eventId-in-normalized-observations.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_kontur_events_observation_id_index.sql
