@@ -42,8 +42,4 @@ public class KonturEventsDao {
     public List<KonturEvent> getNewEventVersionsForFeed(UUID feedId) {
         return mapper.getNewEventVersionsForFeed(feedId);
     }
-
-    public Optional<KonturEvent> getEventByIdEventAndVersionAndIdObservation(UUID eventId, Long version, UUID observationId){
-        return mapper.getEventByIdEventAndVersionAndIdObservation(eventId, version, observationId);
-    }
 }
