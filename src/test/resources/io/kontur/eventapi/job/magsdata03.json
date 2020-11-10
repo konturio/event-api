@@ -31,10 +31,10 @@
         ]
       },
       "properties": {
-        "magId": 16095,
-        "uuid": "111d6b0a-ce18-47d9-9bd2-b1b85e5d967a",
+        "magId": 16096,
+        "uuid": "996d6b0a-ce18-47d9-9bd2-b1b8fe5d967a",
         "title": "Automated Flood SmartAlert Area [ 2020-07-14 21:05:23 GMT ]",
-        "createDate": "2020-07-14T21:05:26.591+0000",
+        "createDate": "2020-07-14T21:05:26.999+0000",
         "magType": "Calculated",
         "creator": "d2p2",
         "isActive": true,
@@ -59,7 +59,7 @@
         "hazard.messageId": "1028.1594760425505",
         "hazard.masterIncidentId": "1052.257100.647665.1",
         "hazard.status": "E",
-        "hazard.uuid": "0457178b-45c1-492f-bbc1-61ca14389a31",
+        "hazard.uuid": "996d6b0a-ce18-47d9-9bd2-b1b8fe5d967a",
         "updateDate": "2020-07-14T21:05:26.591+0000"
       },
       "id": "fid.0"

@@ -4,10 +4,7 @@ import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class UUIDArrayTypeHandler extends BaseTypeHandler<List<UUID>> {
 
@@ -37,7 +34,7 @@ public class UUIDArrayTypeHandler extends BaseTypeHandler<List<UUID>> {
         if (pgArray == null) return Collections.emptyList();
 
         UUID[] uuids = (UUID[]) pgArray.getArray();
-        return containsOnlyNulls(uuids) ? Collections.emptyList() : Arrays.asList(uuids);
+        return containsOnlyNulls(uuids) ? Collections.emptyList() : new ArrayList<>(List.of(uuids));
     }
 
     private boolean containsOnlyNulls(UUID[] uuids) {

@@ -1,7 +1,13 @@
 package io.kontur.eventapi.gdacs.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.gdacs.dto.AlertForInsertDataLake;
+import io.kontur.eventapi.job.EventCombinationJob;
+import io.kontur.eventapi.job.FeedCompositionJob;
+import io.kontur.eventapi.job.NormalizationJob;
+import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.service.EventResourceService;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -16,17 +22,25 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GdacsSearchJobIT extends AbstractIntegrationTest {
 
     private final GdacsSearchJob gdacsSearchJob;
     private final DataLakeDao dataLakeDao;
+    private final NormalizationJob normalizationJob;
+    private final EventCombinationJob eventCombinationJob;
+    private final FeedCompositionJob feedCompositionJob;
+    private final EventResourceService eventResourceService;
 
     @Autowired
-    public GdacsSearchJobIT(GdacsSearchJob gdacsSearchJob, DataLakeDao dataLakeDao) {
+    public GdacsSearchJobIT(GdacsSearchJob gdacsSearchJob, DataLakeDao dataLakeDao, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, EventResourceService eventResourceService) {
         this.gdacsSearchJob = gdacsSearchJob;
         this.dataLakeDao = dataLakeDao;
+        this.normalizationJob = normalizationJob;
+        this.eventCombinationJob = eventCombinationJob;
+        this.feedCompositionJob = feedCompositionJob;
+        this.eventResourceService = eventResourceService;
     }
 
     @Test
@@ -59,7 +73,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         );
 
         int alertCount = 2;
-        assertEquals(alertCount, gdacsSearchJob.getAlertsForDataLake(listOfAlerts).size());
+        assertEquals(alertCount, gdacsSearchJob.getSortedBySentAlertsForDataLake(listOfAlerts).size());
     }
 
     @Test
@@ -75,34 +89,48 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
                 dateModified,
                 externalId,
-                data
+                data,
+                dateModified.plusSeconds(1)
         )));
 
         gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
                 dateModified,
                 externalId,
-                data
+                data,
+                dateModified.plusSeconds(2)
         )));
-        var dataLakesAfterFirstUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateModified);
-        assertEquals(expectedListSize, dataLakesAfterFirstUpdate.size());
 
-        var datePlusDay = dateModified.plusDays(1);
-        gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
-                datePlusDay,
-                externalId,
-                data
-        )));
-        var dataLakesAfterSecondUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, datePlusDay);
-        assertEquals(expectedListSize, dataLakesAfterSecondUpdate.size());
+        assertEquals(expectedListSize, dataLakeDao.getDataLakesByExternalId(externalId).size());
+    }
 
-        var dateMinusDay = dateModified.minusDays(1);
-        gdacsSearchJob.saveAlerts(List.of(new AlertForInsertDataLake(
-                dateMinusDay,
-                externalId,
-                data
-        )));
-        var dataLakesAfterThirdUpdate = dataLakeDao.getDataLakeByExternalIdAndUpdateDate(externalId, dateMinusDay);
-        assertEquals(expectedListSize, dataLakesAfterThirdUpdate.size());
+    @Test
+    public void testSortingAlertsAndEventBySentParameter() throws IOException, XPathExpressionException, ParserConfigurationException {
+        String alert01 = readMessageFromFile("alert_for_test_sorting_by_sent_v1.xml");
+        String id01 = "GDACS_TC_1000738_16";
+        String alert02 = readMessageFromFile("alert_for_test_sorting_by_sent_v2.xml");
+        String id02 = "GDACS_TC_1000738_19";
+
+        var alerts = List.of(alert01, alert02);
+        var alertsForDataLake = gdacsSearchJob.getSortedBySentAlertsForDataLake(alerts);
+
+        assertFalse(alertsForDataLake.isEmpty());
+
+//        second alert was sending earlier
+        assertEquals(id02, alertsForDataLake.get(0).getExternalId());
+        assertEquals(id01, alertsForDataLake.get(1).getExternalId());
+
+        gdacsSearchJob.saveAlerts(alertsForDataLake);
+        normalizationJob.run();
+        eventCombinationJob.run();
+        feedCompositionJob.run();
+
+        List<EventDto> events = eventResourceService.searchEvents("gdacs", List.of(), OffsetDateTime.now().minusYears(10), 1, List.of(), SortOrder.ASC);
+        String expectedDescriptionOfLatestEpisode = "From 31/10/2020 to 04/11/2020, a Tropical Storm (maximum wind speed of 241 km/h) ETA-20 was active in Atlantic. The cyclone affects these countries: Nicaragua, Honduras (vulnerability Medium). Estimated population affected by category 1 (120 km/h) wind speeds or higher is 0.126 million.";
+        String actualDescriptionOfLatestEpisode = events.get(0).getEpisodes().get(events.get(0).getEpisodes().size() - 1).getDescription();
+
+        assertFalse(events.isEmpty());
+        assertEquals(expectedDescriptionOfLatestEpisode, actualDescriptionOfLatestEpisode);
+
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

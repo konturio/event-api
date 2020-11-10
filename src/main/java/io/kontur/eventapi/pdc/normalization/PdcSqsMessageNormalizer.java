@@ -52,7 +52,8 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
 
         switch (type) {
             case "MAG":
-                convertMagTypeProperties(normalizedDto, props);
+                String uniqueExternalId = event.get("syncDa").get("masterSyncEvents").get("uuid").asText();
+                convertMagTypeProperties(normalizedDto, props, uniqueExternalId);
                 break;
             case "HAZARD":
                 convertHazardTypeProperties(normalizedDto, props);
@@ -64,7 +65,8 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
     }
 
     @SuppressWarnings("unchecked")
-    private void convertMagTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props) {
+    private void convertMagTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props, String uniqueExternalId) {
+        normalizedDto.setExternalEpisodeId(uniqueExternalId);
         convertHazardTypeProperties(normalizedDto, (Map<String, Object>) props.get("hazard"));
         normalizedDto.setActive(readBoolean(props, "isActive"));
         normalizedDto.setGeometries(writeJson(convertGeometries(props)));
@@ -84,6 +86,10 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         normalizedDto.setType(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")));
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
         normalizedDto.setPoint(pointWkt);
+
+        if(normalizedDto.getExternalEpisodeId() == null) {
+            normalizedDto.setExternalEpisodeId(readString(props, "uuid"));
+        }
 
         try {
             normalizedDto.setGeometries(writeJson(convertGeometry(pointWkt, props)));

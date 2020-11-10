@@ -65,7 +65,6 @@ public class GdacsNormalizer extends Normalizer {
         var normalizedObservation = new NormalizedObservation();
 
         normalizedObservation.setProvider(dataLakeDto.getProvider());
-        normalizedObservation.setExternalEventId(dataLakeDto.getExternalId());
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
@@ -95,14 +94,17 @@ public class GdacsNormalizer extends Normalizer {
         var xPath = XPathFactory.newInstance().newXPath();
 
         String pathToEvent = "/alert/info/event/text()";
+        String pathToHeadline = "/alert/info/headline/text()";
         String pathToSeverity = "/alert/info/severity/text()";
         String pathToDescription = "/alert/info/description/text()";
         String pathToParameters = "/alert/info/parameter";
 
         var event = (String) xPath.compile(pathToEvent).evaluate(xmlDocument, XPathConstants.STRING);
+        var headline = (String) xPath.compile(pathToHeadline).evaluate(xmlDocument, XPathConstants.STRING);
         var severity = (String) xPath.compile(pathToSeverity).evaluate(xmlDocument, XPathConstants.STRING);
         var description = (String) xPath.compile(pathToDescription).evaluate(xmlDocument, XPathConstants.STRING);
 
+        normalizedObservation.setName(headline);
         normalizedObservation.setDescription(description);
         normalizedObservation.setEpisodeDescription(description);
 
@@ -111,12 +113,12 @@ public class GdacsNormalizer extends Normalizer {
 
         var parameterNodeList = (NodeList) xPath.compile(pathToParameters)
                 .evaluate(xmlDocument, XPathConstants.NODESET);
-        setDataFromParameters(normalizedObservation, parameterNodeList, xmlDocument, xPath, event);
+        setDataFromParameters(normalizedObservation, parameterNodeList, xmlDocument, xPath);
     }
 
     private void setDataFromParameters(NormalizedObservation normalizedObservation, NodeList parameterNodeList,
                                        Document xmlDocument,
-                                       XPath xPath, String event) throws XPathExpressionException, FeignException {
+                                       XPath xPath) throws XPathExpressionException, FeignException {
         String eventid = "";
         String currentepisodeid = "";
         String eventtype = "";
@@ -126,11 +128,6 @@ public class GdacsNormalizer extends Normalizer {
             var valueName = (String) xPath.compile(pathToValueName).evaluate(xmlDocument, XPathConstants.STRING);
 
             switch (valueName) {
-                case "country":
-                    String country = getValue(indexOfParameters, xmlDocument, xPath);
-                    String name = event + " in " + country;
-                    normalizedObservation.setName(name);
-                    break;
                 case "fromdate":
                     String fromDate = getValue(indexOfParameters, xmlDocument, xPath);
                     normalizedObservation.setStartedAt(parseDateTimeFromString(fromDate));
@@ -152,6 +149,7 @@ public class GdacsNormalizer extends Normalizer {
         }
 
         String geometry = gdacsClient.getGeometryByLink(eventtype, eventid, currentepisodeid);
+        normalizedObservation.setExternalEventId(eventtype + "_" + eventid);
         normalizedObservation.setGeometries(geometry);
     }
 

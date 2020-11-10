@@ -3,16 +3,12 @@ package io.kontur.eventapi.typehandler;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import java.sql.Array;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class StringArrayTypeHandler  extends BaseTypeHandler<List<String>> {
+public class StringArrayTypeHandler extends BaseTypeHandler<List<String>> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, List<String> parameter, JdbcType jdbcType) throws SQLException {
@@ -39,7 +35,7 @@ public class StringArrayTypeHandler  extends BaseTypeHandler<List<String>> {
         if (pgArray == null) return Collections.emptyList();
 
         String[] strings = (String[]) pgArray.getArray();
-        return containsOnlyNulls(strings) ? Collections.emptyList() : Arrays.asList(strings);
+        return containsOnlyNulls(strings) ? Collections.emptyList() : new ArrayList<>(List.of(strings));
     }
 
     private boolean containsOnlyNulls(String[] strings) {

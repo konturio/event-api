@@ -39,6 +39,7 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
 
             Map<String, Object> props = features.get(features.size() - 1).getProperties(); //take last updated feature
             normalizedDto.setExternalEventId(readString(props, "hazard.uuid"));
+            normalizedDto.setExternalEpisodeId(readString(props, "uuid"));
             normalizedDto.setName(readString(props, "hazard.hazardName"));
             normalizedDto.setEpisodeDescription(convertDescription(props));
             normalizedDto.setType(defineType(readString(props, "hazard.hazardType.typeId")));

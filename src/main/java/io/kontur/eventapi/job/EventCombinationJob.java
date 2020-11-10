@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.toList;
-
 @Component
 public class EventCombinationJob implements Runnable {
 
@@ -32,27 +30,38 @@ public class EventCombinationJob implements Runnable {
         List<String> externalIds = observationsDao.getExternalIdsToUpdate();
 
         LOG.info("Combination job has started. Events to process: {}", externalIds.size());
-
-        for (String externalId : externalIds) {
-            processEvent(externalId);
-        }
-
+        externalIds.forEach(this::generateEvents);
         LOG.info("Combination job has finished");
+
     }
 
-    private void processEvent(String externalId) {
-        KonturEvent newEventVersion = createNewEventVersion(externalId);
-        List<UUID> observations = observationsDao.getObservationsByExternalId(externalId)
-                .stream()
-                .map(NormalizedObservation::getObservationId)
-                .collect(toList());
-        newEventVersion.addObservations(observations);
-        eventsDao.insertEventVersion(newEventVersion);
+    private void generateEvents(String externalId) {
+        var normalizedObservations = observationsDao.getNotCombinedObservationsByExternalId(externalId);
+        var newEventVersion = createNewEventVersion(externalId);
+        boolean doSaveOnlyToOneEvent = true;
+
+        if (!normalizedObservations.isEmpty()) {
+            var limitOfTimeToOneEvent = normalizedObservations.get(0).getLoadedAt().plusMinutes(1);
+            for (NormalizedObservation observation : normalizedObservations) {
+                if (limitOfTimeToOneEvent.isAfter(observation.getLoadedAt())) {
+                    newEventVersion.addObservations(observation.getObservationId());
+                } else {
+                    doSaveOnlyToOneEvent = false;
+                }
+            }
+            eventsDao.insertEventVersion(newEventVersion);
+        }
+        if(!doSaveOnlyToOneEvent) generateEvents(externalId);
     }
 
     private KonturEvent createNewEventVersion(String externalId) {
-        return eventsDao.getLatestEventByExternalId(externalId)
-                .map(event -> new KonturEvent(event.getEventId(), event.getVersion() + 1))
-                .orElseGet(() -> new KonturEvent(UUID.randomUUID(), 1L));
+        var eventOptional = eventsDao.getLatestEventByExternalId(externalId);
+        if (eventOptional.isPresent()) {
+            var event = eventOptional.get();
+            var konturEvent = new KonturEvent(event.getEventId(), event.getVersion() + 1);
+            konturEvent.setObservationIds(event.getObservationIds());
+            return konturEvent;
+        }
+        return new KonturEvent(UUID.randomUUID(), 1L);
     }
 }

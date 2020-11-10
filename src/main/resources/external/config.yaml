@@ -25,6 +25,9 @@ scheduler:
     enable: true
     initialDelay: 10000
     fixedDelay: 600000
+  gdacsImport:
+    enable: true
+    cron: 30 0/5 * * * *
   normalization:
     enable: true
     initialDelay: 1000

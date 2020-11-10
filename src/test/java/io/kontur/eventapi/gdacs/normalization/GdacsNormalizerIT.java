@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +40,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         var observation = gdacsNormalizer.normalize(dataLake);
 
         String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
-        String name = "Earthquake in Mexico";
+        String name = "Green earthquake alert (Magnitude 4.9M, Depth:28.99km) in Mexico 12/10/2020 07:03 UTC, About 13000 people within 100km.";
 
         var fromDate = OffsetDateTime.of(
                 LocalDateTime.of(2020, 10, 12, 7, 3, 7),
@@ -50,7 +51,9 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
                 ZoneOffset.UTC
         );
 
-        assertEquals(dataLake.getExternalId(), observation.getExternalEventId());
+        assertNotEquals(dataLake.getExternalId(), observation.getExternalEventId());
+        assertEquals("EQ_1239039", observation.getExternalEventId());
+
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
@@ -77,7 +80,8 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         var alert = new AlertForInsertDataLake(
                 OffsetDateTime.of(LocalDateTime.of(2020, 10, 12, 9, 33, 22), ZoneOffset.UTC),
                 "GDACS_EQ_1239039_1337379",
-                readMessageFromFile()
+                readMessageFromFile(),
+                OffsetDateTime.parse("2020-10-12T05:03:07-00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         );
         return new GdacsDataLakeConverter().convertGdacs(alert);
     }
