@@ -60,17 +60,17 @@ public class GdacsSearchJob implements Runnable {
         }
     }
 
-    private void setPubDate(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+    void setPubDate(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         XML_PUB_DATE = gdacsAlertParser.getPubDate(xml);
     }
 
-    private List<String> getLinks(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+    List<String> getLinks(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         return gdacsAlertParser.getLinks(xml).stream()
                 .map(link -> link.replace("https://www.gdacs.org", ""))
                 .collect(toList());
     }
 
-    private List<ParsedAlert> getSortedParsedAlerts(List<String> alerts) throws XPathExpressionException, ParserConfigurationException {
+    List<ParsedAlert> getSortedParsedAlerts(List<String> alerts) throws XPathExpressionException, ParserConfigurationException {
         return gdacsAlertParser.getParsedAlertsToGdacsSearchJob(alerts).stream()
                 .sorted(Comparator.comparing(ParsedAlert::getSent))
                 .collect(toList());
