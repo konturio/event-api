@@ -67,8 +67,8 @@ public class HpSrvService {
 
     public void saveMag(String externalId, JsonNode json) {
         if (json != null && !json.isEmpty() && !json.get("features").isEmpty()) {
-            DataLake magDto = pdcDataLakeConverter.convertHpSrvMagData(json, externalId);
-            dataLakeDao.storeEventData(magDto);
+            pdcDataLakeConverter.convertHpSrvMagData(json, externalId)
+                    .forEach(dataLakeDao::storeEventData);
         }
     }
 

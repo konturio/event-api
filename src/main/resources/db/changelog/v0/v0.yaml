@@ -41,4 +41,13 @@ databaseChangeLog:
     file: 13-clear-sqs-and-feed-data.sql
 - include:
     relativeToChangelogFile: true
-    file: 14-insert-gdacs-feed.sql
+    file: 14-clear-feed-data-kontur-events-normalized-observations.sql
+- include:
+    relativeToChangelogFile: true
+    file: 15-separate-data-lake-mags.sql
+- include:
+    relativeToChangelogFile: true
+    file: 16-add-eventId-in-normalized-observations.sql
+- include:
+    relativeToChangelogFile: true
+    file: 17-insert-gdacs-feed.sql

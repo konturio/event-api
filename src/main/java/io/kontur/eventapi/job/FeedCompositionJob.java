@@ -11,12 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.FeatureCollection;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 @Component
@@ -67,7 +66,7 @@ public class FeedCompositionJob implements Runnable {
 
         fillFeedData(feedDto, observations);
 
-        observations.forEach(observation -> convertObservation(observation)
+        observations.forEach(observation -> convertObservation(observation, feedDto)
                 .ifPresent(feedDto::addEpisode));
 
         feedDao.insertFeedData(feedDto);
@@ -126,10 +125,17 @@ public class FeedCompositionJob implements Runnable {
         }
     }
 
-    private Optional<FeedEpisode> convertObservation(NormalizedObservation observation) {
+    private Optional<FeedEpisode> convertObservation(NormalizedObservation observation, FeedData feedDto) {
         if (observation.getGeometries() == null) {
             return Optional.empty();
         }
+
+        var savedDuplicateObservationId = getSavedDuplicateSqsObservationId(observation);
+        if (savedDuplicateObservationId.isPresent()) {
+            addObservationIdIfDuplicate(observation, feedDto, savedDuplicateObservationId.get());
+            return Optional.empty();
+        }
+
         FeedEpisode feedEpisode = new FeedEpisode();
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
@@ -141,7 +147,32 @@ public class FeedCompositionJob implements Runnable {
         feedEpisode.setUpdatedAt(observation.getLoadedAt());
         feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
         feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
+        feedEpisode.addObservation(observation.getObservationId());
         return Optional.of(feedEpisode);
     }
 
+    private Optional<UUID> getSavedDuplicateSqsObservationId(NormalizedObservation observation) {
+        if (observation.getProvider().equals(HP_SRV_MAG_PROVIDER)) {
+            var duplicateSQSMagObservationOpt = observationsDao.getDuplicateObservation(
+                    observation.getLoadedAt(),
+                    observation.getExternalEpisodeId(),
+                    observation.getObservationId(),
+                    PDC_SQS_PROVIDER);
+            if (duplicateSQSMagObservationOpt.isPresent()) {
+                return Optional.of(duplicateSQSMagObservationOpt.get().getObservationId());
+            }
+        }
+        return Optional.empty();
+    }
+
+    private void addObservationIdIfDuplicate(NormalizedObservation observation, FeedData feedDto, UUID savedDuplicateObservationId) {
+        for (FeedEpisode episode : feedDto.getEpisodes()) {
+            boolean hasDuplicateObservation = episode.getObservations().stream()
+                    .anyMatch(episodeObs -> episodeObs.equals(savedDuplicateObservationId));
+            if (hasDuplicateObservation) {
+                episode.addObservation(observation.getObservationId());
+                return;
+            }
+        }
+    }
 }
