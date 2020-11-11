@@ -47,11 +47,11 @@
         WHERE observation_id = #{observationId}
     </select>
 
-    <select id="getDataLakeByExternalIdAndUpdateDate" resultMap="dataLakeMap">
+    <select id="getDataLakeByExternalIdAndProvider" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake
         WHERE external_id = #{externalId}
-          AND updated_at = #{updatedAt}
+          AND provider = #{provider}
     </select>
 
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
