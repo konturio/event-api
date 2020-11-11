@@ -30,6 +30,10 @@ public class NormalizedObservationsDao {
         return mapper.getNotCombinedObservationsByExternalId(externalId);
     }
 
+    public List<NormalizedObservation> getObservationsNotLinkedToEvent() {
+        return mapper.getObservationsNotLinkedToEvent();
+    }
+
     public List<NormalizedObservation> getObservations(List<UUID> observationIds) {
         return mapper.getObservations(observationIds);
     }

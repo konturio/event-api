@@ -24,7 +24,7 @@ class WorkerSchedulerTest {
     private final GdacsSearchJob gdacsSearchJob = mock(GdacsSearchJob.class);
     private final FirmsImportJob firmsImportJob = mock(FirmsImportJob.class);
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
-            feedCompositionJob, firmsImportJob);
+            feedCompositionJob, firmsImportJob, null);
 
     @AfterEach
     public void resetMocks() {

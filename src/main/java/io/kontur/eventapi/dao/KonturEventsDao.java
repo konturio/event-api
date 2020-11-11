@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +33,10 @@ public class KonturEventsDao {
             LOG.warn(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime startedAt, String geometry){
+        return mapper.getEventWithClosestObservation(startedAt, geometry);
     }
 
     @Transactional

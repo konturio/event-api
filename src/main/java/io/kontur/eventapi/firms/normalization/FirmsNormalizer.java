@@ -20,13 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.kontur.eventapi.firms.FirmsUtil.*;
+import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
+import static io.kontur.eventapi.firms.FirmsUtil.parseRow;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class FirmsNormalizer extends Normalizer {
-    private final static List<String> FIRMS_PROVIDERS = List.of(MODIS_PROVIDER, SUOMI_PROVIDER, NOAA_PROVIDER);
-
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
     private final H3Core h3;
