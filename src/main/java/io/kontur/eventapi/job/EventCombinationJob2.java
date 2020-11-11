@@ -32,11 +32,11 @@ public class EventCombinationJob2 implements Runnable {
     @Override
     @Timed("job.eventCombination2")
     public void run() {
-        List<NormalizedObservation> siblingObservations = observationsDao.getObservationsNotLinkedToEvent();
+        List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 
-        LOG.info("Combination job has started. Events to process: {}", siblingObservations.size());
+        LOG.info("Combination job has started. Events to process: {}", observations.size());
 
-        siblingObservations.forEach(this::addToEvent);
+        observations.forEach(this::addToEvent);
 
         LOG.info("Combination job has finished");
     }
