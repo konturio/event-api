@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class GdacsService {
         this.gdacsClient = gdacsClient;
     }
 
-    public Optional<String> getGdacsXml() {
+    public Optional<String> fetchGdacsXml() {
         try {
             return Optional.of(gdacsClient.getXml());
         } catch (FeignException e) {
@@ -42,7 +43,7 @@ public class GdacsService {
         return Optional.empty();
     }
 
-    public List<String> getAlerts(List<String> links) {
+    public List<String> fetchAlerts(List<String> links) {
         return links.stream()
                 .map(this::getAlertAfterHandleException)
                 .filter(Optional::isPresent)
@@ -60,7 +61,7 @@ public class GdacsService {
         return Optional.empty();
     }
 
-    public List<DataLake> getDataLakes(List<ParsedAlert> alerts) {
+    public List<DataLake> createDataLakeListWithAlertsAndGeometry(List<ParsedAlert> alerts) {
         var dataLakes = new ArrayList<DataLake>();
         for (ParsedAlert alert : alerts) {
             var dataLakesByExternalId = dataLakeDao.getDataLakesByExternalId(alert.getIdentifier());
@@ -77,6 +78,7 @@ public class GdacsService {
                 }
             }
         }
+        dataLakes.sort(Comparator.comparing(DataLake::getLoadedAt));
         return dataLakes;
     }
 

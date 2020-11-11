@@ -32,9 +32,7 @@
         WHERE NOT EXISTS(
                 select * from normalized_observations nr where e.observation_id = nr.observation_id
             )
-          AND e.provider != 'gdacs_alert_geometry'
         ORDER BY loaded_at
-
     </select>
 
     <select id="getDataLakesByExternalId" resultMap="dataLakeMap">
@@ -49,18 +47,11 @@
         WHERE observation_id = #{observationId}
     </select>
 
-    <select id="getDataLakeByExternalIdAndUpdateDate" resultMap="dataLakeMap">
+    <select id="getDataLakeByExternalIdAndProvider" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake
         WHERE external_id = #{externalId}
-          AND updated_at = #{updatedAt}
-    </select>
-
-    <select id="getDataLakeWithGeometryForGdacs" resultMap="dataLakeMap">
-        SELECT *
-        FROM data_lake
-        WHERE external_id = #{externalId}
-          AND provider = 'gdacs_alert_geometry'
+          AND provider = #{provider}
     </select>
 
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">

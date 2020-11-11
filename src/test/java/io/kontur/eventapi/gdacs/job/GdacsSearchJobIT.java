@@ -49,7 +49,7 @@ public class GdacsSearchJobIT extends AbstractIntegrationTest {
         var parsedAlertBeforeLast = parsedAlerts.get(parsedAlerts.size() - 2);
         assertTrue(parsedAlertLast.getSent().isAfter(parsedAlertBeforeLast.getSent()));
 
-        var dataLakes = gdacsService.getDataLakes(parsedAlerts);
+        var dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(parsedAlerts);
         assertEquals(6, dataLakes.size());
 
         dataLakes.forEach(dataLake -> {

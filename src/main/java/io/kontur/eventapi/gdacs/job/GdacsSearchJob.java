@@ -42,14 +42,14 @@ public class GdacsSearchJob implements Runnable {
     public void run() {
         try {
             LOG.info("Gdacs import job has started");
-            var xmlOpt = gdacsService.getGdacsXml();
+            var xmlOpt = gdacsService.fetchGdacsXml();
             if (xmlOpt.isPresent()) {
                 String xml = xmlOpt.get();
                 setPubDate(xml);
                 var links = getLinks(xml);
-                var alerts = gdacsService.getAlerts(links);
+                var alerts = gdacsService.fetchAlerts(links);
                 var parsedAlerts = getSortedParsedAlerts(alerts);
-                var dataLakes = gdacsService.getDataLakes(parsedAlerts);
+                var dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(parsedAlerts);
                 gdacsService.saveGdacs(dataLakes);
             }
             LOG.info("Gdacs import job has finished");
