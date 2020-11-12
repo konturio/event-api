@@ -24,6 +24,20 @@
         LIMIT 1
     </select>
 
+    <select id="getEventWithClosestObservation" resultMap="konturEventDtoMap" >
+        SELECT *
+        FROM kontur_events
+        WHERE observation_id in (
+            SELECT observation_id
+            FROM normalized_observations no
+            WHERE
+                no.started_at between #{startedAt} - interval '24 hours' and #{startedAt} + interval '24 hours'
+                AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, collected_geography, 1000)
+            ORDER BY ST_GeomFromGeoJSON(#{geometry})::geography <![CDATA[<->]]> collected_geography
+            LIMIT 1
+        )
+    </select>
+
     <select id="getNewEventVersionsForFeed" resultMap="konturEventDtoMap">
         SELECT ke.event_id, ke.version, array_agg(ke.observation_id)::uuid[] AS observation_ids
         FROM kontur_events ke,
