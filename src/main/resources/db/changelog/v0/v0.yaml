@@ -51,3 +51,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 17-insert-gdacs-feed.sql
+- include:
+    relativeToChangelogFile: true
+    file: 18-add-collected-geography-to-normalized-observation.sql

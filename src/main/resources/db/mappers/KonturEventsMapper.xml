@@ -32,12 +32,8 @@
             FROM normalized_observations no
             WHERE
                 no.started_at between #{startedAt} - interval '24 hours' and #{startedAt} + interval '24 hours'
-                AND ST_DWithin(
-                    ST_GeomFromGeoJSON(#{geometry}::jsonb->'features'->0->'geometry'),
-                    ST_GeomFromGeoJSON(no.geometries->'features'->0->'geometry'), 0.01
-                    )
-            ORDER BY
-                ST_GeomFromGeoJSON(#{geometry}::jsonb->'features'->0->'geometry') <![CDATA[<->]]> ST_GeomFromGeoJSON(no.geometries->'features'->0->'geometry')
+                AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, collected_geography, 1000)
+            ORDER BY ST_GeomFromGeoJSON(#{geometry})::geography <![CDATA[<->]]> collected_geography
             LIMIT 1
         )
     </select>
