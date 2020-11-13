@@ -5,6 +5,7 @@ import io.kontur.eventapi.entity.DataLake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,5 +42,9 @@ public class DataLakeDao {
 
     public DataLake getDataLakeByObservationId(UUID observationId) {
         return mapper.getDataLakeByObservationId(observationId);
+    }
+
+    public Optional<DataLake> getDataLakeByExternalIdAndProvider(String externalId, String provider) {
+        return mapper.getDataLakeByExternalIdAndProvider(externalId, provider);
     }
 }

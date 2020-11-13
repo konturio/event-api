@@ -14,6 +14,8 @@ import org.wololo.geojson.FeatureCollection;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
+import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
@@ -53,7 +55,7 @@ public class FeedCompositionJob implements Runnable {
         List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
 
         if (event.getObservationIds().size() != observations.size()) {
-            LOG.info(String.format(
+            LOG.debug(String.format(
                     "Feed Data creation for event '%s' with version '%s' was skipped due to missed normalized observations. " +
                             "Expected number of observations %s, actual %s",
                     event.getEventId(), event.getVersion(), event.getObservationIds().size(), observations.size()));
@@ -61,9 +63,7 @@ public class FeedCompositionJob implements Runnable {
         }
 
         observations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
-
         FeedData feedDto = new FeedData(event.getEventId(), feed.getFeedId(), event.getVersion());
-
         fillFeedData(feedDto, observations);
 
         observations.forEach(observation -> convertObservation(observation, feedDto)
@@ -136,7 +136,7 @@ public class FeedCompositionJob implements Runnable {
             return Optional.empty();
         }
 
-        FeedEpisode feedEpisode = new FeedEpisode();
+        var feedEpisode = new FeedEpisode();
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
         feedEpisode.setType(observation.getType());
@@ -147,8 +147,21 @@ public class FeedCompositionJob implements Runnable {
         feedEpisode.setUpdatedAt(observation.getLoadedAt());
         feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
         feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
-        feedEpisode.addObservation(observation.getObservationId());
+        addObservationIdIntoEpisode(feedEpisode, observation);
+
         return Optional.of(feedEpisode);
+    }
+
+    private void addObservationIdIntoEpisode(FeedEpisode feedEpisode, NormalizedObservation observation) {
+        if (observation.getProvider().equals(GDACS_ALERT_GEOMETRY_PROVIDER)) {
+            var gdacsAlertObservation = observationsDao.getNormalizedObservationByExternalEpisodeIdAndProvider(
+                    observation.getExternalEpisodeId(), GDACS_ALERT_PROVIDER);
+            gdacsAlertObservation.ifPresent(
+                    normalizedObservation -> feedEpisode.addObservation(normalizedObservation.getObservationId())
+            );
+        } else {
+            feedEpisode.addObservation(observation.getObservationId());
+        }
     }
 
     private Optional<UUID> getSavedDuplicateSqsObservationId(NormalizedObservation observation) {

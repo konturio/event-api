@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
@@ -17,6 +18,7 @@ public class WorkerScheduler {
     private final Logger LOG = LoggerFactory.getLogger(WorkerScheduler.class);
     private final HpSrvSearchJob hpSrvSearchJob;
     private final HpSrvMagsJob hpSrvMagsJob;
+    private final GdacsSearchJob gdacsSearchJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
@@ -25,6 +27,8 @@ public class WorkerScheduler {
     private String hpSrvImportEnabled;
     @Value("${scheduler.hpSrvMagsImport.enable}")
     private String hpSrvMagsImportEnabled;
+    @Value("${scheduler.gdacsImport.enable}")
+    private String gdacsImportEnabled;
     @Value("${scheduler.normalization.enable}")
     private String normalizationEnabled;
     @Value("${scheduler.eventCombination.enable}")
@@ -32,11 +36,12 @@ public class WorkerScheduler {
     @Value("${scheduler.feedComposition.enable}")
     private String feedCompositionEnabled;
 
-    public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob,
-                           HpSrvMagsJob hpSrvMagsJob, NormalizationJob normalizationJob,
+    public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
+                           GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
+        this.gdacsSearchJob = gdacsSearchJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
@@ -57,6 +62,15 @@ public class WorkerScheduler {
             hpSrvMagsJob.run();
         } else {
             LOG.info("HpSrv mags import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(cron = "${scheduler.gdacsImport.cron}")
+    public void startGdacsImport() {
+        if (Boolean.parseBoolean(gdacsImportEnabled)) {
+            gdacsSearchJob.run();
+        } else {
+            LOG.info("Gdacs import job invocation is skipped");
         }
     }
 

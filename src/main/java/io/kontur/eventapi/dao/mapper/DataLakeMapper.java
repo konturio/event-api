@@ -3,6 +3,7 @@ package io.kontur.eventapi.dao.mapper;
 import io.kontur.eventapi.entity.DataLake;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,4 +22,6 @@ public interface DataLakeMapper {
     List<DataLake> getDataLakesByExternalId(String externalId);
 
     DataLake getDataLakeByObservationId(UUID observationId);
+
+    Optional<DataLake> getDataLakeByExternalIdAndProvider(String externalId, String provider);
 }

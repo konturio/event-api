@@ -1,6 +1,9 @@
 package io.kontur.eventapi.resource;
 
 import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.Severity;
+import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.service.EventResourceService;
@@ -51,20 +54,27 @@ public class EventResource {
                     String feed,
             @Parameter(description = "Filters events by type. More than one can be chosen at once") @RequestParam(value = "types", defaultValue = "")
                     List<EventType> eventTypes,
+            @Parameter(description = "Filters events by severity. More than one can be chosen at once") @RequestParam(value = "severities", defaultValue = "")
+                    List<Severity> severities,
             @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"2020-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime after,
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
-                    @Min(1) @Max(1000) int limit
+                    @Min(1) @Max(1000) int limit,
+            @Parameter(description = "Sort selection. Ascending by default. Default value is ASC") @RequestParam(value = "sortOrder", defaultValue = "ASC") SortOrder sortOrder
     ) {
-        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, limit);
+        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, limit, severities, sortOrder);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(new DataPaginationDTO(events, events.get(events.size() - 1).getUpdatedAt()));
+        if (sortOrder.equals(SortOrder.DESC)) {
+            return ResponseEntity.ok(new DataPaginationDTO(events, events.get(0).getUpdatedAt()));
+        } else {
+            return ResponseEntity.ok(new DataPaginationDTO(events, events.get(events.size() - 1).getUpdatedAt()));
+        }
     }
 
-    @GetMapping(path = "/observations/{observationId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+    @GetMapping(path = "/observations/{observationId}",  produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @Operation(tags = "Events", summary = "returns raw data", description = "Returns raw data which was used to combine events and episodes.")
     @PreAuthorize("hasAuthority('SCOPE_read:raw-data')")
     public ResponseEntity<String> rawData(@Parameter(description = "Observation UUID. May be gathered from event's 'observations' field") @PathVariable UUID observationId) {
@@ -78,5 +88,16 @@ public class EventResource {
         } else {
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(rawData);
         }
+    }
+
+    @GetMapping(path = "/event", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(tags = "Events", summary = "returns event", description = "Returns event by its version, id and feed alias. If no version is provided the latest event version is returned.")
+    @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
+    public ResponseEntity<FeedData> getLastEventById(@Parameter(description = "Feed name") @RequestParam(value = "feed") String feed,
+                                                     @Parameter(description = "Version") @RequestParam(value = "version", required = false) Long version,
+                                                     @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }

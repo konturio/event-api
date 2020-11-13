@@ -20,5 +20,4 @@ public class DataPaginationDTO {
             this.nextAfterValue = nextAfterValue;
         }
     }
-
 }

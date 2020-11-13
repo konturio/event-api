@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
@@ -19,13 +20,15 @@ class WorkerSchedulerTest {
     private final NormalizationJob normalizationJob = mock(NormalizationJob.class);
     private final EventCombinationJob eventCombinationJob = mock(EventCombinationJob.class);
     private final FeedCompositionJob feedCompositionJob = mock(FeedCompositionJob.class);
-    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, normalizationJob,
-            eventCombinationJob, feedCompositionJob);
+    private final GdacsSearchJob gdacsSearchJob = mock(GdacsSearchJob.class);
+    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
+            feedCompositionJob);
 
     @AfterEach
     public void resetMocks() {
         Mockito.reset(hpSrvSearchJob);
         Mockito.reset(hpSrvMagsJob);
+        Mockito.reset(gdacsSearchJob);
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
         Mockito.reset(feedCompositionJob);
@@ -61,6 +64,14 @@ class WorkerSchedulerTest {
         scheduler.startPdcMagsImport();
 
         verify(hpSrvMagsJob, never()).run();
+    }
+
+    @Test
+    public void startGdacsSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "gdacsImportEnabled", "true");
+        scheduler.startGdacsImport();
+
+        verify(gdacsSearchJob, times(1)).run();
     }
 
     @Test

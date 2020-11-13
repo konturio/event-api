@@ -6,6 +6,7 @@ import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,9 +93,11 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
         return feedMapper.searchForEvents(
                 "pdc-v0",
-                Collections.emptyList(),
+                List.of(),
                 loadedTime.minusDays(1),
-                1
+                1,
+                List.of(),
+                SortOrder.ASC
         ).get(0);
     }
 
@@ -171,9 +173,11 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
         FeedData feed = feedMapper.searchForEvents(
                 "pdc-v0",
-                Collections.emptyList(),
+                List.of(),
                 startTimeForSearchingFeed,
-                1
+                1,
+                List.of(),
+                SortOrder.ASC
         ).get(0);
         assertEquals(2, feed.getEpisodes().size());
 
@@ -222,7 +226,9 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
                 "pdc-v0",
                 List.of(EventType.WILDFIRE),
                 loadHpSrvHazardLoadTime,
-                1
+                1,
+                List.of(),
+                SortOrder.ASC
         ).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }

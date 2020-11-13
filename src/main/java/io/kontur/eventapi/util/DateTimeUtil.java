@@ -3,6 +3,7 @@ package io.kontur.eventapi.util;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DateTimeUtil {
@@ -26,4 +27,7 @@ public class DateTimeUtil {
         }
     }
 
+    public static OffsetDateTime parseDateTimeFromString(String value){
+        return OffsetDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME);
+    }
 }

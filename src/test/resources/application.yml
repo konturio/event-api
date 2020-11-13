@@ -3,6 +3,9 @@ pdc:
   user: u1
   password: p1
 
+gdacs:
+  host: 'https://www.gdacs.org'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -11,6 +14,9 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
+  gdacsImport:
+    enable: false
+    cron: 30 30 23 25 12 SUN
   normalization:
     enable: false
     initialDelay: 999999

@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<alert
+	xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+	<sender>info-gdacs@gdacs.org</sender>
+	<sent>2020-10-12T04:06:56-00:00</sent>
+	<status>Actual</status>
+	<msgType>Alert</msgType>
+	<scope>Public</scope>
+	<incidents>1239035</incidents>
+	<info>
+		<category>Geo</category>
+		<event>Earthquake</event>
+		<urgency>Past</urgency>
+		<severity>Moderate</severity>
+		<certainty>Observed</certainty>
+		<senderName>Global Disaster Alert and Coordination System</senderName>
+		<headline>Green earthquake alert (Magnitude 5.1M, Depth:100.49km) in Guatemala 12/10/2020 06:06 UTC, 6480000 people within 100km.</headline>
+		<description>On 10/12/2020 6:06:56 AM, an earthquake occurred in Guatemala potentially affecting 6480000 people within 100km. The earthquake had Magnitude 5.1M, Depth:100.49km.</description>
+		<web>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1239035</web>
+		<parameter>
+			<valueName>currentepisodeid</valueName>
+			<value>1337371</value>
+		</parameter>
+		<parameter>
+			<valueName>glide</valueName>
+			<value />
+		</parameter>
+		<parameter>
+			<valueName>version</valueName>
+			<value>1</value>
+		</parameter>
+		<parameter>
+			<valueName>fromdate</valueName>
+			<value>Mon, 12 Oct 2020 06:06:56 GMT</value>
+		</parameter>
+		<parameter>
+			<valueName>todate</valueName>
+			<value>Mon, 12 Oct 2020 06:06:56 GMT</value>
+		</parameter>
+		<parameter>
+			<valueName>alertlevel</valueName>
+			<value>Green</value>
+		</parameter>
+		<parameter>
+			<valueName>alerttype</valueName>
+			<value>automatic</value>
+		</parameter>
+		<parameter>
+			<valueName>link</valueName>
+			<value>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;amp;eventid=1239035</value>
+		</parameter>
+		<parameter>
+			<valueName>country</valueName>
+			<value>Guatemala</value>
+		</parameter>
+		<parameter>
+			<valueName>eventname</valueName>
+			<value />
+		</parameter>
+		<parameter>
+			<valueName>severity</valueName>
+			<value>Magnitude 5.1M, Depth:100.49km</value>
+		</parameter>
+		<parameter>
+			<valueName>population</valueName>
+			<value>6480000 people within 100km</value>
+		</parameter>
+		<parameter>
+			<valueName>vulnerability</valueName>
+			<value />
+		</parameter>
+		<parameter>
+			<valueName>sourceid</valueName>
+			<value>NEIC</value>
+		</parameter>
+		<parameter>
+			<valueName>iso3</valueName>
+			<value>GTM</value>
+		</parameter>
+		<parameter>
+			<valueName>hazardcomponents</valueName>
+			<value>EQ,magnitude=5.1,depth=100.49,alertleveltype=EQ;JETS=true</value>
+		</parameter>
+		<parameter>
+			<valueName>datemodified</valueName>
+			<value>Mon, 12 Oct 2020 08:37:13 GMT</value>
+		</parameter>
+		<area>
+			<areaDesc>Polygon</areaDesc>
+			<polygon>14.624,-90.729 14.655,-90.73 14.687,-90.731 14.718,-90.734 14.749,-90.738 14.78,-90.743 14.811,-90.749 14.842,-90.757 14.872,-90.765 14.902,-90.775 14.932,-90.785 14.961,-90.797 14.99,-90.81 15.019,-90.823 15.047,-90.838 15.074,-90.854 15.101,-90.871 15.127,-90.888 15.153,-90.907 15.178,-90.926 15.203,-90.947 15.227,-90.968 15.25,-90.99 15.272,-91.013 15.293,-91.037 15.314,-91.062 15.334,-91.087 15.353,-91.113 15.371,-91.139 15.388,-91.167 15.404,-91.195 15.419,-91.223 15.433,-91.252 15.447,-91.281 15.459,-91.311 15.47,-91.342 15.481,-91.372 15.49,-91.403 15.498,-91.435 15.505,-91.467 15.511,-91.498 15.516,-91.531 15.52,-91.563 15.522,-91.595 15.524,-91.628 15.525,-91.66 15.524,-91.693 15.522,-91.725 15.52,-91.757 15.516,-91.79 15.511,-91.822 15.505,-91.854 15.498,-91.885 15.49,-91.917 15.481,-91.948 15.47,-91.979 15.459,-92.009 15.447,-92.039 15.433,-92.068 15.419,-92.097 15.404,-92.126 15.388,-92.153 15.371,-92.181 15.353,-92.207 15.334,-92.233 15.314,-92.259 15.293,-92.283 15.272,-92.307 15.25,-92.33 15.227,-92.352 15.203,-92.373 15.178,-92.394 15.153,-92.413 15.127,-92.432 15.101,-92.45 15.074,-92.466 15.047,-92.482 15.019,-92.497 14.99,-92.511 14.961,-92.523 14.932,-92.535 14.902,-92.546 14.872,-92.555 14.842,-92.564 14.811,-92.571 14.78,-92.577 14.749,-92.582 14.718,-92.586 14.687,-92.589 14.655,-92.591 14.624,-92.591 14.592,-92.591 14.561,-92.589 14.53,-92.586 14.498,-92.582 14.467,-92.577 14.436,-92.571 14.406,-92.564 14.375,-92.555 14.345,-92.546 14.316,-92.535 14.286,-92.523 14.257,-92.511 14.229,-92.497 14.201,-92.482 14.173,-92.466 14.146,-92.45 14.12,-92.432 14.094,-92.413 14.069,-92.394 14.045,-92.373 14.021,-92.352 13.998,-92.33 13.976,-92.307 13.954,-92.283 13.934,-92.259 13.914,-92.233 13.895,-92.207 13.877,-92.181 13.86,-92.153 13.843,-92.126 13.828,-92.097 13.814,-92.068 13.801,-92.039 13.788,-92.009 13.777,-91.979 13.767,-91.948 13.758,-91.917 13.75,-91.885 13.742,-91.854 13.736,-91.822 13.732,-91.79 13.728,-91.757 13.725,-91.725 13.723,-91.693 13.723,-91.66 13.723,-91.628 13.725,-91.595 13.728,-91.563 13.732,-91.531 13.736,-91.498 13.742,-91.467 13.75,-91.435 13.758,-91.403 13.767,-91.372 13.777,-91.342 13.788,-91.311 13.801,-91.281 13.814,-91.252 13.828,-91.223 13.843,-91.195 13.86,-91.167 13.877,-91.139 13.895,-91.113 13.914,-91.087 13.934,-91.062 13.954,-91.037 13.976,-91.013 13.998,-90.99 14.021,-90.968 14.045,-90.947 14.069,-90.926 14.094,-90.907 14.12,-90.888 14.146,-90.871 14.173,-90.854 14.201,-90.838 14.229,-90.823 14.257,-90.81 14.286,-90.797 14.316,-90.785 14.345,-90.775 14.375,-90.765 14.406,-90.757 14.436,-90.749 14.467,-90.743 14.498,-90.738 14.53,-90.734 14.561,-90.731 14.592,-90.73 14.624,-90.729 14.624,-90.729</polygon>
+		</area>
+	</info>
+</alert>

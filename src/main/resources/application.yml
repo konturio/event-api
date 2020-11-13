@@ -31,14 +31,20 @@ pdc:
   user: 'eventapi'
   password: 'zvgusf48D'
 
+gdacs:
+  host: 'https://www.gdacs.org'
+
 scheduler:
   hpSrvImport:
     enable: false
     initialDelay: 1000
   hpSrvMagsImport:
-    enable: true
+    enable: false
     initialDelay: 10000
     fixedDelay: 600000
+  gdacsImport:
+    enable: true
+    cron: 30 0/5 * * * *
   normalization:
     enable: true
     initialDelay: 1000
@@ -48,17 +54,18 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
 
 feign:
   client:
     config:
-      pdcHpSrvBasicAuth:
+      default:
         connectTimeout: 60000
         readTimeout: 60000
         loggerLevel: headers
+      pdcHpSrvBasicAuth:
         requestInterceptors:
           - feign.auth.BasicAuthRequestInterceptor
 
