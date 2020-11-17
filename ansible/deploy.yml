@@ -1,3 +1,5 @@
+--- # Time-stamp: <2020-11-16 22:25:51>
+
 - hosts: all
   any_errors_fatal: true
   vars:
@@ -5,77 +7,91 @@
     home: '{{ ansible_env.HOME }}'
     app_home: '{{ home }}'
   tasks:
-    - name: make app dir
+    - name: Creating app directory if it does not exist
       file:
         path: '{{ app_home }}/{{ app_name }}_{{ version }}'
         state: directory
         mode: 0750
-    - name: Upload and unpack an artifact
+
+    - name: Uploading and unpacking an artifact
       unarchive:
         src: '{{ path_to_dist }}'
         dest: '{{ app_home }}/{{ app_name }}_{{ version }}'
-    - name: Remove old symlink to the current version
+
+    - name: Publishing current app version (1 of 2)
       file:
         path: '{{ app_home }}/current'
         state: absent
-    - name: Make symlink to the current version
+    - name: Publishing current app version (2 of 2)
       file:
         src: '{{ app_name }}_{{ version }}'
         dest: '{{ app_home }}/current'
         state: link
-        force: 'yes'
-    - name: Prepare hosted files
-      block:
-        - copy:
-            src: '{{ app_home }}/current/config.yaml'
-            dest: '{{ app_home }}/config.local.yaml'
-            remote_src: 'yes'
-            force: 'no'
-        - copy:
-            src: '{{ app_home }}/current/environment.rc.sample'
-            dest: '{{ app_home }}/environment.rc'
-            remote_src: 'yes'
-            force: 'no'
-    - name: Deploy event-api.service
+        force: true
+
+    - name: Publishing initial versions of app configs (1 of 2)
+      copy:
+        src: '{{ app_home }}/current/config.yaml'
+        dest: '{{ app_home }}/config.local.yaml'
+        remote_src: true
+        force: false
+    - name: Publishing initial versions of app configs (2 of 2)
+      copy:
+        src: '{{ app_home }}/current/environment.rc.sample'
+        dest: '{{ app_home }}/environment.rc'
+        remote_src: true
+        force: false
+
+    - name: Deploying event-api.service
       block:
         - file:
             path: '{{ home }}/bin/'
             state: directory
-            recurse: 'yes'
+            recurse: true
         - copy:
             src: '{{ app_home }}/current/wrapper.sh'
             dest: '{{ home }}/bin/'
-            remote_src: 'yes'
+            remote_src: true
             mode: 0750
-            force: 'yes'
+            force: true
         - file:
             src: '{{ home }}/bin/wrapper.sh'
             dest: '{{ home }}/bin/{{ app_name }}'
             state: link
-            force: 'yes'
+            force: true
         - file:
             path: '{{ home }}/.config/systemd/user/'
             state: directory
-            recurse: 'yes'
-        - copy:
-            src: '{{ app_home }}/current/event-api.service'
-            dest: '{{ home }}/.config/systemd/user/event-api.service'
-            remote_src: 'yes'
-            force: 'no'
+            recurse: true
         - find:
             paths: '{{ app_home }}/current'
             patterns: event-api-*.jar
-          register: files
+            recurse: true
+            depth: 2
+          register: find_ret
         - replace:
-            path: '{{ home }}/.config/systemd/user/event-api.service'
-            regexp: \$jar_file
+            path: '{{ app_home }}/current/event-api.service'
+            regexp: '%JAR_FILE%'
             replace: '{{ item.path | basename }}'
-          with_items: '{{ files.files }}'
-    - name: Restart
+          register: replace_ret
+          with_items: '{{ find_ret.files }}'
+        - copy:
+            src: '{{ app_home }}/current/event-api.service'
+            dest: '{{ home }}/.config/systemd/user/event-api.service'
+            remote_src: true
+            force: true
+          register: copy_ret
+
+        - name: Reloading systemd manager configuration
+          systemd:
+            daemon_reload: true
+            scope: user
+          when: '( copy_ret.changed or replace_ret.changed )'
+
+    - name: Restarting the service
       systemd:
         name: event-api
         state: restarted
-        enabled: 'yes'
-        force: 'yes'
+        enabled: true
+        force: true
         scope: user
-        daemon_reload: 'yes'
