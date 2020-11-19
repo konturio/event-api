@@ -7,9 +7,9 @@ Type=forking
 # WARNING: environment.rc and config files can override any variable defined here.
 # WARNING: Do not guess, but read wrapper.sh script instead.
 
-Environment=APP_JAVA_OPTS="-Xmx600m -XX:+HeapDumpOnOutOfMemoryError"
+Environment=APP_JAVA_OPTS="-server -Xmx600m -XX:+HeapDumpOnOutOfMemoryError"
 Environment=CLASSPATH=""
-Environment=APP_ENTRY_POINT="-jar event-api-1.0-SNAPSHOT.jar"
+Environment=APP_ENTRY_POINT="-jar %JAR_FILE%"
 Environment=APP_ARGS=""
 Environment=SPRING_CONFIG_ADDITIONAL_LOCATION="file:%h/config.local.yaml"
 Environment=APP_HOME="%h/current"

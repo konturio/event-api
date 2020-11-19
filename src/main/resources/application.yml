@@ -58,7 +58,7 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 60000
   feedComposition:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
 
@@ -101,6 +101,9 @@ management:
       enabled: false
   endpoint:
     health:
+      status:
+        http-mapping:
+          down: 200
       cache:
         time-to-live: 10s
       show-details: always

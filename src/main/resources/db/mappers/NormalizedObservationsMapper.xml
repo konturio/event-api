@@ -97,6 +97,13 @@
         LIMIT 1
     </select>
 
+    <select id="getNormalizedObservationByExternalEpisodeIdAndProvider" resultMap="normalizedObservationsDtoMap">
+        SELECT *
+        FROM normalized_observations
+        WHERE external_episode_id = #{externalEpisodeId}
+          AND provider = #{provider}
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>

@@ -38,8 +38,11 @@ public class NormalizedObservationsDao {
         return mapper.getObservations(observationIds);
     }
 
-    public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider){
+    public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider) {
         return mapper.getDuplicateObservation(loadedAt, externalEpisodeId, observationId, provider);
     }
 
+    public Optional<NormalizedObservation> getNormalizedObservationByExternalEpisodeIdAndProvider(String externalEpisodeId, String provider) {
+        return mapper.getNormalizedObservationByExternalEpisodeIdAndProvider(externalEpisodeId, provider);
+    }
 }

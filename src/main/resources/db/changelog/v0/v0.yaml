@@ -53,4 +53,7 @@ databaseChangeLog:
     file: 17-insert-gdacs-feed.sql
 - include:
     relativeToChangelogFile: true
+    file: add_kontur_events_observation_id_index.sql
+- include:
+    relativeToChangelogFile: true
     file: 18-add-collected-geography-to-normalized-observation.sql

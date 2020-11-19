@@ -44,7 +44,7 @@ public class DataLakeDao {
         return mapper.getDataLakeByObservationId(observationId);
     }
 
-    public List<DataLake> getDataLakeByExternalIdAndUpdateDate(String externalId, OffsetDateTime updatedAt){
-        return mapper.getDataLakeByExternalIdAndUpdateDate(externalId,updatedAt);
+    public Optional<DataLake> getDataLakeByExternalIdAndProvider(String externalId, String provider) {
+        return mapper.getDataLakeByExternalIdAndProvider(externalId, provider);
     }
 }
