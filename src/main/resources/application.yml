@@ -97,6 +97,9 @@ management:
       enabled: false
   endpoint:
     health:
+      status:
+        http-mapping:
+          down: 200
       cache:
         time-to-live: 10s
       show-details: always
