@@ -4,21 +4,18 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.*;
+import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.wololo.geojson.FeatureCollection;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
-import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
-import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 @Component
 public class FeedCompositionJob implements Runnable {
@@ -28,12 +25,14 @@ public class FeedCompositionJob implements Runnable {
     private final KonturEventsDao eventsDao;
     private final FeedDao feedDao;
     private final NormalizedObservationsDao observationsDao;
+    private final List<EpisodeCombinator> episodeCombinators;
 
     public FeedCompositionJob(KonturEventsDao eventsDao, FeedDao feedDao,
-                              NormalizedObservationsDao observationsDao) {
+                              NormalizedObservationsDao observationsDao, List<EpisodeCombinator> episodeCombinators) {
         this.eventsDao = eventsDao;
         this.feedDao = feedDao;
         this.observationsDao = observationsDao;
+        this.episodeCombinators = episodeCombinators;
     }
 
     @Override
@@ -46,7 +45,7 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private void updateFeed(Feed feed) {
-        List<KonturEvent> newEventVersions = eventsDao.getNewEventVersionsForFeed(feed.getFeedId());
+        List<KonturEvent> newEventVersions = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), newEventVersions.size()));
         newEventVersions.forEach(event -> createFeedData(event, feed));
     }
@@ -56,20 +55,29 @@ public class FeedCompositionJob implements Runnable {
 
         if (event.getObservationIds().size() != observations.size()) {
             LOG.debug(String.format(
-                    "Feed Data creation for event '%s' with version '%s' was skipped due to missed normalized observations. " +
+                    "Feed Data creation for event '%s' was skipped due to missed normalized observations. " +
                             "Expected number of observations %s, actual %s",
-                    event.getEventId(), event.getVersion(), event.getObservationIds().size(), observations.size()));
+                    event.getEventId(), event.getObservationIds().size(), observations.size()));
             return;
         }
 
         observations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
-        FeedData feedDto = new FeedData(event.getEventId(), feed.getFeedId(), event.getVersion());
-        fillFeedData(feedDto, observations);
 
-        observations.forEach(observation -> convertObservation(observation, feedDto)
-                .ifPresent(feedDto::addEpisode));
+        Optional<FeedData> lastFeedData = feedDao.getLastFeedData(event.getEventId(), feed.getFeedId());
+        FeedData feedData = new FeedData(event.getEventId(), feed.getFeedId(), lastFeedData.map(f -> f.getVersion() + 1).orElse(1L));
 
-        feedDao.insertFeedData(feedDto);
+        fillFeedData(feedData, observations);
+        fillEpisodes(observations, feedData);
+
+        feedDao.insertFeedData(feedData);
+    }
+
+    private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
+        observations.forEach(observation -> {
+            EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
+            Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData);
+            feedEpisode.ifPresent(feedData::addEpisode);
+        });
     }
 
     private void fillFeedData(FeedData feedDto, List<NormalizedObservation> observations) {
@@ -125,67 +133,4 @@ public class FeedCompositionJob implements Runnable {
         }
     }
 
-    private Optional<FeedEpisode> convertObservation(NormalizedObservation observation, FeedData feedDto) {
-        if (observation.getGeometries() == null) {
-            return Optional.empty();
-        }
-
-        var savedDuplicateObservationId = getSavedDuplicateSqsObservationId(observation);
-        if (savedDuplicateObservationId.isPresent()) {
-            addObservationIdIfDuplicate(observation, feedDto, savedDuplicateObservationId.get());
-            return Optional.empty();
-        }
-
-        var feedEpisode = new FeedEpisode();
-        feedEpisode.setName(observation.getName());
-        feedEpisode.setDescription(observation.getEpisodeDescription());
-        feedEpisode.setType(observation.getType());
-        feedEpisode.setActive(observation.getActive());
-        feedEpisode.setSeverity(observation.getEventSeverity());
-        feedEpisode.setStartedAt(observation.getStartedAt());
-        feedEpisode.setEndedAt(observation.getEndedAt());
-        feedEpisode.setUpdatedAt(observation.getLoadedAt());
-        feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
-        feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
-        addObservationIdIntoEpisode(feedEpisode, observation);
-
-        return Optional.of(feedEpisode);
-    }
-
-    private void addObservationIdIntoEpisode(FeedEpisode feedEpisode, NormalizedObservation observation) {
-        if (observation.getProvider().equals(GDACS_ALERT_GEOMETRY_PROVIDER)) {
-            var gdacsAlertObservation = observationsDao.getNormalizedObservationByExternalEpisodeIdAndProvider(
-                    observation.getExternalEpisodeId(), GDACS_ALERT_PROVIDER);
-            gdacsAlertObservation.ifPresent(
-                    normalizedObservation -> feedEpisode.addObservation(normalizedObservation.getObservationId())
-            );
-        } else {
-            feedEpisode.addObservation(observation.getObservationId());
-        }
-    }
-
-    private Optional<UUID> getSavedDuplicateSqsObservationId(NormalizedObservation observation) {
-        if (observation.getProvider().equals(HP_SRV_MAG_PROVIDER)) {
-            var duplicateSQSMagObservationOpt = observationsDao.getDuplicateObservation(
-                    observation.getLoadedAt(),
-                    observation.getExternalEpisodeId(),
-                    observation.getObservationId(),
-                    PDC_SQS_PROVIDER);
-            if (duplicateSQSMagObservationOpt.isPresent()) {
-                return Optional.of(duplicateSQSMagObservationOpt.get().getObservationId());
-            }
-        }
-        return Optional.empty();
-    }
-
-    private void addObservationIdIfDuplicate(NormalizedObservation observation, FeedData feedDto, UUID savedDuplicateObservationId) {
-        for (FeedEpisode episode : feedDto.getEpisodes()) {
-            boolean hasDuplicateObservation = episode.getObservations().stream()
-                    .anyMatch(episodeObs -> episodeObs.equals(savedDuplicateObservationId));
-            if (hasDuplicateObservation) {
-                episode.addObservation(observation.getObservationId());
-                return;
-            }
-        }
-    }
 }

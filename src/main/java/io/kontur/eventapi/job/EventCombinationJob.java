@@ -4,64 +4,50 @@ import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.KonturEvent;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.eventcombination.EventCombinator;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public class EventCombinationJob implements Runnable {
-
     public static final Logger LOG = LoggerFactory.getLogger(EventCombinationJob.class);
+
     private final NormalizedObservationsDao observationsDao;
     private final KonturEventsDao eventsDao;
+    private final List<EventCombinator> eventCombinators;
 
-    public EventCombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao) {
+    public EventCombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao, List<EventCombinator> eventCombinators) {
         this.observationsDao = observationsDao;
         this.eventsDao = eventsDao;
+        this.eventCombinators = eventCombinators;
     }
 
     @Override
     @Timed("job.eventCombination")
     public void run() {
-        List<String> externalIds = observationsDao.getExternalIdsToUpdate();
+        List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 
-        LOG.info("Combination job has started. Events to process: {}", externalIds.size());
-        externalIds.forEach(this::generateEvents);
+        LOG.info("Combination job has started. Events to process: {}", observations.size());
+
+        observations.forEach(this::addToEvent);
+
         LOG.info("Combination job has finished");
-
     }
 
-    private void generateEvents(String externalId) {
-        var normalizedObservations = observationsDao.getNotCombinedObservationsByExternalId(externalId);
-        var newEventVersion = createNewEventVersion(externalId);
-        boolean doSaveOnlyToOneEvent = true;
-
-        if (!normalizedObservations.isEmpty()) {
-            var limitOfTimeToOneEvent = normalizedObservations.get(0).getLoadedAt().plusMinutes(1);
-            for (NormalizedObservation observation : normalizedObservations) {
-                if (limitOfTimeToOneEvent.isAfter(observation.getLoadedAt())) {
-                    newEventVersion.addObservations(observation.getObservationId());
-                } else {
-                    doSaveOnlyToOneEvent = false;
-                }
-            }
-            eventsDao.insertEventVersion(newEventVersion);
-        }
-        if(!doSaveOnlyToOneEvent) generateEvents(externalId);
+    private void addToEvent(NormalizedObservation observation) {
+        KonturEvent event = findEvent(observation).orElseGet(() -> new KonturEvent(UUID.randomUUID()));
+        event.addObservations(observation.getObservationId());
+        eventsDao.insertEvent(event);
     }
 
-    private KonturEvent createNewEventVersion(String externalId) {
-        var eventOptional = eventsDao.getLatestEventByExternalId(externalId);
-        if (eventOptional.isPresent()) {
-            var event = eventOptional.get();
-            var konturEvent = new KonturEvent(event.getEventId(), event.getVersion() + 1);
-            konturEvent.setObservationIds(event.getObservationIds());
-            return konturEvent;
-        }
-        return new KonturEvent(UUID.randomUUID(), 1L);
+    private Optional<KonturEvent> findEvent(NormalizedObservation normalizedObservation) {
+        EventCombinator eventCombinator = Applicable.get(eventCombinators, normalizedObservation);
+        return eventCombinator.findEventForObservation(normalizedObservation);
     }
 }

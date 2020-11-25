@@ -22,20 +22,12 @@ public class NormalizedObservationsDao {
         return mapper.insert(record);
     }
 
-    public List<String> getExternalIdsToUpdate() {
-        return mapper.getExternalIdsToUpdate();
-    }
-
-    public List<NormalizedObservation> getNotCombinedObservationsByExternalId(String externalId) {
-        return mapper.getNotCombinedObservationsByExternalId(externalId);
-    }
-
     public List<NormalizedObservation> getObservationsNotLinkedToEvent() {
         return mapper.getObservationsNotLinkedToEvent();
     }
 
     public List<NormalizedObservation> getObservations(List<UUID> observationIds) {
-        return mapper.getObservations(observationIds);
+        return observationIds.isEmpty() ? List.of() : mapper.getObservations(observationIds);
     }
 
     public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider) {
