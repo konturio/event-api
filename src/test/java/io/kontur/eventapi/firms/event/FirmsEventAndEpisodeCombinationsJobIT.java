@@ -125,7 +125,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         assertEquals(3, firmsUpdated.get(2).getEpisodes().size());
         assertEquals(2, firmsUpdated.get(2).getVersion());
 
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.0001715, Burning time 6h"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.0000857, Burning time 6h"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(2).getName().contains("Burnt area 0.0001715, Burning time 6h"));
     }
 
     private List<FeedData> searchFeedData() {
