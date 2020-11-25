@@ -4,6 +4,7 @@ import io.kontur.eventapi.entity.KonturEvent;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,9 +12,13 @@ import java.util.UUID;
 @Mapper
 public interface KonturEventsMapper {
 
-    int insert(@Param("eventId") UUID eventId, @Param("version") Long version, @Param("observationId") UUID observationId);
+    int insert(@Param("eventId") UUID eventId, @Param("observationId") UUID observationId);
 
-    Optional<KonturEvent> getLatestEventByExternalId(String externalId);
+    Optional<KonturEvent> getEventByExternalId(String externalId);
 
-    List<KonturEvent> getNewEventVersionsForFeed(UUID feedId);
+    Optional<KonturEvent> getEventById(UUID evenId);
+
+    Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers);
+
+    List<KonturEvent> getEventsForRolloutEpisodes(UUID feedId);
 }

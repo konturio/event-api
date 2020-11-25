@@ -54,3 +54,15 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add_kontur_events_observation_id_index.sql
+- include:
+    relativeToChangelogFile: true
+    file: 18-clear-feed-data-and-duplicated-kontur-events.sql
+- include:
+    relativeToChangelogFile: true
+    file: 19-add-collected-geometry-to-normalized-observation.sql
+- include:
+    relativeToChangelogFile: true
+    file: 20-alter-kontur_events-drop-version.sql
+- include:
+    relativeToChangelogFile: true
+    file: 21-insert-firms-feed.sql

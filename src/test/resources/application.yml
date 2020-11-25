@@ -17,6 +17,10 @@ scheduler:
   gdacsImport:
     enable: false
     cron: 30 30 23 25 12 SUN
+  firmsImport:
+    enable: false
+    initialDelay: 999999
+    fixedRate: 999999
   normalization:
     enable: false
     initialDelay: 999999

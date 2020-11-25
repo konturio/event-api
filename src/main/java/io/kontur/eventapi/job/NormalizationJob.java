@@ -46,19 +46,14 @@ public class NormalizationJob implements Runnable {
     }
 
     private boolean normalize(DataLake denormalizedEvent) {
-        boolean isNormalized = false;
-        for (Normalizer normalizer : normalizers) {
-            if (normalizer.isApplicable(denormalizedEvent)) {
-                try {
-                    NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
-                    normalizedObservationsDao.insert(normalizedDto);
-                    isNormalized = true;
-                } catch (Exception e) {
-                    LOG.warn(e.getMessage(), e);
-                }
-                break;
-            }
+        try {
+            Normalizer normalizer = Applicable.get(normalizers, denormalizedEvent);
+            NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
+            normalizedObservationsDao.insert(normalizedDto);
+            return true;
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
         }
-        return isNormalized;
+        return false;
     }
 }

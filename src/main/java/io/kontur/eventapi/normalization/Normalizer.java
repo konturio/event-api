@@ -2,15 +2,14 @@ package io.kontur.eventapi.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.job.Applicable;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 
-public abstract class Normalizer {
-
-    public abstract boolean isApplicable(DataLake dataLakeDto);
+public abstract class Normalizer implements Applicable<DataLake> {
 
     public abstract NormalizedObservation normalize(DataLake dataLakeDto);
 
