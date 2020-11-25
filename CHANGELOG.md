@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+#### Added
+- FIRMS provider
+#### Changed
+- Event versioning is removed 
+- Refactored normalization, event and episods jobs
+
+### Configuration changes
+#### Added
+```yaml
+scheduler:
+  firmsImport:
+    enable: true
+    initialDelay: 1000
+    fixedRate: 3600000
+```
+
 
 ## 0.3 - 2020-11-18
 #### Added

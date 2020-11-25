@@ -5,23 +5,28 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.KonturEventsMapper">
 
     <insert id="insert" useGeneratedKeys="false">
-        INSERT INTO kontur_events (event_id, version, provider, observation_id)
-        VALUES (#{eventId}, #{version},
+        INSERT INTO kontur_events (event_id, provider, observation_id)
+        VALUES (#{eventId},
                 (select provider from data_lake where observation_id = #{observationId}),
                 #{observationId})
     </insert>
 
-    <select id="getLatestEventByExternalId" resultMap="konturEventDtoMap" >
-        SELECT event_id, version, array_agg(observation_id)::uuid[] AS observation_ids
+    <select id="getEventByExternalId" resultMap="konturEventDtoMap" >
+        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids
         FROM kontur_events
         WHERE observation_id IN (
             SELECT observation_id
             FROM normalized_observations
             WHERE external_event_id = #{externalId}
             )
-        GROUP BY event_id, version
-        ORDER BY version DESC
-        LIMIT 1
+        GROUP BY event_id
+    </select>
+
+    <select id="getEventById" resultMap="konturEventDtoMap" >
+        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids
+        FROM kontur_events
+        WHERE event_id = #{eventId}
+        GROUP BY event_id
     </select>
 
     <select id="getEventWithClosestObservation" resultMap="konturEventDtoMap" >
@@ -31,29 +36,35 @@
             SELECT observation_id
             FROM normalized_observations no
             WHERE
-                no.started_at between #{startedAt} - interval '24 hours' and #{startedAt} + interval '24 hours'
-                AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, collected_geography, 1000)
-            ORDER BY ST_GeomFromGeoJSON(#{geometry})::geography <![CDATA[<->]]> collected_geography
+                no.source_updated_at between #{updatedAt} - interval '24 hours' and #{updatedAt} + interval '24 hours'
+                AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry}), collected_geometry, 0.01)
+                <foreach item="provider" collection="providers" separator="," open="AND provider in (" close=")">
+                  #{provider}
+                </foreach>
+            ORDER BY ST_GeomFromGeoJSON(#{geometry}) <![CDATA[<->]]> collected_geometry
             LIMIT 1
         )
     </select>
 
-    <select id="getNewEventVersionsForFeed" resultMap="konturEventDtoMap">
-        SELECT ke.event_id, ke.version, array_agg(ke.observation_id)::uuid[] AS observation_ids
+    <select id="getEventsForRolloutEpisodes" resultMap="konturEventDtoMap">
+        WITH event_with_obs AS (SELECT e.event_id, array_agg(e.observation_id) observations FROM kontur_events e GROUP BY e.event_id)
+        SELECT ke.event_id,array_agg(ke.observation_id)::uuid[] AS observation_ids
         FROM kontur_events ke,
-             feeds f
-        WHERE NOT exists(SELECT 1
-                         FROM feed_data fd
+            feeds f
+        WHERE NOT EXISTS(SELECT 1
+                         FROM feed_data fd INNER JOIN event_with_obs on event_with_obs.event_id = ke.event_id
                          WHERE fd.event_id = ke.event_id
-                           AND fd.version = ke.version)
-          AND ke.provider = ANY (f.providers)
-          AND f.feed_id = #{uuid}
-        GROUP BY ke.event_id, ke.version
+                            AND fd.version = (SELECT MAX(fdl.version) FROM feed_data fdl WHERE fdl.event_id = ke.event_id )
+                            AND fd.observations <![CDATA[<@]]> event_with_obs.observations
+                            AND fd.observations <![CDATA[@>]]> event_with_obs.observations
+                        )
+            AND ke.provider = ANY (f.providers)
+            AND f.feed_id = #{uuid}
+        GROUP BY ke.event_id
     </select>
 
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">
         <result property="eventId" column="event_id"/>
-        <result property="version" column="version"/>
         <result property="observationIds" column="observation_ids" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler"/>
     </resultMap>
 </mapper>

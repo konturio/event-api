@@ -13,11 +13,7 @@ public interface NormalizedObservationsMapper {
 
     int insert(NormalizedObservation record);
 
-    List<String> getExternalIdsToUpdate();
-
     List<NormalizedObservation> getObservationsNotLinkedToEvent();
-
-    List<NormalizedObservation> getNotCombinedObservationsByExternalId(String externalId);
 
     List<NormalizedObservation> getObservations(List<UUID> observationIds);
 

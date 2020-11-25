@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,9 +26,9 @@ public class KonturEventsDao {
         this.mapper = mapper;
     }
 
-    public Optional<KonturEvent> getLatestEventByExternalId(String externalId) {
+    public Optional<KonturEvent> getEventByExternalId(String externalId) {
         try {
-            return mapper.getLatestEventByExternalId(externalId);
+            return mapper.getEventByExternalId(externalId);
         } catch (Exception e) {
             LOG.warn("externalId = {}", externalId);
             LOG.warn(e.getMessage());
@@ -35,16 +36,24 @@ public class KonturEventsDao {
         }
     }
 
-    public Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime startedAt, String geometry){
-        return mapper.getEventWithClosestObservation(startedAt, geometry);
+    public Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers){
+        return mapper.getEventWithClosestObservation(updatedAt, geometry, providers);
     }
 
     @Transactional
-    public void insertEventVersion(KonturEvent event) {
-        event.getObservationIds().forEach(obs -> mapper.insert(event.getEventId(), event.getVersion(), obs));
+    public void insertEvent(KonturEvent event) {
+        List<UUID> observationIds = getNewObservations(event);
+        observationIds.stream().forEach(obs -> mapper.insert(event.getEventId(), obs));
     }
 
-    public List<KonturEvent> getNewEventVersionsForFeed(UUID feedId) {
-        return mapper.getNewEventVersionsForFeed(feedId);
+    private List<UUID> getNewObservations(KonturEvent event) {
+        List<UUID> observationIds = new ArrayList<>(event.getObservationIds());
+        Optional<KonturEvent> existingEvent = mapper.getEventById(event.getEventId());
+        existingEvent.ifPresent(e -> observationIds.removeAll(e.getObservationIds()));
+        return observationIds;
+    }
+
+    public List<KonturEvent> getEventsForRolloutEpisodes(UUID feedId) {
+        return mapper.getEventsForRolloutEpisodes(feedId);
     }
 }

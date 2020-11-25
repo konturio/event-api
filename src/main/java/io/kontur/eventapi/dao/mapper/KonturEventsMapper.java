@@ -12,11 +12,13 @@ import java.util.UUID;
 @Mapper
 public interface KonturEventsMapper {
 
-    int insert(@Param("eventId") UUID eventId, @Param("version") Long version, @Param("observationId") UUID observationId);
+    int insert(@Param("eventId") UUID eventId, @Param("observationId") UUID observationId);
 
-    Optional<KonturEvent> getLatestEventByExternalId(String externalId);
+    Optional<KonturEvent> getEventByExternalId(String externalId);
 
-    Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime startedAt, String geometry);
+    Optional<KonturEvent> getEventById(UUID evenId);
 
-    List<KonturEvent> getNewEventVersionsForFeed(UUID feedId);
+    Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers);
+
+    List<KonturEvent> getEventsForRolloutEpisodes(UUID feedId);
 }

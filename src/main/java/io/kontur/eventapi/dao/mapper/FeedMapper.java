@@ -23,4 +23,6 @@ public interface FeedMapper {
                                    List<Severity> severities, SortOrder sortOrder);
 
     Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, Long version);
+
+    Optional<FeedData> getLastFeedData(UUID eventId, UUID feedId);
 }

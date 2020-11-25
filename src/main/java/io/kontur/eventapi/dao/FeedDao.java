@@ -42,4 +42,8 @@ public class FeedDao {
     public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
         return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version);
     }
+
+    public Optional<FeedData> getLastFeedData(UUID eventId, UUID feedId) {
+        return mapper.getLastFeedData(eventId, feedId);
+    }
 }

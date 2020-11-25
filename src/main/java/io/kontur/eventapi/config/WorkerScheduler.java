@@ -1,9 +1,8 @@
 package io.kontur.eventapi.config;
 
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
-import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
-import io.kontur.eventapi.job.EventCombinationJob2;
+import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
@@ -24,7 +23,6 @@ public class WorkerScheduler {
     private final FirmsImportJob firmsImportJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
-    private final EventCombinationJob2 eventCombinationJob2;
     private final FeedCompositionJob feedCompositionJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
@@ -45,7 +43,7 @@ public class WorkerScheduler {
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
-                           FirmsImportJob firmsImportJob, EventCombinationJob2 eventCombinationJob2) {
+                           FirmsImportJob firmsImportJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -53,7 +51,6 @@ public class WorkerScheduler {
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.firmsImportJob = firmsImportJob;
-        this.eventCombinationJob2 = eventCombinationJob2;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -105,7 +102,6 @@ public class WorkerScheduler {
     public void startCombinationJob() {
         if (Boolean.parseBoolean(eventCombinationEnabled)) {
             eventCombinationJob.run();
-            eventCombinationJob2.run();
         } else {
             LOG.info("Combination job invocation is skipped");
         }

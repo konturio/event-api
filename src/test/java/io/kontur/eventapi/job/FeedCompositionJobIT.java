@@ -1,5 +1,6 @@
 package io.kontur.eventapi.job;
 
+import com.google.common.collect.Iterables;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.mapper.DataLakeMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
@@ -132,7 +133,7 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
         createNormalizations(externalId, hazardsLoadTime, HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard02.json"));
         eventCombinationJob.run();
-        var eventOptionalVersion1 = konturEventsDao.getLatestEventByExternalId(externalId);
+        var eventOptionalVersion1 = konturEventsDao.getEventByExternalId(externalId);
         assertTrue(eventOptionalVersion1.isPresent());
         assertEquals(1, eventOptionalVersion1.get().getObservationIds().size());
 
@@ -140,12 +141,12 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         createNormalizations(externalId, mags02LoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata03.json"));
         eventCombinationJob.run();
 
-        var eventList = konturEventsDao.getNewEventVersionsForFeed(pdcFeed.getFeedId())
+        var eventList = konturEventsDao.getEventsForRolloutEpisodes(pdcFeed.getFeedId())
                 .stream()
                 .filter(event -> event.getEventId().equals(eventOptionalVersion1.get().getEventId()))
                 .collect(toList());
 
-        assertEquals(3, eventList.size());
+        assertEquals(3, Iterables.getOnlyElement(eventList).getObservationIds().size());
     }
 
     @Test
