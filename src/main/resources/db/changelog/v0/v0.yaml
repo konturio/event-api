@@ -66,3 +66,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: 21-insert-firms-feed.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_normalized_observations_external_id_index.sql
