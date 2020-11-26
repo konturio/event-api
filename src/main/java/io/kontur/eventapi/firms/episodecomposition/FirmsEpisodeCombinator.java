@@ -13,6 +13,7 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Supplier;
@@ -43,8 +44,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData) {
         Set<FeedEpisode> episodesWithSameDate = feedData.getEpisodes().stream()
                 .filter(e -> readObservations(e.getObservations())
-                             .stream()
-                             .anyMatch(o -> o.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt())))
+                        .stream()
+                        .anyMatch(o -> o.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt())))
                 .collect(Collectors.toSet());
 
         FeedEpisode feedEpisode = getOnlyElement(episodesWithSameDate, new FeedEpisode());
@@ -72,8 +73,11 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private FeatureCollection calculateGeometry(NormalizedObservation observation, FeedData feedData) {
         List<NormalizedObservation> observations = readObservations(feedData.getObservations());
 
+        OffsetDateTime oneDayBeforeObservation = observation.getSourceUpdatedAt().minus(24, ChronoUnit.HOURS);
+
         Geometry geometry = observations.stream()
-                .filter(e -> e.getSourceUpdatedAt().isAfter(observation.getSourceUpdatedAt().minus(24, ChronoUnit.HOURS)))
+                .filter(e -> e.getSourceUpdatedAt().isAfter(oneDayBeforeObservation) || e.getSourceUpdatedAt().isEqual(oneDayBeforeObservation))
+                .filter(e -> e.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt()) || e.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
                 .distinct()
                 .reduce(Geometry::union)
@@ -85,7 +89,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private String calculateName(FeedEpisode feedEpisode, FeedData feedData) {
         List<NormalizedObservation> observations = readObservations(feedData.getObservations());
         observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
-        long burningTime = observations.get(0).getSourceUpdatedAt().until(getLast(observations).getSourceUpdatedAt(), ChronoUnit.HOURS);
+        long burningTime = observations.get(0).getSourceUpdatedAt().until(feedEpisode.getSourceUpdatedAt(), ChronoUnit.HOURS);
         FeatureCollection geometries = feedEpisode.getGeometries();
         String burntArea = String.format("%.7f", toGeometry(geometries).getArea());
         return "Burnt area " + burntArea + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
