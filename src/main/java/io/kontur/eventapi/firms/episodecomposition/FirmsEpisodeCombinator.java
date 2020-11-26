@@ -89,7 +89,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private String calculateName(FeedEpisode feedEpisode, FeedData feedData) {
         List<NormalizedObservation> observations = readObservations(feedData.getObservations());
         observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
-        long burningTime = observations.get(0).getSourceUpdatedAt().until(getLast(observations).getSourceUpdatedAt(), ChronoUnit.HOURS);
+        long burningTime = observations.get(0).getSourceUpdatedAt().until(feedEpisode.getSourceUpdatedAt(), ChronoUnit.HOURS);
         FeatureCollection geometries = feedEpisode.getGeometries();
         String burntArea = String.format("%.7f", toGeometry(geometries).getArea());
         return "Burnt area " + burntArea + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");

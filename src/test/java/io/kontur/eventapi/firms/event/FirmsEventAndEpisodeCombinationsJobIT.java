@@ -2,10 +2,7 @@ package io.kontur.eventapi.firms.event;
 
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
-import io.kontur.eventapi.entity.EventType;
-import io.kontur.eventapi.entity.FeedData;
-import io.kontur.eventapi.entity.KonturEvent;
-import io.kontur.eventapi.entity.SortOrder;
+import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.job.EventCombinationJob;
@@ -125,7 +122,9 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         assertEquals(3, firmsUpdated.get(2).getEpisodes().size());
         assertEquals(2, firmsUpdated.get(2).getVersion());
 
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.0000857, Burning time 6h"));
+        firmsUpdated.get(2).getEpisodes().sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.0000857"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(1).getName().contains("Burnt area 0.0000857, Burning time 3h"));
         assertTrue(firmsUpdated.get(2).getEpisodes().get(2).getName().contains("Burnt area 0.0001715, Burning time 6h"));
     }
 
