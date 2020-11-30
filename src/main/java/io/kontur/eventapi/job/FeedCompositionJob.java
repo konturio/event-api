@@ -3,7 +3,10 @@ package io.kontur.eventapi.job;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
-import io.kontur.eventapi.entity.*;
+import io.kontur.eventapi.entity.Feed;
+import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.FeedEpisode;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
@@ -15,6 +18,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -45,29 +50,20 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private void updateFeed(Feed feed) {
-        List<KonturEvent> newEventVersions = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
-        LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), newEventVersions.size()));
-        newEventVersions.forEach(event -> createFeedData(event, feed));
+        Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
+        LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
+        eventsIds.forEach(event -> createFeedData(event, feed));
     }
 
-    private void createFeedData(KonturEvent event, Feed feed) {
-        List<NormalizedObservation> observations = observationsDao.getObservations(event.getObservationIds());
+    private void createFeedData(UUID eventId, Feed feed) {
+        List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
+        eventObservations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
 
-        if (event.getObservationIds().size() != observations.size()) {
-            LOG.debug(String.format(
-                    "Feed Data creation for event '%s' was skipped due to missed normalized observations. " +
-                            "Expected number of observations %s, actual %s",
-                    event.getEventId(), event.getObservationIds().size(), observations.size()));
-            return;
-        }
+        Optional<FeedData> lastFeedData = feedDao.getLastFeedData(eventId, feed.getFeedId());
+        FeedData feedData = new FeedData(eventId, feed.getFeedId(), lastFeedData.map(f -> f.getVersion() + 1).orElse(1L));
 
-        observations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
-
-        Optional<FeedData> lastFeedData = feedDao.getLastFeedData(event.getEventId(), feed.getFeedId());
-        FeedData feedData = new FeedData(event.getEventId(), feed.getFeedId(), lastFeedData.map(f -> f.getVersion() + 1).orElse(1L));
-
-        fillFeedData(feedData, observations);
-        fillEpisodes(observations, feedData);
+        fillFeedData(feedData, eventObservations);
+        fillEpisodes(eventObservations, feedData);
 
         feedDao.insertFeedData(feedData);
     }
@@ -75,7 +71,7 @@ public class FeedCompositionJob implements Runnable {
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
-            Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData);
+            Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
             feedEpisode.ifPresent(feedData::addEpisode);
         });
     }

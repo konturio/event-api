@@ -30,6 +30,10 @@ public class NormalizedObservationsDao {
         return observationIds.isEmpty() ? List.of() : mapper.getObservations(observationIds);
     }
 
+    public List<NormalizedObservation> getObservationsByEventId(UUID eventId) {
+        return mapper.getObservationsByEventId(eventId);
+    }
+
     public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider) {
         return mapper.getDuplicateObservation(loadedAt, externalEpisodeId, observationId, provider);
     }

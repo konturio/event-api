@@ -6,6 +6,8 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.firms.FirmsUtil;
+import net.sf.geographiclib.Geodesic;
+import net.sf.geographiclib.PolygonArea;
 import org.locationtech.jts.geom.Geometry;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
@@ -15,11 +17,17 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.Iterables.getLast;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static java.util.Arrays.asList;
@@ -41,20 +49,20 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData) {
+    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Set<FeedEpisode> episodesWithSameDate = feedData.getEpisodes().stream()
-                .filter(e -> readObservations(e.getObservations())
+                .filter(e -> readObservations(e.getObservations(), eventObservations)
                         .stream()
                         .anyMatch(o -> o.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt())))
                 .collect(Collectors.toSet());
 
         FeedEpisode feedEpisode = getOnlyElement(episodesWithSameDate, new FeedEpisode());
-        populateMissedFields(feedEpisode, observation, feedData);
+        populateMissedFields(feedEpisode, observation, feedData, eventObservations);
 
         return episodesWithSameDate.isEmpty() ? Optional.of(feedEpisode) : Optional.empty();
     }
 
-    private void populateMissedFields(FeedEpisode feedEpisode, NormalizedObservation observation, FeedData feedData) {
+    private void populateMissedFields(FeedEpisode feedEpisode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         feedEpisode.setDescription(firstNonNull(feedEpisode.getDescription(), observation.getEpisodeDescription()));
         feedEpisode.setType(firstNonNull(feedEpisode.getType(), observation.getType()));
         feedEpisode.setActive(firstNonNull(feedEpisode.getActive(), observation.getActive()));
@@ -64,14 +72,14 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         feedEpisode.setUpdatedAt(firstNonNull(feedEpisode.getUpdatedAt(), observation.getLoadedAt()));
         feedEpisode.setSourceUpdatedAt(firstNonNull(feedEpisode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
 
-        feedEpisode.setGeometries(firstNonNull(feedEpisode.getGeometries(), () -> calculateGeometry(observation, feedData)));
-        feedEpisode.setName(firstNonNull(feedEpisode.getName(), () -> calculateName(feedEpisode, feedData)));
+        feedEpisode.setGeometries(firstNonNull(feedEpisode.getGeometries(), () -> calculateGeometry(observation, feedData, eventObservations)));
+        feedEpisode.setName(firstNonNull(feedEpisode.getName(), () -> calculateName(feedEpisode, feedData, eventObservations)));
 
         feedEpisode.addObservation(observation.getObservationId());
     }
 
-    private FeatureCollection calculateGeometry(NormalizedObservation observation, FeedData feedData) {
-        List<NormalizedObservation> observations = readObservations(feedData.getObservations());
+    private FeatureCollection calculateGeometry(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+        List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
 
         OffsetDateTime oneDayBeforeObservation = observation.getSourceUpdatedAt().minus(24, ChronoUnit.HOURS);
 
@@ -86,13 +94,21 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return createFirmGeometry(geometry, getFirmFeature(observation.getGeometries()).getProperties());
     }
 
-    private String calculateName(FeedEpisode feedEpisode, FeedData feedData) {
-        List<NormalizedObservation> observations = readObservations(feedData.getObservations());
+    private String calculateName(FeedEpisode feedEpisode, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+        List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
         observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
         long burningTime = observations.get(0).getSourceUpdatedAt().until(feedEpisode.getSourceUpdatedAt(), ChronoUnit.HOURS);
-        FeatureCollection geometries = feedEpisode.getGeometries();
-        String burntArea = String.format("%.7f", toGeometry(geometries).getArea());
-        return "Burnt area " + burntArea + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+        String burntArea = getArea(feedEpisode);
+        return "Burnt area " + burntArea +"km" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+    }
+
+    private String getArea(FeedEpisode feedEpisode) {
+        Geometry geometry = toGeometry(feedEpisode.getGeometries());
+        PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
+        Arrays.stream(geometry.getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
+        double areaInMeters = Math.abs(polygonArea.Compute().area);
+        double areaInKm = areaInMeters / 1_000_000;
+        return String.format("%.3f", areaInKm);
     }
 
     private Geometry toGeometry(FeatureCollection geometries) {
@@ -119,8 +135,15 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return readJson(geometries, FeatureCollection.class);
     }
 
-    private List<NormalizedObservation> readObservations(List<UUID> observations) {
-        return observationsDao.getObservations(observations);
+    private List<NormalizedObservation> readObservations(List<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {
+        List<NormalizedObservation> observationsByIds = eventObservations
+                .stream().filter(e -> observationsIds.contains(e.getObservationId()))
+                .collect(Collectors.toList());
+
+        checkState(observationsByIds.size() == observationsIds.size(),
+                "can not find all needed observations in event");
+
+        return observationsByIds;
     }
 
     private FeatureCollection createFirmGeometry(Geometry geometry, Map<String, Object> properties) {

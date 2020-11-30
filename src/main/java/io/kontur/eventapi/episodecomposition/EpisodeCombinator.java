@@ -7,12 +7,13 @@ import io.kontur.eventapi.job.Applicable;
 import org.wololo.geojson.FeatureCollection;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
 
-    public abstract Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData);
+    public abstract Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);
 
     protected Optional<FeedEpisode> createDefaultEpisode(NormalizedObservation observation) {
         if (observation.getGeometries() == null) {

@@ -37,30 +37,32 @@
             FROM normalized_observations no
             WHERE
                 no.source_updated_at between #{updatedAt} - interval '24 hours' and #{updatedAt} + interval '24 hours'
-                AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry}), collected_geometry, 0.01)
+                AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, collected_geography, 1000)
                 <foreach item="provider" collection="providers" separator="," open="AND provider in (" close=")">
-                  #{provider}
+                    #{provider}
                 </foreach>
-            ORDER BY ST_GeomFromGeoJSON(#{geometry}) <![CDATA[<->]]> collected_geometry
-            LIMIT 1
+        ORDER BY ST_GeomFromGeoJSON(#{geometry})::geography <![CDATA[<->]]> collected_geography
+        LIMIT 1
         )
     </select>
 
-    <select id="getEventsForRolloutEpisodes" resultMap="konturEventDtoMap">
-        WITH event_with_obs AS (SELECT e.event_id, array_agg(e.observation_id) observations FROM kontur_events e GROUP BY e.event_id)
-        SELECT ke.event_id,array_agg(ke.observation_id)::uuid[] AS observation_ids
-        FROM kontur_events ke,
-            feeds f
+    <select id="getEventsForRolloutEpisodes" resultType="java.util.UUID">
+        WITH feed_max_version as (SELECT fdl.event_id, MAX(fdl.version) as version FROM feed_data fdl group by fdl.event_id)
+        SELECT ke.event_id
+        FROM kontur_events ke, feeds f
         WHERE NOT EXISTS(SELECT 1
-                         FROM feed_data fd INNER JOIN event_with_obs on event_with_obs.event_id = ke.event_id
-                         WHERE fd.event_id = ke.event_id
-                            AND fd.version = (SELECT MAX(fdl.version) FROM feed_data fdl WHERE fdl.event_id = ke.event_id )
-                            AND fd.observations <![CDATA[<@]]> event_with_obs.observations
-                            AND fd.observations <![CDATA[@>]]> event_with_obs.observations
-                        )
-            AND ke.provider = ANY (f.providers)
-            AND f.feed_id = #{uuid}
+                        FROM (SELECT fdle.event_id, fdle.feed_id, unnest(observations) as observations
+                                FROM feed_data fdle
+                                INNER JOIN feed_max_version fdmv
+                                    ON fdmv.event_id = fdle.event_id AND fdmv.version = fdle.version) fd
+                        WHERE fd.event_id = ke.event_id
+                        AND fd.observations = ke.observation_id
+                        AND fd.feed_id = #{uuid}
+        )
+        AND ke.provider = ANY (f.providers)
+        AND f.feed_id = #{uuid}
         GROUP BY ke.event_id
+        LIMIT 100000;
     </select>
 
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">

@@ -96,6 +96,11 @@
 			<artifactId>guava</artifactId>
 			<version>30.0-jre</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.geographiclib</groupId>
+			<artifactId>GeographicLib-Java</artifactId>
+			<version>1.51</version>
+		</dependency>
 
 		<!-- Swagger UI -->
 		<dependency>
