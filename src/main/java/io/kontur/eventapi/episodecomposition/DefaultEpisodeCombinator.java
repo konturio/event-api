@@ -6,6 +6,7 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class DefaultEpisodeCombinator extends EpisodeCombinator {
@@ -16,7 +17,7 @@ public class DefaultEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData) {
+    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         return createDefaultEpisode(observation);
     }
 }

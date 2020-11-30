@@ -8,6 +8,7 @@ import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
@@ -26,7 +27,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData) {
+    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Optional<FeedEpisode> episodeOpt = createDefaultEpisode(observation);
         episodeOpt.ifPresent(episode -> addObservationIdIntoEpisode(episode, observation));
         return episodeOpt;

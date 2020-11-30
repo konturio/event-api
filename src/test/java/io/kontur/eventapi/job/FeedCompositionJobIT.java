@@ -1,7 +1,7 @@
 package io.kontur.eventapi.job;
 
-import com.google.common.collect.Iterables;
 import io.kontur.eventapi.dao.KonturEventsDao;
+import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.mapper.DataLakeMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.DataLake;
@@ -25,6 +25,7 @@ import java.util.UUID;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.testcontainers.shaded.com.google.common.collect.Iterables.getOnlyElement;
 
 
 public class FeedCompositionJobIT extends AbstractIntegrationTest {
@@ -35,17 +36,19 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
     private final DataLakeMapper dataLakeMapper;
     private final FeedMapper feedMapper;
     private final KonturEventsDao konturEventsDao;
+    private final NormalizedObservationsDao observationsDao;
 
     @Autowired
     public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob,
                                 FeedCompositionJob feedCompositionJob, DataLakeMapper dataLakeMapper,
-                                FeedMapper feedMapper, KonturEventsDao konturEventsDao) {
+                                FeedMapper feedMapper, KonturEventsDao konturEventsDao, NormalizedObservationsDao observationsDao) {
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.dataLakeMapper = dataLakeMapper;
         this.feedMapper = feedMapper;
         this.konturEventsDao = konturEventsDao;
+        this.observationsDao = observationsDao;
     }
 
     @Test
@@ -143,10 +146,10 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
 
         var eventList = konturEventsDao.getEventsForRolloutEpisodes(pdcFeed.getFeedId())
                 .stream()
-                .filter(event -> event.getEventId().equals(eventOptionalVersion1.get().getEventId()))
+                .filter(event -> event.equals(eventOptionalVersion1.get().getEventId()))
                 .collect(toList());
 
-        assertEquals(3, Iterables.getOnlyElement(eventList).getObservationIds().size());
+        assertEquals(3, observationsDao.getObservationsByEventId(getOnlyElement(eventList)).size());
     }
 
     @Test

@@ -33,6 +33,7 @@
                 select * from normalized_observations nr where e.observation_id = nr.observation_id
             )
         ORDER BY loaded_at
+        LIMIT 100000
     </select>
 
     <select id="getDataLakesByExternalId" resultMap="dataLakeMap">

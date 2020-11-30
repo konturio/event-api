@@ -56,9 +56,16 @@
     </insert>
 
     <select id="getObservationsNotLinkedToEvent" resultMap="normalizedObservationsDtoMap">
-        select *
-        from normalized_observations no
-        where not exists(select 1 from kontur_events ke where ke.observation_id = no.observation_id)
+        SELECT *
+        FROM normalized_observations no
+        WHERE NOT EXISTS(SELECT 1 FROM kontur_events ke WHERE ke.observation_id = no.observation_id)
+        LIMIT 100000
+    </select>
+
+    <select id="getObservationsByEventId" resultMap="normalizedObservationsDtoMap">
+        SELECT *
+        FROM normalized_observations
+        WHERE observation_id IN (SELECT observation_id FROM kontur_events WHERE event_id = #{eventId});
     </select>
 
     <select id="getObservations" resultMap="normalizedObservationsDtoMap">

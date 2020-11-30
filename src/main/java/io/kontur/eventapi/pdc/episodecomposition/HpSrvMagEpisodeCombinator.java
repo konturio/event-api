@@ -6,16 +6,13 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.springframework.stereotype.Component;
-import org.wololo.geojson.FeatureCollection;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
-import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
-import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
-import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 @Component
 public class HpSrvMagEpisodeCombinator extends EpisodeCombinator {
@@ -31,7 +28,7 @@ public class HpSrvMagEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData) {
+    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         var savedDuplicateObservationId = getSavedDuplicateSqsObservationId(observation);
         if (savedDuplicateObservationId.isPresent()) {
             addObservationIdIfDuplicate(observation, feedData, savedDuplicateObservationId.get());

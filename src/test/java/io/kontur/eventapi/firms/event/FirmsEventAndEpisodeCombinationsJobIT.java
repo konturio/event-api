@@ -1,6 +1,7 @@
 package io.kontur.eventapi.firms.event;
 
 import io.kontur.eventapi.dao.KonturEventsDao;
+import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
@@ -19,8 +20,11 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static io.kontur.eventapi.TestUtil.readFile;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,18 +35,20 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
     private final FeedCompositionJob feedCompositionJob;
     private final FeedMapper feedMapper;
     private final KonturEventsDao konturEventsDao;
+    private final NormalizedObservationsDao observationsDao;
 
     @MockBean
     private FirmsClient firmsClient;
 
     @Autowired
-    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, FeedMapper feedMapper, KonturEventsDao konturEventsDao) {
+    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, FeedMapper feedMapper, KonturEventsDao konturEventsDao, NormalizedObservationsDao observationsDao) {
         this.firmsImportJob = firmsImportJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.feedMapper = feedMapper;
         this.konturEventsDao = konturEventsDao;
+        this.observationsDao = observationsDao;
     }
 
     @Test
@@ -61,8 +67,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         //THEN
         var firmsFeed = feedMapper.getFeeds().stream().filter(feed -> feed.getAlias().equals("firms")).findFirst().orElseThrow();
 
-        List<KonturEvent> eventsForRolloutEpisodes = konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId());
-        eventsForRolloutEpisodes.sort(Comparator.comparing(e -> e.getObservationIds().size()));
+        List<KonturEvent> eventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
 
         assertEquals(2, eventsForRolloutEpisodes.size());//2 group of observations with are far from each other (> 1km)
         assertEquals(1, eventsForRolloutEpisodes.get(0).getObservationIds().size());
@@ -81,7 +86,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.0000857, Burning time 3h"));
+        assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.871km, Burning time 3h"));
 
         //WHEN new data available for modis - 2 observations within 1 km to 2 existing observation
         //and 1 other observation
@@ -94,8 +99,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         eventCombinationJob.run();
 
         //THEN
-        List<KonturEvent> eventsForRolloutEpisodesUpdated = konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId());
-        eventsForRolloutEpisodesUpdated.sort(Comparator.comparing(konturEvent -> konturEvent.getObservationIds().size()));
+        List<KonturEvent> eventsForRolloutEpisodesUpdated = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
 
         assertEquals(3, eventsForRolloutEpisodesUpdated.size());//3 group of observations with are far from each other (> 1km)
         assertEquals(1, eventsForRolloutEpisodesUpdated.get(0).getObservationIds().size());
@@ -123,9 +127,18 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         assertEquals(2, firmsUpdated.get(2).getVersion());
 
         firmsUpdated.get(2).getEpisodes().sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.0000857"));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(1).getName().contains("Burnt area 0.0000857, Burning time 3h"));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(2).getName().contains("Burnt area 0.0001715, Burning time 6h"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.871km"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(1).getName().contains("Burnt area 0.871km, Burning time 3h"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(2).getName().contains("Burnt area 1.742km, Burning time 6h"));
+    }
+
+    private List<KonturEvent> readEvents(Set<UUID> eventsForRolloutEpisodes1) {
+        return eventsForRolloutEpisodes1
+                .stream()
+                .map(e -> new KonturEvent(e).setObservationIds(observationsDao.getObservationsByEventId(e).stream()
+                        .map(NormalizedObservation::getObservationId).collect(toList())))
+                .sorted(Comparator.comparing(e -> e.getObservationIds().size()))
+                .collect(toList());
     }
 
     private List<FeedData> searchFeedData() {

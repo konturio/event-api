@@ -12,6 +12,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -53,7 +54,7 @@ public class KonturEventsDao {
         return observationIds;
     }
 
-    public List<KonturEvent> getEventsForRolloutEpisodes(UUID feedId) {
+    public Set<UUID> getEventsForRolloutEpisodes(UUID feedId) {
         return mapper.getEventsForRolloutEpisodes(feedId);
     }
 }

@@ -69,3 +69,12 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add_normalized_observations_external_id_index.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_normalized_observations_external_episode_id_loaded_at_observation_provider_index.sql
+- include:
+    relativeToChangelogFile: true
+    file: fix_feed_data_index.sql
+- include:
+    relativeToChangelogFile: true
+    file: add-collected-geography-to-normalized-observation.sql

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Mapper
@@ -20,5 +21,5 @@ public interface KonturEventsMapper {
 
     Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers);
 
-    List<KonturEvent> getEventsForRolloutEpisodes(UUID feedId);
+    Set<UUID> getEventsForRolloutEpisodes(UUID feedId);
 }
