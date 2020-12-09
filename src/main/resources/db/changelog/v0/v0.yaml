@@ -78,3 +78,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add-collected-geography-to-normalized-observation.sql
+- include:
+    relativeToChangelogFile: true
+    file: add-schema-to-functions.sql
