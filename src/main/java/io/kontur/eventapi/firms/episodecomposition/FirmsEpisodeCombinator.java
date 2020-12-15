@@ -1,6 +1,5 @@
 package io.kontur.eventapi.firms.episodecomposition;
 
-import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -18,7 +17,6 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,17 +29,13 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static java.util.Arrays.asList;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class FirmsEpisodeCombinator extends EpisodeCombinator {
-    private final NormalizedObservationsDao observationsDao;
-
     private final GeoJSONReader geoJSONReader = new GeoJSONReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
-
-    public FirmsEpisodeCombinator(NormalizedObservationsDao observationsDao) {
-        this.observationsDao = observationsDao;
-    }
 
     @Override
     public boolean isApplicable(NormalizedObservation observation) {
@@ -50,56 +44,74 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     @Override
     public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        Set<FeedEpisode> episodesWithSameDate = feedData.getEpisodes().stream()
-                .filter(e -> readObservations(e.getObservations(), eventObservations)
-                        .stream()
-                        .anyMatch(o -> o.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt())))
+        Set<FeedEpisode> existingEpisodeForObservation = feedData.getEpisodes()
+                .stream()
+                .filter(ep -> getLatestObservationInEpisode(ep, eventObservations)
+                        .filter(ob -> ob.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt()))
+                        .isPresent()
+                )
                 .collect(Collectors.toSet());
 
-        FeedEpisode feedEpisode = getOnlyElement(episodesWithSameDate, new FeedEpisode());
+        FeedEpisode feedEpisode = getOnlyElement(existingEpisodeForObservation, new FeedEpisode());
         populateMissedFields(feedEpisode, observation, feedData, eventObservations);
 
-        return episodesWithSameDate.isEmpty() ? Optional.of(feedEpisode) : Optional.empty();
+        return existingEpisodeForObservation.isEmpty() ? Optional.of(feedEpisode) : Optional.empty();
     }
 
-    private void populateMissedFields(FeedEpisode feedEpisode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        feedEpisode.setDescription(firstNonNull(feedEpisode.getDescription(), observation.getEpisodeDescription()));
-        feedEpisode.setType(firstNonNull(feedEpisode.getType(), observation.getType()));
-        feedEpisode.setActive(firstNonNull(feedEpisode.getActive(), observation.getActive()));
-        feedEpisode.setSeverity(firstNonNull(feedEpisode.getSeverity(), observation.getEventSeverity()));
-        feedEpisode.setStartedAt(firstNonNull(feedEpisode.getStartedAt(), observation.getStartedAt()));
-        feedEpisode.setEndedAt(firstNonNull(feedEpisode.getEndedAt(), observation.getEndedAt()));
-        feedEpisode.setUpdatedAt(firstNonNull(feedEpisode.getUpdatedAt(), observation.getLoadedAt()));
-        feedEpisode.setSourceUpdatedAt(firstNonNull(feedEpisode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
-
-        feedEpisode.setGeometries(firstNonNull(feedEpisode.getGeometries(), () -> calculateGeometry(observation, feedData, eventObservations)));
-        feedEpisode.setName(firstNonNull(feedEpisode.getName(), () -> calculateName(feedEpisode, feedData, eventObservations)));
-
-        feedEpisode.addObservation(observation.getObservationId());
+    private Optional<NormalizedObservation> getLatestObservationInEpisode(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
+        return readObservations(episode.getObservations(), eventObservations)
+                .stream()
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt));
     }
 
-    private FeatureCollection calculateGeometry(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
+    private void populateMissedFields(FeedEpisode episode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+        episode.setDescription(firstNonNull(episode.getDescription(), observation.getEpisodeDescription()));
+        episode.setType(firstNonNull(episode.getType(), observation.getType()));
+        episode.setActive(firstNonNull(episode.getActive(), observation.getActive()));
+        episode.setSeverity(firstNonNull(episode.getSeverity(), observation.getEventSeverity()));
+        episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
+        episode.setEndedAt(firstNonNull(episode.getEndedAt(), observation.getEndedAt()));
+        episode.setUpdatedAt(firstNonNull(episode.getUpdatedAt(), observation.getLoadedAt()));
 
-        OffsetDateTime oneDayBeforeObservation = observation.getSourceUpdatedAt().minus(24, ChronoUnit.HOURS);
+        if (episode.getObservations().isEmpty()) {
+            List<NormalizedObservation> feedObservations = readObservations(feedData.getObservations(), eventObservations);
+            List<NormalizedObservation> episodeObservations = findObservationsForEpisode(observation, feedObservations);
+            List<UUID> episodeObservationsIds = episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toList());
 
-        Geometry geometry = observations.stream()
-                .filter(e -> e.getSourceUpdatedAt().isAfter(oneDayBeforeObservation) || e.getSourceUpdatedAt().isEqual(oneDayBeforeObservation))
-                .filter(e -> e.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt()) || e.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
+            episode.getObservations().addAll(episodeObservationsIds);
+        }
+
+        episode.setGeometries(firstNonNull(episode.getGeometries(), () -> calculateGeometry(episode, observation, eventObservations)));
+        episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
+        episode.setName(firstNonNull(episode.getName(), () -> calculateName(episode, feedData, eventObservations)));
+    }
+
+    private FeatureCollection calculateGeometry(FeedEpisode feedEpisode, NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
+        Geometry geometry = readObservations(feedEpisode.getObservations(), eventObservations)
+                .stream()
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
                 .distinct()
                 .reduce(Geometry::union)
                 .get();
 
-        return createFirmGeometry(geometry, getFirmFeature(observation.getGeometries()).getProperties());
+        return createFeatureCollection(geometry, getFirmFeature(observation.getGeometries()).getProperties());
+    }
+
+    private List<NormalizedObservation> findObservationsForEpisode(NormalizedObservation observation, List<NormalizedObservation> observations) {
+        OffsetDateTime oneDayBeforeObservation = observation.getSourceUpdatedAt().minus(24, ChronoUnit.HOURS);
+
+        return observations.stream()
+                .filter(o -> o.getSourceUpdatedAt().isAfter(oneDayBeforeObservation) || o.getSourceUpdatedAt().isEqual(oneDayBeforeObservation))
+                .filter(o -> o.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt()) || o.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
+                .collect(toList());
     }
 
     private String calculateName(FeedEpisode feedEpisode, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
-        observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
+        observations.sort(comparing(NormalizedObservation::getSourceUpdatedAt));
         long burningTime = observations.get(0).getSourceUpdatedAt().until(feedEpisode.getSourceUpdatedAt(), ChronoUnit.HOURS);
         String burntArea = getArea(feedEpisode);
-        return "Burnt area " + burntArea +"km" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+        return "Burnt area " + burntArea + "km" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
     }
 
     private String getArea(FeedEpisode feedEpisode) {
@@ -138,7 +150,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private List<NormalizedObservation> readObservations(List<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {
         List<NormalizedObservation> observationsByIds = eventObservations
                 .stream().filter(e -> observationsIds.contains(e.getObservationId()))
-                .collect(Collectors.toList());
+                .collect(toList());
 
         checkState(observationsByIds.size() == observationsIds.size(),
                 "can not find all needed observations in event");
@@ -146,7 +158,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return observationsByIds;
     }
 
-    private FeatureCollection createFirmGeometry(Geometry geometry, Map<String, Object> properties) {
+    private FeatureCollection createFeatureCollection(Geometry geometry, Map<String, Object> properties) {
         org.wololo.geojson.Geometry write = geoJSONWriter.write(geometry);
         Feature feature = new Feature(write, properties);
         return new FeatureCollection(new Feature[]{feature});
