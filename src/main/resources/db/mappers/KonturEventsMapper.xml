@@ -30,20 +30,16 @@
     </select>
 
     <select id="getEventWithClosestObservation" resultMap="konturEventDtoMap" >
-        SELECT *
-        FROM kontur_events
-        WHERE observation_id in (
-            SELECT observation_id
-            FROM normalized_observations no
-            WHERE
-                no.source_updated_at between #{updatedAt} - interval '24 hours' and #{updatedAt} + interval '24 hours'
-                AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, collected_geography, 1000)
-                <foreach item="provider" collection="providers" separator="," open="AND provider in (" close=")">
-                    #{provider}
-                </foreach>
-        ORDER BY ST_GeomFromGeoJSON(#{geometry})::geography <![CDATA[<->]]> collected_geography
+        SELECT ev.*
+        FROM kontur_events ev inner join normalized_observations no on ev.observation_id = no.observation_id
+        WHERE
+            no.source_updated_at between #{updatedAt} - interval '24 hours' and #{updatedAt} + interval '24 hours'
+            AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, no.collected_geography, 1000)
+            <foreach item="provider" collection="providers" separator="," open="AND no.provider in (" close=")">
+             #{provider}
+            </foreach>
+        ORDER BY ST_GeomFromGeoJSON(#{geometry})::geography <![CDATA[<->]]> no.collected_geography
         LIMIT 1
-        )
     </select>
 
     <select id="getEventsForRolloutEpisodes" resultType="java.util.UUID">

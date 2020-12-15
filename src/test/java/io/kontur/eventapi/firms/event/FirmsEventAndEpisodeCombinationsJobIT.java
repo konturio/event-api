@@ -69,7 +69,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
 
         List<KonturEvent> eventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
 
-        assertEquals(2, eventsForRolloutEpisodes.size());//2 group of observations with are far from each other (> 1km)
+        assertEquals(2, eventsForRolloutEpisodes.size());//2 group of observations which are far from each other (> 1km)
         assertEquals(1, eventsForRolloutEpisodes.get(0).getObservationIds().size());
         assertEquals(3, eventsForRolloutEpisodes.get(1).getObservationIds().size());
 
@@ -87,8 +87,10 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
         assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.871km, Burning time 3h"));
+        assertEquals(3, feedData.get(1).getEpisodes().get(0).getObservations().size());
 
-        //WHEN new data available for modis - 2 observations within 1 km to 2 existing observation
+
+        //WHEN new data available for modis - 3 observations within 1 km to 2 existing observation
         //and 1 other observation
         Mockito.when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6-update.csv"));
         Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
@@ -104,7 +106,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         assertEquals(3, eventsForRolloutEpisodesUpdated.size());//3 group of observations with are far from each other (> 1km)
         assertEquals(1, eventsForRolloutEpisodesUpdated.get(0).getObservationIds().size());
         assertEquals(2, eventsForRolloutEpisodesUpdated.get(1).getObservationIds().size());
-        assertEquals(4, eventsForRolloutEpisodesUpdated.get(2).getObservationIds().size());
+        assertEquals(5, eventsForRolloutEpisodesUpdated.get(2).getObservationIds().size());
 
         //WHEN run feed job again
         feedCompositionJob.run();
@@ -122,14 +124,21 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         assertEquals(2, firmsUpdated.get(1).getEpisodes().size());
         assertEquals(2, firmsUpdated.get(1).getVersion());
 
-        assertEquals(4, firmsUpdated.get(2).getObservations().size());
-        assertEquals(3, firmsUpdated.get(2).getEpisodes().size());
+        assertEquals(5, firmsUpdated.get(2).getObservations().size());
+        assertEquals(4, firmsUpdated.get(2).getEpisodes().size());
         assertEquals(2, firmsUpdated.get(2).getVersion());
 
         firmsUpdated.get(2).getEpisodes().sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
         assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.871km"));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(1).getName().contains("Burnt area 0.871km, Burning time 3h"));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(2).getName().contains("Burnt area 1.742km, Burning time 6h"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(1).getName().contains("Burnt area 1.742km, Burning time 1h"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(2).getName().contains("Burnt area 1.742km, Burning time 3h"));
+        assertTrue(firmsUpdated.get(2).getEpisodes().get(3).getName().contains("Burnt area 2.613km, Burning time 11h"));
+
+        assertEquals(4, firmsUpdated.get(2).getEpisodes().get(2).getObservations().size());
+        assertEquals(OffsetDateTime.parse("2020-11-02T14:50Z"), firmsUpdated.get(2).getEpisodes().get(2).getSourceUpdatedAt());
+
+        assertEquals(5, firmsUpdated.get(2).getEpisodes().get(3).getObservations().size());
+        assertEquals(OffsetDateTime.parse("2020-11-02T22:50Z"), firmsUpdated.get(2).getEpisodes().get(3).getSourceUpdatedAt());
     }
 
     private List<KonturEvent> readEvents(Set<UUID> eventsForRolloutEpisodes1) {
