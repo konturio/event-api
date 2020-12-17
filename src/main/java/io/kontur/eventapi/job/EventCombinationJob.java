@@ -29,7 +29,7 @@ public class EventCombinationJob implements Runnable {
     }
 
     @Override
-    @Timed("job.eventCombination")
+    @Timed(value = "job.eventCombination", longTask = true)
     public void run() {
         List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 

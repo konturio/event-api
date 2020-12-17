@@ -41,7 +41,7 @@ public class FeedCompositionJob implements Runnable {
     }
 
     @Override
-    @Timed("job.feedComposition")
+    @Timed(value = "job.feedComposition", longTask = true)
     public void run() {
         LOG.info("Feed Composition job has started.");
         List<Feed> feeds = feedDao.getFeeds();
