@@ -29,7 +29,7 @@ public class NormalizationJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.normalization")
+    @Timed(value = "job.normalization", longTask = true)
     public void run() {
         List<DataLake> denormalizedEvents = dataLakeDao.getDenormalizedEvents();
         LOG.info("Normalization job has started. Events to process: {}", denormalizedEvents.size());
