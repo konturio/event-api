@@ -2,10 +2,11 @@ package io.kontur.eventapi.gdacs.job;
 
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.service.GdacsService;
-import io.kontur.eventapi.test.AbstractIntegrationTest;
+import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -13,17 +14,20 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GdacsSearchJobIT extends AbstractIntegrationTest {
+public class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
 
     private final GdacsSearchJob gdacsSearchJob;
     private final GdacsAlertXmlParser gdacsAlertXmlParser;
     private final GdacsService gdacsService;
 
     @Autowired
-    public GdacsSearchJobIT(GdacsSearchJob gdacsSearchJob, GdacsAlertXmlParser gdacsAlertXmlParser, GdacsService gdacsService) {
+    public GdacsSearchJobIT(GdacsSearchJob gdacsSearchJob, GdacsAlertXmlParser gdacsAlertXmlParser, GdacsService gdacsService, JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
         this.gdacsSearchJob = gdacsSearchJob;
         this.gdacsAlertXmlParser = gdacsAlertXmlParser;
         this.gdacsService = gdacsService;

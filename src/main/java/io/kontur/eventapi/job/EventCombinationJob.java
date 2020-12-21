@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +33,10 @@ public class EventCombinationJob implements Runnable {
     @Timed(value = "job.eventCombination", longTask = true)
     public void run() {
         List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
+
+        //ideally order should not matter, but now firms processing is depending on order
+        // (see https://kontur.fibery.io/Tasks/Task/Firms-observation-with-distance-less-then-1km-are-in-different-envents-4446)
+        observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
 
         LOG.info("Combination job has started. Events to process: {}", observations.size());
 

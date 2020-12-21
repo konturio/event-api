@@ -5,7 +5,9 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
+import io.kontur.eventapi.resource.dto.DateTimeRange;
 import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.resource.validation.ValidBbox;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -56,14 +59,22 @@ public class EventResource {
                     List<EventType> eventTypes,
             @Parameter(description = "Filters events by severity. More than one can be chosen at once") @RequestParam(value = "severities", defaultValue = "")
                     List<Severity> severities,
-            @Parameter(description = "Includes hazards that were updated after this time. A date-time in ISO8601 format (e.g. \"2020-04-12T23:20:50.52Z\")") @RequestParam(value = "after", required = false)
+            @Parameter(description = "Includes events that were updated after this time. `updatedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")") @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                    OffsetDateTime after,
+                    OffsetDateTime updatedAfter,
+            @Parameter(schema = @Schema(type = "string"),
+                    description = "Either a date-time or an interval, open or closed. Date and time expressions adhere to RFC 3339. Open intervals are expressed using double-dots.  Examples:  * A date-time: \"2018-02-12T23:20:50Z\" * A closed interval: \"2020-01-01T00:00:00Z/2020-12-01T00:00:00Z\" * Open intervals: \"2020-01-01T00:00:00Z/..\" or \"../2020-12-01T00:00:00Z\"  Only events that have a `startedAt` - `endedAt` interval that intersects the value of `datetime` are selected.", example = "2020-01-01T00:00:00Z/2020-12-01T00:00:00Z")
+            @RequestParam(value = "datetime", required = false)
+                    DateTimeRange datetime,
+            @Parameter(description = "Only hazards that have a geometry that intersects the bounding box are selected. The bounding box is provided as four numbers  * Lower left corner, coordinate axis 1 * Lower left corner, coordinate axis 2 * Upper right corner, coordinate axis 1 * Upper right corner, coordinate axis 2  The coordinate reference system of the values is WGS 84 longitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84). For WGS 84 longitude/latitude the values are the sequence of minimum longitude, minimum latitude, maximum longitude and maximum latitude.")
+            @RequestParam(value = "bbox", required = false) @ValidBbox List<BigDecimal> bbox,
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
-                    @Min(1) @Max(1000) int limit,
-            @Parameter(description = "Sort selection. Ascending by default. Default value is ASC") @RequestParam(value = "sortOrder", defaultValue = "ASC") SortOrder sortOrder
-    ) {
-        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes, after, limit, severities, sortOrder);
+            @Min(1) @Max(1000) int limit,
+            @Parameter(description = "Sort selection. Default value is ASC") @RequestParam(value = "sortOrder", defaultValue = "ASC") SortOrder sortOrder) {
+        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes,
+                datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
+                datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
+                updatedAfter, limit, severities, sortOrder, bbox);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -74,7 +85,7 @@ public class EventResource {
         }
     }
 
-    @GetMapping(path = "/observations/{observationId}",  produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(path = "/observations/{observationId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @Operation(tags = "Events", summary = "returns raw data", description = "Returns raw data which was used to combine events and episodes.")
     @PreAuthorize("hasAuthority('SCOPE_read:raw-data')")
     public ResponseEntity<String> rawData(@Parameter(description = "Observation UUID. May be gathered from event's 'observations' field") @PathVariable UUID observationId) {
