@@ -8,12 +8,14 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.kontur.eventapi.firms.FirmsUtil;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -65,7 +67,17 @@ public class FeedCompositionJob implements Runnable {
         fillFeedData(feedData, eventObservations);
         fillEpisodes(eventObservations, feedData);
 
+        overrideFirmsFeedDataFields(eventObservations, feedData);
+
         feedDao.insertFeedData(feedData);
+    }
+
+    private void overrideFirmsFeedDataFields(List<NormalizedObservation> eventObservations, FeedData feedData) {
+        if (FirmsUtil.FIRMS_PROVIDERS.contains(eventObservations.get(0).getProvider())){
+            feedData.setName(feedData.getEpisodes().stream().max(Comparator.comparing(FeedEpisode::getEndedAt)).get().getName());
+            feedData.setStartedAt(feedData.getEpisodes().stream().map(FeedEpisode::getStartedAt).min(OffsetDateTime::compareTo).get());
+            feedData.setEndedAt(feedData.getEpisodes().stream().map(FeedEpisode::getEndedAt).max(OffsetDateTime::compareTo).get());
+        }
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

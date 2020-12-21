@@ -70,7 +70,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setActive(firstNonNull(episode.getActive(), observation.getActive()));
         episode.setSeverity(firstNonNull(episode.getSeverity(), observation.getEventSeverity()));
         episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
-        episode.setEndedAt(firstNonNull(episode.getEndedAt(), observation.getEndedAt()));
+        episode.setEndedAt(firstNonNull(episode.getEndedAt(), calculateEndedDate(observation, eventObservations)));
         episode.setUpdatedAt(firstNonNull(episode.getUpdatedAt(), observation.getLoadedAt()));
 
         if (episode.getObservations().isEmpty()) {
@@ -86,8 +86,17 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setName(firstNonNull(episode.getName(), () -> calculateName(episode, feedData, eventObservations)));
     }
 
-    private FeatureCollection calculateGeometry(FeedEpisode feedEpisode, NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
-        Geometry geometry = readObservations(feedEpisode.getObservations(), eventObservations)
+    private OffsetDateTime calculateEndedDate(NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
+        return eventObservations
+                .stream()
+                .map(NormalizedObservation::getStartedAt)
+                .filter(startDate -> startDate.isAfter(observation.getStartedAt()))
+                .min(OffsetDateTime::compareTo)
+                .orElse(observation.getStartedAt().plusHours(24));
+    }
+
+    private FeatureCollection calculateGeometry(FeedEpisode episode, NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
+        Geometry geometry = readObservations(episode.getObservations(), eventObservations)
                 .stream()
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
                 .distinct()
@@ -110,21 +119,25 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
         observations.sort(comparing(NormalizedObservation::getSourceUpdatedAt));
         long burningTime = observations.get(0).getSourceUpdatedAt().until(feedEpisode.getSourceUpdatedAt(), ChronoUnit.HOURS);
-        String burntArea = getArea(feedEpisode);
+        String burntArea = getArea(feedEpisode, eventObservations);
         return "Burnt area " + burntArea + "km" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
     }
 
-    private String getArea(FeedEpisode feedEpisode) {
-        Geometry geometry = toGeometry(feedEpisode.getGeometries());
-        PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
-        Arrays.stream(geometry.getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
-        double areaInMeters = Math.abs(polygonArea.Compute().area);
-        double areaInKm = areaInMeters / 1_000_000;
-        return String.format("%.3f", areaInKm);
-    }
-
-    private Geometry toGeometry(FeatureCollection geometries) {
-        return toGeometry(getFirmFeature(geometries));
+    private String getArea(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations) {
+        return readObservations(feedEpisode.getObservations(), eventObservations)
+                .stream()
+                .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
+                .distinct()
+                .map(geometry -> {
+                    PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
+                    Arrays.stream(geometry.getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
+                    double areaInMeters = Math.abs(polygonArea.Compute().area);
+                    double areaInKm = areaInMeters / 1_000_000;
+                    return areaInKm;
+                })
+                .reduce(Double::sum)
+                .map(area -> String.format("%.3f", area))
+                .get();
     }
 
     private Geometry toGeometry(String geometries) {
