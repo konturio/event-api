@@ -1,6 +1,8 @@
 # Release notes
 
 ## Unreleased
+#### Added
+- `bbox` and `datetime` filter to the `/v1/` endpoint
 
 #### Added
 - FIRMS provider
@@ -17,7 +19,6 @@ scheduler:
     initialDelay: 1000
     fixedRate: 3600000
 ```
-
 
 ## 0.3 - 2020-11-18
 #### Added

@@ -7,6 +7,7 @@ import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EventDto;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +25,10 @@ public class EventResourceService {
         this.dataLakeDao = dataLakeDao;
     }
 
-    public List<EventDto> searchEvents(String feedAlias, List<EventType> eventTypes,
-                                       OffsetDateTime after, int limit, List<Severity> severities, SortOrder sortOrder) {
-        List<FeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, after, limit, severities, sortOrder);
+    public List<EventDto> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime
+            to, OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox) {
+
+        List<FeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder, bbox);
 
         return feedData.stream()
                 .map(EventDtoConverter::convert)

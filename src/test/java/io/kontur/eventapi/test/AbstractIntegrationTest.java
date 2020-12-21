@@ -6,5 +6,4 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("awsSqsDisabled")
 public abstract class AbstractIntegrationTest {
-
 }
