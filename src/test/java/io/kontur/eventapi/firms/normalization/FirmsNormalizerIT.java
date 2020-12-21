@@ -3,9 +3,10 @@ package io.kontur.eventapi.firms.normalization;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.firms.FirmsUtil;
-import io.kontur.eventapi.test.AbstractIntegrationTest;
+import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -14,14 +15,17 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static io.kontur.eventapi.TestUtil.readFile;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FirmsNormalizerIT extends AbstractIntegrationTest {
+public class FirmsNormalizerIT extends AbstractCleanableIntegrationTest {
 
     private final FirmsNormalizer firmsNormalizer;
 
     @Autowired
-    public FirmsNormalizerIT(FirmsNormalizer firmsNormalizer) {
+    public FirmsNormalizerIT(FirmsNormalizer firmsNormalizer, JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
         this.firmsNormalizer = firmsNormalizer;
     }
 

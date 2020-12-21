@@ -3,18 +3,23 @@ package io.kontur.eventapi.firms.event;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
-import io.kontur.eventapi.entity.*;
+import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.FeedEpisode;
+import io.kontur.eventapi.entity.KonturEvent;
+import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
-import io.kontur.eventapi.test.AbstractIntegrationTest;
+import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -29,7 +34,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTest {
+public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableIntegrationTest {
     private final FirmsImportJob firmsImportJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
@@ -42,7 +47,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
     private FirmsClient firmsClient;
 
     @Autowired
-    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, FeedMapper feedMapper, KonturEventsDao konturEventsDao, NormalizedObservationsDao observationsDao) {
+    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, FeedMapper feedMapper, KonturEventsDao konturEventsDao, NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
         this.firmsImportJob = firmsImportJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
@@ -53,7 +59,6 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
     }
 
     @Test
-    @Sql(executionPhase= Sql.ExecutionPhase.BEFORE_TEST_METHOD,scripts="classpath:/io/kontur/eventapi/firms/event/clean.sql")
     public void testFirmsEventAndEpisodesRollout() throws IOException {
         //GIVEN 3 observation within 1 km, 2 of them have same date. And 1 other observation
         Mockito.when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6.csv"));
@@ -175,10 +180,16 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractIntegrationTe
         List<FeedData> firms = feedMapper.searchForEvents(
                 "firms",
                 List.of(EventType.WILDFIRE),
+                null,
+                null,
                 OffsetDateTime.parse("2020-11-02T11:00Z"),
                 100,
                 List.of(),
-                SortOrder.ASC
+                SortOrder.ASC,
+                null,
+                null,
+                null,
+                null
         );
         firms.sort(Comparator.comparing(f -> f.getObservations().size()));
         return firms;

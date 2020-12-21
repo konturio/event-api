@@ -2,14 +2,15 @@ package io.kontur.eventapi.firms.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -19,7 +20,7 @@ import static io.kontur.eventapi.TestUtil.readFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class FirmsImportJobIT extends AbstractIntegrationTest {
+public class FirmsImportJobIT extends AbstractCleanableIntegrationTest {
     private final FirmsImportJob firmsImportJob;
     private final DataLakeDao dataLakeDao;
 
@@ -27,7 +28,8 @@ public class FirmsImportJobIT extends AbstractIntegrationTest {
     private FirmsClient firmsClient;
 
     @Autowired
-    public FirmsImportJobIT(FirmsImportJob firmsImportJob, DataLakeDao dataLakeDao) {
+    public FirmsImportJobIT(FirmsImportJob firmsImportJob, DataLakeDao dataLakeDao, JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
         this.firmsImportJob = firmsImportJob;
         this.dataLakeDao = dataLakeDao;
     }

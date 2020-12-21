@@ -1,18 +1,22 @@
 package io.kontur.eventapi.job;
 
+import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
-import io.kontur.eventapi.dao.mapper.DataLakeMapper;
-import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.SortOrder;
+import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,26 +31,24 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.testcontainers.shaded.com.google.common.collect.Iterables.getOnlyElement;
 
-
-public class FeedCompositionJobIT extends AbstractIntegrationTest {
+public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
-    private final DataLakeMapper dataLakeMapper;
-    private final FeedMapper feedMapper;
+    private final DataLakeDao dataLakeDao;
+    private final FeedDao feedDao;
     private final KonturEventsDao konturEventsDao;
     private final NormalizedObservationsDao observationsDao;
 
     @Autowired
-    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob,
-                                FeedCompositionJob feedCompositionJob, DataLakeMapper dataLakeMapper,
-                                FeedMapper feedMapper, KonturEventsDao konturEventsDao, NormalizedObservationsDao observationsDao) {
+    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, KonturEventsDao konturEventsDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao) {
+        super(jdbcTemplate);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
-        this.dataLakeMapper = dataLakeMapper;
-        this.feedMapper = feedMapper;
+        this.dataLakeDao = dataLakeDao;
+        this.feedDao = feedDao;
         this.konturEventsDao = konturEventsDao;
         this.observationsDao = observationsDao;
     }
@@ -95,17 +97,11 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        return feedMapper.searchForEvents(
-                "pdc-v0",
-                List.of(),
-                loadedTime.minusDays(1),
-                1,
-                List.of(),
-                SortOrder.ASC
-        ).get(0);
+        return feedDao.searchForEvents("pdc-v0", List.of(), null,
+                null, loadedTime, 1, List.of(), SortOrder.ASC, null).get(0);
     }
 
-    private void createNormalizations(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data){
+    private void createNormalizations(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {
         var dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
         dataLake.setExternalId(externalEventUUId);
@@ -113,7 +109,7 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         dataLake.setProvider(provider);
         dataLake.setData(data);
 
-        dataLakeMapper.create(dataLake);
+        dataLakeDao.storeEventData(dataLake);
         normalizationJob.run();
     }
 
@@ -121,7 +117,7 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
     public void testSavedMags() throws IOException {
         String externalId = "996d6b0a-ce18-47d9-9bd2-b1b8fe5d967a";
 
-        var pdcFeed = feedMapper.getFeeds()
+        var pdcFeed = feedDao.getFeeds()
                 .stream()
                 .filter(feed -> feed.getAlias().equals("pdc-v0"))
                 .findFirst()
@@ -175,14 +171,8 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedMapper.searchForEvents(
-                "pdc-v0",
-                List.of(),
-                startTimeForSearchingFeed,
-                1,
-                List.of(),
-                SortOrder.ASC
-        ).get(0);
+        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(), null,
+                null, startTimeForSearchingFeed, 1, List.of(), SortOrder.ASC, null).get(0);
         assertEquals(2, feed.getEpisodes().size());
 
         boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
@@ -201,7 +191,7 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         sqsDataLake01.setProvider(PDC_SQS_PROVIDER);
         sqsDataLake01.setLoadedAt(OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 20, 54, 22), ZoneOffset.UTC));
         sqsDataLake01.setData(readMessageFromFile("SQSDataTestOrder01.json"));
-        dataLakeMapper.create(sqsDataLake01);
+        dataLakeDao.storeEventData(sqsDataLake01);
 
         var sqsDataLake02 = new DataLake();
         sqsDataLake02.setObservationId(UUID.fromString("39f665ef-4400-4acb-8ccb-5c9c3a2d2346"));
@@ -209,7 +199,7 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         sqsDataLake02.setProvider(PDC_SQS_PROVIDER);
         sqsDataLake02.setLoadedAt(latestUpdatedDate);
         sqsDataLake02.setData(readMessageFromFile("SQSDataTestOrder02.json"));
-        dataLakeMapper.create(sqsDataLake02);
+        dataLakeDao.storeEventData(sqsDataLake02);
 
         var loadHpSrvHazardLoadTime = OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 10, 10, 33), ZoneOffset.UTC);
         var hpSrvHazardDataLake = new DataLake();
@@ -219,21 +209,15 @@ public class FeedCompositionJobIT extends AbstractIntegrationTest {
         hpSrvHazardDataLake.setLoadedAt(loadHpSrvHazardLoadTime);
         hpSrvHazardDataLake.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 8, 56, 9), ZoneOffset.UTC));
         hpSrvHazardDataLake.setData(readMessageFromFile("HpSrvSearchTestOrder.json"));
-        dataLakeMapper.create(hpSrvHazardDataLake);
+        dataLakeDao.storeEventData(hpSrvHazardDataLake);
 
         normalizationJob.run();
         eventCombinationJob.run();
 
         feedCompositionJob.run();
 
-        FeedData feed = feedMapper.searchForEvents(
-                "pdc-v0",
-                List.of(EventType.WILDFIRE),
-                loadHpSrvHazardLoadTime,
-                1,
-                List.of(),
-                SortOrder.ASC
-        ).get(0);
+        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(EventType.WILDFIRE), null,
+                null, loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }
 

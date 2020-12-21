@@ -7,7 +7,6 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
-import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.MethodOrderer;
@@ -25,7 +24,12 @@ import java.util.List;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GdacsNormalizerIT extends AbstractIntegrationTest {
@@ -41,7 +45,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
     private static DataLake dataLakeAlertGeometry;
 
     @Autowired
-    public GdacsNormalizerIT(GdacsAlertNormalizer gdacsAlertNormalizer, GdacsGeometryNormalizer gdacsGeometryNormalizer, GdacsService gdacsService, GdacsDataLakeConverter gdacsDataLakeConverter, DataLakeDao dataLakeDao, NormalizedObservationsDao normalizedObservationsDao) {
+    public GdacsNormalizerIT(GdacsAlertNormalizer gdacsAlertNormalizer, GdacsGeometryNormalizer gdacsGeometryNormalizer, GdacsDataLakeConverter gdacsDataLakeConverter, DataLakeDao dataLakeDao, NormalizedObservationsDao normalizedObservationsDao) {
         this.gdacsAlertNormalizer = gdacsAlertNormalizer;
         this.gdacsGeometryNormalizer = gdacsGeometryNormalizer;
         this.gdacsDataLakeConverter = gdacsDataLakeConverter;
@@ -81,7 +85,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
 
     @Test
     @Order(4)
-    public void normalizeGdacsAlert() throws IOException {
+    public void normalizeGdacsAlert() {
         var observation = gdacsAlertNormalizer.normalize(dataLakeAlert);
 
         String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
@@ -172,15 +176,15 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         parsedAlert.setIdentifier(externalId);
         parsedAlert.setDateModified(OffsetDateTime.of(LocalDateTime.of(2020, 10, 12, 9, 33, 22), ZoneOffset.UTC));
         parsedAlert.setSent(OffsetDateTime.parse("2020-10-12T05:03:07-00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        parsedAlert.setData(readMessageFromFile());
+        parsedAlert.setData(readMessageFromFile("alert.xml"));
 
         return List.of(
                 gdacsDataLakeConverter.convertGdacs(parsedAlert),
-                gdacsDataLakeConverter.convertGdacsWithGeometry(parsedAlert, "{}")
+                gdacsDataLakeConverter.convertGdacsWithGeometry(parsedAlert, readMessageFromFile("geometry.json"))
         );
     }
 
-    private String readMessageFromFile() throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream("alert.xml"), "UTF-8");
+    private String readMessageFromFile(String fileName) throws IOException {
+        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
     }
 }

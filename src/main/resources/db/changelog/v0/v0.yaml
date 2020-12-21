@@ -81,3 +81,7 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add-schema-to-functions.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_geometry_column_in_feed_data.sql
+

@@ -19,6 +19,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -187,7 +188,7 @@ public class GdacsAlertXmlParser {
     private Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
         var builderFactory = DocumentBuilderFactory.newInstance();
         var builder = builderFactory.newDocumentBuilder();
-        var inputStream = new ByteArrayInputStream(xml.getBytes());
+        var inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         return builder.parse(inputStream);
     }
 
