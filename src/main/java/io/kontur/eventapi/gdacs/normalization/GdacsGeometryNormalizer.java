@@ -33,7 +33,6 @@ public class GdacsGeometryNormalizer extends Normalizer {
 
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
-
         var normalizedObservation = getGdacsAlertNormalizedObservation(dataLakeDto.getExternalId());
         if (normalizedObservation.isPresent()) {
             var normalizedObservationWithGeometry = new NormalizedObservation();
@@ -41,8 +40,7 @@ public class GdacsGeometryNormalizer extends Normalizer {
             setDataFromDataLake(normalizedObservationWithGeometry, dataLakeDto);
             return normalizedObservationWithGeometry;
         }
-        LOG.warn("Observation with provider = {} and externalId = {} has not normalized", GDACS_ALERT_PROVIDER, dataLakeDto.getExternalId());
-        return null;
+        throw new RuntimeException(String.format("Observation with provider = %s and externalId = %s has not normalized", GDACS_ALERT_PROVIDER, dataLakeDto.getExternalId()));
     }
 
     private void setDataFromNormalizedObservation(NormalizedObservation normalizedObservationWithGeometry, NormalizedObservation observation) {
