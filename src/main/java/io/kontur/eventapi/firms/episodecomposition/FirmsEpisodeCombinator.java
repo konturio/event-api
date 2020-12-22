@@ -120,7 +120,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         observations.sort(comparing(NormalizedObservation::getSourceUpdatedAt));
         long burningTime = observations.get(0).getSourceUpdatedAt().until(feedEpisode.getSourceUpdatedAt(), ChronoUnit.HOURS);
         String burntArea = getArea(feedEpisode, eventObservations);
-        return "Burnt area " + burntArea + "km" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+        return "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
     }
 
     private String getArea(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations) {

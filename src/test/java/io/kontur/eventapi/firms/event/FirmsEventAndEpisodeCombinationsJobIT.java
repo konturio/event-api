@@ -92,7 +92,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.871km, Burning time 3h"));
+        assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.871km\u00B2, Burning time 3h"));
         assertEquals(3, feedData.get(1).getEpisodes().get(0).getObservations().size());
 
 
