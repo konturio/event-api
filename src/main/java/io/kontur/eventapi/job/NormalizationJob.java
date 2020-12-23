@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Component
 public class NormalizationJob implements Runnable {
 
@@ -49,7 +51,7 @@ public class NormalizationJob implements Runnable {
         try {
             Normalizer normalizer = Applicable.get(normalizers, denormalizedEvent);
             NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
-            normalizedObservationsDao.insert(normalizedDto);
+            normalizedObservationsDao.insert(checkNotNull(normalizedDto));
             return true;
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);

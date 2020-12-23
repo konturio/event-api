@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
+import static java.lang.String.format;
 
 
 @Component
@@ -51,11 +52,9 @@ public class GdacsAlertNormalizer extends GdacsNormalizer {
                 setDataFromParsedAlert(normalizedObservation, parsedAlert);
                 return normalizedObservation;
             }
-            LOG.warn("Gdacs alert geometry has not found in data_lake, observationId = {}", dataLakeDto.getObservationId());
-            return null;
+            throw new RuntimeException(format("Gdacs alert geometry has not found in data_lake, observationId = %s", dataLakeDto.getObservationId()));
         } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
-            LOG.warn("Alert can not be parsed {}", dataLakeDto.getObservationId());
-            throw new RuntimeException(e);
+            throw new RuntimeException(format("Alert can not be parsed %s", dataLakeDto.getObservationId()));
         }
     }
 
