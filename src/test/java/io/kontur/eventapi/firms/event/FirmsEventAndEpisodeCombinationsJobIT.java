@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static io.kontur.eventapi.TestUtil.readFile;
+import static java.time.OffsetDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -91,7 +92,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.871km, Burning time 3h"));
+        assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.871km\u00B2, Burning time 3h"));
         assertEquals(3, feedData.get(1).getEpisodes().get(0).getObservations().size());
 
 
@@ -129,21 +130,41 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(2, firmsUpdated.get(1).getEpisodes().size());
         assertEquals(2, firmsUpdated.get(1).getVersion());
 
-        assertEquals(5, firmsUpdated.get(2).getObservations().size());
-        assertEquals(4, firmsUpdated.get(2).getEpisodes().size());
-        assertEquals(2, firmsUpdated.get(2).getVersion());
+        FeedData someFedData = firmsUpdated.get(2);
+        assertEquals("Burnt area 2.613km\u00B2, Burning time 11h", someFedData.getName());
+        assertEquals(5, someFedData.getObservations().size());
+        assertEquals(parse("2020-11-02T11:50Z"),someFedData.getStartedAt());
+        assertEquals(parse("2020-11-03T22:50Z"),someFedData.getEndedAt());
+        assertEquals(2, someFedData.getVersion());
 
-        firmsUpdated.get(2).getEpisodes().sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(0).getName().contains("Burnt area 0.871km"));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(1).getName().contains("Burnt area 1.742km, Burning time 1h"));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(2).getName().contains("Burnt area 1.742km, Burning time 3h"));
-        assertTrue(firmsUpdated.get(2).getEpisodes().get(3).getName().contains("Burnt area 2.613km, Burning time 11h"));
+        List<FeedEpisode> episodes = someFedData.getEpisodes();
+        assertEquals(4, episodes.size());
 
-        assertEquals(4, firmsUpdated.get(2).getEpisodes().get(2).getObservations().size());
-        assertEquals(OffsetDateTime.parse("2020-11-02T14:50Z"), firmsUpdated.get(2).getEpisodes().get(2).getSourceUpdatedAt());
+        episodes.sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
 
-        assertEquals(5, firmsUpdated.get(2).getEpisodes().get(3).getObservations().size());
-        assertEquals(OffsetDateTime.parse("2020-11-02T22:50Z"), firmsUpdated.get(2).getEpisodes().get(3).getSourceUpdatedAt());
+        assertTrue(episodes.get(0).getName().contains("Burnt area 0.871km\u00B2"));
+        assertEquals(2, episodes.get(0).getObservations().size());
+        assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt());
+        assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getStartedAt());
+        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt());
+
+        assertTrue(episodes.get(1).getName().contains("Burnt area 1.742km\u00B2, Burning time 1h"));
+        assertEquals(3, episodes.get(1).getObservations().size());
+        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt());
+        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt());
+        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt());
+
+        assertTrue(episodes.get(2).getName().contains("Burnt area 1.742km\u00B2, Burning time 3h"));
+        assertEquals(4, episodes.get(2).getObservations().size());
+        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getSourceUpdatedAt());
+        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getStartedAt());
+        assertEquals(parse("2020-11-02T22:50Z"), episodes.get(2).getEndedAt());
+
+        assertTrue(episodes.get(3).getName().contains("Burnt area 2.613km\u00B2, Burning time 11h"));
+        assertEquals(5, episodes.get(3).getObservations().size());
+        assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getSourceUpdatedAt());
+        assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getStartedAt());
+        assertEquals(parse("2020-11-03T22:50Z"), episodes.get(3).getEndedAt());
     }
 
     private List<KonturEvent> readEvents(Set<UUID> eventsForRolloutEpisodes1) {
