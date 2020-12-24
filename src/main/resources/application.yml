@@ -15,6 +15,7 @@ spring:
     hikari:
       register-mbeans: true
       pool-name: HikariPool-1
+      minimum-idle: 5
   security:
     oauth2:
       resourceserver:
