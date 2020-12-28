@@ -3,6 +3,7 @@ package io.kontur.eventapi.dao;
 import io.kontur.eventapi.dao.mapper.NormalizedObservationsMapper;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -13,13 +14,21 @@ import java.util.UUID;
 public class NormalizedObservationsDao {
 
     private final NormalizedObservationsMapper mapper;
+    private final DataLakeDao dataLakeDao;
 
-    public NormalizedObservationsDao(NormalizedObservationsMapper mapper) {
+    public NormalizedObservationsDao(NormalizedObservationsMapper mapper, DataLakeDao dataLakeDao) {
         this.mapper = mapper;
+        this.dataLakeDao = dataLakeDao;
     }
 
-    public int insert(NormalizedObservation record) {
-        return mapper.insert(record);
+    @Transactional
+    public int insert(NormalizedObservation observation) {
+        dataLakeDao.markAsNormalized(observation.getObservationId());
+        return mapper.insert(observation);
+    }
+
+    public void markAsRecombined(UUID observationId) {
+        mapper.markAsRecombined(observationId);
     }
 
     public List<NormalizedObservation> getObservationsNotLinkedToEvent() {

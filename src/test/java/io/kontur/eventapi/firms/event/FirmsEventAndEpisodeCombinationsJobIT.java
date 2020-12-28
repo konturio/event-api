@@ -165,6 +165,9 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getStartedAt());
         assertEquals(parse("2020-11-03T22:50Z"), episodes.get(3).getEndedAt());
+
+        List<KonturEvent> newEventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
+        assertTrue(newEventsForRolloutEpisodes.isEmpty());
     }
 
     private List<KonturEvent> readEvents(Set<UUID> eventsForRolloutEpisodes1) {

@@ -11,6 +11,7 @@ public class DataLake {
     private OffsetDateTime loadedAt;
     private String provider;
     private String data;
+    private boolean normalized = false;
 
     public DataLake() {
     }
@@ -68,5 +69,13 @@ public class DataLake {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public boolean isNormalized() {
+        return normalized;
+    }
+
+    public void setNormalized(boolean normalized) {
+        this.normalized = normalized;
     }
 }

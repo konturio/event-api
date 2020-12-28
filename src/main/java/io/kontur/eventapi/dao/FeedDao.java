@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -17,22 +18,27 @@ import static io.kontur.eventapi.util.JsonUtil.writeJson;
 public class FeedDao {
 
     private final FeedMapper mapper;
+    private final FeedEventStatusDao feedEventStatusDao;
 
     @Autowired
-    public FeedDao(FeedMapper mapper) {
+    public FeedDao(FeedMapper mapper, FeedEventStatusDao feedEventStatusDao) {
         this.mapper = mapper;
+        this.feedEventStatusDao = feedEventStatusDao;
     }
 
     public List<Feed> getFeeds() {
         return mapper.getFeeds();
     }
 
+    @Transactional
     public void insertFeedData(FeedData feedData) {
         String episodesJson = writeJson(feedData.getEpisodes());
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getDescription(),
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson);
+
+        feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
     }
 
     public List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,

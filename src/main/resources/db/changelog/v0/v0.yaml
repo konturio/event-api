@@ -84,4 +84,10 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add_geometry_column_in_feed_data.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_flags_for_processed_items.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_feed_event_status.sql
 

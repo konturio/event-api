@@ -13,6 +13,8 @@ public interface NormalizedObservationsMapper {
 
     int insert(NormalizedObservation record);
 
+    void markAsRecombined(UUID observationId);
+
     List<NormalizedObservation> getObservationsNotLinkedToEvent();
 
     List<NormalizedObservation> getObservations(List<UUID> observationIds);

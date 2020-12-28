@@ -27,7 +27,8 @@
             started_at,
             ended_at,
             source_updated_at,
-            source_uri
+            source_uri,
+            recombined
         ) VALUES (
             #{observationId},
             #{provider},
@@ -51,14 +52,19 @@
             #{startedAt},
             #{endedAt},
             #{sourceUpdatedAt},
-            #{sourceUri}
+            #{sourceUri},
+            #{recombined}
         )
+    </insert>
+
+    <insert id="markAsRecombined">
+        UPDATE normalized_observations SET recombined = 'true' WHERE observation_id = #{observationId}
     </insert>
 
     <select id="getObservationsNotLinkedToEvent" resultMap="normalizedObservationsDtoMap">
         SELECT *
-        FROM normalized_observations no
-        WHERE NOT EXISTS(SELECT 1 FROM kontur_events ke WHERE ke.observation_id = no.observation_id)
+        FROM normalized_observations
+        WHERE recombined is false
         LIMIT 100000
     </select>
 
@@ -114,5 +120,6 @@
         <result property="endedAt" column="ended_at"/>
         <result property="sourceUpdatedAt" column="source_updated_at"/>
         <result property="sourceUri" column="source_uri"/>
+        <result property="recombined" column="recombined"/>
     </resultMap>
 </mapper>

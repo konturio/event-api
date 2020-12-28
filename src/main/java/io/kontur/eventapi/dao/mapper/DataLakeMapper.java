@@ -12,6 +12,8 @@ public interface DataLakeMapper {
 
     void create(DataLake dataLake);
 
+    void markAsNormalized(UUID observationId);
+
     Optional<DataLake> getLatestUpdatedEventForProvider(String provider);
 
     List<DataLake> getPdcHpSrvHazardsWithoutAreas();
