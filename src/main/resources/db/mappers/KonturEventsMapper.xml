@@ -38,7 +38,7 @@
             <foreach item="provider" collection="providers" separator="," open="AND no.provider in (" close=")">
              #{provider}
             </foreach>
-        ORDER BY ST_GeomFromGeoJSON(#{geometry})::geography <![CDATA[<->]]> no.collected_geography
+        ORDER BY ST_Distance(ST_GeomFromGeoJSON(#{geometry})::geography, no.collected_geography)
         LIMIT 1
     </select>
 
