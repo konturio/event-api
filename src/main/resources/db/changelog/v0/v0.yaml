@@ -90,4 +90,7 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add_feed_event_status.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_missed_indexes.sql
 
