@@ -25,6 +25,7 @@ public class NormalizedObservation {
     private OffsetDateTime endedAt;
     private OffsetDateTime sourceUpdatedAt;
     private String sourceUri;
+    private boolean recombined = false;
 
     public UUID getObservationId() {
         return observationId;
@@ -176,5 +177,13 @@ public class NormalizedObservation {
 
     public void setSourceUri(String sourceUri) {
         this.sourceUri = sourceUri;
+    }
+
+    public boolean getRecombined() {
+        return recombined;
+    }
+
+    public void setRecombined(boolean recombined) {
+        this.recombined = recombined;
     }
 }

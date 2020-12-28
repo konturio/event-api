@@ -24,6 +24,10 @@ public class DataLakeDao {
         mapper.create(dataLake);
     }
 
+    public void markAsNormalized(UUID observationId) {
+        mapper.markAsNormalized(observationId);
+    }
+
     public List<DataLake> getDataLakesByExternalId(String externalId) {
         return mapper.getDataLakesByExternalId(externalId);
     }

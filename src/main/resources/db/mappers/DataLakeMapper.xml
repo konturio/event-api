@@ -5,8 +5,12 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.DataLakeMapper">
 
     <insert id="create" useGeneratedKeys="false">
-        INSERT INTO data_lake (observation_id, external_id, updated_at, loaded_at, provider, data)
-        VALUES (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data})
+        INSERT INTO data_lake (observation_id, external_id, updated_at, loaded_at, provider, data, normalized)
+        VALUES (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data}, #{normalized})
+    </insert>
+
+    <insert id="markAsNormalized">
+        UPDATE data_lake SET normalized = 'true' WHERE observation_id = #{observationId}
     </insert>
 
     <select id="getLatestUpdatedEventForProvider" resultType="io.kontur.eventapi.entity.DataLake">
@@ -29,9 +33,7 @@
     <select id="getDenormalizedEvents" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake e
-        WHERE NOT EXISTS(
-                select * from normalized_observations nr where e.observation_id = nr.observation_id
-            )
+        WHERE normalized is false
         ORDER BY loaded_at
         LIMIT 100000
     </select>
@@ -62,6 +64,7 @@
         <result property="loadedAt" column="loaded_at" />
         <result property="provider" column="provider" />
         <result property="data" column="data" />
+        <result property="normalized" column="normalized" />
     </resultMap>
 
 </mapper>
