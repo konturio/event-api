@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.service.HpSrvService;
 import io.kontur.eventapi.util.JsonUtil;
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,8 @@ public class HpSrvMagsJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.pdc.hpSrvMags", longTask = true)
+    @Counted(value = "job.pdc_hpsrvmags.counter")
+    @Timed(value = "job.pdc_hpsrvmags.in_progress_timer", longTask = true)
     public void run() {
         LOG.info("PDC mags import job has started");
         importMags();
