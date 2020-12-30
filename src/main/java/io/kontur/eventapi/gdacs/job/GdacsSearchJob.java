@@ -4,6 +4,7 @@ import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,8 @@ public class GdacsSearchJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.gdacs.gdacsSearchJob", longTask = true)
+    @Counted(value = "job.gdacs_search.counter")
+    @Timed(value = "job.gdacs_search.in_progress_timer", longTask = true)
     public void run() {
         try {
             LOG.info("Gdacs import job has started");

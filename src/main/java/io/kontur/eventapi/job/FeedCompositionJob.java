@@ -9,6 +9,7 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.firms.FirmsUtil;
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,8 @@ public class FeedCompositionJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.feedComposition", longTask = true)
+    @Counted(value = "job.feed_composition.counter")
+    @Timed(value = "job.feed_composition.in_progress_timer", longTask = true)
     public void run() {
         LOG.info("Feed Composition job has started.");
         List<Feed> feeds = feedDao.getFeeds();
