@@ -93,4 +93,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add_missed_indexes.sql
-
+- include:
+    relativeToChangelogFile: true
+    file: add_constraints.sql

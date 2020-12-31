@@ -52,10 +52,13 @@ public class KonturEventsDao {
     public void insertEvent(KonturEvent event) {
         List<UUID> notLinkedObservationIds = getNewObservations(event);
 
-        NormalizedObservation observation = observationsDao.getObservations(notLinkedObservationIds).get(0);
-        feedDao.getFeeds().stream()
-                .filter(f -> f.getProviders().contains(observation.getProvider()))
-                .forEach(f -> feedEventStatusDao.markAsActual(f.getFeedId(), event.getEventId(), false));
+        if (!notLinkedObservationIds.isEmpty()) {
+            NormalizedObservation observation = observationsDao.getObservations(notLinkedObservationIds).get(0);
+
+            feedDao.getFeeds().stream()
+                    .filter(f -> f.getProviders().contains(observation.getProvider()))
+                    .forEach(f -> feedEventStatusDao.markAsActual(f.getFeedId(), event.getEventId(), false));
+        }
 
         notLinkedObservationIds.forEach(observationId -> {
             mapper.insert(event.getEventId(), observationId);
