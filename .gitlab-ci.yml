@@ -15,6 +15,7 @@ cache:
 
 stages:
   - build
+  - test
   - deploy
 
 build:
@@ -27,6 +28,15 @@ build:
     name: event-api-$CI_COMMIT_REF_SLUG
     paths:
       - '*.zip'
+
+test:
+  stage: test
+  script:
+    - set
+  when: manual
+  allow_failure: true
+  dependencies:
+    - build
 
 deploy-sonic:
   tags:
