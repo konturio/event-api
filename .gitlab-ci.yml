@@ -7,6 +7,8 @@ stages:
 
 test:
   script:
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/kontur-private/platform/event-api.git/
-    - ls -lAR event-api
+#    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/kontur-private/platform/event-api.git/
+#    - ls -lAR event-api
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/kontur-private/platform/event-api-tests.git/
+    - ls -lAR event-api-tests
 
