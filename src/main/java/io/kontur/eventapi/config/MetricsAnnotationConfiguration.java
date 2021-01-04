@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.micrometer.core.aop.CountedAspect;
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
@@ -8,11 +9,16 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @Configuration
 @EnableAspectJAutoProxy
-public class TimedAnnotationConfiguration {
+public class MetricsAnnotationConfiguration {
 
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {
         return new TimedAspect(registry);
+    }
+
+    @Bean
+    public CountedAspect countedAspect(MeterRegistry meterRegistry) {
+        return new CountedAspect(meterRegistry);
     }
 
 }

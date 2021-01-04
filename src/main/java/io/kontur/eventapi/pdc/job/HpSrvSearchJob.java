@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
 import io.kontur.eventapi.pdc.service.HpSrvService;
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,8 @@ public class HpSrvSearchJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.pdc.hpSrvSearch", longTask = true)
+    @Counted(value = "job.pdc_hpsrvsearch.counter")
+    @Timed(value = "job.pdc_hpsrvsearch.in_progress_timer", longTask = true)
     public void run() {
         LOG.info("PDC hazards import job has started");
         importHazards();

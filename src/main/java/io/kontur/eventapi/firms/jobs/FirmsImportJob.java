@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -44,7 +45,8 @@ public class FirmsImportJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.firms.firmsImportJob", longTask = true)
+    @Counted(value = "job.firms_import.counter")
+    @Timed(value = "job.firms_import.in_progress_timer", longTask = true)
     public void run() {
         LOG.info("Firms import job has started");
 

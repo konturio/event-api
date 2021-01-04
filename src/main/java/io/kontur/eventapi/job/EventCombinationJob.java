@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.KonturEvent;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.eventcombination.EventCombinator;
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,8 @@ public class EventCombinationJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.eventCombination", longTask = true)
+    @Counted(value = "job.event_combination.counter")
+    @Timed(value = "job.event_combination.in_progress_timer", longTask = true)
     public void run() {
         List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 

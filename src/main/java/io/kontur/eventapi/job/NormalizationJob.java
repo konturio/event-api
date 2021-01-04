@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,8 @@ public class NormalizationJob implements Runnable {
     }
 
     @Override
-    @Timed(value = "job.normalization", longTask = true)
+    @Counted(value = "job.normalization.counter")
+    @Timed(value = "job.normalization.in_progress_timer", longTask = true)
     public void run() {
         List<DataLake> denormalizedEvents = dataLakeDao.getDenormalizedEvents();
         LOG.info("Normalization job has started. Events to process: {}", denormalizedEvents.size());
