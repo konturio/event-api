@@ -7,5 +7,5 @@ stages:
 
 test:
   script:
-    - set
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/kontur-private/platform/event-api
 
