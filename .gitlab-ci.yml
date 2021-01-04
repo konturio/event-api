@@ -1,0 +1,11 @@
+---
+variables:
+#  CI_DEBUG_TRACE: 'true'
+
+stages:
+  - test
+
+test:
+  script:
+    - set
+
