@@ -32,12 +32,12 @@ build:
 allure-tests:
   stage: test
   variables:
-    TESTS_WORKING_DIR: '$CI_PROJECT_DIR/../'
+    TESTS_WORKING_DIR: '$CI_PROJECT_DIR/../allore-tests'
   script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/kontur-private/platform/event-api-tests.git/ "$TESTS_WORKING_DIR"
     - ls -lAR "$TESTS_WORKING_DIR"
-  when: manual
-  allow_failure: true
+#  when: manual
+#  allow_failure: true
   dependencies:
     - build
 
