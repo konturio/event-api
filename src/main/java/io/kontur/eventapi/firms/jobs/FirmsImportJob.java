@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static io.kontur.eventapi.firms.FirmsUtil.*;
+import static io.kontur.eventapi.util.CsvUtil.parseRow;
 
 @Component
 public class FirmsImportJob implements Runnable {
@@ -55,7 +56,7 @@ public class FirmsImportJob implements Runnable {
     }
 
     private void createDataLakes(String provider, String data) {
-        String[] csvRows = data.split("\n");
+        String[] csvRows = data.split("\r?\n");
         String csvHeader = csvRows[0];
 
         for (int i = 1; i < csvRows.length; i++) {

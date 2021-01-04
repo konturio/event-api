@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
@@ -23,8 +24,10 @@ class WorkerSchedulerTest {
     private final FeedCompositionJob feedCompositionJob = mock(FeedCompositionJob.class);
     private final GdacsSearchJob gdacsSearchJob = mock(GdacsSearchJob.class);
     private final FirmsImportJob firmsImportJob = mock(FirmsImportJob.class);
+    private final EmDatImportJob emDatImportJob = mock(EmDatImportJob.class);
+
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
-            feedCompositionJob, firmsImportJob);
+            feedCompositionJob, firmsImportJob, emDatImportJob);
 
     @AfterEach
     public void resetMocks() {

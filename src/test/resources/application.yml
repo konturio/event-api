@@ -6,6 +6,10 @@ pdc:
 gdacs:
   host: 'https://www.gdacs.org'
 
+emdat:
+  user: 'user@user.com'
+  password: 'the_most_secured_password'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -19,6 +23,10 @@ scheduler:
     cron: 30 30 23 25 12 SUN
   firmsImport:
     enable: false
+    initialDelay: 999999
+    fixedRate: 999999
+  emDatImport:
+    enable: true
     initialDelay: 999999
     fixedRate: 999999
   normalization:

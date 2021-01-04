@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.EventCombinationJob;
@@ -24,6 +25,7 @@ public class WorkerScheduler {
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
+    private final EmDatImportJob emDatImportJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -39,11 +41,13 @@ public class WorkerScheduler {
     private String eventCombinationEnabled;
     @Value("${scheduler.feedComposition.enable}")
     private String feedCompositionEnabled;
+    @Value("${scheduler.emDatImport.enable}")
+    private String emDatImportEnabled;
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
-                           FirmsImportJob firmsImportJob) {
+                           FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -51,6 +55,7 @@ public class WorkerScheduler {
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.firmsImportJob = firmsImportJob;
+        this.emDatImportJob = emDatImportJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -113,6 +118,15 @@ public class WorkerScheduler {
             feedCompositionJob.run();
         } else {
             LOG.info("Feed Compose job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.emDatImport.initialDelay}", fixedRateString = "${scheduler.emDatImport.fixedRate}")
+    public void emDatImportJob() {
+        if (Boolean.parseBoolean(emDatImportEnabled)) {
+            emDatImportJob.run();
+        } else {
+            LOG.info("EM-DAT Import job invocation is skipped");
         }
     }
 }

@@ -3,9 +3,8 @@
 ## Unreleased
 #### Added
 - `bbox` and `datetime` filter to the `/v1/` endpoint
-
-#### Added
 - FIRMS provider
+- EM-DAT provider
 #### Changed
 - Event versioning is removed 
 - Refactored normalization, event and episods jobs
@@ -13,8 +12,16 @@
 ### Configuration changes
 #### Added
 ```yaml
+emdat:
+  user: 'username'
+  password: 'password'
+
 scheduler:
   firmsImport:
+    enable: true
+    initialDelay: 1000
+    fixedRate: 3600000
+  emDatImport:
     enable: true
     initialDelay: 1000
     fixedRate: 3600000
