@@ -29,10 +29,13 @@ build:
     paths:
       - '*.zip'
 
-test:
+allure-tests:
   stage: test
+  variables:
+    TESTS_WORKING_DIR: '$CI_PROJECT_DIR/../'
   script:
-    - set
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/kontur-private/platform/event-api-tests.git/ "$TESTS_WORKING_DIR"
+    - ls -lAR "$TESTS_WORKING_DIR"
   when: manual
   allow_failure: true
   dependencies:
