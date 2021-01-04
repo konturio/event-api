@@ -13,6 +13,7 @@ import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -24,6 +25,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 @Component
 public class FeedCompositionJob implements Runnable {
@@ -86,8 +90,30 @@ public class FeedCompositionJob implements Runnable {
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
             Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
-            feedEpisode.ifPresent(feedData::addEpisode);
+            feedEpisode.ifPresent(episode -> {
+                if (episode.getStartedAt().isAfter(episode.getEndedAt())) {
+                    OffsetDateTime endedAt = episode.getEndedAt();
+                    episode.setEndedAt(episode.getStartedAt());
+                    addEpisode(feedData, episode);
+
+                    FeedEpisode newEpisode = new FeedEpisode();
+                    BeanUtils.copyProperties(episode, newEpisode);
+                    newEpisode.setStartedAt(endedAt);
+                    newEpisode.setEndedAt(endedAt);
+                    addEpisode(feedData, newEpisode);
+                } else {
+                    addEpisode(feedData, episode);
+                }
+            });
         });
+    }
+
+    private void addEpisode(FeedData feedData, FeedEpisode episode) {
+        checkNotNull(episode.getStartedAt());
+        checkNotNull(episode.getEndedAt());
+        checkState(!episode.getStartedAt().isAfter(episode.getEndedAt()));
+
+        feedData.addEpisode(episode);
     }
 
     private void fillFeedData(FeedData feedDto, List<NormalizedObservation> observations) {
