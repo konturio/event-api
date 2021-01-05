@@ -7,16 +7,14 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.FeedData;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
-import io.kontur.eventapi.test.AbstractIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.jdbc.JdbcTestUtils;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -26,9 +24,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.testcontainers.shaded.com.google.common.collect.Iterables.getOnlyElement;
 
 public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
@@ -51,6 +53,27 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         this.feedDao = feedDao;
         this.konturEventsDao = konturEventsDao;
         this.observationsDao = observationsDao;
+    }
+
+    @Test
+    public void testEpisodesWhenStartDateLaterThenEndedDate() throws IOException {
+        //given data_lake with started_at > ended_at
+        //when episodes crated
+        FeedData feedV1 = createFeed(UUID.randomUUID().toString(), OffsetDateTime.of(
+                LocalDateTime.of(2020, 1, 1, 1, 1), ZoneOffset.UTC),
+                HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard_with_start_later_then_end.json"));
+
+        //then
+        assertEquals(2, feedV1.getEpisodes().size());
+        assertEquals(feedV1.getEpisodes().get(1).getName(), feedV1.getEpisodes().get(0).getName());
+
+        NormalizedObservation observation = getOnlyElement(observationsDao.getObservations(feedV1.getObservations()));
+
+        assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(0).getStartedAt());
+        assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(0).getEndedAt());
+
+        assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(1).getStartedAt());
+        assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(1).getEndedAt());
     }
 
     @Test
