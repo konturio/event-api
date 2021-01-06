@@ -117,8 +117,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     private String calculateName(FeedEpisode feedEpisode, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
-        observations.sort(comparing(NormalizedObservation::getSourceUpdatedAt));
-        long burningTime = observations.get(0).getSourceUpdatedAt().until(feedEpisode.getSourceUpdatedAt(), ChronoUnit.HOURS);
+        observations.sort(comparing(NormalizedObservation::getStartedAt));
+        long burningTime = observations.get(0).getStartedAt().until(feedEpisode.getEndedAt(), ChronoUnit.HOURS);
         String burntArea = getArea(feedEpisode, eventObservations);
         return "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
     }
