@@ -28,6 +28,13 @@ public class BboxValidator implements ConstraintValidator<ValidBbox, List<BigDec
                     .addConstraintViolation();
             return false;
         }
+
+        if (bbox.get(0).compareTo(bbox.get(2)) > 0 || bbox.get(1).compareTo(bbox.get(3)) > 0) {
+            ctx.buildConstraintViolationWithTemplate("antimeridian coordinates is not supported")
+                    .addConstraintViolation();
+            return false;
+        }
+
         return true;
     }
 
