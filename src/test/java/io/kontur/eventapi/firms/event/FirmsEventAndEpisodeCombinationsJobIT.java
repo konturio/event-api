@@ -92,8 +92,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertTrue(feedData.get(1).getEpisodes().get(0).getName().equals("Burnt area 0.871km\u00B2, Burning time 27h"));
-        assertEquals(3, feedData.get(1).getEpisodes().get(0).getObservations().size());
+        assertTrue(feedData.get(1).getEpisodes().get(1).getName().equals("Burnt area 0.871km\u00B2, Burning time 27h"));
+        assertEquals(3, feedData.get(1).getEpisodes().get(1).getObservations().size());
 
 
         //WHEN new data available for modis - 3 observations within 1 km to 2 existing observation

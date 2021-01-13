@@ -36,10 +36,6 @@ public class EventCombinationJob implements Runnable {
     public void run() {
         List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 
-        //ideally order should not matter, but now firms processing is depending on order
-        // (see https://kontur.fibery.io/Tasks/Task/Firms-observation-with-distance-less-then-1km-are-in-different-envents-4446)
-        observations.sort(Comparator.comparing(NormalizedObservation::getSourceUpdatedAt));
-
         LOG.info("Combination job has started. Events to process: {}", observations.size());
 
         observations.forEach(this::addToEvent);

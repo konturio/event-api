@@ -65,7 +65,9 @@ public class FeedCompositionJob implements Runnable {
 
     private void createFeedData(UUID eventId, Feed feed) {
         List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
-        eventObservations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
+        eventObservations.sort(Comparator
+                .comparing(NormalizedObservation::getStartedAt)
+                .thenComparing(NormalizedObservation::getLoadedAt));
 
         Optional<FeedData> lastFeedData = feedDao.getLastFeedData(eventId, feed.getFeedId());
         FeedData feedData = new FeedData(eventId, feed.getFeedId(), lastFeedData.map(f -> f.getVersion() + 1).orElse(1L));
@@ -79,7 +81,7 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private void overrideFirmsFeedDataFields(List<NormalizedObservation> eventObservations, FeedData feedData) {
-        if (!eventObservations.isEmpty() && FirmsUtil.FIRMS_PROVIDERS.contains(eventObservations.get(0).getProvider())){
+        if (!eventObservations.isEmpty() && FirmsUtil.FIRMS_PROVIDERS.contains(eventObservations.get(0).getProvider())) {
             feedData.setName(feedData.getEpisodes().stream().max(Comparator.comparing(FeedEpisode::getEndedAt)).get().getName());
             feedData.setStartedAt(feedData.getEpisodes().stream().map(FeedEpisode::getStartedAt).min(OffsetDateTime::compareTo).get());
             feedData.setEndedAt(feedData.getEpisodes().stream().map(FeedEpisode::getEndedAt).max(OffsetDateTime::compareTo).get());
