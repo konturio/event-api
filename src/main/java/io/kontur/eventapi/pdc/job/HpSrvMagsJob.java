@@ -3,6 +3,7 @@ package io.kontur.eventapi.pdc.job;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.service.HpSrvService;
 import io.kontur.eventapi.util.JsonUtil;
 import io.micrometer.core.annotation.Counted;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class HpSrvMagsJob implements Runnable {
+public class HpSrvMagsJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(HpSrvMagsJob.class);
 
@@ -31,10 +32,8 @@ public class HpSrvMagsJob implements Runnable {
     @Override
     @Counted(value = "job.pdc_hpsrvmags.counter")
     @Timed(value = "job.pdc_hpsrvmags.in_progress_timer", longTask = true)
-    public void run() {
-        LOG.info("PDC mags import job has started");
+    public void execute() {
         importMags();
-        LOG.info("PDC mags import job has finished");
     }
 
     private void importMags() {

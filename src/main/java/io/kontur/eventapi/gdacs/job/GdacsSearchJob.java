@@ -3,6 +3,7 @@ package io.kontur.eventapi.gdacs.job;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.gdacs.service.GdacsService;
+import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
@@ -23,7 +24,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Component
-public class GdacsSearchJob implements Runnable {
+public class GdacsSearchJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
 
@@ -41,9 +42,8 @@ public class GdacsSearchJob implements Runnable {
     @Override
     @Counted(value = "job.gdacs_search.counter")
     @Timed(value = "job.gdacs_search.in_progress_timer", longTask = true)
-    public void run() {
+    public void execute() throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         try {
-            LOG.info("Gdacs import job has started");
             var xmlOpt = gdacsService.fetchGdacsXml();
             if (xmlOpt.isPresent()) {
                 String xml = xmlOpt.get();
@@ -54,11 +54,9 @@ public class GdacsSearchJob implements Runnable {
                 var dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(parsedAlerts);
                 gdacsService.saveGdacs(dataLakes);
             }
-            LOG.info("Gdacs import job has finished");
         } catch (DateTimeParseException e) {
             LOG.warn("Parsing pubDate from Gdacs was failed");
-        } catch (IOException | ParserConfigurationException | SAXException | XPathExpressionException e) {
-            LOG.warn("Gdacs import job has failed", e);
+            throw e;
         }
     }
 
