@@ -65,6 +65,7 @@
         SELECT *
         FROM normalized_observations
         WHERE recombined is false
+        ORDER BY collected_geography
         LIMIT 100000
     </select>
 
