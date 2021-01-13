@@ -3,12 +3,11 @@ package io.kontur.eventapi.firms.jobs;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.firms.client.FirmsClient;
+import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,13 +21,13 @@ import java.time.temporal.ChronoField;
 import java.util.Map;
 import java.util.UUID;
 
-import static io.kontur.eventapi.firms.FirmsUtil.*;
+import static io.kontur.eventapi.firms.FirmsUtil.MODIS_PROVIDER;
+import static io.kontur.eventapi.firms.FirmsUtil.NOAA_PROVIDER;
+import static io.kontur.eventapi.firms.FirmsUtil.SUOMI_PROVIDER;
+import static io.kontur.eventapi.firms.FirmsUtil.parseRow;
 
 @Component
-public class FirmsImportJob implements Runnable {
-
-    private final static Logger LOG = LoggerFactory.getLogger(FirmsImportJob.class);
-
+public class FirmsImportJob extends AbstractJob {
     private final static DateTimeFormatter FIRMS_DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.HOUR_OF_DAY, 2)
             .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
@@ -46,14 +45,10 @@ public class FirmsImportJob implements Runnable {
     @Override
     @Counted(value = "job.firms_import.counter")
     @Timed(value = "job.firms_import.in_progress_timer", longTask = true)
-    public void run() {
-        LOG.info("Firms import job has started");
-
+    public void execute() {
         createDataLakes(MODIS_PROVIDER, firmsClient.getModisData());
         createDataLakes(NOAA_PROVIDER, firmsClient.getNoaa20VirsData());
         createDataLakes(SUOMI_PROVIDER, firmsClient.getSuomiNppVirsData());
-
-        LOG.info("Firms import job has finished");
     }
 
     private void createDataLakes(String provider, String data) {

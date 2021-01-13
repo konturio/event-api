@@ -62,7 +62,7 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.hpSrvMagsImport.initialDelay}", fixedRateString = "${scheduler.hpSrvMagsImport.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.hpSrvMagsImport.initialDelay}", fixedDelayString = "${scheduler.hpSrvMagsImport.fixedDelay}")
     public void startPdcMagsImport() {
         if (Boolean.parseBoolean(hpSrvMagsImportEnabled)) {
             hpSrvMagsJob.run();
@@ -80,7 +80,7 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.firmsImport.initialDelay}", fixedRateString = "${scheduler.firmsImport.fixedRate}")
+    @Scheduled(initialDelayString = "${scheduler.firmsImport.initialDelay}", fixedDelayString= "${scheduler.firmsImport.fixedDelay}")
     public void startFirmsImport() {
         if (Boolean.parseBoolean(firmsImportEnabled)) {
             firmsImportJob.run();
@@ -89,7 +89,7 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedRateString = "${scheduler.normalization.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedDelayString = "${scheduler.normalization.fixedDelay}")
     public void startNormalization() {
         if (Boolean.parseBoolean(normalizationEnabled)) {
             normalizationJob.run();
@@ -98,7 +98,7 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedRateString = "${scheduler.eventCombination.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedDelayString = "${scheduler.eventCombination.fixedDelay}")
     public void startCombinationJob() {
         if (Boolean.parseBoolean(eventCombinationEnabled)) {
             eventCombinationJob.run();
@@ -107,7 +107,7 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedRateString = "${scheduler.feedComposition.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
     public void startFeedCompositionJob() {
         if (Boolean.parseBoolean(feedCompositionEnabled)) {
             feedCompositionJob.run();

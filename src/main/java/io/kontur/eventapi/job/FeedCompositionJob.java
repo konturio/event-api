@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 @Component
-public class FeedCompositionJob implements Runnable {
+public class FeedCompositionJob  extends AbstractJob  {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeedCompositionJob.class);
 
@@ -50,11 +50,9 @@ public class FeedCompositionJob implements Runnable {
     @Override
     @Counted(value = "job.feed_composition.counter")
     @Timed(value = "job.feed_composition.in_progress_timer", longTask = true)
-    public void run() {
-        LOG.info("Feed Composition job has started.");
+    public void execute() {
         List<Feed> feeds = feedDao.getFeeds();
         feeds.forEach(this::updateFeed);
-        LOG.info("Feed Composition job has finished.");
     }
 
     private void updateFeed(Feed feed) {

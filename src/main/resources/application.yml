@@ -49,7 +49,7 @@ scheduler:
   firmsImport:
     enable: true
     initialDelay: 1000
-    fixedRate: 3600000
+    fixedDelay: 3600000
   normalization:
     enable: true
     initialDelay: 1000

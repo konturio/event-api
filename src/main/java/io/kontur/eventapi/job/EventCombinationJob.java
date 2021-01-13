@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class EventCombinationJob implements Runnable {
+public class EventCombinationJob extends AbstractJob  {
     public static final Logger LOG = LoggerFactory.getLogger(EventCombinationJob.class);
 
     private final NormalizedObservationsDao observationsDao;
@@ -33,14 +33,12 @@ public class EventCombinationJob implements Runnable {
     @Override
     @Counted(value = "job.event_combination.counter")
     @Timed(value = "job.event_combination.in_progress_timer", longTask = true)
-    public void run() {
+    public void execute() {
         List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 
-        LOG.info("Combination job has started. Events to process: {}", observations.size());
+        LOG.info("Combination processing: {} events", observations.size());
 
         observations.forEach(this::addToEvent);
-
-        LOG.info("Combination job has finished");
     }
 
     private void addToEvent(NormalizedObservation observation) {
