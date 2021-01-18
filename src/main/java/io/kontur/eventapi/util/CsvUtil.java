@@ -17,7 +17,14 @@ public final class CsvUtil {
                     if (i >= csvRows.length) {
                         return "";
                     }
-                    return csvRows[i];
+                    return trimDoubleQuotes(csvRows[i]);
                 }));
+    }
+
+    private static String trimDoubleQuotes(String value) {
+        if (value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1);
+        }
+        return value;
     }
 }

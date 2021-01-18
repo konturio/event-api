@@ -22,6 +22,7 @@ import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -91,11 +92,25 @@ public class EmDatNormalizer extends Normalizer {
 
         normalizationService
                 .obtainGeometries(csvData.get("Country"), csvData.get("Location"))
-                .map(geometry -> new Feature(geometry, Map.of("country", csvData.get("Country"),
-                        "regions", csvData.get("Location"),
-                        "name", obs.getName(),
-                        "severity", obs.getEventSeverity(),
-                        "type", obs.getType())))
+                .map(geometry -> {
+                    Map<String, Object> properties = new HashMap<>();
+                    properties.put("country", csvData.get("Country"));
+                    properties.put("regions", csvData.get("Location"));
+                    properties.put("name", obs.getName());
+                    properties.put("severity", obs.getEventSeverity());
+                    properties.put("type", obs.getType());
+                    properties.put("injured", csvData.get("No Injured"));
+                    properties.put("affected", csvData.get("No Affected"));
+                    properties.put("deaths", csvData.get("Total Deaths"));
+                    properties.put("homeless", csvData.get("No Homeless"));
+                    properties.put("total_affected", csvData.get("Total Affected"));
+                    properties.put("reconstruction_costs", csvData.get("Reconstruction Costs"));
+                    properties.put("total_damages", csvData.get("Total Damages"));
+                    properties.put("dis_mag_scale", csvData.get("Dis Mag Scale"));
+                    properties.put("dis_mag_value", csvData.get("Dis Mag Value"));
+                    return new Feature(geometry, properties);
+                })
+                //TODO add affected population
                 .map(f -> new Feature[]{f})
                 .map(FeatureCollection::new)
                 .ifPresent(fc -> obs.setGeometries(fc.toString()));
