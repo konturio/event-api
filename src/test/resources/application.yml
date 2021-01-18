@@ -9,6 +9,10 @@ gdacs:
 emdat:
   user: 'user@user.com'
   password: 'the_most_secured_password'
+  host: 'https://public.emdat.be/api'
+
+konturApi:
+  host: 'https://api.kontur.io/'
 
 scheduler:
   hpSrvImport:
