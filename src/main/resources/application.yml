@@ -38,6 +38,10 @@ gdacs:
 emdat:
   user: 'username'
   password: 'password'
+  host: 'https://public.emdat.be/api'
+
+konturApi:
+  host: 'https://api.kontur.io/'
 
 scheduler:
   hpSrvImport:
@@ -55,11 +59,11 @@ scheduler:
     initialDelay: 1000
     fixedRate: 3600000
   emDatImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedRate: 3600000
   normalization:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
   eventCombination:

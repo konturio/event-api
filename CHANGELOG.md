@@ -15,6 +15,11 @@
 emdat:
   user: 'username'
   password: 'password'
+  host: 'https://public.emdat.be/api'
+
+konturApi:
+  host: 'https://api.kontur.io/'
+
 
 scheduler:
   firmsImport:

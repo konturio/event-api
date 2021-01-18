@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@FeignClient(value = "emDatClient", url = "https://public.emdat.be/api")
+@FeignClient(value = "emDatClient", url = "${emdat.host}")
 public interface EmDatClient {
 
     @PostMapping("/graphql")

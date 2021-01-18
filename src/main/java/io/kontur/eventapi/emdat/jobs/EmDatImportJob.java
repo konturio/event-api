@@ -15,10 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.DateTimeException;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -32,8 +31,10 @@ public class EmDatImportJob implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmDatImportJob.class);
     private static final String CSV_ID_HEADER = "Dis No";
+    private static final String FILE_CREATION_CELL = "File creation:";
     private static final DataFormatter DATA_FORMATTER = new DataFormatter(Locale.ENGLISH);
-
+    private static final DateTimeFormatter FILE_CREATION_FORMATTER = DateTimeFormatter
+            .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
     private final EmDatImportService importService;
     private final DataLakeDao dataLakeDao;
 
@@ -54,6 +55,7 @@ public class EmDatImportJob implements Runnable {
              final Workbook wb = WorkbookFactory.create(stream)) {
             Sheet sheet = getDataSheet(wb);
             int headerRowNum = findHeaderRow(sheet);
+            OffsetDateTime fileCreationDate = getFileCreationDate(sheet);
             String csvHeader = convertRowIntoCsv(sheet.getRow(headerRowNum));
             for (int dataRowNum = headerRowNum + 1; dataRowNum <= sheet.getLastRowNum(); dataRowNum++) {
                 String csvData = convertRowIntoCsv(sheet.getRow(dataRowNum));
@@ -62,7 +64,7 @@ public class EmDatImportJob implements Runnable {
                     String externalId = row.get(CSV_ID_HEADER);
                     boolean doesRowNotExistInDataLake = dataLakeDao.getDataLakesByExternalId(externalId).isEmpty();
                     if (doesRowNotExistInDataLake) {
-                        convertAndStore(row, csvHeader, csvData);
+                        save(row, csvHeader, csvData, fileCreationDate);
                     }
                 } catch (Exception e) {
                     LOG.error("Can't create EM-DAT row: {}", csvData, e);
@@ -84,11 +86,23 @@ public class EmDatImportJob implements Runnable {
 
     private int findHeaderRow(Sheet sheet) {
         for (int i = 0; i < sheet.getLastRowNum(); i++) {
-            if (CSV_ID_HEADER.equals(sheet.getRow(i).getCell(0).getStringCellValue())) {
+            if (CSV_ID_HEADER.equals(DATA_FORMATTER.formatCellValue(sheet.getRow(i).getCell(0)))) {
                 return i;
             }
         }
         throw new IllegalArgumentException("Illegal EM-DAT xlsx format. Could not find table header");
+    }
+
+    private OffsetDateTime getFileCreationDate(Sheet sheet) {
+        for (Row row : sheet) {
+            if (FILE_CREATION_CELL.equals(DATA_FORMATTER.formatCellValue(row.getCell(0)))) {
+                return ZonedDateTime
+                        .parse(DATA_FORMATTER.formatCellValue(row.getCell(1)), FILE_CREATION_FORMATTER)
+                        .toOffsetDateTime();
+            }
+        }
+        throw new IllegalArgumentException(
+                String.format("Illegal EM-DAT xlsx format. Could not find %s cell", FILE_CREATION_CELL));
     }
 
     private String convertRowIntoCsv(Row row) {
@@ -106,38 +120,16 @@ public class EmDatImportJob implements Runnable {
         return builder.toString();
     }
 
-    private void convertAndStore(Map<String, String> row, String csvHeader,
-                                 String csvData) {
+    private void save(Map<String, String> row, String csvHeader, String csvData, OffsetDateTime fileCreationDate) {
         DataLake dataLake = new DataLake();
 
         dataLake.setObservationId(UUID.randomUUID());
+        dataLake.setProvider(EM_DAT_PROVIDER);
         dataLake.setExternalId(row.get(CSV_ID_HEADER));
         dataLake.setData(csvHeader + "\n" + csvData);
         dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
-        dataLake.setProvider(EM_DAT_PROVIDER);
-        dataLake.setUpdatedAt(getExtractStartedAtValue(row, csvData));
+        dataLake.setUpdatedAt(fileCreationDate);
 
         dataLakeDao.storeEventData(dataLake);
-    }
-
-    private OffsetDateTime getExtractStartedAtValue(Map<String, String> row, String csvData) {
-        int startYear = Integer.parseInt(row.get("Start Year"));
-        int startMonth = Integer.parseInt(getOrDefault(row.get("Start Month"), "1"));
-        int startDay = Integer.parseInt(getOrDefault(row.get("Start Day"), "1"));
-        LocalDateTime ldt;
-        try {
-            ldt = LocalDateTime.of(startYear, startMonth, startDay, 0, 0, 0);
-        } catch (DateTimeException e) {
-            LOG.warn("'{}' for {}", e.getMessage(), csvData);
-            ldt = LocalDateTime.of(startYear, startMonth, 1, 0, 0, 0);
-        }
-        return OffsetDateTime.of(ldt, ZoneOffset.UTC);
-    }
-
-    private String getOrDefault(String value, String def) {
-        if (value == null || value.isBlank()) {
-            return def;
-        }
-        return value;
     }
 }
