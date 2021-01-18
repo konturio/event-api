@@ -13,6 +13,7 @@ import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -25,8 +26,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 @Component
-public class FeedCompositionJob implements Runnable {
+public class FeedCompositionJob  extends AbstractJob  {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeedCompositionJob.class);
 
@@ -46,11 +50,9 @@ public class FeedCompositionJob implements Runnable {
     @Override
     @Counted(value = "job.feed_composition.counter")
     @Timed(value = "job.feed_composition.in_progress_timer", longTask = true)
-    public void run() {
-        LOG.info("Feed Composition job has started.");
+    public void execute() {
         List<Feed> feeds = feedDao.getFeeds();
         feeds.forEach(this::updateFeed);
-        LOG.info("Feed Composition job has finished.");
     }
 
     private void updateFeed(Feed feed) {
@@ -61,7 +63,9 @@ public class FeedCompositionJob implements Runnable {
 
     private void createFeedData(UUID eventId, Feed feed) {
         List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
-        eventObservations.sort(Comparator.comparing(NormalizedObservation::getLoadedAt));
+        eventObservations.sort(Comparator
+                .comparing(NormalizedObservation::getStartedAt)
+                .thenComparing(NormalizedObservation::getLoadedAt));
 
         Optional<FeedData> lastFeedData = feedDao.getLastFeedData(eventId, feed.getFeedId());
         FeedData feedData = new FeedData(eventId, feed.getFeedId(), lastFeedData.map(f -> f.getVersion() + 1).orElse(1L));
@@ -75,7 +79,7 @@ public class FeedCompositionJob implements Runnable {
     }
 
     private void overrideFirmsFeedDataFields(List<NormalizedObservation> eventObservations, FeedData feedData) {
-        if (!eventObservations.isEmpty() && FirmsUtil.FIRMS_PROVIDERS.contains(eventObservations.get(0).getProvider())){
+        if (!eventObservations.isEmpty() && FirmsUtil.FIRMS_PROVIDERS.contains(eventObservations.get(0).getProvider())) {
             feedData.setName(feedData.getEpisodes().stream().max(Comparator.comparing(FeedEpisode::getEndedAt)).get().getName());
             feedData.setStartedAt(feedData.getEpisodes().stream().map(FeedEpisode::getStartedAt).min(OffsetDateTime::compareTo).get());
             feedData.setEndedAt(feedData.getEpisodes().stream().map(FeedEpisode::getEndedAt).max(OffsetDateTime::compareTo).get());
@@ -86,8 +90,30 @@ public class FeedCompositionJob implements Runnable {
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
             Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
-            feedEpisode.ifPresent(feedData::addEpisode);
+            feedEpisode.ifPresent(episode -> {
+                if (episode.getStartedAt().isAfter(episode.getEndedAt())) {
+                    OffsetDateTime endedAt = episode.getEndedAt();
+                    episode.setEndedAt(episode.getStartedAt());
+                    addEpisode(feedData, episode);
+
+                    FeedEpisode newEpisode = new FeedEpisode();
+                    BeanUtils.copyProperties(episode, newEpisode);
+                    newEpisode.setStartedAt(endedAt);
+                    newEpisode.setEndedAt(endedAt);
+                    addEpisode(feedData, newEpisode);
+                } else {
+                    addEpisode(feedData, episode);
+                }
+            });
         });
+    }
+
+    private void addEpisode(FeedData feedData, FeedEpisode episode) {
+        checkNotNull(episode.getStartedAt());
+        checkNotNull(episode.getEndedAt());
+        checkState(!episode.getStartedAt().isAfter(episode.getEndedAt()));
+
+        feedData.addEpisode(episode);
     }
 
     private void fillFeedData(FeedData feedDto, List<NormalizedObservation> observations) {

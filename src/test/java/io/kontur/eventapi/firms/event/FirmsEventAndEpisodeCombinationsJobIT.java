@@ -92,8 +92,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertTrue(feedData.get(1).getEpisodes().get(0).getName().contains("Burnt area 0.871km\u00B2, Burning time 3h"));
-        assertEquals(3, feedData.get(1).getEpisodes().get(0).getObservations().size());
+        assertTrue(feedData.get(1).getEpisodes().get(1).getName().equals("Burnt area 0.871km\u00B2, Burning time 27h"));
+        assertEquals(3, feedData.get(1).getEpisodes().get(1).getObservations().size());
 
 
         //WHEN new data available for modis - 3 observations within 1 km to 2 existing observation
@@ -131,7 +131,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(2, firmsUpdated.get(1).getVersion());
 
         FeedData someFedData = firmsUpdated.get(2);
-        assertEquals("Burnt area 2.613km\u00B2, Burning time 11h", someFedData.getName());
+        assertEquals("Burnt area 2.613km\u00B2, Burning time 35h", someFedData.getName());
         assertEquals(5, someFedData.getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"),someFedData.getStartedAt());
         assertEquals(parse("2020-11-03T22:50Z"),someFedData.getEndedAt());
@@ -142,25 +142,25 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
         episodes.sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
 
-        assertTrue(episodes.get(0).getName().contains("Burnt area 0.871km\u00B2"));
+        assertEquals(episodes.get(0).getName(), "Burnt area 0.871km\u00B2, Burning time 1h");
         assertEquals(2, episodes.get(0).getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getStartedAt());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt());
 
-        assertTrue(episodes.get(1).getName().contains("Burnt area 1.742km\u00B2, Burning time 1h"));
+        assertEquals(episodes.get(1).getName(), "Burnt area 1.742km\u00B2, Burning time 3h");
         assertEquals(3, episodes.get(1).getObservations().size());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt());
 
-        assertTrue(episodes.get(2).getName().contains("Burnt area 1.742km\u00B2, Burning time 3h"));
+        assertEquals(episodes.get(2).getName(), "Burnt area 1.742km\u00B2, Burning time 11h");
         assertEquals(4, episodes.get(2).getObservations().size());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getStartedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(2).getEndedAt());
 
-        assertTrue(episodes.get(3).getName().contains("Burnt area 2.613km\u00B2, Burning time 11h"));
+        assertEquals(episodes.get(3).getName(), "Burnt area 2.613km\u00B2, Burning time 35h");
         assertEquals(5, episodes.get(3).getObservations().size());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getStartedAt());

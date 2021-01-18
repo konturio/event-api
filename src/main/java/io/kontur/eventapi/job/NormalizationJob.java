@@ -16,7 +16,7 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Component
-public class NormalizationJob implements Runnable {
+public class NormalizationJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(NormalizationJob.class);
 
@@ -34,19 +34,17 @@ public class NormalizationJob implements Runnable {
     @Override
     @Counted(value = "job.normalization.counter")
     @Timed(value = "job.normalization.in_progress_timer", longTask = true)
-    public void run() {
-        List<DataLake> denormalizedEvents = dataLakeDao.getDenormalizedEvents();
-        LOG.info("Normalization job has started. Events to process: {}", denormalizedEvents.size());
+    public void execute() {
+        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
+        LOG.info("Normalization processing: {} data lakes", dataLakes.size());
 
-        for (DataLake denormalizedEvent : denormalizedEvents) {
-            boolean isNormalized = normalize(denormalizedEvent);
+        for (DataLake dataLake : dataLakes) {
+            boolean isNormalized = normalize(dataLake);
             if (!isNormalized) {
-                LOG.info("Event wasn't normalized. Provider: {}, observation: {}", denormalizedEvent.getProvider(),
-                        denormalizedEvent.getObservationId());
+                LOG.info("Event wasn't normalized. Provider: {}, observation: {}", dataLake.getProvider(),
+                        dataLake.getObservationId());
             }
         }
-
-        LOG.info("Normalization job has finished");
     }
 
     private boolean normalize(DataLake denormalizedEvent) {
