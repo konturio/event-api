@@ -96,3 +96,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add_constraints.sql
+- include:
+    relativeToChangelogFile: true
+    file: add_updated_at_index_for_feed_data.sql

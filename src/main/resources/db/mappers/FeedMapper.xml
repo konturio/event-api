@@ -16,50 +16,40 @@
     </insert>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        WITH feed as (SELECT feed_id
-                      FROM feeds
-                      WHERE alias = #{feedAlias}),
-            feed_version as (SELECT event_id, max(version) as version
-                             FROM feed_data fd2,
-                                 feed f
-                             WHERE fd2.feed_id = f.feed_id
-                             GROUP BY event_id),
-            type_match as (select distinct tm.event_id, tm.version
-                           from feed_data tm,
-                                <if test="(eventTypes!=null &amp;&amp; !eventTypes.isEmpty()) || (severities!=null &amp;&amp; !severities.isEmpty())"  >
-                                    jsonb_array_elements(episodes) arr(episode),
-                                </if>
-                               feed_version
-                           where feed_version.event_id = tm.event_id
-                             and feed_version.version = tm.version
-                             <foreach item="eventType" collection="eventTypes" separator="," open="and episode ->> 'type' in (" close=")">
-                                 #{eventType}
-                             </foreach>
-                             <foreach item="severity" collection="severities" separator="," open="and episode ->> 'severity' in (" close=")">
-                                 #{severity}
-                             </foreach>
+        <![CDATA[
+        select *
+        from feed_data fd
+        where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+            and not exists (select from feed_data prev where fd.feed_id = prev.feed_id and fd.event_id = prev.event_id and fd.version < prev.version)
+        ]]>
+            <if test="(eventTypes!=null &amp;&amp; !eventTypes.isEmpty()) || (severities!=null &amp;&amp; !severities.isEmpty())"  >
+                and exists(select from jsonb_array_elements(episodes) arr(episode) where 1=1
+                <foreach item="eventType" collection="eventTypes" separator="," open="and episode ->> 'type' in (" close=")">
+                    #{eventType}
+                </foreach>
+                <foreach item="severity" collection="severities" separator="," open="and episode ->> 'severity' in (" close=")">
+                   #{severity}
+                </foreach>
                 )
-        SELECT fd.*
-        FROM feed_data fd,
-            feed f,
-            type_match
-        WHERE fd.feed_id = f.feed_id
-          AND fd.event_id = type_match.event_id
-          AND fd.version = type_match.version
-        <if test='from != null'>
-            AND (fd.ended_at <![CDATA[>=]]> #{from})
-        </if>
-        <if test='to != null'>
-            AND (fd.started_at <![CDATA[<=]]> #{to})
-        </if>
-        <if test='updatedAfter != null'>
-            AND fd.updated_at >= #{updatedAfter}
-        </if>
-        <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
-            AND ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
-        </if>
-        ORDER BY fd.updated_at ${sortOrder}
-        LIMIT #{limit};
+            </if>
+            <if test='from != null'>
+                <![CDATA[
+                and (fd.ended_at >= #{from})
+                ]]>
+            </if>
+            <if test='to != null'>
+                <![CDATA[
+                and (fd.started_at <= #{to})
+                ]]>
+            </if>
+            <if test='updatedAfter != null'>
+                and fd.updated_at >= #{updatedAfter}
+            </if>
+            <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
+                and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
+            </if>
+        order by fd.updated_at ${sortOrder}
+        limit #{limit};
     </select>
 
     <select id="getEventByEventIdAndByVersionOrLast" resultMap="feedDataDtoMap">
