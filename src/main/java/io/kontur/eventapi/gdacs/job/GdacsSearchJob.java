@@ -20,6 +20,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -70,7 +71,7 @@ public class GdacsSearchJob extends AbstractJob {
                 .collect(toList());
     }
 
-    List<ParsedAlert> getSortedParsedAlerts(List<String> alerts) throws XPathExpressionException, ParserConfigurationException {
+    List<ParsedAlert> getSortedParsedAlerts(Map<String, String> alerts) throws XPathExpressionException, ParserConfigurationException {
         return gdacsAlertParser.getParsedAlertsToGdacsSearchJob(alerts).stream()
                 .sorted(Comparator.comparing(ParsedAlert::getSent))
                 .collect(toList());

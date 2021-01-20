@@ -25,8 +25,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static io.kontur.eventapi.gdacs.service.GdacsService.ALERT_BY_LINK;
 import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 @Component
@@ -57,7 +59,7 @@ public class GdacsAlertXmlParser {
         return links;
     }
 
-    public List<ParsedAlert> getParsedAlertsToGdacsSearchJob(List<String> alertXmlList) throws ParserConfigurationException, XPathExpressionException {
+    public List<ParsedAlert> getParsedAlertsToGdacsSearchJob(Map<String, String> alertsByLinks) throws ParserConfigurationException, XPathExpressionException {
         var parsedAlerts = new ArrayList<ParsedAlert>();
 
         var xPath = XPathFactory.newInstance().newXPath();
@@ -70,15 +72,16 @@ public class GdacsAlertXmlParser {
         var xPathExpressionToParameters = xPath.compile(pathToDateModified);
         var xPathExpressionToSent = xPath.compile(pathToSent);
 
-        for (String alertXml : alertXmlList) {
-            var parsedAlert = parseAlert(externalIdExpression, xPathExpressionToParameters, xPathExpressionToSent, alertXml);
-            parsedAlert.ifPresent(parsedAlerts::add);
+        for (Map.Entry<String, String> alertXml : alertsByLinks.entrySet()) {
+            parseAlert(externalIdExpression, xPathExpressionToParameters,
+                    xPathExpressionToSent, alertXml.getKey(), alertXml.getValue()).ifPresent(parsedAlerts::add);
         }
+
         return parsedAlerts;
     }
 
     private Optional<ParsedAlert> parseAlert(XPathExpression externalIdExpression, XPathExpression xPathExpressionToParameters,
-                                             XPathExpression xPathExpressionToSent, String alertXml) throws ParserConfigurationException {
+                                             XPathExpression xPathExpressionToSent, String link, String alertXml) throws ParserConfigurationException {
         String externalId = "";
         try {
 
@@ -110,7 +113,7 @@ public class GdacsAlertXmlParser {
                 }
             }
             if (StringUtils.isEmpty(eventType) || StringUtils.isEmpty(eventId) || StringUtils.isEmpty(dateModified)) {
-                LOG.warn("Alerts xml does not have parameter: {}", alertXml);
+                LOG.warn(ALERT_BY_LINK + " does not have parameter: {}", link, alertXml);
                 return Optional.empty();
             }
 
@@ -124,9 +127,9 @@ public class GdacsAlertXmlParser {
                     alertXml));
 
         } catch (IOException | SAXException | XPathExpressionException e) {
-            LOG.warn("Alerts xml is not valid and can not be parsed: {}", alertXml);
+            LOG.warn(ALERT_BY_LINK + " is not valid and can not be parsed: {}", link, alertXml);
         } catch (DateTimeParseException e) {
-            LOG.warn("Alerts xml value of parameter datemodified or sent can not be parsed: {}", externalId);
+            LOG.warn(ALERT_BY_LINK + " value of parameter datemodified or sent can not be parsed: {}", link, externalId);
         }
         return Optional.empty();
     }
