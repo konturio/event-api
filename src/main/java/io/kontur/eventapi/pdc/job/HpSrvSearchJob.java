@@ -30,7 +30,7 @@ public class HpSrvSearchJob extends AbstractJob {
 
     @Override
     @Counted(value = "job.pdc_hpsrvsearch.counter")
-    @Timed(value = "job.pdc_hpsrvsearch.in_progress_timer", longTask = true)
+    @Timed(value = "job.pdc_hpsrvsearch.in_progress_timer")
     public void execute() {
         importHazards();
     }
