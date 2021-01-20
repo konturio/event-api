@@ -41,7 +41,7 @@ public class GdacsSearchJob extends AbstractJob {
 
     @Override
     @Counted(value = "job.gdacs_search.counter")
-    @Timed(value = "job.gdacs_search.in_progress_timer", longTask = true)
+    @Timed(value = "job.gdacs_search.in_progress_timer")
     public void execute() throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         try {
             var xmlOpt = gdacsService.fetchGdacsXml();

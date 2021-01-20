@@ -44,7 +44,7 @@ public class FirmsImportJob extends AbstractJob {
 
     @Override
     @Counted(value = "job.firms_import.counter")
-    @Timed(value = "job.firms_import.in_progress_timer", longTask = true)
+    @Timed(value = "job.firms_import.in_progress_timer")
     public void execute() {
         createDataLakes(MODIS_PROVIDER, firmsClient.getModisData());
         createDataLakes(NOAA_PROVIDER, firmsClient.getNoaa20VirsData());

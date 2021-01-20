@@ -47,7 +47,7 @@ public class FeedCompositionJob extends AbstractJob {
 
     @Override
     @Counted(value = "job.feed_composition.counter")
-    @Timed(value = "job.feed_composition.in_progress_timer", longTask = true)
+    @Timed(value = "job.feed_composition.in_progress_timer")
     public void execute() {
         List<Feed> feeds = feedDao.getFeeds();
         feeds.forEach(this::updateFeed);
