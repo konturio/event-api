@@ -5,8 +5,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,18 +36,22 @@ public class FirmsImportJob extends AbstractJob {
     private final DataLakeDao dataLakeDao;
 
     @Autowired
-    public FirmsImportJob(FirmsClient firmsClient, DataLakeDao dataLakeDao) {
+    public FirmsImportJob(FirmsClient firmsClient, DataLakeDao dataLakeDao, MeterRegistry meterRegistry) {
+        super(meterRegistry);
         this.firmsClient = firmsClient;
         this.dataLakeDao = dataLakeDao;
     }
 
     @Override
-    @Counted(value = "job.firms_import.counter")
-    @Timed(value = "job.firms_import.in_progress_timer")
     public void execute() {
         createDataLakes(MODIS_PROVIDER, firmsClient.getModisData());
         createDataLakes(NOAA_PROVIDER, firmsClient.getNoaa20VirsData());
         createDataLakes(SUOMI_PROVIDER, firmsClient.getSuomiNppVirsData());
+    }
+
+    @Override
+    public String getName() {
+        return "firmsImport";
     }
 
     private void createDataLakes(String provider, String data) {

@@ -5,8 +5,7 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,15 +24,14 @@ public class NormalizationJob extends AbstractJob {
     private final NormalizedObservationsDao normalizedObservationsDao;
 
     public NormalizationJob(List<Normalizer> normalizers, DataLakeDao dataLakeDao,
-                            NormalizedObservationsDao normalizedObservationsDao) {
+                            NormalizedObservationsDao normalizedObservationsDao, MeterRegistry meterRegistry) {
+        super(meterRegistry);
         this.normalizers = normalizers;
         this.dataLakeDao = dataLakeDao;
         this.normalizedObservationsDao = normalizedObservationsDao;
     }
 
     @Override
-    @Counted(value = "job.normalization.counter")
-    @Timed(value = "job.normalization.in_progress_timer")
     public void execute() {
         List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
         LOG.info("Normalization processing: {} data lakes", dataLakes.size());
@@ -45,6 +43,11 @@ public class NormalizationJob extends AbstractJob {
                         dataLake.getObservationId());
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return "normalization";
     }
 
     private boolean normalize(DataLake denormalizedEvent) {

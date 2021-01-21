@@ -5,8 +5,7 @@ import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +34,13 @@ public class GdacsSearchJob extends AbstractJob {
     private final GdacsAlertXmlParser gdacsAlertParser;
 
     @Autowired
-    public GdacsSearchJob(GdacsService gdacsService, GdacsAlertXmlParser gdacsAlertParser) {
+    public GdacsSearchJob(GdacsService gdacsService, GdacsAlertXmlParser gdacsAlertParser, MeterRegistry meterRegistry) {
+        super(meterRegistry);
         this.gdacsService = gdacsService;
         this.gdacsAlertParser = gdacsAlertParser;
     }
 
     @Override
-    @Counted(value = "job.gdacs_search.counter")
-    @Timed(value = "job.gdacs_search.in_progress_timer")
     public void execute() throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         try {
             var xmlOpt = gdacsService.fetchGdacsXml();
@@ -59,6 +57,11 @@ public class GdacsSearchJob extends AbstractJob {
             LOG.warn("Parsing pubDate from Gdacs was failed");
             throw e;
         }
+    }
+
+    @Override
+    public String getName() {
+        return "gdacsSearch";
     }
 
     void setPubDate(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
