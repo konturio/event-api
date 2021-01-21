@@ -28,6 +28,10 @@ scheduler:
   gdacsImport:
     enable: true
     cron: 30 0/5 * * * *
+  firmsImport:
+    enable: true
+  emDatImport:
+    enable: true
   normalization:
     enable: true
     initialDelay: 1000

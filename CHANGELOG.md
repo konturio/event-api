@@ -25,11 +25,11 @@ scheduler:
   firmsImport:
     enable: true
     initialDelay: 1000
-    fixedRate: 3600000
+    fixedDelay: 3600000
   emDatImport:
     enable: true
     initialDelay: 1000
-    fixedRate: 3600000
+    fixedDelay: PT3H # every 3 hours
 ```
 
 ## 0.3 - 2020-11-18

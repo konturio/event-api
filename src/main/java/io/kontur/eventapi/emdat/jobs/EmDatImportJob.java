@@ -18,11 +18,10 @@ import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
+import static java.util.Comparator.comparing;
 
 @Component
 public class EmDatImportJob implements Runnable {
@@ -54,22 +53,7 @@ public class EmDatImportJob implements Runnable {
         try (final InputStream stream = importService.obtainFile(emDatPublicFile.getName(), token);
              final Workbook wb = WorkbookFactory.create(stream)) {
             Sheet sheet = getDataSheet(wb);
-            int headerRowNum = findHeaderRow(sheet);
-            OffsetDateTime fileCreationDate = getFileCreationDate(sheet);
-            String csvHeader = convertRowIntoCsv(sheet.getRow(headerRowNum));
-            for (int dataRowNum = headerRowNum + 1; dataRowNum <= sheet.getLastRowNum(); dataRowNum++) {
-                String csvData = convertRowIntoCsv(sheet.getRow(dataRowNum));
-                try {
-                    Map<String, String> row = parseRow(csvHeader, csvData);
-                    String externalId = row.get(CSV_ID_HEADER);
-                    boolean doesRowNotExistInDataLake = dataLakeDao.getDataLakesByExternalId(externalId).isEmpty();
-                    if (doesRowNotExistInDataLake) {
-                        save(row, csvHeader, csvData, fileCreationDate);
-                    }
-                } catch (Exception e) {
-                    LOG.error("Can't create EM-DAT row: {}", csvData, e);
-                }
-            }
+            parseAndSaveContent(sheet);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -82,6 +66,32 @@ public class EmDatImportJob implements Runnable {
             throw new IllegalArgumentException("Illegal EM-DAT xlsx format. Could not find 'emdat data' sheet");
         }
         return sheet;
+    }
+
+    private void parseAndSaveContent(Sheet sheet) {
+        OffsetDateTime fileCreationDate = getFileCreationDate(sheet);
+        int headerRowNum = findHeaderRow(sheet);
+        String csvHeader = convertRowIntoCsv(sheet.getRow(headerRowNum));
+        for (int dataRowNum = headerRowNum + 1; dataRowNum <= sheet.getLastRowNum(); dataRowNum++) {
+            String csvData = convertRowIntoCsv(sheet.getRow(dataRowNum));
+            try {
+                Map<String, String> row = parseRow(csvHeader, csvData);
+                String externalId = row.get(CSV_ID_HEADER);
+                String data = csvHeader + "\n" + csvData;
+                if (isNewEvent(externalId, data)) {
+                    save(row, data, fileCreationDate);
+                }
+            } catch (Exception e) {
+                LOG.error("Can't create EM-DAT row: {}", csvData, e);
+            }
+        }
+    }
+
+    private boolean isNewEvent(String externalId, String data) {
+        Optional<DataLake> dataLake = dataLakeDao.getDataLakesByExternalId(externalId)
+                .stream()
+                .max(comparing(DataLake::getLoadedAt));
+        return dataLake.isEmpty() || !data.equals(dataLake.get().getData());
     }
 
     private int findHeaderRow(Sheet sheet) {
@@ -120,13 +130,13 @@ public class EmDatImportJob implements Runnable {
         return builder.toString();
     }
 
-    private void save(Map<String, String> row, String csvHeader, String csvData, OffsetDateTime fileCreationDate) {
+    private void save(Map<String, String> row, String data, OffsetDateTime fileCreationDate) {
         DataLake dataLake = new DataLake();
 
         dataLake.setObservationId(UUID.randomUUID());
         dataLake.setProvider(EM_DAT_PROVIDER);
         dataLake.setExternalId(row.get(CSV_ID_HEADER));
-        dataLake.setData(csvHeader + "\n" + csvData);
+        dataLake.setData(data);
         dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setUpdatedAt(fileCreationDate);
 
