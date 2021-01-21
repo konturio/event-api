@@ -42,7 +42,11 @@ public abstract class AbstractJob implements Runnable {
         }
 
         stopwatch.stop();
-        logger.info("job has finished in {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS));
+        long time = stopwatch.elapsed(TimeUnit.SECONDS);
+        logger.info("job has finished in {} seconds", time);
+        if (time > 60) {
+            logger.warn("[slow_job] {} seconds", time);
+        }
     }
 
     private void printThreadDump() {

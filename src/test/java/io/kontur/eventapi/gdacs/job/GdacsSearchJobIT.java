@@ -12,7 +12,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,11 +62,11 @@ public class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
         });
     }
 
-    private List<String> getAlerts() throws IOException {
-        return List.of(
-                readMessageFromFile("alert01.xml"),
-                readMessageFromFile("alert02.xml"),
-                readMessageFromFile("alert03.xml")
+    private Map<String, String> getAlerts() throws IOException {
+        return Map.of(
+                "1", readMessageFromFile("alert01.xml"),
+                "2", readMessageFromFile("alert02.xml"),
+                "3", readMessageFromFile("alert03.xml")
         );
     }
 
