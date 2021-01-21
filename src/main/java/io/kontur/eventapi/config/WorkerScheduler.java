@@ -121,7 +121,7 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.emDatImport.initialDelay}", fixedRateString = "${scheduler.emDatImport.fixedRate}")
+    @Scheduled(initialDelayString = "${scheduler.emDatImport.initialDelay}", fixedDelayString = "${scheduler.emDatImport.fixedDelay}")
     public void emDatImportJob() {
         if (Boolean.parseBoolean(emDatImportEnabled)) {
             emDatImportJob.run();

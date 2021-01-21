@@ -110,7 +110,6 @@ public class EmDatNormalizer extends Normalizer {
                     properties.put("dis_mag_value", csvData.get("Dis Mag Value"));
                     return new Feature(geometry, properties);
                 })
-                //TODO add affected population
                 .map(f -> new Feature[]{f})
                 .map(FeatureCollection::new)
                 .ifPresent(fc -> obs.setGeometries(fc.toString()));
@@ -125,8 +124,6 @@ public class EmDatNormalizer extends Normalizer {
                 LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
             }
         }
-//        obs.setDescription();
-//        obs.setEpisodeDescription();
 
         return obs;
     }
@@ -169,12 +166,12 @@ public class EmDatNormalizer extends Normalizer {
     }
 
     private EventType defineEventType(String disasterType, String disasterSubtype, String disasterSubSubtype) {
-        EventType type = typeMap.get(disasterType);
+        EventType type = typeMap.get(disasterSubSubtype);
         if (type == null) {
             type = typeMap.get(disasterSubtype);
         }
         if (type == null) {
-            type = typeMap.get(disasterSubSubtype);
+            type = typeMap.get(disasterType);
         }
         return Optional.ofNullable(type).orElse(EventType.OTHER);
     }
