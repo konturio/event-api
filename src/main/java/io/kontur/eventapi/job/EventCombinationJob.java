@@ -5,13 +5,11 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.KonturEvent;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.eventcombination.EventCombinator;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,21 +22,25 @@ public class EventCombinationJob extends AbstractJob  {
     private final KonturEventsDao eventsDao;
     private final List<EventCombinator> eventCombinators;
 
-    public EventCombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao, List<EventCombinator> eventCombinators) {
+    public EventCombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao, List<EventCombinator> eventCombinators, MeterRegistry meterRegistry) {
+        super(meterRegistry);
         this.observationsDao = observationsDao;
         this.eventsDao = eventsDao;
         this.eventCombinators = eventCombinators;
     }
 
     @Override
-    @Counted(value = "job.event_combination.counter")
-    @Timed(value = "job.event_combination.in_progress_timer")
     public void execute() {
         List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 
         LOG.info("Combination processing: {} events", observations.size());
 
         observations.forEach(this::addToEvent);
+    }
+
+    @Override
+    public String getName() {
+        return "eventCombination";
     }
 
     private void addToEvent(NormalizedObservation observation) {

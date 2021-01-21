@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.service.HpSrvService;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -44,7 +45,7 @@ class HpSrvMagsJobTest {
         when(dataLakeDao.getPdcHpSrvHazardsWithoutAreas()).thenReturn(dataLakeList);
 
         //when
-        HpSrvMagsJob hpSrvMagsJob = new HpSrvMagsJob(dataLakeDao, hpSrvService);
+        HpSrvMagsJob hpSrvMagsJob = new HpSrvMagsJob(dataLakeDao, hpSrvService, new SimpleMeterRegistry());
         hpSrvMagsJob.run();
 
         //then
@@ -67,7 +68,7 @@ class HpSrvMagsJobTest {
         when(dataLakeDao.getPdcHpSrvHazardsWithoutAreas()).thenReturn(Collections.emptyList());
 
         //when
-        HpSrvMagsJob hpSrvMagsJob = new HpSrvMagsJob(dataLakeDao, hpSrvService);
+        HpSrvMagsJob hpSrvMagsJob = new HpSrvMagsJob(dataLakeDao, hpSrvService, new SimpleMeterRegistry());
         hpSrvMagsJob.run();
 
         //then

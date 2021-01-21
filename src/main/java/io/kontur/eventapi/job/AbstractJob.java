@@ -1,6 +1,8 @@
 package io.kontur.eventapi.job;
 
-import com.google.common.base.Stopwatch;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,12 +10,16 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractJob implements Runnable {
     private final static Map<String, Lock> locks = new ConcurrentHashMap<>();
+    private final MeterRegistry meterRegistry;
+
+    protected AbstractJob(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+    }
 
     @Override
     public void run() {
@@ -29,24 +35,33 @@ public abstract class AbstractJob implements Runnable {
         }
 
         logger.info("job has started");
-        Stopwatch stopwatch = Stopwatch.createStarted();
+        Timer.Sample regularTimer = Timer.start(meterRegistry);
+        LongTaskTimer.Sample longTaskTimer = LongTaskTimer.builder("job." + getName() + ".current")
+                .register(meterRegistry).start();
+
         try {
             execute();
         } catch (Exception e) {
-            stopwatch.stop();
-            logger.error("job has failed after {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS), e);
+            long duration = stopTimer(regularTimer);
+            longTaskTimer.stop();
+            logger.error("job has failed after {} ms", duration, e);
 
             throw new RuntimeException("failed job " + jobName, e);
         } finally {
             lock.unlock();
         }
 
-        stopwatch.stop();
-        long time = stopwatch.elapsed(TimeUnit.SECONDS);
-        logger.info("job has finished in {} seconds", time);
-        if (time > 60) {
-            logger.warn("[slow_job] {} seconds", time);
+        long duration = stopTimer(regularTimer);
+        longTaskTimer.stop();
+        logger.info("job has finished in {} seconds", duration);
+        if (duration > 60) {
+            logger.warn("[slow_job] {} seconds", duration);
         }
+    }
+
+    private long stopTimer(Timer.Sample timer) {
+        long durationInNS = timer.stop(Timer.builder("job." + getName()).register(meterRegistry));
+        return durationInNS / 1_000_000_000;
     }
 
     private void printThreadDump() {
@@ -57,4 +72,6 @@ public abstract class AbstractJob implements Runnable {
     }
 
     public abstract void execute() throws Exception;
+
+    public abstract String getName();
 }

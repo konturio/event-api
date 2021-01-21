@@ -8,8 +8,7 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -38,7 +37,8 @@ public class FeedCompositionJob extends AbstractJob {
     private final List<EpisodeCombinator> episodeCombinators;
 
     public FeedCompositionJob(KonturEventsDao eventsDao, FeedDao feedDao,
-                              NormalizedObservationsDao observationsDao, List<EpisodeCombinator> episodeCombinators) {
+                              NormalizedObservationsDao observationsDao, List<EpisodeCombinator> episodeCombinators, MeterRegistry meterRegistry) {
+        super(meterRegistry);
         this.eventsDao = eventsDao;
         this.feedDao = feedDao;
         this.observationsDao = observationsDao;
@@ -46,11 +46,14 @@ public class FeedCompositionJob extends AbstractJob {
     }
 
     @Override
-    @Counted(value = "job.feed_composition.counter")
-    @Timed(value = "job.feed_composition.in_progress_timer")
     public void execute() {
         List<Feed> feeds = feedDao.getFeeds();
         feeds.forEach(this::updateFeed);
+    }
+
+    @Override
+    public String getName() {
+        return "feedComposition";
     }
 
     private void updateFeed(Feed feed) {
