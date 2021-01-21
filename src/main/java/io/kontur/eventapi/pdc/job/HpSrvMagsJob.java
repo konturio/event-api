@@ -31,7 +31,7 @@ public class HpSrvMagsJob extends AbstractJob {
 
     @Override
     @Counted(value = "job.pdc_hpsrvmags.counter")
-    @Timed(value = "job.pdc_hpsrvmags.in_progress_timer", longTask = true)
+    @Timed(value = "job.pdc_hpsrvmags.in_progress_timer")
     public void execute() {
         importMags();
     }

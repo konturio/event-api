@@ -33,7 +33,7 @@ public class NormalizationJob extends AbstractJob {
 
     @Override
     @Counted(value = "job.normalization.counter")
-    @Timed(value = "job.normalization.in_progress_timer", longTask = true)
+    @Timed(value = "job.normalization.in_progress_timer")
     public void execute() {
         List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
         LOG.info("Normalization processing: {} data lakes", dataLakes.size());

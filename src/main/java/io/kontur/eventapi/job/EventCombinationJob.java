@@ -32,7 +32,7 @@ public class EventCombinationJob extends AbstractJob  {
 
     @Override
     @Counted(value = "job.event_combination.counter")
-    @Timed(value = "job.event_combination.in_progress_timer", longTask = true)
+    @Timed(value = "job.event_combination.in_progress_timer")
     public void execute() {
         List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
 
