@@ -28,7 +28,7 @@ scheduler:
   firmsImport:
     enable: false
     initialDelay: 999999
-    fixedRate: 999999
+    fixedDelay: 999999
   emDatImport:
     enable: true
     initialDelay: 999999
