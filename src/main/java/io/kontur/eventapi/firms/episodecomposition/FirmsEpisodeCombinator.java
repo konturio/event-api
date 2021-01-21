@@ -71,7 +71,6 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setSeverity(firstNonNull(episode.getSeverity(), observation.getEventSeverity()));
         episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
         episode.setEndedAt(firstNonNull(episode.getEndedAt(), calculateEndedDate(observation, eventObservations)));
-        episode.setUpdatedAt(firstNonNull(episode.getUpdatedAt(), observation.getLoadedAt()));
 
         if (episode.getObservations().isEmpty()) {
             List<NormalizedObservation> feedObservations = readObservations(feedData.getObservations(), eventObservations);
@@ -81,6 +80,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
             episode.getObservations().addAll(episodeObservationsIds);
         }
 
+        episode.setUpdatedAt(calculateUpdatedDate(episode, eventObservations));
         episode.setGeometries(firstNonNull(episode.getGeometries(), () -> calculateGeometry(episode, observation, eventObservations)));
         episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
         episode.setName(firstNonNull(episode.getName(), () -> calculateName(episode, feedData, eventObservations)));
@@ -93,6 +93,14 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .filter(startDate -> startDate.isAfter(observation.getStartedAt()))
                 .min(OffsetDateTime::compareTo)
                 .orElse(observation.getStartedAt().plusHours(24));
+    }
+
+    private OffsetDateTime calculateUpdatedDate(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
+        return readObservations(episode.getObservations(), eventObservations)
+                .stream()
+                .map(NormalizedObservation::getLoadedAt)
+                .max(OffsetDateTime::compareTo)
+                .get();
     }
 
     private FeatureCollection calculateGeometry(FeedEpisode episode, NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
