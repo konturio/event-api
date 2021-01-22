@@ -44,7 +44,7 @@ public abstract class AbstractJob implements Runnable {
         } catch (Exception e) {
             long duration = stopTimer(regularTimer);
             longTaskTimer.stop();
-            logger.error("job has failed after {} ms", duration, e);
+            logger.error("job has failed after {} seconds", duration, e);
 
             throw new RuntimeException("failed job " + jobName, e);
         } finally {

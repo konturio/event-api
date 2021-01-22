@@ -4,8 +4,8 @@ import io.kontur.eventapi.dao.mapper.DataLakeMapper;
 import io.kontur.eventapi.entity.DataLake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +18,11 @@ public class DataLakeDao {
     @Autowired
     public DataLakeDao(DataLakeMapper mapper) {
         this.mapper = mapper;
+    }
+
+    @Transactional
+    public void storeDataLakes(List<DataLake> dataLakes) {
+        dataLakes.forEach(this::storeEventData);
     }
 
     public void storeEventData(DataLake dataLake) {

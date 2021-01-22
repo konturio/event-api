@@ -17,6 +17,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -44,9 +46,16 @@ public class FirmsImportJob extends AbstractJob {
 
     @Override
     public void execute() {
-        createDataLakes(MODIS_PROVIDER, firmsClient.getModisData());
-        createDataLakes(NOAA_PROVIDER, firmsClient.getNoaa20VirsData());
-        createDataLakes(SUOMI_PROVIDER, firmsClient.getSuomiNppVirsData());
+        List<DataLake> dataLakesFromModis = createDataLakes(MODIS_PROVIDER, firmsClient.getModisData());
+        List<DataLake> dataLakesFromNoaa= createDataLakes(NOAA_PROVIDER, firmsClient.getNoaa20VirsData());
+        List<DataLake> dataLakesFromSuomi = createDataLakes(SUOMI_PROVIDER, firmsClient.getSuomiNppVirsData());
+
+        List<DataLake> allDataLakes = new ArrayList<>();
+        allDataLakes.addAll(dataLakesFromModis);
+        allDataLakes.addAll(dataLakesFromNoaa);
+        allDataLakes.addAll(dataLakesFromSuomi);
+
+        dataLakeDao.storeDataLakes(allDataLakes);
     }
 
     @Override
@@ -54,7 +63,8 @@ public class FirmsImportJob extends AbstractJob {
         return "firmsImport";
     }
 
-    private void createDataLakes(String provider, String data) {
+    private List<DataLake> createDataLakes(String provider, String data) {
+        List<DataLake> dataLakes = new ArrayList<>();
         String[] csvRows = data.split("\n");
         String csvHeader = csvRows[0];
 
@@ -74,9 +84,11 @@ public class FirmsImportJob extends AbstractJob {
                 Map<String, String> csvData = parseRow(csvHeader, csvRow);
                 dataLake.setUpdatedAt(extractUpdatedAtValue(csvData));
 
-                dataLakeDao.storeEventData(dataLake);
+                dataLakes.add(dataLake);
             }
         }
+
+        return dataLakes;
     }
 
     private OffsetDateTime extractUpdatedAtValue(Map<String, String> collect) {
