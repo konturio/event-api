@@ -104,10 +104,12 @@ public class EmDatNormalizer extends Normalizer {
                     properties.put("deaths", csvData.get("Total Deaths"));
                     properties.put("homeless", csvData.get("No Homeless"));
                     properties.put("total_affected", csvData.get("Total Affected"));
-                    properties.put("reconstruction_costs", csvData.get("Reconstruction Costs"));
-                    properties.put("total_damages", csvData.get("Total Damages"));
+                    properties.put("reconstruction_costs", csvData.get("Reconstruction Costs ('000 US$)"));
+                    properties.put("total_damages", csvData.get("Total Damages ('000 US$)"));
+                    properties.put("insured_damages", csvData.get("Insured Damages ('000 US$)"));
                     properties.put("dis_mag_scale", csvData.get("Dis Mag Scale"));
                     properties.put("dis_mag_value", csvData.get("Dis Mag Value"));
+                    properties.put("river_basin", csvData.get("River Basin"));
                     return new Feature(geometry, properties);
                 })
                 .map(f -> new Feature[]{f})
