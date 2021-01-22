@@ -13,15 +13,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Service
 public class GdacsService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsService.class);
+    public static final String ALERT_BY_LINK = "Alert by link https://www.gdacs.org{}";
 
     private final DataLakeDao dataLakeDao;
     private final GdacsDataLakeConverter dataLakeConverter;
@@ -43,20 +46,27 @@ public class GdacsService {
         return Optional.empty();
     }
 
-    public List<String> fetchAlerts(List<String> links) {
-        return links.stream()
-                .map(this::getAlertAfterHandleException)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(alert -> alert.startsWith("\uFEFF") ? alert.substring(1) : alert)
-                .collect(toList());
+    public Map<String, String> fetchAlerts(List<String> links) {
+        Map<String, String> processedLinks = new HashMap<>();
+
+        for (String link : links) {
+            getAlertAfterHandleException(link)
+                    .ifPresent(alert -> processedLinks.put(link, alert.startsWith("\uFEFF") ? alert.substring(1) : alert));
+        }
+
+        return processedLinks;
     }
 
     private Optional<String> getAlertAfterHandleException(String link) {
         try {
-            return Optional.of(gdacsClient.getAlertByLink(link));
+            String alertByLink = gdacsClient.getAlertByLink(link);
+            if (isEmpty(alertByLink)) {
+                LOG.warn(ALERT_BY_LINK + " is empty", link);
+                return Optional.empty();
+            }
+            return Optional.of(alertByLink);
         } catch (FeignException e) {
-            LOG.warn("Alert by link https://www.gdacs.org{} not found", link);
+            LOG.warn(ALERT_BY_LINK + " not found", link);
         }
         return Optional.empty();
     }

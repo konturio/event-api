@@ -6,8 +6,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.service.HpSrvService;
 import io.kontur.eventapi.util.JsonUtil;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +23,20 @@ public class HpSrvMagsJob extends AbstractJob {
     private final HpSrvService hpSrvService;
 
     @Autowired
-    public HpSrvMagsJob(DataLakeDao dataLakeDao, HpSrvService hpSrvService) {
+    public HpSrvMagsJob(DataLakeDao dataLakeDao, HpSrvService hpSrvService, MeterRegistry meterRegistry) {
+        super(meterRegistry);
         this.dataLakeDao = dataLakeDao;
         this.hpSrvService = hpSrvService;
     }
 
     @Override
-    @Counted(value = "job.pdc_hpsrvmags.counter")
-    @Timed(value = "job.pdc_hpsrvmags.in_progress_timer")
     public void execute() {
         importMags();
+    }
+
+    @Override
+    public String getName() {
+        return "hpSrvMags";
     }
 
     private void importMags() {

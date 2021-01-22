@@ -6,8 +6,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
 import io.kontur.eventapi.pdc.service.HpSrvService;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,16 +22,20 @@ public class HpSrvSearchJob extends AbstractJob {
     private final HpSrvService hpSrvService;
 
     @Autowired
-    public HpSrvSearchJob(DataLakeDao dataLakeDao, HpSrvService hpSrvService) {
+    public HpSrvSearchJob(DataLakeDao dataLakeDao, HpSrvService hpSrvService, MeterRegistry meterRegistry) {
+        super(meterRegistry);
         this.dataLakeDao = dataLakeDao;
         this.hpSrvService = hpSrvService;
     }
 
     @Override
-    @Counted(value = "job.pdc_hpsrvsearch.counter")
-    @Timed(value = "job.pdc_hpsrvsearch.in_progress_timer")
     public void execute() {
         importHazards();
+    }
+
+    @Override
+    public String getName() {
+        return "hpSrvSearch";
     }
 
     private void importHazards() {

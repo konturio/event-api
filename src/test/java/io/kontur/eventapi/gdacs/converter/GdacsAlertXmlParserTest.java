@@ -6,11 +6,10 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
-
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GdacsAlertXmlParserTest {
 
@@ -23,12 +22,12 @@ class GdacsAlertXmlParserTest {
 
     @Test
     public void testAlerts() throws IOException, ParserConfigurationException, XPathExpressionException {
-        var listOfAlerts = List.of(
-                readMessageFromFile("alert01_valid.xml"),
-                readMessageFromFile("alert02_without_identifier.xml"),
-                readMessageFromFile("alert02_without_parameters.xml"),
-                readMessageFromFile("alert02_invaliddate.xml"),
-                readMessageFromFile("alert02_valid.xml")
+        var listOfAlerts = Map.of(
+                "1", readMessageFromFile("alert01_valid.xml"),
+                "2", readMessageFromFile("alert02_without_identifier.xml"),
+                "3", readMessageFromFile("alert02_without_parameters.xml"),
+                "4", readMessageFromFile("alert02_invaliddate.xml"),
+                "5", readMessageFromFile("alert02_valid.xml")
         );
 
         int alertCount = 2;

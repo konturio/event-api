@@ -6,6 +6,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
 import io.kontur.eventapi.pdc.service.HpSrvService;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -41,7 +42,7 @@ class HpSrvSearchJobTest {
         when(hpSrvService.obtainHazards(eq(offset30SearchBody))).thenReturn(generateArrayNodeSize0());
 
         //when
-        HpSrvSearchJob hpSrvSearchJob = new HpSrvSearchJob(dataLakeDao, hpSrvService);
+        HpSrvSearchJob hpSrvSearchJob = new HpSrvSearchJob(dataLakeDao, hpSrvService, new SimpleMeterRegistry());
         hpSrvSearchJob.run();
 
         //then
@@ -63,7 +64,7 @@ class HpSrvSearchJobTest {
         when(dataLakeDao.getLatestUpdatedHazard(HP_SRV_SEARCH_PROVIDER)).thenReturn(Optional.of(dataLake));
 
         //when
-        HpSrvSearchJob hpSrvSearchJob = new HpSrvSearchJob(dataLakeDao, hpSrvService);
+        HpSrvSearchJob hpSrvSearchJob = new HpSrvSearchJob(dataLakeDao, hpSrvService, new SimpleMeterRegistry());
         hpSrvSearchJob.run();
 
         //then
