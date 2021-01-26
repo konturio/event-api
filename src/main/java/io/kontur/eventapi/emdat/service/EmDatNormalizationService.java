@@ -6,6 +6,8 @@ import org.locationtech.jts.geom.CoordinateXY;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -22,6 +24,7 @@ import java.util.stream.Stream;
 @Service
 public class EmDatNormalizationService {
 
+    private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
     private final GeometryFactory geometryFactory = new GeometryFactory();
     private final KonturApiClient konturApiClient;
@@ -52,6 +55,19 @@ public class EmDatNormalizationService {
         MultiPolygon multiPolygon = geometryFactory.createMultiPolygon(polygons);
 
         return Optional.of(geoJSONWriter.write(multiPolygon));
+    }
+
+    public Optional<? extends Geometry> convertWktPointIntoGeometry(String point) {
+        if (StringUtils.isEmpty(point)) {
+            return Optional.empty();
+        }
+
+        try {
+            org.locationtech.jts.geom.Geometry geometry = wktReader.read(point);
+            return Optional.of(geoJSONWriter.write(geometry));
+        } catch (ParseException e) {
+            return Optional.empty();
+        }
     }
 
     private Optional<GeocoderDto> callGeocoder(String search) {

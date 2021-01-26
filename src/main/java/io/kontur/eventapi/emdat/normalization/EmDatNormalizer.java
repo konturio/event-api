@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
+import org.wololo.geojson.Geometry;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
@@ -50,7 +51,6 @@ public class EmDatNormalizer extends Normalizer {
     private final List<EmDatSeverityConverter> severityConverters;
     private final EmDatNormalizationService normalizationService;
     private final WKTReader wktReader = new WKTReader();
-    ;
 
     public EmDatNormalizer(
             List<EmDatSeverityConverter> severityConverters,
@@ -90,32 +90,6 @@ public class EmDatNormalizer extends Normalizer {
             }
         }
 
-        normalizationService
-                .obtainGeometries(csvData.get("Country"), csvData.get("Location"))
-                .map(geometry -> {
-                    Map<String, Object> properties = new HashMap<>();
-                    properties.put("country", csvData.get("Country"));
-                    properties.put("regions", csvData.get("Location"));
-                    properties.put("name", obs.getName());
-                    properties.put("severity", obs.getEventSeverity());
-                    properties.put("type", obs.getType());
-                    properties.put("injured", csvData.get("No Injured"));
-                    properties.put("affected", csvData.get("No Affected"));
-                    properties.put("deaths", csvData.get("Total Deaths"));
-                    properties.put("homeless", csvData.get("No Homeless"));
-                    properties.put("total_affected", csvData.get("Total Affected"));
-                    properties.put("reconstruction_costs", csvData.get("Reconstruction Costs ('000 US$)"));
-                    properties.put("total_damages", csvData.get("Total Damages ('000 US$)"));
-                    properties.put("insured_damages", csvData.get("Insured Damages ('000 US$)"));
-                    properties.put("dis_mag_scale", csvData.get("Dis Mag Scale"));
-                    properties.put("dis_mag_value", csvData.get("Dis Mag Value"));
-                    properties.put("river_basin", csvData.get("River Basin"));
-                    return new Feature(geometry, properties);
-                })
-                .map(f -> new Feature[]{f})
-                .map(FeatureCollection::new)
-                .ifPresent(fc -> obs.setGeometries(fc.toString()));
-
         if (!StringUtils.isEmpty(csvData.get("Latitude")) && !StringUtils.isEmpty(csvData.get("Longitude"))) {
             try {
                 String point = makeWktPoint(Double.parseDouble(csvData.get("Longitude")),
@@ -127,7 +101,35 @@ public class EmDatNormalizer extends Normalizer {
             }
         }
 
+        Geometry geom = normalizationService
+                .obtainGeometries(csvData.get("Country"), csvData.get("Location"))
+                .or(() -> normalizationService.convertWktPointIntoGeometry(obs.getPoint()))
+                .orElse(null);
+        obs.setGeometries(createFeatureCollection(geom, obs, csvData).toString());
+
         return obs;
+    }
+
+    private FeatureCollection createFeatureCollection(Geometry geom, NormalizedObservation obs, Map<String, String> csvData) {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("country", csvData.get("Country"));
+        properties.put("regions", csvData.get("Location"));
+        properties.put("name", obs.getName());
+        properties.put("severity", obs.getEventSeverity());
+        properties.put("type", obs.getType());
+        properties.put("injured", csvData.get("No Injured"));
+        properties.put("affected", csvData.get("No Affected"));
+        properties.put("deaths", csvData.get("Total Deaths"));
+        properties.put("homeless", csvData.get("No Homeless"));
+        properties.put("total_affected", csvData.get("Total Affected"));
+        properties.put("reconstruction_costs", csvData.get("Reconstruction Costs ('000 US$)"));
+        properties.put("total_damages", csvData.get("Total Damages ('000 US$)"));
+        properties.put("insured_damages", csvData.get("Insured Damages ('000 US$)"));
+        properties.put("dis_mag_scale", csvData.get("Dis Mag Scale"));
+        properties.put("dis_mag_value", csvData.get("Dis Mag Value"));
+        properties.put("river_basin", csvData.get("River Basin"));
+        Feature feature = new Feature(geom, properties);
+        return new FeatureCollection(new Feature[]{feature});
     }
 
     private Map<String, String> getCsvDataMap(DataLake dataLake) {
