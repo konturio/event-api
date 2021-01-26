@@ -7,7 +7,7 @@ Type=forking
 # WARNING: environment.rc and config files can override any variable defined here.
 # WARNING: Do not guess, but read wrapper.sh script instead.
 
-Environment=APP_JAVA_OPTS="-server -Xmx900m -XX:+HeapDumpOnOutOfMemoryError -Xlog:gc*:file=%h/log/event-api.GC.log"
+Environment=APP_JAVA_OPTS="-server -Xmx1200m -XX:+HeapDumpOnOutOfMemoryError -Xlog:gc*:file=%h/log/event-api.GC.log"
 Environment=CLASSPATH=""
 Environment=APP_ENTRY_POINT="-jar %JAR_FILE%"
 Environment=APP_ARGS=""
