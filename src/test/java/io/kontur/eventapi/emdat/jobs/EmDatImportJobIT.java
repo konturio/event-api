@@ -55,7 +55,7 @@ class EmDatImportJobIT extends AbstractCleanableIntegrationTest {
 
         DataLake emdat3 = dataLakes.get(2);
         checkDataLakeEntity(emdat3, "1900-9002-CPV",
-                "1900-9002-CPV,1900,9002,Natural,Climatological,Drought,Drought,,,,Cabo Verde,CPV,Western Africa,Africa,Countrywide,,Famine,,,No,No,,,Km2,,,,,1900,,,1900,,,11000,,,,,,,,3.261388983");
+                "1900-9002-CPV,1900,9002,Natural,Climatological,Drought,Drought,,,,Cabo Verde,CPV,Western Africa,Africa,Countrywide,,Famine,,,No,No,,,Km2,,,,,1900,,,1900,,,11000,,,,,,,,3.2613889831938998");
     }
 
     @Test
@@ -81,7 +81,7 @@ class EmDatImportJobIT extends AbstractCleanableIntegrationTest {
 
         DataLake emdat3 = dataLakes.get(2);
         checkDataLakeEntity(emdat3, "1900-9002-CPV",
-                "1900-9002-CPV,1900,9002,Natural,Climatological,Drought,Drought,,,,Cabo Verde,CPV,Western Africa,Africa,Countrywide,,Famine,,,No,No,,,Km2,,,,,1900,,,1900,,,11000,,,,,,,,3.261388983");
+                "1900-9002-CPV,1900,9002,Natural,Climatological,Drought,Drought,,,,Cabo Verde,CPV,Western Africa,Africa,Countrywide,,Famine,,,No,No,,,Km2,,,,,1900,,,1900,,,11000,,,,,,,,3.2613889831938998");
 
         DataLake emdat4 = dataLakes.get(3);
         checkDataLakeEntity(emdat4, "2020-0131-TLS",
