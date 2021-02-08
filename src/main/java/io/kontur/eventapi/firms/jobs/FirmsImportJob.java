@@ -22,10 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static io.kontur.eventapi.firms.FirmsUtil.MODIS_PROVIDER;
-import static io.kontur.eventapi.firms.FirmsUtil.NOAA_PROVIDER;
-import static io.kontur.eventapi.firms.FirmsUtil.SUOMI_PROVIDER;
-import static io.kontur.eventapi.firms.FirmsUtil.parseRow;
+import static io.kontur.eventapi.firms.FirmsUtil.*;
+import static io.kontur.eventapi.util.CsvUtil.parseRow;
 
 @Component
 public class FirmsImportJob extends AbstractJob {
@@ -65,7 +63,7 @@ public class FirmsImportJob extends AbstractJob {
 
     private List<DataLake> createDataLakes(String provider, String data) {
         List<DataLake> dataLakes = new ArrayList<>();
-        String[] csvRows = data.split("\n");
+        String[] csvRows = data.split("\r?\n");
         String csvHeader = csvRows[0];
 
         for (int i = 1; i < csvRows.length; i++) {

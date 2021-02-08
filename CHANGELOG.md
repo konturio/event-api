@@ -3,9 +3,8 @@
 ## Unreleased
 #### Added
 - `bbox` and `datetime` filter to the `/v1/` endpoint
-
-#### Added
 - FIRMS provider
+- EM-DAT provider
 #### Changed
 - Event versioning is removed 
 - Refactored normalization, event and episods jobs
@@ -13,11 +12,24 @@
 ### Configuration changes
 #### Added
 ```yaml
+emdat:
+  user: 'username'
+  password: 'password'
+  host: 'https://public.emdat.be/api'
+
+konturApi:
+  host: 'https://api.kontur.io/'
+
+
 scheduler:
   firmsImport:
     enable: true
     initialDelay: 1000
-    fixedRate: 3600000
+    fixedDelay: 3600000
+  emDatImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: PT3H # every 3 hours
 ```
 
 ## 0.3 - 2020-11-18

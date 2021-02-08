@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
-import static io.kontur.eventapi.firms.FirmsUtil.parseRow;
+
+import static io.kontur.eventapi.util.CsvUtil.parseRow;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component

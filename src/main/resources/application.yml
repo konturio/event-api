@@ -35,6 +35,14 @@ pdc:
 gdacs:
   host: 'https://www.gdacs.org'
 
+emdat:
+  user: 'username'
+  password: 'password'
+  host: 'https://public.emdat.be/api'
+
+konturApi:
+  host: 'https://api.kontur.io/'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -50,6 +58,10 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 3600000
+  emDatImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: PT3H # every 3 hours
   normalization:
     enable: true
     initialDelay: 1000
