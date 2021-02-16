@@ -53,7 +53,7 @@ spring:
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     platform: postgres
-    url: 'jdbc:tc:postgis12:///event-api?TC_INITSCRIPT=db/init_db.sql'
+    url: 'jdbc:tc:postgis:13-3.1-alpine:///event-api?TC_INITSCRIPT=db/init_db.sql'
   security:
     oauth2:
       resourceserver:

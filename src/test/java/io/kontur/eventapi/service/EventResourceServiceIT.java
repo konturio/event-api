@@ -6,7 +6,6 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
@@ -16,7 +15,6 @@ import org.testcontainers.shaded.com.google.common.collect.Iterables;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Geometry;
-import org.wololo.geojson.Polygon;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.math.BigDecimal;
@@ -72,7 +70,6 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertEquals(fetchEvent(getBbox(50, 60, 52, 62)).size(), 0);
     }
 
-    @NotNull
     private List<BigDecimal> getBbox(int i, int i2, int i3, int i4) {
         return List.of(BigDecimal.valueOf(i), BigDecimal.valueOf(i2), BigDecimal.valueOf(i3), BigDecimal.valueOf(i4));
     }
@@ -130,7 +127,6 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertTrue(resultOfSearching13.isPresent());
     }
 
-    @NotNull
     private OffsetDateTime dateTimeOf(int year, int month, int day) {
         return OffsetDateTime.of(LocalDateTime.of(year, month, day, 0, 0), ZoneOffset.UTC);
     }
