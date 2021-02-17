@@ -1,5 +1,6 @@
 package io.kontur.eventapi.firms.event;
 
+import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
@@ -15,11 +16,12 @@ import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
+import io.kontur.eventapi.util.JsonUtil;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.wololo.geojson.FeatureCollection;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -33,6 +35,7 @@ import static java.time.OffsetDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableIntegrationTest {
     private final FirmsImportJob firmsImportJob;
@@ -45,6 +48,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
     @MockBean
     private FirmsClient firmsClient;
+    @MockBean
+    private KonturApiClient konturApiClient;
 
     @Autowired
     public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, FeedMapper feedMapper, KonturEventsDao konturEventsDao, NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
@@ -61,9 +66,10 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     @Test
     public void testFirmsEventAndEpisodesRollout() throws IOException {
         //GIVEN 3 observation within 1 km, 2 of them have same date. And 1 other observation
-        Mockito.when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6.csv"));
-        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
-        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
+        when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6.csv"));
+        when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
+        when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
+        configureKonturApiClient();
 
         //WHEN run event job
         firmsImportJob.run();
@@ -92,15 +98,15 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertTrue(feedData.get(1).getEpisodes().get(1).getName().equals("Burnt area 0.871km\u00B2, Burning time 27h"));
+        assertEquals("Burnt area 0.871km\u00B2, Burning time 27h", feedData.get(1).getEpisodes().get(1).getName());
         assertEquals(3, feedData.get(1).getEpisodes().get(1).getObservations().size());
 
 
         //WHEN new data available for modis - 3 observations within 1 km to 2 existing observation
         //and 1 other observation
-        Mockito.when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6-update.csv"));
-        Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
-        Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
+        when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6-update.csv"));
+        when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
+        when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
         firmsImportJob.run();
         normalizationJob.run();
@@ -142,7 +148,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
         episodes.sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
 
-        assertEquals(episodes.get(0).getName(), "Burnt area 0.871km\u00B2, Burning time 1h");
+        assertEquals("Philippines, Luzon, Cordillera Administrative Region. Burnt area 0.871km\u00B2, Burning time 1h",
+                episodes.get(0).getName());
         assertEquals(2, episodes.get(0).getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getStartedAt());
@@ -168,6 +175,12 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
         List<KonturEvent> newEventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
         assertTrue(newEventsForRolloutEpisodes.isEmpty());
+    }
+
+    private void configureKonturApiClient() {
+        when(konturApiClient.adminBoundaries("POINT (145.96182870077337 -34.74616144892276)", 3))
+                .then((i) -> JsonUtil.readJson("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"properties\":{\"name\":\"Philippines\",\"tags\":{\"int_name\":\"Philippines\",\"name\":\"Philippines_name\",\"name:en\":\"Philippines_name:en\",\"admin_level\":\"2\"},\"osm_id\":443174,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"2\"},\"id\":\"443174\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Cordillera Administrative Region\",\"tags\":{\"ref\":\"140000000\",\"name:en\":\"Cordillera Administrative Region\",\"admin_level\":\"3\",\"designation\":\"region\"},\"osm_id\":1552190,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"3\"},\"id\":\"1552190\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Luzon\",\"tags\":{\"name\":\"Luzon\",\"admin_level\":\"2.5\"},\"osm_id\":11144278,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"2.5\"},\"id\":\"11144278\"}],\"timeStamp\":\"2021-02-16T14:28:28Z\",\"numberMatched\":3,\"numberReturned\":3}",
+                        FeatureCollection.class));
     }
 
     private List<KonturEvent> readEvents(Set<UUID> eventsForRolloutEpisodes1) {

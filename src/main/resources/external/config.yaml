@@ -12,6 +12,9 @@ spring:
 auth0:
   audience: 'https://test-apps02.konturlabs.com/events/'
 
+konturApi:
+  host: 'https://api.kontur.io/'
+
 pdc:
   host: 'https://testemops.pdc.org'
   user: user

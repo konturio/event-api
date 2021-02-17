@@ -41,7 +41,7 @@ emdat:
   host: 'https://public.emdat.be/api'
 
 konturApi:
-  host: 'https://api.kontur.io/'
+  host: 'https://test-api02.konturlabs.com/'
 
 scheduler:
   hpSrvImport:

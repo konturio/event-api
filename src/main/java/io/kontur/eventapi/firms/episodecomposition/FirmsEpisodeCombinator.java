@@ -1,5 +1,6 @@
 package io.kontur.eventapi.firms.episodecomposition;
 
+import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -8,7 +9,9 @@ import io.kontur.eventapi.firms.FirmsUtil;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
@@ -16,14 +19,10 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
@@ -36,6 +35,12 @@ import static java.util.stream.Collectors.toList;
 public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private final GeoJSONReader geoJSONReader = new GeoJSONReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
+    private final GeometryFactory geometryFactory = new GeometryFactory();
+    private final KonturApiClient konturApiClient;
+
+    public FirmsEpisodeCombinator(KonturApiClient konturApiClient) {
+        this.konturApiClient = konturApiClient;
+    }
 
     @Override
     public boolean isApplicable(NormalizedObservation observation) {
@@ -128,7 +133,41 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         observations.sort(comparing(NormalizedObservation::getStartedAt));
         long burningTime = observations.get(0).getStartedAt().until(feedEpisode.getEndedAt(), ChronoUnit.HOURS);
         String burntArea = getArea(feedEpisode, eventObservations);
-        return "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+        String area = getBurntAreaName(feedEpisode, eventObservations);
+        if (!StringUtils.isEmpty(area)) {
+            area = area + ". ";
+        }
+        return area + "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+    }
+
+    private String getBurntAreaName(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
+        Geometry centroid = calculateCentroid(episode, eventObservations);
+        FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 3);
+        if (adminBoundaries == null || adminBoundaries.getFeatures() == null) {
+            return "";
+        }
+        return Stream.of(adminBoundaries.getFeatures())
+                .map(Feature::getProperties)
+                .sorted(Comparator.comparing(prop -> Double.parseDouble(String.valueOf(prop.get("admin_level")))))
+                .map(prop -> ((Map<String, String>)prop.get("tags")))
+                .map(tags -> {
+                    if (tags.containsKey("int_name")) {
+                        return tags.get("int_name");
+                    } else if (tags.containsKey("name:en")) {
+                        return tags.get("name:en");
+                    } else {
+                        return tags.get("name");
+                    }
+                })
+                .collect(Collectors.joining(", "));
+    }
+
+    private Geometry calculateCentroid(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
+        List<Geometry> geometries = readObservations(episode.getObservations(), eventObservations)
+                .stream()
+                .map(no -> toGeometry(no.getGeometries()))
+                .collect(toList());
+        return geometryFactory.buildGeometry(geometries).getCentroid();
     }
 
     private String getArea(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations) {
@@ -144,7 +183,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                     return areaInKm;
                 })
                 .reduce(Double::sum)
-                .map(area -> String.format("%.3f", area))
+                .map(area -> String.format(Locale.US, "%.3f", area))
                 .get();
     }
 
@@ -170,7 +209,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     private List<NormalizedObservation> readObservations(List<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {
         List<NormalizedObservation> observationsByIds = eventObservations
-                .stream().filter(e -> observationsIds.contains(e.getObservationId()))
+                .stream()
+                .filter(e -> observationsIds.contains(e.getObservationId()))
                 .collect(toList());
 
         checkState(observationsByIds.size() == observationsIds.size(),
