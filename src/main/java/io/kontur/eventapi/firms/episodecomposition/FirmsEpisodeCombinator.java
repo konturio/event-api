@@ -10,6 +10,7 @@ import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
@@ -35,7 +36,7 @@ import static java.util.stream.Collectors.toList;
 public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private final GeoJSONReader geoJSONReader = new GeoJSONReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
-    private final GeometryFactory geometryFactory = new GeometryFactory();
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(1000));
     private final KonturApiClient konturApiClient;
 
     public FirmsEpisodeCombinator(KonturApiClient konturApiClient) {
@@ -142,6 +143,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     private String getBurntAreaName(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
         Geometry centroid = calculateCentroid(episode, eventObservations);
+//        centroid.getPrecisionModel().
         FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 3);
         if (adminBoundaries == null || adminBoundaries.getFeatures() == null) {
             return "";
@@ -192,7 +194,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private Geometry toGeometry(Feature firmFeature) {
-        return geoJSONReader.read(firmFeature.getGeometry());
+        return geoJSONReader.read(firmFeature.getGeometry(), geometryFactory);
     }
 
     private Feature getFirmFeature(FeatureCollection featureCollection) {
