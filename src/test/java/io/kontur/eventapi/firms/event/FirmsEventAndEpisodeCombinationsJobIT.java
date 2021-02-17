@@ -4,12 +4,7 @@ import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
-import io.kontur.eventapi.entity.EventType;
-import io.kontur.eventapi.entity.FeedData;
-import io.kontur.eventapi.entity.FeedEpisode;
-import io.kontur.eventapi.entity.KonturEvent;
-import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.entity.SortOrder;
+import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.job.EventCombinationJob;
@@ -155,24 +150,28 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getStartedAt());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt());
+        assertEquals(Severity.MINOR, episodes.get(0).getSeverity());
 
         assertEquals(episodes.get(1).getName(), "Burnt area 1.742km\u00B2, Burning time 3h");
         assertEquals(3, episodes.get(1).getObservations().size());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt());
+        assertEquals(Severity.MINOR, episodes.get(1).getSeverity());
 
         assertEquals(episodes.get(2).getName(), "Burnt area 1.742km\u00B2, Burning time 11h");
         assertEquals(4, episodes.get(2).getObservations().size());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getStartedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(2).getEndedAt());
+        assertEquals(Severity.MINOR, episodes.get(2).getSeverity());
 
         assertEquals(episodes.get(3).getName(), "Burnt area 2.613km\u00B2, Burning time 35h");
         assertEquals(5, episodes.get(3).getObservations().size());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getStartedAt());
         assertEquals(parse("2020-11-03T22:50Z"), episodes.get(3).getEndedAt());
+        assertEquals(Severity.MINOR, episodes.get(3).getSeverity());
 
         List<KonturEvent> newEventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
         assertTrue(newEventsForRolloutEpisodes.isEmpty());

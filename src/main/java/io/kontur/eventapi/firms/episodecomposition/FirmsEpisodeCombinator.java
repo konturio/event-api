@@ -4,6 +4,7 @@ import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.firms.FirmsUtil;
 import net.sf.geographiclib.Geodesic;
@@ -74,7 +75,6 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setDescription(firstNonNull(episode.getDescription(), observation.getEpisodeDescription()));
         episode.setType(firstNonNull(episode.getType(), observation.getType()));
         episode.setActive(firstNonNull(episode.getActive(), observation.getActive()));
-        episode.setSeverity(firstNonNull(episode.getSeverity(), observation.getEventSeverity()));
         episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
         episode.setEndedAt(firstNonNull(episode.getEndedAt(), calculateEndedDate(observation, eventObservations)));
 
@@ -89,7 +89,14 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setUpdatedAt(calculateUpdatedDate(episode, eventObservations));
         episode.setGeometries(firstNonNull(episode.getGeometries(), () -> calculateGeometry(episode, observation, eventObservations)));
         episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
-        episode.setName(firstNonNull(episode.getName(), () -> calculateName(episode, feedData, eventObservations)));
+
+        Double area = getArea(episode, eventObservations);
+        List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
+        observations.sort(comparing(NormalizedObservation::getStartedAt));
+        long burningTime = observations.get(0).getStartedAt().until(episode.getEndedAt(), ChronoUnit.HOURS);
+
+        episode.setSeverity(calculateSeverity(area, burningTime));
+        episode.setName(calculateName(episode, eventObservations, area, burningTime));
     }
 
     private OffsetDateTime calculateEndedDate(NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
@@ -129,21 +136,34 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .collect(toList());
     }
 
-    private String calculateName(FeedEpisode feedEpisode, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
-        observations.sort(comparing(NormalizedObservation::getStartedAt));
-        long burningTime = observations.get(0).getStartedAt().until(feedEpisode.getEndedAt(), ChronoUnit.HOURS);
-        String burntArea = getArea(feedEpisode, eventObservations);
-        String area = getBurntAreaName(feedEpisode, eventObservations);
-        if (!StringUtils.isEmpty(area)) {
-            area = area + ". ";
+    private Severity calculateSeverity(Double area, long burningTime) {
+        if (burningTime < 24) {
+            return Severity.MINOR;
         }
-        return area + "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+        if (area == null) {
+            return Severity.UNKNOWN;
+        }
+        if (area < 5) {
+            return Severity.MINOR;
+        } else if (area < 10) {
+            return Severity.MODERATE;
+        } else if (area < 50) {
+            return Severity.SEVERE;
+        }
+        return Severity.EXTREME;
+    }
+
+    private String calculateName(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations, Double area, long burningTime) {
+        String burntArea = String.format(Locale.US, "%.3f", area);
+        String areaName = getBurntAreaName(feedEpisode, eventObservations);
+        if (!StringUtils.isEmpty(areaName)) {
+            areaName = areaName + ". ";
+        }
+        return areaName + "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
     }
 
     private String getBurntAreaName(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
         Geometry centroid = calculateCentroid(episode, eventObservations);
-//        centroid.getPrecisionModel().
         FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 3);
         if (adminBoundaries == null || adminBoundaries.getFeatures() == null) {
             return "";
@@ -172,7 +192,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return geometryFactory.buildGeometry(geometries).getCentroid();
     }
 
-    private String getArea(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations) {
+    private Double getArea(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations) {
         return readObservations(feedEpisode.getObservations(), eventObservations)
                 .stream()
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
@@ -185,7 +205,6 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                     return areaInKm;
                 })
                 .reduce(Double::sum)
-                .map(area -> String.format(Locale.US, "%.3f", area))
                 .get();
     }
 
