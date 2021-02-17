@@ -35,6 +35,7 @@ import static java.time.OffsetDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableIntegrationTest {
@@ -178,6 +179,10 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     }
 
     private void configureKonturApiClient() {
+        when(konturApiClient.adminBoundaries(any(), any())).then(invocation -> {
+            System.out.println(invocation.getArguments()[0]);
+            return null;
+        });
         when(konturApiClient.adminBoundaries("POINT (145.96182870077337 -34.74616144892276)", 3))
                 .then((i) -> JsonUtil.readJson("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"properties\":{\"name\":\"Philippines\",\"tags\":{\"int_name\":\"Philippines\",\"name\":\"Philippines_name\",\"name:en\":\"Philippines_name:en\",\"admin_level\":\"2\"},\"osm_id\":443174,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"2\"},\"id\":\"443174\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Cordillera Administrative Region\",\"tags\":{\"ref\":\"140000000\",\"name:en\":\"Cordillera Administrative Region\",\"admin_level\":\"3\",\"designation\":\"region\"},\"osm_id\":1552190,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"3\"},\"id\":\"1552190\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Luzon\",\"tags\":{\"name\":\"Luzon\",\"admin_level\":\"2.5\"},\"osm_id\":11144278,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"2.5\"},\"id\":\"11144278\"}],\"timeStamp\":\"2021-02-16T14:28:28Z\",\"numberMatched\":3,\"numberReturned\":3}",
                         FeatureCollection.class));
