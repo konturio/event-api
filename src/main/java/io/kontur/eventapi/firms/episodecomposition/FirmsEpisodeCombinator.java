@@ -9,6 +9,7 @@ import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.firms.FirmsUtil;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
@@ -164,13 +165,15 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     private String getBurntAreaName(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
         Geometry centroid = calculateCentroid(episode, eventObservations);
-        FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 3);
+        FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 10);
         if (adminBoundaries == null || adminBoundaries.getFeatures() == null) {
             return "";
         }
         return Stream.of(adminBoundaries.getFeatures())
                 .map(Feature::getProperties)
+                .filter(prop -> NumberUtils.isCreatable(String.valueOf(prop.get("admin_level"))))
                 .sorted(Comparator.comparing(prop -> Double.parseDouble(String.valueOf(prop.get("admin_level")))))
+                .limit(3)
                 .map(prop -> ((Map<String, String>)prop.get("tags")))
                 .map(tags -> {
                     if (tags.containsKey("int_name")) {
