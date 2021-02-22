@@ -79,25 +79,26 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
         episode.setEndedAt(firstNonNull(episode.getEndedAt(), calculateEndedDate(observation, eventObservations)));
 
+        List<NormalizedObservation> feedObservations = readObservations(feedData.getObservations(), eventObservations);
         if (episode.getObservations().isEmpty()) {
-            List<NormalizedObservation> feedObservations = readObservations(feedData.getObservations(), eventObservations);
             List<NormalizedObservation> episodeObservations = findObservationsForEpisode(observation, feedObservations);
             List<UUID> episodeObservationsIds = episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toList());
 
             episode.getObservations().addAll(episodeObservationsIds);
         }
 
-        episode.setUpdatedAt(calculateUpdatedDate(episode, eventObservations));
-        episode.setGeometries(firstNonNull(episode.getGeometries(), () -> calculateGeometry(episode, observation, eventObservations)));
+        List<NormalizedObservation> episodeObservations = readObservations(episode.getObservations(), eventObservations);
+        episode.setUpdatedAt(calculateUpdatedDate(episodeObservations));
+        Geometry episodeGeometry = calculateEpisodeGeometry(episodeObservations);
+        episode.setGeometries(firstNonNull(episode.getGeometries(), () -> createEpisodeGeometryFeatureCollection(observation, episodeGeometry)));
         episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
 
-        Double area = getArea(episode, eventObservations);
-        List<NormalizedObservation> observations = readObservations(feedData.getObservations(), eventObservations);
-        observations.sort(comparing(NormalizedObservation::getStartedAt));
-        long burningTime = observations.get(0).getStartedAt().until(episode.getEndedAt(), ChronoUnit.HOURS);
+        Double area = calculateArea(episodeGeometry);
+        feedObservations.sort(comparing(NormalizedObservation::getStartedAt));
+        long burningTime = feedObservations.get(0).getStartedAt().until(episode.getEndedAt(), ChronoUnit.HOURS);
 
         episode.setSeverity(calculateSeverity(area, burningTime));
-        episode.setName(calculateName(episode, eventObservations, area, burningTime));
+        episode.setName(calculateName(episodeObservations, area, burningTime));
     }
 
     private OffsetDateTime calculateEndedDate(NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
@@ -109,22 +110,24 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .orElse(observation.getStartedAt().plusHours(24));
     }
 
-    private OffsetDateTime calculateUpdatedDate(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
-        return readObservations(episode.getObservations(), eventObservations)
+    private OffsetDateTime calculateUpdatedDate(List<NormalizedObservation> episodeObservations) {
+        return episodeObservations
                 .stream()
                 .map(NormalizedObservation::getLoadedAt)
                 .max(OffsetDateTime::compareTo)
                 .get();
     }
 
-    private FeatureCollection calculateGeometry(FeedEpisode episode, NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
-        Geometry geometry = readObservations(episode.getObservations(), eventObservations)
+    private Geometry calculateEpisodeGeometry(List<NormalizedObservation> episodeObservations) {
+        return episodeObservations
                 .stream()
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
                 .distinct()
                 .reduce(Geometry::union)
                 .get();
+    }
 
+    private FeatureCollection createEpisodeGeometryFeatureCollection(NormalizedObservation observation, Geometry geometry) {
         return createFeatureCollection(geometry, getFirmFeature(observation.getGeometries()).getProperties());
     }
 
@@ -154,17 +157,17 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return Severity.EXTREME;
     }
 
-    private String calculateName(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations, Double area, long burningTime) {
+    private String calculateName(List<NormalizedObservation> episodeObservations, Double area, long burningTime) {
         String burntArea = String.format(Locale.US, "%.3f", area);
-        String areaName = getBurntAreaName(feedEpisode, eventObservations);
+        String areaName = getBurntAreaName(episodeObservations);
         if (!StringUtils.isEmpty(areaName)) {
             areaName = areaName + ". ";
         }
         return areaName + "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
     }
 
-    private String getBurntAreaName(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
-        Geometry centroid = calculateCentroid(episode, eventObservations);
+    private String getBurntAreaName(List<NormalizedObservation> episodeObservations) {
+        Geometry centroid = calculateCentroid(episodeObservations);
         FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 10);
         if (adminBoundaries == null || adminBoundaries.getFeatures() == null) {
             return "";
@@ -187,28 +190,20 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .collect(Collectors.joining(", "));
     }
 
-    private Geometry calculateCentroid(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
-        List<Geometry> geometries = readObservations(episode.getObservations(), eventObservations)
+    private Geometry calculateCentroid(List<NormalizedObservation> episodeObservations) {
+        List<Geometry> geometries = episodeObservations
                 .stream()
                 .map(no -> toGeometry(no.getGeometries()))
                 .collect(toList());
         return geometryFactory.buildGeometry(geometries).getCentroid();
     }
 
-    private Double getArea(FeedEpisode feedEpisode, Set<NormalizedObservation> eventObservations) {
-        return readObservations(feedEpisode.getObservations(), eventObservations)
-                .stream()
-                .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
-                .distinct()
-                .map(geometry -> {
-                    PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
-                    Arrays.stream(geometry.getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
-                    double areaInMeters = Math.abs(polygonArea.Compute().area);
-                    double areaInKm = areaInMeters / 1_000_000;
-                    return areaInKm;
-                })
-                .reduce(Double::sum)
-                .get();
+    private Double calculateArea(Geometry geometry) {
+        PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
+        Arrays.stream(geometry.getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
+        double areaInMeters = Math.abs(polygonArea.Compute().area);
+        double areaInKm = areaInMeters / 1_000_000;
+        return areaInKm;
     }
 
     private Geometry toGeometry(String geometries) {
@@ -219,12 +214,12 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return geoJSONReader.read(firmFeature.getGeometry(), geometryFactory);
     }
 
-    private Feature getFirmFeature(FeatureCollection featureCollection) {
-        return getOnlyElement(asList(featureCollection.getFeatures()));
-    }
-
     private Feature getFirmFeature(String geometries) {
         return getFirmFeature(getFeatureCollection(geometries));
+    }
+
+    private Feature getFirmFeature(FeatureCollection featureCollection) {
+        return getOnlyElement(asList(featureCollection.getFeatures()));
     }
 
     private FeatureCollection getFeatureCollection(String geometries) {
