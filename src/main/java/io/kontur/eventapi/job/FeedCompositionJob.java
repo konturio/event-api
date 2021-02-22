@@ -59,7 +59,9 @@ public class FeedCompositionJob extends AbstractJob {
     private void updateFeed(Feed feed) {
         Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
-        eventsIds.forEach(event -> createFeedData(event, feed));
+        eventsIds
+                .parallelStream()
+                .forEach(event -> createFeedData(event, feed));
     }
 
     private void createFeedData(UUID eventId, Feed feed) {
