@@ -147,11 +147,11 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         if (area == null) {
             return Severity.UNKNOWN;
         }
-        if (area < 5) {
+        if (area < 10) {
             return Severity.MINOR;
-        } else if (area < 10) {
-            return Severity.MODERATE;
         } else if (area < 50) {
+            return Severity.MODERATE;
+        } else if (area < 100) {
             return Severity.SEVERE;
         }
         return Severity.EXTREME;
