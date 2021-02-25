@@ -141,7 +141,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private Severity calculateSeverity(Double area, long burningTime) {
-        if (burningTime < 24) {
+        if (burningTime <= 24) {
             return Severity.MINOR;
         }
         if (area == null) {
