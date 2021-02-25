@@ -10,9 +10,7 @@ import io.kontur.eventapi.firms.FirmsUtil;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
@@ -199,9 +197,12 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private Double calculateArea(Geometry geometry) {
-        PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
-        Arrays.stream(geometry.getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
-        double areaInMeters = Math.abs(polygonArea.Compute().area);
+        double areaInMeters = 0;
+        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+            PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
+            Arrays.stream(geometry.getGeometryN(i).getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
+            areaInMeters += Math.abs(polygonArea.Compute().area);
+        }
         double areaInKm = areaInMeters / 1_000_000;
         return areaInKm;
     }
