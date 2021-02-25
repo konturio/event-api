@@ -163,7 +163,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         if (!StringUtils.isEmpty(areaName)) {
             areaName = areaName + ". ";
         }
-        return areaName + "Burnt area " + burntArea + "km\u00B2" + (burningTime > 0 ? ", Burning time " + burningTime + "h" : "");
+        return areaName + "Burnt area " + burntArea + " km\u00B2" + (burningTime > 24 ? ", burning " + burningTime + " hours." : "");
     }
 
     private String getBurntAreaName(List<NormalizedObservation> episodeObservations) {
