@@ -62,6 +62,9 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: PT3H # every 3 hours
+  staticTornadoImport:
+    enable: true
+    initialDelay: 1000
   normalization:
     enable: true
     initialDelay: 1000

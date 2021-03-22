@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.swissre.job.StaticTornadoImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
@@ -26,6 +27,7 @@ public class WorkerScheduler {
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
     private final EmDatImportJob emDatImportJob;
+    private final StaticTornadoImportJob staticTornadoImportJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -43,11 +45,14 @@ public class WorkerScheduler {
     private String feedCompositionEnabled;
     @Value("${scheduler.emDatImport.enable}")
     private String emDatImportEnabled;
+    @Value("${scheduler.staticTornadoImport.enable}")
+    private String staticTornadoImportEnabled;
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
-                           FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob) {
+                           FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob,
+                           StaticTornadoImportJob staticTornadoImportJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -56,6 +61,7 @@ public class WorkerScheduler {
         this.feedCompositionJob = feedCompositionJob;
         this.firmsImportJob = firmsImportJob;
         this.emDatImportJob = emDatImportJob;
+        this.staticTornadoImportJob = staticTornadoImportJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -91,6 +97,15 @@ public class WorkerScheduler {
             firmsImportJob.run();
         } else {
             LOG.info("Firms import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.staticTornadoImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
+    public void startStaticTornadoImport() {
+        if (Boolean.parseBoolean(staticTornadoImportEnabled)) {
+            staticTornadoImportJob.run();
+        } else {
+            LOG.info("StaticTornado import job invocation is skipped");
         }
     }
 
