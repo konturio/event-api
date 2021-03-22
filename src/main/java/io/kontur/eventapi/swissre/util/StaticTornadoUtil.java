@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class StaticTornadoUtil {
     public final static String CANADA_GOV = "canada-gov";
-    public final static String AUSTRALIAN_BM = "australian_bm";
+    public final static String AUSTRALIAN_BM = "australian-bm";
 
     public final static Map<String, String> PROVIDERS = Map.of(
             CANADA_GOV, "static/kontur_tornado_pt_canada.json",
