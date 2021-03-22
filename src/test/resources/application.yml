@@ -33,6 +33,9 @@ scheduler:
     enable: true
     initialDelay: 999999
     fixedDelay: 999999
+  staticTornadoImport:
+    enable: false
+    initialDelay: 9999999
   normalization:
     enable: false
     initialDelay: 999999
