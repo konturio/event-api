@@ -52,14 +52,14 @@ scheduler:
     initialDelay: 10000
     fixedDelay: 600000
   gdacsImport:
-    enable: true
+    enable: false
     cron: 30 0/5 * * * *
   firmsImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 3600000
   emDatImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: PT3H # every 3 hours
   staticTornadoImport:

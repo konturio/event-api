@@ -110,4 +110,4 @@ databaseChangeLog:
     file: create_collectGeometryFromEpisodes_function.sql
 - include:
       relativeToChangelogFile: true
-      file: insert-swissre-02-feed.sql
+      file: insert-tornado-feed.sql

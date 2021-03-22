@@ -1,4 +1,4 @@
-package io.kontur.eventapi.swissre.job;
+package io.kontur.eventapi.tornado.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
@@ -14,12 +14,19 @@ import org.wololo.geojson.GeoJSONFactory;
 import java.io.InputStream;
 import java.util.*;
 
-import static io.kontur.eventapi.swissre.util.StaticTornadoUtil.PROVIDERS;
-
 @Component
 public class StaticTornadoImportJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(StaticTornadoImportJob.class);
+
+    public final static String CANADA_GOV = "canada-gov";
+    public final static String AUSTRALIAN_BM = "australian-bm";
+
+    private final static Map<String, String> PROVIDERS = Map.of(
+            CANADA_GOV, "static/kontur_tornado_pt_canada.json",
+            AUSTRALIAN_BM, "static/kontur_tornado_pt_australia.json"
+    );
+
     private final DataLakeDao dataLakeDao;
 
     protected StaticTornadoImportJob(MeterRegistry meterRegistry, DataLakeDao dataLakeDao) {

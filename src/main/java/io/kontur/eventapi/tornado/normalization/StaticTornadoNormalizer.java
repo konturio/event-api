@@ -1,11 +1,11 @@
-package io.kontur.eventapi.swissre.normalization;
+package io.kontur.eventapi.tornado.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -18,14 +18,16 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import static io.kontur.eventapi.swissre.util.StaticTornadoUtil.*;
+public abstract class StaticTornadoNormalizer extends Normalizer {
 
-@Component
-public class StaticTornadoNormalizer extends Normalizer {
-    @Override
-    public boolean isApplicable(DataLake dataLakeDto) {
-        return PROVIDERS.containsKey(dataLakeDto.getProvider());
-    }
+    private final static Map<String, Severity> SEVERITIES = Map.of(
+            "0", Severity.MINOR,
+            "1", Severity.MODERATE,
+            "2", Severity.MODERATE,
+            "3", Severity.SEVERE,
+            "4", Severity.EXTREME,
+            "5", Severity.EXTREME
+    );
 
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
@@ -46,58 +48,38 @@ public class StaticTornadoNormalizer extends Normalizer {
         normalizedObservation.setStartedAt(date);
         normalizedObservation.setEndedAt(date);
 
-        normalizedObservation.setEventSeverity(getSeverity((String) properties.get("fujita_scale")));
-        normalizedObservation.setCost(getCost(properties.get("damage_property")));
+        normalizedObservation.setEventSeverity(convertSeverity((String) properties.get("fujita_scale")));
 
-        String nearestCity = (String) properties.get("nearest_city");
-        String state = (String) properties.get("admin0");
-        normalizedObservation.setName(createName(dataLakeDto.getProvider(), nearestCity, state));
-
-        String updatedAt = SOURCE_UPDATES.get(dataLakeDto.getProvider());
-        normalizedObservation.setSourceUpdatedAt(parseDate(updatedAt));
+        String damage = (String) properties.get("damage_property");
+        normalizedObservation.setCost(NumberUtils.isParsable(damage) ? BigDecimal.valueOf(Long.parseLong(damage)) : null);
 
         Double latitude = objectToDouble(properties.get("latitude"));
         Double longitude = objectToDouble(properties.get("longitude"));
         normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
         normalizedObservation.setGeometries(new FeatureCollection(new Feature[]{feature}).toString());
 
+        normalizedObservation.setName(createName(properties));
+        normalizedObservation.setSourceUpdatedAt(parseDate(getSourceUpdatedAt()));
+
         return normalizedObservation;
     }
 
-    private Severity getSeverity(String fujitaScale) {
-        if (fujitaScale == null || !SEVERITIES.containsKey(fujitaScale)) {
-            return Severity.UNKNOWN;
+    private Severity convertSeverity(String fujitaScale) {
+        if (fujitaScale != null && SEVERITIES.containsKey(fujitaScale)) {
+            return SEVERITIES.get(fujitaScale);
         }
-        return SEVERITIES.get(fujitaScale);
-    }
-
-    private BigDecimal getCost(Object damage) {
-        if (damage == null || UNKNOWN.equals(damage)) {
-            return null;
-        }
-        return BigDecimal.valueOf(Integer.parseInt((String) damage));
+        return Severity.UNKNOWN;
     }
 
     private Double objectToDouble(Object obj) {
-        if (obj instanceof Double) {
-            return (Double) obj;
-        } else {
-            return Double.valueOf((Integer) obj);
-        }
+        return obj instanceof Double ? (Double) obj : Double.valueOf((Integer) obj);
     }
 
-    private String createName(String provider, String nearestCity, String state) {
-        StringBuilder sb = new StringBuilder("Tornado - ");
-        sb.append(nearestCity).append(", ");
-        if (provider.equals(CANADA_GOV)) {
-            sb.append(state).append(", ");
-        }
-        sb.append(COUNTRY_NAMES.get(provider));
-        return sb.toString();
-    }
-
-    private OffsetDateTime parseDate(String dateString) {
+    protected OffsetDateTime parseDate(String dateString) {
         LocalDate localDate = LocalDate.parse(dateString, DateTimeFormatter.BASIC_ISO_DATE);
         return OffsetDateTime.of(localDate, LocalTime.MIN, ZoneOffset.UTC);
     }
+
+    protected abstract String createName(Map<String, Object> properties);
+    protected abstract String getSourceUpdatedAt();
 }

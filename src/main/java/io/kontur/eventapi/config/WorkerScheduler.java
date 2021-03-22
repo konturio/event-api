@@ -1,6 +1,6 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.swissre.job.StaticTornadoImportJob;
+import io.kontur.eventapi.tornado.job.StaticTornadoImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
