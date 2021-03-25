@@ -1,85 +1,70 @@
 package io.kontur.eventapi.tornado.normalization;
 
-import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
-import io.kontur.eventapi.normalization.Normalizer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
-
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
+import static io.kontur.eventapi.tornado.job.StaticTornadoImportJob.*;
+import static io.kontur.eventapi.tornado.service.TornadoService.parseDateWithFormatter;
 
-public abstract class StaticTornadoNormalizer extends Normalizer {
+@Component
+public class StaticTornadoNormalizer extends TornadoNormalizer {
 
-    private final static Map<String, Severity> SEVERITIES = Map.of(
-            "0", Severity.MINOR,
-            "1", Severity.MODERATE,
-            "2", Severity.MODERATE,
-            "3", Severity.SEVERE,
-            "4", Severity.EXTREME,
-            "5", Severity.EXTREME
-    );
+    private final Map<String, String> COUNTRY_NAMES = Map.of(TORNADO_CANADA_GOV_PROVIDER, "Canada");
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
-        NormalizedObservation normalizedObservation = new NormalizedObservation();
-        normalizedObservation.setObservationId(dataLakeDto.getObservationId());
-        normalizedObservation.setType(EventType.TORNADO);
-        normalizedObservation.setActive(false);
-        normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
-        normalizedObservation.setProvider(dataLakeDto.getProvider());
-
-        Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
+    protected void setDataFields(String data, NormalizedObservation normalizedObservation) {
+        Feature feature = (Feature) GeoJSONFactory.create(data);
         Map<String, Object> properties = feature.getProperties();
 
-        normalizedObservation.setExternalEventId((String) properties.get("source_id"));
-        normalizedObservation.setDescription((String) properties.get("comments"));
+        normalizedObservation.setDescription(readString(properties, "comments"));
 
-        OffsetDateTime date = parseDate((String) properties.get("date"));
+        DateTimeFormatter formatter = FORMATTERS.get(normalizedObservation.getProvider());
+        OffsetDateTime date = parseDateWithFormatter(readString(properties, "date"), formatter);
         normalizedObservation.setStartedAt(date);
         normalizedObservation.setEndedAt(date);
 
-        normalizedObservation.setEventSeverity(convertSeverity((String) properties.get("fujita_scale")));
+        Severity severity = convertSeverity(readString(properties, "fujita_scale"));
+        normalizedObservation.setEventSeverity(severity);
 
-        String damage = (String) properties.get("damage_property");
-        normalizedObservation.setCost(NumberUtils.isParsable(damage) ? BigDecimal.valueOf(Long.parseLong(damage)) : null);
+        BigDecimal cost = parseCost(readString(properties, "damage_property"));
+        normalizedObservation.setCost(cost);
 
-        Double latitude = objectToDouble(properties.get("latitude"));
-        Double longitude = objectToDouble(properties.get("longitude"));
+        String name = readString(properties, "name");
+        String nearestCity = readString(properties, "nearest_city");
+        String admin0 = readString(properties, "admin0");
+        String country = COUNTRY_NAMES.getOrDefault(normalizedObservation.getProvider(), StringUtils.EMPTY);
+        normalizedObservation.setName(StringUtils.isBlank(name) ? createName(nearestCity, admin0, country) : name);
+    }
+
+    @Override
+    protected void setGeometry(String data, NormalizedObservation normalizedObservation) {
+        Feature feature = (Feature) GeoJSONFactory.create(data);
+        Map<String, Object> properties = feature.getProperties();
+
+        Double latitude = parseDouble(readString(properties, "latitude"));
+        Double longitude = parseDouble(readString(properties, "longitude"));
+
         normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[]{feature}).toString());
-
-        normalizedObservation.setName(createName(properties));
-        normalizedObservation.setSourceUpdatedAt(parseDate(getSourceUpdatedAt()));
-
-        return normalizedObservation;
+        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}).toString());
     }
 
-    private Severity convertSeverity(String fujitaScale) {
-        if (fujitaScale != null && SEVERITIES.containsKey(fujitaScale)) {
-            return SEVERITIES.get(fujitaScale);
-        }
-        return Severity.UNKNOWN;
+
+    @Override
+    protected List<String> getProviders() {
+        return List.of(TORNADO_CANADA_GOV_PROVIDER, TORNADO_AUSTRALIAN_BM_PROVIDER, TORNADO_OSM_PROVIDER);
     }
 
-    private Double objectToDouble(Object obj) {
-        return obj instanceof Double ? (Double) obj : Double.valueOf((Integer) obj);
+    private BigDecimal parseCost(String costString) {
+        return NumberUtils.isParsable(costString) ? NumberUtils.createBigDecimal(costString) : null;
     }
-
-    protected OffsetDateTime parseDate(String dateString) {
-        LocalDate localDate = LocalDate.parse(dateString, DateTimeFormatter.BASIC_ISO_DATE);
-        return OffsetDateTime.of(localDate, LocalTime.MIN, ZoneOffset.UTC);
-    }
-
-    protected abstract String createName(Map<String, Object> properties);
-    protected abstract String getSourceUpdatedAt();
 }
