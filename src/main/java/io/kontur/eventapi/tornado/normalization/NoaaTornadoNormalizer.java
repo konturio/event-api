@@ -16,26 +16,26 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static io.kontur.eventapi.tornado.job.NoaaTornadoImportJob.TORNADO_NOAA_PROVIDER;
-import static io.kontur.eventapi.tornado.service.TornadoService.makeWktLineString;
-import static io.kontur.eventapi.tornado.service.TornadoService.parseDateTimeWithFormatter;
+import static io.kontur.eventapi.tornado.normalization.converter.TornadoDateConverter.parseDateTime;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 
 @Component
 public class NoaaTornadoNormalizer extends TornadoNormalizer {
 
     private final static Logger LOG = LoggerFactory.getLogger(NoaaTornadoNormalizer.class);
-    private final static WKTReader wktReader = new WKTReader();
-    private final static GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
+
     private final static String COUNTRY = "USA";
     private final static Map<String, BigDecimal> COST_UNITS = Map.of(
             "K", BigDecimal.valueOf(1000),
             "M", BigDecimal.valueOf(1000000));
+
+    private final static WKTReader wktReader = new WKTReader();
+    private final static GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
 
     @Override
     protected void setDataFields(String data, NormalizedObservation normalizedObservation) {
@@ -53,10 +53,9 @@ public class NoaaTornadoNormalizer extends TornadoNormalizer {
         BigDecimal cost = parseCostWithUnit(dataMap.get("DAMAGE_PROPERTY"));
         normalizedObservation.setCost(cost);
 
-        DateTimeFormatter formatter = FORMATTERS.get(normalizedObservation.getProvider());
-        OffsetDateTime startedAt = parseDateTimeWithFormatter(dataMap.get("BEGIN_DATE_TIME"), formatter);
+        OffsetDateTime startedAt = parseDateTime(dataMap.get("BEGIN_DATE_TIME"), normalizedObservation.getProvider());
         normalizedObservation.setStartedAt(startedAt);
-        OffsetDateTime endedAt = parseDateTimeWithFormatter(dataMap.get("END_DATE_TIME"), formatter);
+        OffsetDateTime endedAt = parseDateTime(dataMap.get("END_DATE_TIME"), normalizedObservation.getProvider());
         normalizedObservation.setEndedAt(endedAt);
 
         String cz_name = dataMap.get("CZ_NAME");
@@ -74,15 +73,20 @@ public class NoaaTornadoNormalizer extends TornadoNormalizer {
         Double endLatitude = parseDouble(dataMap.get("END_LAT"));
         Double endLongitude = parseDouble(dataMap.get("END_LON"));
 
-        if (startLatitude != null && startLongitude != null && endLatitude != null && endLongitude != null) {
-            String geometries = createGeometries(startLongitude, startLatitude, endLongitude, endLatitude);
-            normalizedObservation.setGeometries(geometries);
-        }
-        if (startLatitude != null && startLongitude != null) {
-            normalizedObservation.setPoint(makeWktPoint(startLongitude, startLatitude));
-        } else if (endLatitude != null && endLongitude != null) {
-            normalizedObservation.setPoint(makeWktPoint(endLongitude, endLatitude));
-        }
+        boolean startPointPresent = checkPoint(startLongitude, startLatitude);
+        boolean endPointPresent = checkPoint(endLongitude, endLatitude);
+
+        if (!startPointPresent && !endPointPresent) return;
+
+        String wktPoint = startPointPresent
+                ? makeWktPoint(startLongitude, startLatitude)
+                : makeWktPoint(endLongitude, endLatitude);
+        String wktGeometry = startPointPresent && endPointPresent
+                ? makeWktLineString(startLongitude, startLatitude, endLongitude, endLatitude)
+                : wktPoint;
+
+        normalizedObservation.setPoint(wktPoint);
+        normalizedObservation.setGeometries(createGeometries(wktGeometry));
     }
 
     @Override
@@ -100,15 +104,18 @@ public class NoaaTornadoNormalizer extends TornadoNormalizer {
         return NumberUtils.createBigDecimal(cost).multiply(multiplyValue);
     }
 
-    private String createGeometries(Double startLon, Double startLat, Double endLon, Double endLat) {
+    private String createGeometries(String wkt) {
         try {
-            String wktLineString = makeWktLineString(startLon, startLat, endLon, endLat);
-            Geometry geometry = geoJSONWriter.write(wktReader.read(wktLineString));
+            Geometry geometry = geoJSONWriter.write(wktReader.read(wkt));
             Feature feature = new Feature(geometry, Collections.emptyMap());
             return new FeatureCollection(new Feature[] {feature}).toString();
         } catch (ParseException e) {
             LOG.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    private boolean checkPoint(Double lon, Double lat) {
+        return lon != null && lat != null;
     }
 }

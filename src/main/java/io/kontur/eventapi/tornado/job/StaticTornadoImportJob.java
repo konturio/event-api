@@ -3,10 +3,9 @@ package io.kontur.eventapi.tornado.job;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
-import io.kontur.eventapi.util.DateTimeUtil;
+import io.kontur.eventapi.tornado.job.converter.TornadoDataLakeConverter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,10 +38,13 @@ public class StaticTornadoImportJob extends AbstractJob {
     );
 
     private final DataLakeDao dataLakeDao;
+    private final TornadoDataLakeConverter converter;
 
-    protected StaticTornadoImportJob(MeterRegistry meterRegistry, DataLakeDao dataLakeDao) {
+    protected StaticTornadoImportJob(MeterRegistry meterRegistry, DataLakeDao dataLakeDao,
+                                     TornadoDataLakeConverter converter) {
         super(meterRegistry);
         this.dataLakeDao = dataLakeDao;
+        this.converter = converter;
     }
 
     @Override
@@ -67,8 +69,7 @@ public class StaticTornadoImportJob extends AbstractJob {
     }
 
     private String readFile(String fileName) throws Exception {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
         if (inputStream == null) {
             throw new Exception("File not found: " + fileName);
         }
@@ -77,17 +78,12 @@ public class StaticTornadoImportJob extends AbstractJob {
 
     private List<DataLake> createDateLakes(Feature[] features, String provider) {
         List<DataLake> dataLakes = new ArrayList<>();
+
         for (Feature feature: features) {
-            String sourceId = (String) feature.getProperties().get("source_id");
-            String externalId = StringUtils.isBlank(sourceId) ? DigestUtils.md5Hex(feature.toString()) : sourceId;
+            String externalId = DigestUtils.md5Hex(feature.toString());
             if (dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, provider).isEmpty()) {
-                DataLake dataLake = new DataLake();
-                dataLake.setObservationId(UUID.randomUUID());
-                dataLake.setExternalId(externalId);
-                dataLake.setData(feature.toString());
-                dataLake.setProvider(provider);
-                dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
-                dataLake.setUpdatedAt(PROVIDER_UPDATE_DATES.getOrDefault(provider, null));
+                OffsetDateTime updatedAt = PROVIDER_UPDATE_DATES.getOrDefault(provider, null);
+                DataLake dataLake = converter.convertDataLake(externalId, updatedAt, provider, feature.toString());
                 dataLakes.add(dataLake);
             }
         }

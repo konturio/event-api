@@ -6,18 +6,10 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static io.kontur.eventapi.tornado.job.NoaaTornadoImportJob.TORNADO_NOAA_PROVIDER;
-import static io.kontur.eventapi.tornado.job.StaticTornadoImportJob.*;
 
 public abstract class TornadoNormalizer extends Normalizer {
 
@@ -29,17 +21,6 @@ public abstract class TornadoNormalizer extends Normalizer {
             "4", Severity.EXTREME,
             "5", Severity.EXTREME
     );
-
-    protected final static Map<String, DateTimeFormatter> FORMATTERS = Map.of(
-            TORNADO_CANADA_GOV_PROVIDER, DateTimeFormatter.ofPattern("yyyyMMdd"),
-            TORNADO_AUSTRALIAN_BM_PROVIDER, DateTimeFormatter.ofPattern("yyyyMMdd"),
-            TORNADO_OSM_PROVIDER, DateTimeFormatter.ofPattern("d MMMM yyyy"),
-            TORNADO_NOAA_PROVIDER, new DateTimeFormatterBuilder()
-                    .parseCaseInsensitive()
-                    .appendPattern("dd-MMM-")
-                    .appendValueReduced(ChronoField.YEAR, 2, 2, 1949)
-                    .appendPattern(" HH:mm:ss")
-                    .toFormatter());
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -76,7 +57,11 @@ public abstract class TornadoNormalizer extends Normalizer {
     }
 
     protected Double parseDouble(String string) {
-        return StringUtils.isBlank(string) ? null : NumberUtils.createDouble(string);
+        return StringUtils.isBlank(string) ? null : Double.valueOf(string);
+    }
+
+    protected static String makeWktLineString(Double startLon, Double startLat, Double endLon, Double endLat) {
+        return String.format("LINESTRING(%s %s, %s %s)", startLon, startLat, endLon, endLat);
     }
 
     protected abstract void setDataFields(String data, NormalizedObservation normalizedObservation);

@@ -10,11 +10,10 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import static io.kontur.eventapi.tornado.job.StaticTornadoImportJob.*;
-import static io.kontur.eventapi.tornado.service.TornadoService.parseDateWithFormatter;
+import static io.kontur.eventapi.tornado.normalization.converter.TornadoDateConverter.parseDate;
 
 @Component
 public class StaticTornadoNormalizer extends TornadoNormalizer {
@@ -28,8 +27,7 @@ public class StaticTornadoNormalizer extends TornadoNormalizer {
 
         normalizedObservation.setDescription(readString(properties, "comments"));
 
-        DateTimeFormatter formatter = FORMATTERS.get(normalizedObservation.getProvider());
-        OffsetDateTime date = parseDateWithFormatter(readString(properties, "date"), formatter);
+        OffsetDateTime date = parseDate(readString(properties, "date"), normalizedObservation.getProvider());
         normalizedObservation.setStartedAt(date);
         normalizedObservation.setEndedAt(date);
 
@@ -51,8 +49,8 @@ public class StaticTornadoNormalizer extends TornadoNormalizer {
         Feature feature = (Feature) GeoJSONFactory.create(data);
         Map<String, Object> properties = feature.getProperties();
 
-        Double latitude = parseDouble(readString(properties, "latitude"));
-        Double longitude = parseDouble(readString(properties, "longitude"));
+        Double latitude = readDouble(properties, "latitude");
+        Double longitude = readDouble(properties, "longitude");
 
         normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
         normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}).toString());

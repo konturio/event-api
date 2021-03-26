@@ -4,7 +4,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.tornado.client.NoaaTornadoClient;
-import io.kontur.eventapi.util.DateTimeUtil;
+import io.kontur.eventapi.tornado.job.converter.TornadoDataLakeConverter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -17,24 +17,27 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
-import static io.kontur.eventapi.tornado.service.TornadoService.parseDateTimeWithPattern;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 
 @Component
 public class NoaaTornadoImportJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(NoaaTornadoImportJob.class);
-    private final NoaaTornadoClient noaaTornadoClient;
-    private final DataLakeDao dataLakeDao;
 
     @Value("${noaaTornado.host}")
     private String URL;
     public final static String TORNADO_NOAA_PROVIDER = "tornado.noaa";
 
-    protected NoaaTornadoImportJob(MeterRegistry meterRegistry, NoaaTornadoClient noaaTornadoClient, DataLakeDao dataLakeDao) {
+    private final NoaaTornadoClient noaaTornadoClient;
+    private final DataLakeDao dataLakeDao;
+    private final TornadoDataLakeConverter converter;
+
+    protected NoaaTornadoImportJob(MeterRegistry meterRegistry, NoaaTornadoClient noaaTornadoClient,
+                                   DataLakeDao dataLakeDao, TornadoDataLakeConverter converter) {
         super(meterRegistry);
         this.noaaTornadoClient = noaaTornadoClient;
         this.dataLakeDao = dataLakeDao;
+        this.converter = converter;
     }
 
     @Override
@@ -64,8 +67,8 @@ public class NoaaTornadoImportJob extends AbstractJob {
                     .map(element -> {
                         String[] rowItems = StringUtils.split(element.text());
                         String filename = rowItems[0];
-                        String updateDate = StringUtils.joinWith(StringUtils.SPACE, rowItems[1], rowItems[2]);
-                        return Map.entry(filename, parseDateTimeWithPattern(updateDate, "yyyy-MM-dd HH:mm"));
+                        String updateDate = rowItems[1] + "T" + rowItems[2] + "Z";
+                        return Map.entry(filename, OffsetDateTime.parse(updateDate));
                     }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
@@ -86,13 +89,8 @@ public class NoaaTornadoImportJob extends AbstractJob {
         for (int i = 1; i < csvRows.length; i++) {
             String externalId = parseRow(csvHeader, csvRows[i]).get("EVENT_ID");
             if (dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, TORNADO_NOAA_PROVIDER).isEmpty()) {
-                DataLake dataLake = new DataLake();
-                dataLake.setObservationId(UUID.randomUUID());
-                dataLake.setExternalId(externalId);
-                dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
-                dataLake.setUpdatedAt(updatedAt);
-                dataLake.setProvider(TORNADO_NOAA_PROVIDER);
-                dataLake.setData(csvHeader + "\n" + csvRows[i]);
+                String data = csvHeader + "\n" + csvRows[i];
+                DataLake dataLake = converter.convertDataLake(externalId, updatedAt, TORNADO_NOAA_PROVIDER, data);
                 dataLakes.add(dataLake);
             }
         }
