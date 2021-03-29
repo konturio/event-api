@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import static io.kontur.eventapi.tornado.job.StaticTornadoImportJob.*;
-import static io.kontur.eventapi.tornado.normalization.converter.TornadoDateConverter.parseDate;
+import static io.kontur.eventapi.tornado.converter.TornadoDateConverter.parseDate;
 
 @Component
 public class StaticTornadoNormalizer extends TornadoNormalizer {

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.kontur.eventapi.tornado.job.NoaaTornadoImportJob.TORNADO_NOAA_PROVIDER;
-import static io.kontur.eventapi.tornado.normalization.converter.TornadoDateConverter.parseDateTime;
+import static io.kontur.eventapi.tornado.converter.TornadoDateConverter.parseDateTime;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 
 @Component

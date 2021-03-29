@@ -1,4 +1,4 @@
-package io.kontur.eventapi.tornado.normalization.converter;
+package io.kontur.eventapi.tornado.converter;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;

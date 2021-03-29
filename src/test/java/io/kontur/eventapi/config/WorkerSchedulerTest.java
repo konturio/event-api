@@ -39,6 +39,8 @@ class WorkerSchedulerTest {
         Mockito.reset(hpSrvMagsJob);
         Mockito.reset(gdacsSearchJob);
         Mockito.reset(firmsImportJob);
+        Mockito.reset(staticTornadoImportJob);
+        Mockito.reset(noaaTornadoImportJob);
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
         Mockito.reset(feedCompositionJob);
@@ -90,6 +92,38 @@ class WorkerSchedulerTest {
         scheduler.startFirmsImport();
 
         verify(firmsImportJob, times(1)).run();
+    }
+
+    @Test
+    public void startStaticTornadoImportJob() {
+        ReflectionTestUtils.setField(scheduler, "staticTornadoImportEnabled", "true");
+        scheduler.startStaticTornadoImport();
+
+        verify(staticTornadoImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipStaticTornadoImportJob() {
+        ReflectionTestUtils.setField(scheduler, "staticTornadoImportEnabled", "false");
+        scheduler.startStaticTornadoImport();
+
+        verify(staticTornadoImportJob, never()).run();
+    }
+
+    @Test
+    public void startNoaaTornadoImportJob() {
+        ReflectionTestUtils.setField(scheduler, "noaaTornadoImportEnabled", "true");
+        scheduler.startNoaaTornadoImport();
+
+        verify(noaaTornadoImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipNoaaTornadoImportJob() {
+        ReflectionTestUtils.setField(scheduler, "noaaTornadoImportEnabled", "false");
+        scheduler.startNoaaTornadoImport();
+
+        verify(noaaTornadoImportJob, never()).run();
     }
 
 
