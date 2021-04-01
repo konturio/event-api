@@ -16,7 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
@@ -47,16 +46,14 @@ public class NoaaTornadoImportJob extends AbstractJob {
 
     @Override
     public void execute() throws Exception {
-        Map<String, OffsetDateTime> filenamesAndUpdateDates = htmlParser.parseFilenamesAndUpdateDates();
-        List<DataLake> allDataLakes = filenamesAndUpdateDates.entrySet().stream()
-                .filter(entry -> isNewOrUpdatedFile(entry.getValue()))
-                .map(entry -> processFile(entry.getKey(), entry.getValue()))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-        dataLakeDao.storeDataLakes(allDataLakes);
+        OffsetDateTime latestHazardUpdatedAt = getLatestHazardUpdatedAt();
+        htmlParser.parseFilenamesAndUpdateDates()
+                .entrySet().stream()
+                .filter(entry -> isNewOrUpdatedFile(latestHazardUpdatedAt, entry.getValue()))
+                .forEach(entry -> processFile(entry.getKey(), entry.getValue()));
     }
 
-    private List<DataLake> processFile(String filename, OffsetDateTime updatedAt) {
+    private void processFile(String filename, OffsetDateTime updatedAt) {
         try {
             String csv = decompressGZIP(client.getGZIP(filename));
             String[] rows = StringUtils.split(csv, CSV_SEPARATOR);
@@ -65,11 +62,10 @@ public class NoaaTornadoImportJob extends AbstractJob {
             for (int i = 1; i < rows.length; i++) {
                 processRow(header, rows[i], updatedAt).ifPresent(dataLakes::add);
             }
-            return dataLakes;
+            dataLakeDao.storeDataLakes(dataLakes);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
-        return Collections.emptyList();
     }
 
     private Optional<DataLake> processRow(String header, String row, OffsetDateTime updatedAt) {
@@ -84,9 +80,12 @@ public class NoaaTornadoImportJob extends AbstractJob {
         return Optional.empty();
     }
 
-    private boolean isNewOrUpdatedFile(OffsetDateTime fileUpdatedAt) {
-        Optional<DataLake> latestUpdatedHazard = dataLakeDao.getLatestUpdatedHazard(NOAA_TORNADO_PROVIDER);
-        return latestUpdatedHazard.isEmpty() || fileUpdatedAt.isAfter(latestUpdatedHazard.get().getUpdatedAt());
+    private boolean isNewOrUpdatedFile(OffsetDateTime latestHazardUpdatedAt, OffsetDateTime fileUpdatedAt) {
+        return latestHazardUpdatedAt == null || fileUpdatedAt.isAfter(latestHazardUpdatedAt);
+    }
+
+    private OffsetDateTime getLatestHazardUpdatedAt() {
+        return dataLakeDao.getLatestUpdatedHazard(NOAA_TORNADO_PROVIDER).map(DataLake::getUpdatedAt).orElse(null);
     }
 
     private String decompressGZIP(byte[] gzip) throws IOException{
