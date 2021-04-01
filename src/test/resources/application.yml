@@ -41,7 +41,8 @@ scheduler:
     initialDelay: 9999999
   noaaTornadoImport:
     enable: false
-    initialDelay: 9999999
+    initialDelay: 999999
+    fixedDelay: 999999
   normalization:
     enable: false
     initialDelay: 999999
