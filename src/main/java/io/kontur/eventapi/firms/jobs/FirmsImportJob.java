@@ -45,15 +45,16 @@ public class FirmsImportJob extends AbstractJob {
     @Override
     public void execute() {
         List<DataLake> dataLakesFromModis = createDataLakes(MODIS_PROVIDER, firmsClient.getModisData());
-        List<DataLake> dataLakesFromNoaa= createDataLakes(NOAA_PROVIDER, firmsClient.getNoaa20VirsData());
-        List<DataLake> dataLakesFromSuomi = createDataLakes(SUOMI_PROVIDER, firmsClient.getSuomiNppVirsData());
-
-        List<DataLake> allDataLakes = new ArrayList<>();
-        allDataLakes.addAll(dataLakesFromModis);
-        allDataLakes.addAll(dataLakesFromNoaa);
-        allDataLakes.addAll(dataLakesFromSuomi);
-
-        dataLakeDao.storeDataLakes(allDataLakes);
+        dataLakeDao.storeDataLakes(dataLakesFromModis);
+//        List<DataLake> dataLakesFromNoaa= createDataLakes(NOAA_PROVIDER, firmsClient.getNoaa20VirsData());
+//        List<DataLake> dataLakesFromSuomi = createDataLakes(SUOMI_PROVIDER, firmsClient.getSuomiNppVirsData());
+//
+//        List<DataLake> allDataLakes = new ArrayList<>();
+//        allDataLakes.addAll(dataLakesFromModis);
+//        allDataLakes.addAll(dataLakesFromNoaa);
+//        allDataLakes.addAll(dataLakesFromSuomi);
+//
+//        dataLakeDao.storeDataLakes(allDataLakes);
     }
 
     @Override

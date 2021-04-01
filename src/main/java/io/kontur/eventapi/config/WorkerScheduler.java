@@ -1,7 +1,7 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.tornado.job.NoaaTornadoImportJob;
-import io.kontur.eventapi.tornado.job.StaticTornadoImportJob;
+import io.kontur.eventapi.noaatornado.job.NoaaTornadoImportJob;
+import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
@@ -28,7 +28,7 @@ public class WorkerScheduler {
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
     private final EmDatImportJob emDatImportJob;
-    private final StaticTornadoImportJob staticTornadoImportJob;
+    private final StaticImportJob staticImportJob;
     private final NoaaTornadoImportJob noaaTornadoImportJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
@@ -47,8 +47,8 @@ public class WorkerScheduler {
     private String feedCompositionEnabled;
     @Value("${scheduler.emDatImport.enable}")
     private String emDatImportEnabled;
-    @Value("${scheduler.staticTornadoImport.enable}")
-    private String staticTornadoImportEnabled;
+    @Value("${scheduler.staticImport.enable}")
+    private String staticImportEnabled;
     @Value("${scheduler.noaaTornadoImport.enable}")
     private String noaaTornadoImportEnabled;
 
@@ -56,7 +56,7 @@ public class WorkerScheduler {
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
                            FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob,
-                           StaticTornadoImportJob staticTornadoImportJob, NoaaTornadoImportJob noaaTornadoImportJob) {
+                           StaticImportJob staticImportJob, NoaaTornadoImportJob noaaTornadoImportJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -65,7 +65,7 @@ public class WorkerScheduler {
         this.feedCompositionJob = feedCompositionJob;
         this.firmsImportJob = firmsImportJob;
         this.emDatImportJob = emDatImportJob;
-        this.staticTornadoImportJob = staticTornadoImportJob;
+        this.staticImportJob = staticImportJob;
         this.noaaTornadoImportJob = noaaTornadoImportJob;
     }
 
@@ -105,12 +105,12 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.staticTornadoImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
-    public void startStaticTornadoImport() {
-        if (Boolean.parseBoolean(staticTornadoImportEnabled)) {
-            staticTornadoImportJob.run();
+    @Scheduled(initialDelayString = "${scheduler.staticImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
+    public void startStaticImport() {
+        if (Boolean.parseBoolean(staticImportEnabled)) {
+            staticImportJob.run();
         } else {
-            LOG.info("StaticTornado import job invocation is skipped");
+            LOG.info("Static import job invocation is skipped");
         }
     }
 

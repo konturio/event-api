@@ -1,4 +1,4 @@
-package io.kontur.eventapi.tornado.client;
+package io.kontur.eventapi.noaatornado.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

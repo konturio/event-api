@@ -1,15 +1,15 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.tornado.job.NoaaTornadoImportJob;
-import io.kontur.eventapi.tornado.job.StaticTornadoImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
+import io.kontur.eventapi.noaatornado.job.NoaaTornadoImportJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
+import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,11 +27,11 @@ class WorkerSchedulerTest {
     private final GdacsSearchJob gdacsSearchJob = mock(GdacsSearchJob.class);
     private final FirmsImportJob firmsImportJob = mock(FirmsImportJob.class);
     private final EmDatImportJob emDatImportJob = mock(EmDatImportJob.class);
-    private final StaticTornadoImportJob staticTornadoImportJob = mock(StaticTornadoImportJob.class);
+    private final StaticImportJob staticImportJob = mock(StaticImportJob.class);
     private final NoaaTornadoImportJob noaaTornadoImportJob = mock(NoaaTornadoImportJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
-            feedCompositionJob, firmsImportJob, emDatImportJob, staticTornadoImportJob, noaaTornadoImportJob);
+            feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, noaaTornadoImportJob);
 
     @AfterEach
     public void resetMocks() {
@@ -39,11 +39,11 @@ class WorkerSchedulerTest {
         Mockito.reset(hpSrvMagsJob);
         Mockito.reset(gdacsSearchJob);
         Mockito.reset(firmsImportJob);
-        Mockito.reset(staticTornadoImportJob);
-        Mockito.reset(noaaTornadoImportJob);
+        Mockito.reset(staticImportJob);
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
         Mockito.reset(feedCompositionJob);
+        Mockito.reset(noaaTornadoImportJob);
     }
 
     @Test
@@ -95,19 +95,19 @@ class WorkerSchedulerTest {
     }
 
     @Test
-    public void startStaticTornadoImportJob() {
-        ReflectionTestUtils.setField(scheduler, "staticTornadoImportEnabled", "true");
-        scheduler.startStaticTornadoImport();
+    public void startStaticImportJob() {
+        ReflectionTestUtils.setField(scheduler, "staticImportEnabled", "true");
+        scheduler.startStaticImport();
 
-        verify(staticTornadoImportJob, times(1)).run();
+        verify(staticImportJob, times(1)).run();
     }
 
     @Test
-    public void skipStaticTornadoImportJob() {
-        ReflectionTestUtils.setField(scheduler, "staticTornadoImportEnabled", "false");
-        scheduler.startStaticTornadoImport();
+    public void skipStaticImportJob() {
+        ReflectionTestUtils.setField(scheduler, "staticImportEnabled", "false");
+        scheduler.startStaticImport();
 
-        verify(staticTornadoImportJob, never()).run();
+        verify(staticImportJob, never()).run();
     }
 
     @Test
@@ -125,7 +125,6 @@ class WorkerSchedulerTest {
 
         verify(noaaTornadoImportJob, never()).run();
     }
-
 
     @Test
     public void startNormalizationJob() {
