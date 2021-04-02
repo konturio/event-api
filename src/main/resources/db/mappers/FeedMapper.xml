@@ -73,13 +73,11 @@
 
     </select>
 
-    <select id="getLastFeedData" resultMap="feedDataDtoMap">
-        SELECT *
+    <select id="getLastFeedDataVersion" resultType="java.lang.Long">
+        SELECT max(version)
         FROM feed_data
         WHERE event_id = #{eventId}
             AND feed_id = #{feedId}
-        ORDER BY version DESC
-        LIMIT 1
     </select>
 
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">

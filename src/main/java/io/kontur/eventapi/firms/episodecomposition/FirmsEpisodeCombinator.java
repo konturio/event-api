@@ -1,5 +1,7 @@
 package io.kontur.eventapi.firms.episodecomposition;
 
+import com.uber.h3core.H3Core;
+import com.uber.h3core.util.GeoCoord;
 import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
@@ -18,6 +20,7 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -36,11 +39,17 @@ import static java.util.stream.Collectors.toList;
 public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private final GeoJSONReader geoJSONReader = new GeoJSONReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
-    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(1000));
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(10000));
     private final KonturApiClient konturApiClient;
+    private final H3Core h3;
 
     public FirmsEpisodeCombinator(KonturApiClient konturApiClient) {
         this.konturApiClient = konturApiClient;
+        try {
+            h3 = H3Core.newInstance();
+        } catch (IOException e) {
+            throw new RuntimeException("failed to create h3 engine", e);
+        }
     }
 
     @Override
@@ -165,7 +174,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private String getBurntAreaName(List<NormalizedObservation> episodeObservations) {
-        Geometry centroid = calculateCentroid(episodeObservations);
+        Geometry centroid = calculateH3Centroid(calculateCentroid(episodeObservations));
+
         FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 10);
         if (adminBoundaries == null || adminBoundaries.getFeatures() == null) {
             return "";
@@ -188,12 +198,17 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .collect(Collectors.joining(", "));
     }
 
-    private Geometry calculateCentroid(List<NormalizedObservation> episodeObservations) {
+    private Point calculateCentroid(List<NormalizedObservation> episodeObservations) {
         List<Geometry> geometries = episodeObservations
                 .stream()
                 .map(no -> toGeometry(no.getGeometries()))
                 .collect(toList());
         return geometryFactory.buildGeometry(geometries).getCentroid();
+    }
+
+    private Point calculateH3Centroid(Point geometry) {
+        GeoCoord geoCoord = h3.h3ToGeo(h3.geoToH3(geometry.getY(), geometry.getX(), 8));
+        return geometryFactory.createPoint(new Coordinate(geoCoord.lng, geoCoord.lat));
     }
 
     private Double calculateArea(Geometry geometry) {

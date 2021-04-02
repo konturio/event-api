@@ -60,7 +60,6 @@ public class FeedCompositionJob extends AbstractJob {
         Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
         eventsIds
-                .parallelStream()
                 .forEach(event -> createFeedData(event, feed));
     }
 
@@ -70,9 +69,9 @@ public class FeedCompositionJob extends AbstractJob {
             eventObservations.sort(comparing(NormalizedObservation::getStartedAt)
                     .thenComparing(NormalizedObservation::getLoadedAt));
 
-            Optional<FeedData> lastFeedData = feedDao.getLastFeedData(eventId, feed.getFeedId());
+            Optional<Long> lastFeedDataVersion = feedDao.getLastFeedDataVersion(eventId, feed.getFeedId());
             FeedData feedData = new FeedData(eventId, feed.getFeedId(),
-                    lastFeedData.map(f -> f.getVersion() + 1).orElse(1L));
+                    lastFeedDataVersion.map(v -> v + 1).orElse(1L));
 
             feedData.setObservations(
                     eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toList()));
