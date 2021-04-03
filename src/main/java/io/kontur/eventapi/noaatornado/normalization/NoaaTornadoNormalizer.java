@@ -27,7 +27,6 @@ import java.time.temporal.ChronoField;
 import java.util.Collections;
 import java.util.Map;
 
-import static io.kontur.eventapi.noaatornado.job.NoaaTornadoImportJob.CSV_SEPARATOR;
 import static io.kontur.eventapi.noaatornado.job.NoaaTornadoImportJob.NOAA_TORNADO_PROVIDER;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 import static io.kontur.eventapi.util.SeverityUtil.convertFujitaScale;
@@ -65,7 +64,7 @@ public class NoaaTornadoNormalizer extends Normalizer {
         normalizedObservation.setActive(false);
         normalizedObservation.setType(EventType.TORNADO);
 
-        String[] csvHeaderAndRow = dataLakeDto.getData().split(CSV_SEPARATOR);
+        String[] csvHeaderAndRow = dataLakeDto.getData().split("\n");
         Map<String, String> data = parseRow(csvHeaderAndRow[0], csvHeaderAndRow[1]);
 
         normalizedObservation.setExternalEventId(parseString(data, "EPISODE_ID"));

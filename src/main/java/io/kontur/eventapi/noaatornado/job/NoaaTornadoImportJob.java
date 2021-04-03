@@ -25,7 +25,6 @@ public class NoaaTornadoImportJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(NoaaTornadoImportJob.class);
     public final static String NOAA_TORNADO_PROVIDER = "tornado.noaa";
-    public final static String CSV_SEPARATOR = "\n";
 
     private final NoaaTornadoHTMLParser htmlParser;
     private final NoaaTornadoClient client;
@@ -56,7 +55,7 @@ public class NoaaTornadoImportJob extends AbstractJob {
     private void processFile(String filename, OffsetDateTime updatedAt) {
         try {
             String csv = decompressGZIP(client.getGZIP(filename));
-            String[] rows = StringUtils.split(csv, CSV_SEPARATOR);
+            String[] rows = StringUtils.split(csv, "\n");
             String header = rows[0];
             List<DataLake> dataLakes = new ArrayList<>();
             for (int i = 1; i < rows.length; i++) {
@@ -70,11 +69,11 @@ public class NoaaTornadoImportJob extends AbstractJob {
 
     private Optional<DataLake> processRow(String header, String row, OffsetDateTime updatedAt) {
         String externalId = parseRow(header, row).get("EVENT_ID");
-        Optional<DataLake> existingDataLake = dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, NOAA_TORNADO_PROVIDER);
-        if (existingDataLake.isEmpty() || !existingDataLake.get().getUpdatedAt().isEqual(updatedAt)) {
+        String data = header + "\n" + row;
+        if (isNewOrUpdatedEvent(externalId, data)) {
             DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
             dataLake.setProvider(NOAA_TORNADO_PROVIDER);
-            dataLake.setData(header + CSV_SEPARATOR + row);
+            dataLake.setData(data);
             return Optional.of(dataLake);
         }
         return Optional.empty();
@@ -82,6 +81,11 @@ public class NoaaTornadoImportJob extends AbstractJob {
 
     private boolean isNewOrUpdatedFile(OffsetDateTime latestHazardUpdatedAt, OffsetDateTime fileUpdatedAt) {
         return latestHazardUpdatedAt == null || fileUpdatedAt.isAfter(latestHazardUpdatedAt);
+    }
+
+    private boolean isNewOrUpdatedEvent(String externalId, String data) {
+        Optional<DataLake> existingEvent =  dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, NOAA_TORNADO_PROVIDER);
+        return existingEvent.isEmpty() || !existingEvent.get().getData().equals(data);
     }
 
     private OffsetDateTime getLatestHazardUpdatedAt() {

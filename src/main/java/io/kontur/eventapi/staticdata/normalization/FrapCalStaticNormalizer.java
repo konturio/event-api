@@ -5,11 +5,13 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import org.apache.commons.lang3.StringUtils;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
-import org.wololo.geojson.MultiPolygon;
+import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,6 +22,9 @@ import java.util.Map;
 
 @Component
 public class FrapCalStaticNormalizer extends StaticNormalizer {
+
+    private final static GeoJSONReader reader = new GeoJSONReader();
+
     @Override
     protected List<String> getProviders() {
         return List.of("wildfire.frap.cal");
@@ -30,10 +35,9 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
         Feature feature = (Feature) GeoJSONFactory.create(dataLake.getData());
         Map<String, Object> properties = feature.getProperties();
 
-        MultiPolygon multiPolygon = (MultiPolygon) feature.getGeometry();
-        Double lon = multiPolygon.getCoordinates()[0][0][0][0];
-        Double lat = multiPolygon.getCoordinates()[0][0][0][1];
-        normalizedObservation.setPoint(makeWktPoint(lon, lat));
+        MultiPolygon multiPolygon = (MultiPolygon) reader.read(feature.getGeometry());
+        Point point = multiPolygon.getCentroid();
+        normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
         normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}).toString());
 
         String state = readString(properties, "STATE");
