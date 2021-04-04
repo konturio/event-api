@@ -17,7 +17,7 @@ import java.util.Map;
 public class StaticImportJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(StaticImportJob.class);
-    private final static String STATIC_DATA_FOLDER = "static/";
+    private String STATIC_DATA_FOLDER = "static/";
     
     private final Map<String, StaticImportService> importServices;
     private final StaticFileReader fileReader;
