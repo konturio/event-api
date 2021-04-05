@@ -5,7 +5,7 @@
 - `bbox` and `datetime` filter to the `/v1/` endpoint
 - FIRMS provider
 - EM-DAT provider
-- Static data providers (tornado.canada-gov, tornado.australian-bm, tornado.osm-wiki, wildfire.frap.cal)
+- Static data providers (tornado.canada-gov, tornado.australian-bm, tornado.osm-wiki, wildfire.frap.cal, tornado.des-inventar-sendai)
 - Noaa provider
 #### Changed
 - Event versioning is removed 

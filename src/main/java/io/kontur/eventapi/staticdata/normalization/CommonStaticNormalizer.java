@@ -23,7 +23,7 @@ public class CommonStaticNormalizer extends StaticNormalizer {
 
     @Override
     protected List<String> getProviders() {
-        return List.of("tornado.canada-gov", "tornado.australian-bm", "tornado.osm-wiki");
+        return List.of("tornado.canada-gov", "tornado.australian-bm", "tornado.osm-wiki", "tornado.des-inventar-sendai");
     }
 
     @Override
