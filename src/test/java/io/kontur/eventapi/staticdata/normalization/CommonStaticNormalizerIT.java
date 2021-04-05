@@ -31,6 +31,7 @@ class CommonStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         assertTrue(normalizer.isApplicable(createDataLakeWithProvider("tornado.canada-gov")));
         assertTrue(normalizer.isApplicable(createDataLakeWithProvider("tornado.australian-bm")));
         assertTrue(normalizer.isApplicable(createDataLakeWithProvider("tornado.osm-wiki")));
+        assertTrue(normalizer.isApplicable(createDataLakeWithProvider("tornado.des-inventar-sendai")));
     }
 
     @Test
