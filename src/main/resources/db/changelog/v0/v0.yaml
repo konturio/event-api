@@ -108,3 +108,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: create_collectGeometryFromEpisodes_function.sql
+- include:
+      relativeToChangelogFile: true
+      file: insert-swiss-re-feed.sql
