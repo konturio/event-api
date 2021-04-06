@@ -2,6 +2,7 @@ package io.kontur.eventapi.staticdata.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.staticdata.config.StaticFileData;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ class StaticImportJobIT extends AbstractCleanableIntegrationTest {
     private final DataLakeDao dataLakeDao;
 
     private final static String provider = "test-provider";
-    private final static OffsetDateTime updatedAt = OffsetDateTime.of(LocalDateTime.parse("2020-07-12T10:37:00"), ZoneOffset.UTC);
+    private final static OffsetDateTime updatedAt = OffsetDateTime.parse("2020-07-12T00:00:00Z");
 
     @Autowired
     public StaticImportJobIT(JdbcTemplate jdbcTemplate, StaticImportJob staticImportJob, DataLakeDao dataLakeDao) {
@@ -32,7 +33,9 @@ class StaticImportJobIT extends AbstractCleanableIntegrationTest {
 
     @Test
     public void testStaticDataImport() throws IOException {
-        ReflectionTestUtils.setField(staticImportJob, "STATIC_DATA_FOLDER", "io/kontur/eventapi/staticdata/static/");
+        ReflectionTestUtils.setField(staticImportJob, "files", List.of(
+                new StaticFileData("io/kontur/eventapi/staticdata/static/test.geojson", provider,
+                        updatedAt, "geojson")));
 
         staticImportJob.run();
         List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
