@@ -25,6 +25,10 @@ konturApi:
 noaaTornado:
   host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
 
+staticdata:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'PROD/'
+
 scheduler:
   firmsImport:
     enable: true
