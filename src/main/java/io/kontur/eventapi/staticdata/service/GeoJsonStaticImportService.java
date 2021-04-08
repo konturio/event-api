@@ -19,8 +19,8 @@ public class GeoJsonStaticImportService extends StaticImportService {
     }
 
     @Override
-    public void saveDataLakes(String data, String provider, OffsetDateTime updatedAt) {
-        FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(data);
+    public void saveDataLakes(String json, String provider, OffsetDateTime updatedAt) {
+        FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(json);
         Feature[] features = featureCollection.getFeatures();
 
         List<DataLake> dataLakes = new ArrayList<>();
