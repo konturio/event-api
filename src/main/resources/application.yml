@@ -75,7 +75,7 @@ scheduler:
   noaaTornadoImport:
     enable: true
     initialDelay: 1000
-    fixedDelay: P30D # every 30 days
+    fixedDelay: P1D # every day
   normalization:
     enable: true
     initialDelay: 1000

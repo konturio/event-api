@@ -48,6 +48,7 @@ public class NoaaTornadoImportJob extends AbstractJob {
         OffsetDateTime latestHazardUpdatedAt = getLatestHazardUpdatedAt();
         htmlParser.parseFilenamesAndUpdateDates()
                 .entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
                 .filter(entry -> isNewOrUpdatedFile(latestHazardUpdatedAt, entry.getValue()))
                 .forEach(entry -> processFile(entry.getKey(), entry.getValue()));
     }
@@ -80,7 +81,7 @@ public class NoaaTornadoImportJob extends AbstractJob {
     }
 
     private boolean isNewOrUpdatedFile(OffsetDateTime latestHazardUpdatedAt, OffsetDateTime fileUpdatedAt) {
-        return latestHazardUpdatedAt == null || fileUpdatedAt.isAfter(latestHazardUpdatedAt);
+        return latestHazardUpdatedAt == null || !fileUpdatedAt.isBefore(latestHazardUpdatedAt);
     }
 
     private boolean isNewOrUpdatedEvent(String externalId, String data) {
