@@ -20,10 +20,7 @@ import org.wololo.geojson.FeatureCollection;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static io.kontur.eventapi.TestUtil.readFile;
 import static java.time.OffsetDateTime.parse;
@@ -174,6 +171,22 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
         List<KonturEvent> newEventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
         assertTrue(newEventsForRolloutEpisodes.isEmpty());
+
+        //WHEN new data available for modis - 1 observations within 1 km to existing observations
+        when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6-update-2.csv"));
+
+        firmsImportJob.run();
+        normalizationJob.run();
+        eventCombinationJob.run();
+        feedCompositionJob.run();
+
+        //THEN area is calculated from all hexaons that were burning
+        List<FeedData> firmsUpdated2 = searchFeedData();
+
+        assertEquals(3, firmsUpdated2.size());
+        Optional<FeedData> updatedEvent = firmsUpdated2.stream().filter(event -> event.getVersion() == 3).findFirst();
+        assertTrue(updatedEvent.isPresent());
+        assertEquals("Wildfire in an unknown area. Burnt area 3.484 km\u00B2, burning 53 hours.", updatedEvent.get().getEpisodes().get(4).getName());
     }
 
     private void configureKonturApiClient() {
