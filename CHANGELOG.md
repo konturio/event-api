@@ -5,6 +5,8 @@
 - `bbox` and `datetime` filter to the `/v1/` endpoint
 - FIRMS provider
 - EM-DAT provider
+- Static data providers (tornado.canada-gov, tornado.australian-bm, tornado.osm-wiki, wildfire.frap.cal, tornado.des-inventar-sendai)
+- Noaa provider
 #### Changed
 - Event versioning is removed 
 - Refactored normalization, event and episods jobs
@@ -20,6 +22,12 @@ emdat:
 konturApi:
   host: 'https://api.kontur.io/'
 
+noaaTornado:
+  host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
+
+staticdata:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'PROD/'
 
 scheduler:
   firmsImport:
@@ -30,6 +38,13 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: PT3H # every 3 hours
+  staticImport:
+    enable: true
+    initialDelay: 1000
+  noaaTornadoImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: P30D # every 30 days
 ```
 
 ## 0.3 - 2020-11-18

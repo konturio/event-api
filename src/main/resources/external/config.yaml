@@ -20,6 +20,9 @@ pdc:
   user: user
   password: password
 
+noaaTornado:
+  host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -35,6 +38,13 @@ scheduler:
     enable: true
   emDatImport:
     enable: true
+  staticImport:
+    enable: true
+    initialDelay: 1000
+  noaaTornadoImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: P30D
   normalization:
     enable: true
     initialDelay: 1000

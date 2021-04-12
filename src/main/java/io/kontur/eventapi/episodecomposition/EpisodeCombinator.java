@@ -16,10 +16,6 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
     public abstract Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);
 
     protected Optional<FeedEpisode> createDefaultEpisode(NormalizedObservation observation) {
-        if (observation.getGeometries() == null) {
-            return Optional.empty();
-        }
-
         FeedEpisode feedEpisode = new FeedEpisode();
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
@@ -30,8 +26,11 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         feedEpisode.setEndedAt(observation.getEndedAt());
         feedEpisode.setUpdatedAt(observation.getLoadedAt());
         feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
-        feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
         feedEpisode.addObservation(observation.getObservationId());
+
+        if (observation.getGeometries() != null) {
+            feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
+        }
 
         return Optional.of(feedEpisode);
     }
