@@ -26,5 +26,5 @@ public interface FeedMapper {
 
     Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, Long version);
 
-    Optional<FeedData> getLastFeedData(UUID eventId, UUID feedId);
+    Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId);
 }

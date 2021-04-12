@@ -1,6 +1,6 @@
 package io.kontur.eventapi.emdat.service;
 
-import io.kontur.eventapi.emdat.client.KonturApiClient;
+import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.emdat.dto.GeocoderDto;
 import io.kontur.eventapi.util.JsonUtil;
 import org.junit.jupiter.api.Test;

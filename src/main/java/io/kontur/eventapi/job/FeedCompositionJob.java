@@ -59,22 +59,31 @@ public class FeedCompositionJob extends AbstractJob {
     private void updateFeed(Feed feed) {
         Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
-        eventsIds.forEach(event -> createFeedData(event, feed));
+        eventsIds
+                .forEach(event -> createFeedData(event, feed));
     }
 
     private void createFeedData(UUID eventId, Feed feed) {
-        List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
-        eventObservations.sort(comparing(NormalizedObservation::getStartedAt)
-                .thenComparing(NormalizedObservation::getLoadedAt));
+        try {
+            List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
+            eventObservations.sort(comparing(NormalizedObservation::getStartedAt)
+                    .thenComparing(NormalizedObservation::getLoadedAt));
 
-        Optional<FeedData> lastFeedData = feedDao.getLastFeedData(eventId, feed.getFeedId());
-        FeedData feedData = new FeedData(eventId, feed.getFeedId(), lastFeedData.map(f -> f.getVersion() + 1).orElse(1L));
+            Optional<Long> lastFeedDataVersion = feedDao.getLastFeedDataVersion(eventId, feed.getFeedId());
+            FeedData feedData = new FeedData(eventId, feed.getFeedId(),
+                    lastFeedDataVersion.map(v -> v + 1).orElse(1L));
 
-        feedData.setObservations(eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toList()));
-        fillEpisodes(eventObservations, feedData);
-        fillFeedData(feedData);
+            feedData.setObservations(
+                    eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toList()));
+            fillEpisodes(eventObservations, feedData);
+            fillFeedData(feedData);
 
-        feedDao.insertFeedData(feedData);
+            feedDao.insertFeedData(feedData);
+        } catch (Exception e) {
+            LOG.error(
+                    String.format("Error while processing event with id = '%s', for '%s' feed. Error: %s", eventId.toString(),
+                            feed.getAlias(), e.getMessage()), e);
+        }
     }
 
     private void fillFeedData(FeedData feedData) {
