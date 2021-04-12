@@ -111,7 +111,7 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: insert-swiss-re-feed.sql
--include:
+- include:
     relativeToChangelogFile: true
     file: update-swiss-re-feed.sql
 - include:
