@@ -1,9 +1,9 @@
-package io.kontur.eventapi.noaatornado.job;
+package io.kontur.eventapi.stormsnoaa.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.noaatornado.client.NoaaTornadoClient;
-import io.kontur.eventapi.noaatornado.parser.NoaaTornadoHTMLParser;
+import io.kontur.eventapi.stormsnoaa.client.StormsNoaaClient;
+import io.kontur.eventapi.stormsnoaa.parser.StormsNoaaHTMLParser;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,32 +21,32 @@ import java.util.zip.GZIPOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NoaaTornadoImportJobIT extends AbstractCleanableIntegrationTest {
+class StormsNoaaImportJobIT extends AbstractCleanableIntegrationTest {
 
-    private final NoaaTornadoImportJob noaaTornadoImportJob;
+    private final StormsNoaaImportJob stormsNoaaImportJob;
     private final DataLakeDao dataLakeDao;
 
     @MockBean
-    private NoaaTornadoClient noaaTornadoClient;
+    private StormsNoaaClient stormsNoaaClient;
 
     @MockBean
-    private NoaaTornadoHTMLParser noaaTornadoHTMLParser;
+    private StormsNoaaHTMLParser stormsNoaaHTMLParser;
 
     @Autowired
-    public NoaaTornadoImportJobIT(JdbcTemplate jdbcTemplate, NoaaTornadoImportJob noaaTornadoImportJob,
-                                  DataLakeDao dataLakeDao) {
+    public StormsNoaaImportJobIT(JdbcTemplate jdbcTemplate, StormsNoaaImportJob stormsNoaaImportJob,
+                                 DataLakeDao dataLakeDao) {
         super(jdbcTemplate);
-        this.noaaTornadoImportJob = noaaTornadoImportJob;
+        this.stormsNoaaImportJob = stormsNoaaImportJob;
         this.dataLakeDao = dataLakeDao;
     }
 
     @Test
     public void testNoaaTornadoImport() throws IOException {
-        Mockito.when(noaaTornadoHTMLParser.parseFilenamesAndUpdateDates())
+        Mockito.when(stormsNoaaHTMLParser.parseFilenamesAndUpdateDates())
                 .thenReturn(Map.of("test-filename", OffsetDateTime.now()));
-        Mockito.when(noaaTornadoClient.getGZIP("test-filename"))
+        Mockito.when(stormsNoaaClient.getGZIP("test-filename"))
                 .thenReturn(getTestFile());
-        noaaTornadoImportJob.run();
+        stormsNoaaImportJob.run();
         List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
         assertEquals(2, dataLakes.size());
         checkDataLake(dataLakes.get(0), "10096222");
@@ -69,7 +69,7 @@ class NoaaTornadoImportJobIT extends AbstractCleanableIntegrationTest {
         assertEquals(externalId, dataLake.getExternalId());
         assertNotNull(dataLake.getLoadedAt());
         assertNotNull(dataLake.getUpdatedAt());
-        assertEquals("tornado.noaa", dataLake.getProvider());
+        assertEquals("storms.noaa", dataLake.getProvider());
         assertNotNull(dataLake.getData());
     }
 }

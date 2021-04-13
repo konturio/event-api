@@ -1,4 +1,4 @@
-package io.kontur.eventapi.noaatornado.normalization;
+package io.kontur.eventapi.stormsnoaa.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
@@ -24,17 +24,19 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.List;
 import java.util.Map;
 
-import static io.kontur.eventapi.noaatornado.job.NoaaTornadoImportJob.NOAA_TORNADO_PROVIDER;
+import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 import static io.kontur.eventapi.util.SeverityUtil.convertFujitaScale;
 
 @Component
-public class NoaaTornadoNormalizer extends Normalizer {
+public class StormsNoaaNormalizer extends Normalizer {
 
-    private final static Logger LOG = LoggerFactory.getLogger(NoaaTornadoNormalizer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(StormsNoaaNormalizer.class);
     private static final GeoJSONWriter geoJsonWriter = new GeoJSONWriter();
     private static final WKTReader wktReader = new WKTReader();
 
@@ -49,9 +51,34 @@ public class NoaaTornadoNormalizer extends Normalizer {
             .appendPattern(" HH:mm:ss")
             .toFormatter();
 
+    private static final Map<String, EventType> EVENT_TYPES_MAPPER = Map.ofEntries(
+            Map.entry("Drought", EventType.DROUGHT),
+            Map.entry("Flash Flood", EventType.FLOOD),
+            Map.entry("Flood", EventType.FLOOD),
+            Map.entry("HAIL FLOODING", EventType.FLOOD),
+            Map.entry("Lakeshore Flood", EventType.FLOOD),
+            Map.entry("THUNDERSTORM WINDS/ FLOOD", EventType.FLOOD),
+            Map.entry("THUNDERSTORM WINDS/FLASH FLOOD", EventType.FLOOD),
+            Map.entry("THUNDERSTORM WINDS/FLOODING", EventType.FLOOD),
+            Map.entry("Marine Tropical Storm", EventType.STORM),
+            Map.entry("Tropical Storm", EventType.STORM),
+            Map.entry("Tornado", EventType.TORNADO),
+            Map.entry("TORNADO/WATERSPOUT", EventType.TORNADO),
+            Map.entry("TORNADOES, TSTM WIND, HAIL", EventType.TORNADO),
+            Map.entry("Tsunami", EventType.TSUNAMI),
+            Map.entry("Volcanic Ash", EventType.VOLCANO),
+            Map.entry("Volcanic Ashfall", EventType.VOLCANO),
+            Map.entry("Wildfires", EventType.WILDFIRE),
+            Map.entry("Winter Storm", EventType.WINTER_STORM));
+
+    private static final List<String> PROPERTY_FIELDS = List.of("STATE", "CZ_NAME", "MAGNITUDE",
+            "TOR_WIDTH", "EVENT_TYPE", "TOR_LENGTH", "FLOOD_CAUSE", "TOR_F_SCALE", "DAMAGE_CROPS",
+            "END_LOCATION", "DEATHS_DIRECT", "BEGIN_LOCATION", "MAGNITUDE_TYPE", "DAMAGE_PROPERTY",
+            "DEATHS_INDIRECT", "EVENT_NARRATIVE", "INJURIES_DIRECT", "EPISODE_NARRATIVE", "INJURIES_INDIRECT");
+
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return dataLakeDto.getProvider().equals(NOAA_TORNADO_PROVIDER);
+        return dataLakeDto.getProvider().equals(STORMS_NOAA_PROVIDER);
     }
 
     @Override
@@ -62,7 +89,6 @@ public class NoaaTornadoNormalizer extends Normalizer {
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
         normalizedObservation.setActive(false);
-        normalizedObservation.setType(EventType.TORNADO);
 
         String[] csvHeaderAndRow = dataLakeDto.getData().split("\n");
         Map<String, String> data = parseRow(csvHeaderAndRow[0], csvHeaderAndRow[1]);
@@ -78,34 +104,51 @@ public class NoaaTornadoNormalizer extends Normalizer {
         String fujitaScale = StringUtils.getDigits(parseString(data, "TOR_F_SCALE"));
         normalizedObservation.setEventSeverity(convertFujitaScale(fujitaScale));
 
-        Double startLon = parseDouble(data, "BEGIN_LON");
-        Double startLat = parseDouble(data,"BEGIN_LAT");
-        Double endLon = parseDouble(data, "END_LON");
-        Double endLat = parseDouble(data, "END_LAT");
-        setGeometry(startLon, startLat, endLon, endLat, normalizedObservation);
+        setGeometry(data, normalizedObservation);
+
+        String eventType = parseString(data, "EVENT_TYPE");
+        normalizedObservation.setType(EVENT_TYPES_MAPPER.getOrDefault(eventType, EventType.OTHER));
 
         String zone = parseString(data, "CZ_NAME");
         String state = parseString(data, "STATE");
-        String name = "Tornado - " + (zone == null ? "" : zone + ", ") + (state == null ? "" : state + ", ") + "USA";
-        normalizedObservation.setName(name);
+        normalizedObservation.setName(createName(eventType, zone, state, "USA"));
 
         return normalizedObservation;
     }
 
-    private void setGeometry(Double x1, Double y1, Double x2, Double y2, NormalizedObservation normalizedObservation) {
+    private void setGeometry(Map<String, String> data, NormalizedObservation normalizedObservation) {
+        Double x1 = parseDouble(data, "BEGIN_LON");
+        Double y1 = parseDouble(data,"BEGIN_LAT");
+        Double x2 = parseDouble(data, "END_LON");
+        Double y2 = parseDouble(data, "END_LAT");
+
         boolean startPointPresent = x1 != null && y1 != null;
         boolean endPointPresent = x2 != null && y2 != null;
-        if (!startPointPresent && !endPointPresent) return;
-        String point = startPointPresent ? makeWktPoint(x1, y1) : makeWktPoint(x2, y2);
+        String point = startPointPresent ? makeWktPoint(x1, y1) : endPointPresent ? makeWktPoint(x2, y2) : null;
         String geom = startPointPresent && endPointPresent ? makeWktLine(x1, y1, x2, y2) : point;
         normalizedObservation.setPoint(point);
         try {
-            Geometry geometry = geoJsonWriter.write(wktReader.read(geom));
-            Feature feature = new Feature(geometry, Collections.emptyMap());
+            Geometry geometry = geom == null ? null : geoJsonWriter.write(wktReader.read(geom));
+            Feature feature = new Feature(geometry, createGeometryProperties(data));
             normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}).toString());
         } catch (ParseException e) {
             LOG.error(e.getMessage(), e);
         }
+    }
+
+    private Map<String, Object> createGeometryProperties(Map<String, String> data) {
+        return data.entrySet()
+                .stream()
+                .filter(entry -> PROPERTY_FIELDS.contains(entry.getKey()))
+                .map(entry -> Map.entry(entry.getKey().toLowerCase(), (Object) entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private String createName(String eventType, String ... atu) {
+        return eventType + " - " + Arrays.stream(atu)
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                .collect(Collectors.joining(", "));
     }
 
     private BigDecimal getCost(String damageProperty) {

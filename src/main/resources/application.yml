@@ -43,7 +43,7 @@ emdat:
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
 
-noaaTornado:
+stormsNoaa:
   host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
 
 staticdata:
@@ -72,7 +72,7 @@ scheduler:
   staticImport:
     enable: true
     initialDelay: 1000
-  noaaTornadoImport:
+  stormsNoaaImport:
     enable: true
     initialDelay: 1000
     fixedDelay: P1D # every day

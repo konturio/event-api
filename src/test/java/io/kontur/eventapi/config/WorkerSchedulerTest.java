@@ -5,7 +5,7 @@ import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
-import io.kontur.eventapi.noaatornado.job.NoaaTornadoImportJob;
+import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
@@ -28,10 +28,10 @@ class WorkerSchedulerTest {
     private final FirmsImportJob firmsImportJob = mock(FirmsImportJob.class);
     private final EmDatImportJob emDatImportJob = mock(EmDatImportJob.class);
     private final StaticImportJob staticImportJob = mock(StaticImportJob.class);
-    private final NoaaTornadoImportJob noaaTornadoImportJob = mock(NoaaTornadoImportJob.class);
+    private final StormsNoaaImportJob stormsNoaaImportJob = mock(StormsNoaaImportJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
-            feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, noaaTornadoImportJob);
+            feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob);
 
     @AfterEach
     public void resetMocks() {
@@ -43,7 +43,7 @@ class WorkerSchedulerTest {
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
         Mockito.reset(feedCompositionJob);
-        Mockito.reset(noaaTornadoImportJob);
+        Mockito.reset(stormsNoaaImportJob);
     }
 
     @Test
@@ -111,19 +111,19 @@ class WorkerSchedulerTest {
     }
 
     @Test
-    public void startNoaaTornadoImportJob() {
-        ReflectionTestUtils.setField(scheduler, "noaaTornadoImportEnabled", "true");
-        scheduler.startNoaaTornadoImport();
+    public void startStormsNoaaImportJob() {
+        ReflectionTestUtils.setField(scheduler, "stormsNoaaImportEnabled", "true");
+        scheduler.startStormNoaaImport();
 
-        verify(noaaTornadoImportJob, times(1)).run();
+        verify(stormsNoaaImportJob, times(1)).run();
     }
 
     @Test
-    public void skipNoaaTornadoImportJob() {
-        ReflectionTestUtils.setField(scheduler, "noaaTornadoImportEnabled", "false");
-        scheduler.startNoaaTornadoImport();
+    public void skipStormsNoaaImportJob() {
+        ReflectionTestUtils.setField(scheduler, "stormsNoaaImportEnabled", "false");
+        scheduler.startStormNoaaImport();
 
-        verify(noaaTornadoImportJob, never()).run();
+        verify(stormsNoaaImportJob, never()).run();
     }
 
     @Test

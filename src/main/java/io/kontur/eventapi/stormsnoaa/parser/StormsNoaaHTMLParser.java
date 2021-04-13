@@ -1,4 +1,4 @@
-package io.kontur.eventapi.noaatornado.parser;
+package io.kontur.eventapi.stormsnoaa.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class NoaaTornadoHTMLParser {
+public class StormsNoaaHTMLParser {
 
-    private final static Logger LOG = LoggerFactory.getLogger(NoaaTornadoHTMLParser.class);
+    private final static Logger LOG = LoggerFactory.getLogger(StormsNoaaHTMLParser.class);
 
-    @Value("${noaaTornado.host}")
+    @Value("${stormsNoaa.host}")
     private String URL;
 
     public Map<String, OffsetDateTime> parseFilenamesAndUpdateDates() {

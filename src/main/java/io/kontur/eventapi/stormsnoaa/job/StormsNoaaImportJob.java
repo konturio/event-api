@@ -1,10 +1,10 @@
-package io.kontur.eventapi.noaatornado.job;
+package io.kontur.eventapi.stormsnoaa.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
-import io.kontur.eventapi.noaatornado.client.NoaaTornadoClient;
-import io.kontur.eventapi.noaatornado.parser.NoaaTornadoHTMLParser;
+import io.kontur.eventapi.stormsnoaa.client.StormsNoaaClient;
+import io.kontur.eventapi.stormsnoaa.parser.StormsNoaaHTMLParser;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
@@ -21,17 +21,17 @@ import java.util.zip.GZIPInputStream;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 
 @Component
-public class NoaaTornadoImportJob extends AbstractJob {
+public class StormsNoaaImportJob extends AbstractJob {
 
-    private final static Logger LOG = LoggerFactory.getLogger(NoaaTornadoImportJob.class);
-    public final static String NOAA_TORNADO_PROVIDER = "tornado.noaa";
+    private final static Logger LOG = LoggerFactory.getLogger(StormsNoaaImportJob.class);
+    public final static String STORMS_NOAA_PROVIDER = "storms.noaa";
 
-    private final NoaaTornadoHTMLParser htmlParser;
-    private final NoaaTornadoClient client;
+    private final StormsNoaaHTMLParser htmlParser;
+    private final StormsNoaaClient client;
     private final DataLakeDao dataLakeDao;
 
-    public NoaaTornadoImportJob(MeterRegistry meterRegistry, NoaaTornadoHTMLParser htmlParser,
-                                NoaaTornadoClient client, DataLakeDao dataLakeDao) {
+    public StormsNoaaImportJob(MeterRegistry meterRegistry, StormsNoaaHTMLParser htmlParser,
+                               StormsNoaaClient client, DataLakeDao dataLakeDao) {
         super(meterRegistry);
         this.htmlParser = htmlParser;
         this.client = client;
@@ -63,7 +63,7 @@ public class NoaaTornadoImportJob extends AbstractJob {
                 processRow(header, rows[i], updatedAt).ifPresent(dataLakes::add);
             }
             dataLakeDao.storeDataLakes(dataLakes);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }
     }
@@ -73,7 +73,7 @@ public class NoaaTornadoImportJob extends AbstractJob {
         String data = header + "\n" + row;
         if (isNewOrUpdatedEvent(externalId, data)) {
             DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
-            dataLake.setProvider(NOAA_TORNADO_PROVIDER);
+            dataLake.setProvider(STORMS_NOAA_PROVIDER);
             dataLake.setData(data);
             return Optional.of(dataLake);
         }
@@ -85,12 +85,12 @@ public class NoaaTornadoImportJob extends AbstractJob {
     }
 
     private boolean isNewOrUpdatedEvent(String externalId, String data) {
-        Optional<DataLake> existingEvent =  dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, NOAA_TORNADO_PROVIDER);
+        Optional<DataLake> existingEvent =  dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, STORMS_NOAA_PROVIDER);
         return existingEvent.isEmpty() || !existingEvent.get().getData().equals(data);
     }
 
     private OffsetDateTime getLatestHazardUpdatedAt() {
-        return dataLakeDao.getLatestUpdatedHazard(NOAA_TORNADO_PROVIDER).map(DataLake::getUpdatedAt).orElse(null);
+        return dataLakeDao.getLatestUpdatedHazard(STORMS_NOAA_PROVIDER).map(DataLake::getUpdatedAt).orElse(null);
     }
 
     private String decompressGZIP(byte[] gzip) throws IOException{
