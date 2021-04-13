@@ -1,6 +1,6 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.noaatornado.job.NoaaTornadoImportJob;
+import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
@@ -29,7 +29,7 @@ public class WorkerScheduler {
     private final FeedCompositionJob feedCompositionJob;
     private final EmDatImportJob emDatImportJob;
     private final StaticImportJob staticImportJob;
-    private final NoaaTornadoImportJob noaaTornadoImportJob;
+    private final StormsNoaaImportJob stormsNoaaImportJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -49,14 +49,14 @@ public class WorkerScheduler {
     private String emDatImportEnabled;
     @Value("${scheduler.staticImport.enable}")
     private String staticImportEnabled;
-    @Value("${scheduler.noaaTornadoImport.enable}")
-    private String noaaTornadoImportEnabled;
+    @Value("${scheduler.stormsNoaaImport.enable}")
+    private String stormsNoaaImportEnabled;
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
                            FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob,
-                           StaticImportJob staticImportJob, NoaaTornadoImportJob noaaTornadoImportJob) {
+                           StaticImportJob staticImportJob, StormsNoaaImportJob stormsNoaaImportJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -66,7 +66,7 @@ public class WorkerScheduler {
         this.firmsImportJob = firmsImportJob;
         this.emDatImportJob = emDatImportJob;
         this.staticImportJob = staticImportJob;
-        this.noaaTornadoImportJob = noaaTornadoImportJob;
+        this.stormsNoaaImportJob = stormsNoaaImportJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -114,12 +114,12 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.noaaTornadoImport.initialDelay}", fixedDelayString = "${scheduler.noaaTornadoImport.fixedDelay}")
-    public void startNoaaTornadoImport() {
-        if (Boolean.parseBoolean(noaaTornadoImportEnabled)) {
-            noaaTornadoImportJob.run();
+    @Scheduled(initialDelayString = "${scheduler.stormsNoaaImport.initialDelay}", fixedDelayString = "${scheduler.stormsNoaaImport.fixedDelay}")
+    public void startStormNoaaImport() {
+        if (Boolean.parseBoolean(stormsNoaaImportEnabled)) {
+            stormsNoaaImportJob.run();
         } else {
-            LOG.info("NoaaTornado import job invocation is skipped");
+            LOG.info("StormsNoaa import job invocation is skipped");
         }
     }
 

@@ -1,4 +1,4 @@
-package io.kontur.eventapi.noaatornado.normalization;
+package io.kontur.eventapi.stormsnoaa.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
@@ -16,12 +16,12 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NoaaTornadoNormalizerIT extends AbstractCleanableIntegrationTest {
+class StormsNoaaNormalizerIT extends AbstractCleanableIntegrationTest {
 
-    private final NoaaTornadoNormalizer normalizer;
+    private final StormsNoaaNormalizer normalizer;
 
     @Autowired
-    public NoaaTornadoNormalizerIT(JdbcTemplate jdbcTemplate, NoaaTornadoNormalizer normalizer) {
+    public StormsNoaaNormalizerIT(JdbcTemplate jdbcTemplate, StormsNoaaNormalizer normalizer) {
         super(jdbcTemplate);
         this.normalizer = normalizer;
     }
@@ -29,7 +29,7 @@ class NoaaTornadoNormalizerIT extends AbstractCleanableIntegrationTest {
     @Test
     public void testIsApplicable() {
         DataLake dataLake = new DataLake();
-        dataLake.setProvider("tornado.noaa");
+        dataLake.setProvider("storms.noaa");
         assertTrue(normalizer.isApplicable(dataLake));
     }
 
@@ -64,8 +64,8 @@ class NoaaTornadoNormalizerIT extends AbstractCleanableIntegrationTest {
         dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setUpdatedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setProvider("test-provider");
-        dataLake.setData("EPISODE_ID,EVENT_ID,STATE,CZ_NAME,BEGIN_DATE_TIME,END_DATE_TIME,DAMAGE_PROPERTY,TOR_F_SCALE,BEGIN_LAT,BEGIN_LON,END_LAT,END_LON,EPISODE_NARRATIVE,EVENT_NARRATIVE\n" +
-                ",10096222,OKLAHOMA,WASHITA,28-APR-50 13:20:00,29-APR-50 14:45:00,250K,F3,35.12,-99.2,35.17,-99.2,,");
+        dataLake.setData("EVENT_TYPE,EPISODE_ID,EVENT_ID,STATE,CZ_NAME,BEGIN_DATE_TIME,END_DATE_TIME,DAMAGE_PROPERTY,TOR_F_SCALE,BEGIN_LAT,BEGIN_LON,END_LAT,END_LON,EPISODE_NARRATIVE,EVENT_NARRATIVE\n" +
+                "Tornado,,10096222,OKLAHOMA,WASHITA,28-APR-50 13:20:00,29-APR-50 14:45:00,250K,F3,35.12,-99.2,35.17,-99.2,,");
         return dataLake;
     }
 }
