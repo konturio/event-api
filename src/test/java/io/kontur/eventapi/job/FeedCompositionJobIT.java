@@ -121,7 +121,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         feedCompositionJob.run();
 
         return feedDao.searchForEvents("pdc-v0", List.of(), null,
-                null, loadedTime, 1, List.of(), SortOrder.ASC, null).get(0);
+                null, null, 1, List.of(), SortOrder.ASC, null).get(0);
     }
 
     private void createNormalizations(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {

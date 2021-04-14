@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,8 @@ public class StormsNoaaNormalizer extends Normalizer {
             .appendPattern("dd-MMM-")
             .appendValueReduced(ChronoField.YEAR, 2, 2, 1949)
             .appendPattern(" HH:mm:ss")
-            .toFormatter();
+            .toFormatter()
+            .withLocale(Locale.US);
 
     private static final Map<String, EventType> EVENT_TYPES_MAPPER = Map.ofEntries(
             Map.entry("Drought", EventType.DROUGHT),

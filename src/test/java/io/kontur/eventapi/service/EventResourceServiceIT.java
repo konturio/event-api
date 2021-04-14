@@ -127,6 +127,61 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertTrue(resultOfSearching13.isPresent());
     }
 
+    @Test
+    public void checkPagination() {
+        //GIVEN
+        var feed = feedDao.getFeeds().stream()
+                .filter(f -> f.getAlias().equals(feedAlias))
+                .findFirst()
+                .orElseThrow();
+
+        var earliestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
+        earliestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 22), ZoneOffset.UTC));
+        feedDao.insertFeedData(earliestEvent);
+
+        var middleEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
+        middleEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 23), ZoneOffset.UTC));
+        feedDao.insertFeedData(middleEvent);
+
+        var latestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
+        latestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 24), ZoneOffset.UTC));
+        feedDao.insertFeedData(latestEvent);
+
+        //when page 1 ASC
+        List<EventDto> page1Asc = eventResourceService
+                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.ASC, null);
+
+        //then
+        assertEquals(2, page1Asc.size());
+        assertEquals(earliestEvent.getEventId(), page1Asc.get(0).getEventId());
+        assertEquals(middleEvent.getEventId(), page1Asc.get(1).getEventId());
+
+        //when page 2 ASC
+        List<EventDto> page2Asc = eventResourceService
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.ASC, null);
+
+        //then
+        assertEquals(1, page2Asc.size());
+        assertEquals(latestEvent.getEventId(), page2Asc.get(0).getEventId());
+
+        //when page 1 DESC
+        List<EventDto> page1Desc = eventResourceService
+                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.DESC, null);
+
+        //then
+        assertEquals(2, page1Desc.size());
+        assertEquals(latestEvent.getEventId(), page1Desc.get(0).getEventId());
+        assertEquals(middleEvent.getEventId(), page1Desc.get(1).getEventId());
+
+        //when page 2 DESC
+        List<EventDto> page2Desc = eventResourceService
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.DESC, null);
+
+        //then
+        assertEquals(1, page2Desc.size());
+        assertEquals(earliestEvent.getEventId(), page2Desc.get(0).getEventId());
+    }
+
     private OffsetDateTime dateTimeOf(int year, int month, int day) {
         return OffsetDateTime.of(LocalDateTime.of(year, month, day, 0, 0), ZoneOffset.UTC);
     }

@@ -43,7 +43,12 @@
                 ]]>
             </if>
             <if test='updatedAfter != null'>
-                and fd.updated_at >= #{updatedAfter}
+                <if test='"ASC".equalsIgnoreCase(sortOrder)'>
+                    and fd.updated_at > #{updatedAfter}
+                </if>
+                <if test='"DESC".equalsIgnoreCase(sortOrder)'>
+                    and fd.updated_at &lt; #{updatedAfter}
+                </if>
             </if>
             <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                 and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)

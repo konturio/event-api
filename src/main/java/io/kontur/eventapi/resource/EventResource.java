@@ -78,11 +78,7 @@ public class EventResource {
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        if (sortOrder.equals(SortOrder.DESC)) {
-            return ResponseEntity.ok(new DataPaginationDTO(events, events.get(0).getUpdatedAt()));
-        } else {
-            return ResponseEntity.ok(new DataPaginationDTO(events, events.get(events.size() - 1).getUpdatedAt()));
-        }
+        return ResponseEntity.ok(new DataPaginationDTO(events, events.get(events.size() - 1).getUpdatedAt()));
     }
 
     @GetMapping(path = "/observations/{observationId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
