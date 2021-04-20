@@ -117,6 +117,3 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add-gdacs-firms-feed.sql
-- include:
-   relativeToChangelogFile: true
-   file: clear-outdated-tornado-noaa-data.sql
