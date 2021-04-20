@@ -24,11 +24,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
-import java.util.Map;
 
 import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
@@ -73,11 +70,6 @@ public class StormsNoaaNormalizer extends Normalizer {
             Map.entry("Wildfires", EventType.WILDFIRE),
             Map.entry("Winter Storm", EventType.WINTER_STORM));
 
-    private static final List<String> PROPERTY_FIELDS = List.of("STATE", "CZ_NAME", "MAGNITUDE",
-            "TOR_WIDTH", "EVENT_TYPE", "TOR_LENGTH", "FLOOD_CAUSE", "TOR_F_SCALE", "DAMAGE_CROPS",
-            "END_LOCATION", "DEATHS_DIRECT", "BEGIN_LOCATION", "MAGNITUDE_TYPE", "DAMAGE_PROPERTY",
-            "DEATHS_INDIRECT", "EVENT_NARRATIVE", "INJURIES_DIRECT", "EPISODE_NARRATIVE", "INJURIES_INDIRECT");
-
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
         return dataLakeDto.getProvider().equals(STORMS_NOAA_PROVIDER);
@@ -102,9 +94,7 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setCost(getCost(parseString(data, "DAMAGE_PROPERTY")));
         normalizedObservation.setStartedAt(parseDate(data, "BEGIN_DATE_TIME"));
         normalizedObservation.setEndedAt(parseDate(data, "END_DATE_TIME"));
-
-        String fujitaScale = StringUtils.getDigits(parseString(data, "TOR_F_SCALE"));
-        normalizedObservation.setEventSeverity(convertFujitaScale(fujitaScale));
+        normalizedObservation.setEventSeverity(convertFujitaScale(parseString(data, "TOR_F_SCALE")));
 
         setGeometry(data, normalizedObservation);
 
@@ -131,19 +121,11 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setPoint(point);
         try {
             Geometry geometry = geom == null ? null : geoJsonWriter.write(wktReader.read(geom));
-            Feature feature = new Feature(geometry, createGeometryProperties(data));
+            Feature feature = new Feature(geometry, Collections.emptyMap());
             normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}).toString());
         } catch (ParseException e) {
             LOG.error(e.getMessage(), e);
         }
-    }
-
-    private Map<String, Object> createGeometryProperties(Map<String, String> data) {
-        return data.entrySet()
-                .stream()
-                .filter(entry -> PROPERTY_FIELDS.contains(entry.getKey()))
-                .map(entry -> Map.entry(entry.getKey().toLowerCase(), (Object) entry.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private String createName(String eventType, String ... atu) {
