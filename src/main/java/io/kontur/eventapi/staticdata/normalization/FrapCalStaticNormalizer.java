@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,8 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
         MultiPolygon multiPolygon = (MultiPolygon) reader.read(feature.getGeometry());
         Point point = multiPolygon.getCentroid();
         normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}).toString());
+        Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
+        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}).toString());
 
         String state = readString(properties, "STATE");
         String unit = readString(properties, "UNIT_ID");

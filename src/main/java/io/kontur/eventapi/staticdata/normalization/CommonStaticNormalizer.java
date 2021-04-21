@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,8 @@ public class CommonStaticNormalizer extends StaticNormalizer {
         Double lon = readDouble(properties, "longitude");
         Double lat = readDouble(properties, "latitude");
         normalizedObservation.setPoint(makeWktPoint(lon, lat));
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}).toString());
+        Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
+        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}).toString());
 
         String name = readString(properties, "name");
         String admin0 = readString(properties, "admin0");
