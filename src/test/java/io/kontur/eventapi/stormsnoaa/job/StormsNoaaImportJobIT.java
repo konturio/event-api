@@ -3,6 +3,7 @@ package io.kontur.eventapi.stormsnoaa.job;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.stormsnoaa.client.StormsNoaaClient;
+import io.kontur.eventapi.stormsnoaa.parser.FileInfo;
 import io.kontur.eventapi.stormsnoaa.parser.StormsNoaaHTMLParser;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,8 +42,8 @@ class StormsNoaaImportJobIT extends AbstractCleanableIntegrationTest {
 
     @Test
     public void testNoaaTornadoImport() throws IOException {
-        Mockito.when(stormsNoaaHTMLParser.parseFilenamesAndUpdateDates())
-                .thenReturn(Map.of("test-filename", OffsetDateTime.now()));
+        Mockito.when(stormsNoaaHTMLParser.parseFilesInfo())
+                .thenReturn(List.of(new FileInfo("test-filename", OffsetDateTime.now())));
         Mockito.when(stormsNoaaClient.getGZIP("test-filename"))
                 .thenReturn(getTestFile());
         stormsNoaaImportJob.run();

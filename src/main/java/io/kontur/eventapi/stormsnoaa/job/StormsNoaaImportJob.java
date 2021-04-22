@@ -4,18 +4,18 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.stormsnoaa.client.StormsNoaaClient;
+import io.kontur.eventapi.stormsnoaa.parser.FileInfo;
 import io.kontur.eventapi.stormsnoaa.parser.StormsNoaaHTMLParser;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
@@ -23,7 +23,6 @@ import static io.kontur.eventapi.util.CsvUtil.parseRow;
 @Component
 public class StormsNoaaImportJob extends AbstractJob {
 
-    private final static Logger LOG = LoggerFactory.getLogger(StormsNoaaImportJob.class);
     public final static String STORMS_NOAA_PROVIDER = "storms.noaa";
 
     private final StormsNoaaHTMLParser htmlParser;
@@ -46,15 +45,16 @@ public class StormsNoaaImportJob extends AbstractJob {
     @Override
     public void execute() throws Exception {
         OffsetDateTime latestHazardUpdatedAt = getLatestHazardUpdatedAt();
-        htmlParser.parseFilenamesAndUpdateDates()
-                .entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .filter(entry -> isNewOrUpdatedFile(latestHazardUpdatedAt, entry.getValue()))
-                .forEach(entry -> processFile(entry.getKey(), entry.getValue()));
+        List<FileInfo> files = htmlParser.parseFilesInfo().stream()
+                .filter(file -> isNewOrUpdatedFile(latestHazardUpdatedAt, file.getUpdatedAt()))
+                .sorted(Comparator.comparing(FileInfo::getUpdatedAt))
+                .collect(Collectors.toList());
+        for (FileInfo file : files) {
+            processFile(file.getFilename(), file.getUpdatedAt());
+        }
     }
 
-    private void processFile(String filename, OffsetDateTime updatedAt) {
-        try {
+    private void processFile(String filename, OffsetDateTime updatedAt) throws Exception {
             String csv = decompressGZIP(client.getGZIP(filename));
             String[] rows = StringUtils.split(csv, "\n");
             String header = rows[0];
@@ -63,9 +63,7 @@ public class StormsNoaaImportJob extends AbstractJob {
                 processRow(header, rows[i], updatedAt).ifPresent(dataLakes::add);
             }
             dataLakeDao.storeDataLakes(dataLakes);
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
+
     }
 
     private Optional<DataLake> processRow(String header, String row, OffsetDateTime updatedAt) {
