@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,20 +22,20 @@ public class StormsNoaaHTMLParser {
     @Value("${stormsNoaa.host}")
     private String URL;
 
-    public Map<String, OffsetDateTime> parseFilenamesAndUpdateDates() {
+    public List<FileInfo> parseFilesInfo() {
         try {
             Document doc = Jsoup.connect(URL).get();
             Elements tableRows = doc.select("tr:has(a:matches(StormEvents_details))");
-            return tableRows.stream()
-                    .map(row -> {
+            return tableRows.stream().map(
+                    row -> {
                         String[] rowItems = StringUtils.split(row.text());
                         String filename = rowItems[0];
-                        String updateDate = rowItems[1] + "T" + rowItems[2] + "Z";
-                        return Map.entry(filename, OffsetDateTime.parse(updateDate));
-                    }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        } catch (IOException e) {
+                        OffsetDateTime updatedAt = OffsetDateTime.parse(rowItems[1] + "T" + rowItems[2] + "Z");
+                        return new FileInfo(filename, updatedAt);
+                    }).collect(Collectors.toList());
+        } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }
-        return Collections.emptyMap();
+        return Collections.emptyList();
     }
 }

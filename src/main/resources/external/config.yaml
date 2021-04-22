@@ -44,7 +44,7 @@ scheduler:
   stormsNoaaImport:
     enable: true
     initialDelay: 1000
-    fixedDelay: P30D
+    fixedDelay: P1D
   normalization:
     enable: true
     initialDelay: 1000
