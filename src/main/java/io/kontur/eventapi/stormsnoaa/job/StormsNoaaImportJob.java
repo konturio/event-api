@@ -3,16 +3,14 @@ package io.kontur.eventapi.stormsnoaa.job;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
-import io.kontur.eventapi.stormsnoaa.client.StormsNoaaClient;
+import io.kontur.eventapi.stormsnoaa.service.StormsNoaaImportService;
 import io.kontur.eventapi.stormsnoaa.parser.FileInfo;
 import io.kontur.eventapi.stormsnoaa.parser.StormsNoaaHTMLParser;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,14 +24,14 @@ public class StormsNoaaImportJob extends AbstractJob {
     public final static String STORMS_NOAA_PROVIDER = "storms.noaa";
 
     private final StormsNoaaHTMLParser htmlParser;
-    private final StormsNoaaClient client;
+    private final StormsNoaaImportService importService;
     private final DataLakeDao dataLakeDao;
 
     public StormsNoaaImportJob(MeterRegistry meterRegistry, StormsNoaaHTMLParser htmlParser,
-                               StormsNoaaClient client, DataLakeDao dataLakeDao) {
+                               StormsNoaaImportService importService, DataLakeDao dataLakeDao) {
         super(meterRegistry);
         this.htmlParser = htmlParser;
-        this.client = client;
+        this.importService = importService;
         this.dataLakeDao = dataLakeDao;
     }
 
@@ -50,20 +48,29 @@ public class StormsNoaaImportJob extends AbstractJob {
                 .sorted(Comparator.comparing(FileInfo::getUpdatedAt))
                 .collect(Collectors.toList());
         for (FileInfo file : files) {
-            processFile(file.getFilename(), file.getUpdatedAt());
+            String tmpPath = importService.getFilePath(file.getFilename());
+            try {
+               importService.downloadFile(file.getFilename(), tmpPath);
+               processFile(tmpPath, file.getUpdatedAt());
+            } finally {
+                importService.deleteFile(tmpPath);
+            }
         }
     }
 
-    private void processFile(String filename, OffsetDateTime updatedAt) throws Exception {
-            String csv = decompressGZIP(client.getGZIP(filename));
-            String[] rows = StringUtils.split(csv, "\n");
-            String header = rows[0];
+    private void processFile(String filePath, OffsetDateTime updatedAt) throws Exception {
+        try (FileInputStream fileInputStream = new FileInputStream(filePath);
+             GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
+             InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream);
+             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
             List<DataLake> dataLakes = new ArrayList<>();
-            for (int i = 1; i < rows.length; i++) {
-                processRow(header, rows[i], updatedAt).ifPresent(dataLakes::add);
+            String header = bufferedReader.readLine();
+            String row;
+            while ((row = bufferedReader.readLine()) != null) {
+                processRow(header, row, updatedAt).ifPresent(dataLakes::add);
             }
             dataLakeDao.storeDataLakes(dataLakes);
-
+        }
     }
 
     private Optional<DataLake> processRow(String header, String row, OffsetDateTime updatedAt) {
@@ -89,10 +96,5 @@ public class StormsNoaaImportJob extends AbstractJob {
 
     private OffsetDateTime getLatestHazardUpdatedAt() {
         return dataLakeDao.getLatestUpdatedHazard(STORMS_NOAA_PROVIDER).map(DataLake::getUpdatedAt).orElse(null);
-    }
-
-    private String decompressGZIP(byte[] gzip) throws IOException{
-        GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(gzip));
-        return new String(gzipInputStream.readAllBytes());
     }
 }
