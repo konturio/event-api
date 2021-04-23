@@ -41,7 +41,6 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
             normalizedDto.setExternalEventId(readString(props, "hazard.uuid"));
             normalizedDto.setExternalEpisodeId(readString(props, "uuid"));
             normalizedDto.setName(readString(props, "hazard.hazardName"));
-            normalizedDto.setEpisodeDescription(convertDescription(props));
             normalizedDto.setType(defineType(readString(props, "hazard.hazardType.typeId")));
             normalizedDto.setEventSeverity(Severity.UNKNOWN);
             normalizedDto.setActive(readBoolean(props, "isActive"));
