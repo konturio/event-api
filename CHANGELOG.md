@@ -1,6 +1,9 @@
 # Release notes
 
-## Unreleased
+##UNRELEASED
+
+
+## 0.4 - 2021-04-23
 #### Added
 - `bbox` and `datetime` filter to the `/v1/` endpoint
 - FIRMS provider
