@@ -114,6 +114,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: update-swiss-re-feed.sql
-- include:
-    relativeToChangelogFile: true
-    file: add-gdacs-firms-feed.sql
+#- include:
+#    relativeToChangelogFile: true
+#    file: add-gdacs-firms-feed.sql
