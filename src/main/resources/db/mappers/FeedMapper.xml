@@ -22,11 +22,13 @@
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
             and not exists (select from feed_data prev where fd.feed_id = prev.feed_id and fd.event_id = prev.event_id and fd.version < prev.version)
         ]]>
-            <if test="(eventTypes!=null &amp;&amp; !eventTypes.isEmpty()) || (severities!=null &amp;&amp; !severities.isEmpty())"  >
-                and exists(select from jsonb_array_elements(episodes) arr(episode) where 1=1
-                <foreach item="eventType" collection="eventTypes" separator="," open="and episode ->> 'type' in (" close=")">
-                    #{eventType}
+            <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty()" >
+                <foreach item="eventType" collection="eventTypes" separator="," open="and collected_types &amp;&amp; array[" close="]">
+                    #{eventType}::text
                 </foreach>
+            </if>
+            <if test="severities!=null &amp;&amp; !severities.isEmpty()"  >
+                and exists(select from jsonb_array_elements(episodes) arr(episode) where 1=1
                 <foreach item="severity" collection="severities" separator="," open="and episode ->> 'severity' in (" close=")">
                    #{severity}
                 </foreach>
