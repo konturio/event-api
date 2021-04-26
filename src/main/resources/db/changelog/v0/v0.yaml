@@ -120,3 +120,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add-feed-data-types-column.sql
+- include:
+    relativeToChangelogFile: true
+    file: add-feed-data-is-latest-version-column.sql

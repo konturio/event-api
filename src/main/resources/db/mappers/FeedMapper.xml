@@ -10,18 +10,25 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes)
+        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes, is_latest_version)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt},
-                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb)
+                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb, true)
     </insert>
 
+    <update id="markOutdatedEventsVersions">
+    <![CDATA[
+        update feed_data set is_latest_version = false
+        where event_id = #{eventId}
+          and feed_id = #{feedId}
+          and version < #{version}
+    ]]>
+    </update>
+
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        <![CDATA[
         select *
         from feed_data fd
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
-            and not exists (select from feed_data prev where fd.feed_id = prev.feed_id and fd.event_id = prev.event_id and fd.version < prev.version)
-        ]]>
+            and is_latest_version = true
             <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty()" >
                 <foreach item="eventType" collection="eventTypes" separator="," open="and collected_types &amp;&amp; array[" close="]">
                     #{eventType}::text

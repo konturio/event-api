@@ -20,6 +20,11 @@ public interface FeedMapper {
             OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt,
             @Param("observations") List<UUID> observations, @Param("episodes") String episodes);
 
+    /**
+     * Mark events below specified version outdated
+     */
+    void markOutdatedEventsVersions(UUID eventId, UUID feedId, Long version);
+
     List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime to,
                                    OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
                                    BigDecimal xMin, BigDecimal xMax, BigDecimal yMin, BigDecimal yMax);

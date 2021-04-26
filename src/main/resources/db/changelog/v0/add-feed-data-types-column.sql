@@ -15,6 +15,3 @@ AS $$
 alter table feed_data
     add column collected_types text[] GENERATED ALWAYS AS (collectTypesFromEpisodes(episodes)) STORED;
 
-CREATE INDEX if not exists feed_data_feed_id_types ON feed_data USING GIN (feed_id, collected_types);
-
-

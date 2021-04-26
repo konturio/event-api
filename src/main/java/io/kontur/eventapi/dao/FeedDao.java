@@ -38,6 +38,7 @@ public class FeedDao {
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson);
 
+        mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
     }
 
