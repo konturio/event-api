@@ -8,11 +8,7 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +39,7 @@ public class CommonStaticNormalizer extends StaticNormalizer {
         String nearestCity = readString(properties, "nearest_city");
         normalizedObservation.setName(name.isEmpty() ? createName("Tornado", nearestCity, admin0) : name);
 
-        LocalDate localDate = LocalDate.parse(readString(properties, "date"), DateTimeFormatter.BASIC_ISO_DATE);
-        OffsetDateTime date = OffsetDateTime.of(localDate, LocalTime.MIN, ZoneOffset.UTC);
+        OffsetDateTime date = parseISOBasicDate(readString(properties, "date"));
         normalizedObservation.setStartedAt(date);
         normalizedObservation.setEndedAt(date);
 

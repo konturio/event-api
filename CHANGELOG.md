@@ -5,14 +5,25 @@
 #### Changed
 - !BE AWARE! It might take a  while to install this version. Heavy sql scripts will be run.  
 - Denormalize feed_data table in order to improve search speed. #4736 #5183 #5168 
-
+- Static data files stored in AWS S3 bucket `event-api-locker01`. The following folders are used: 
+  `PROD/` for production, `TEST QA/` for testing, `TEST DEV/` for development, `EXP/` for experiments. Default 
+  folder is `PROD/`. Folder can be changed in configuration.
 
 ## 0.4 - 2021-04-23
 #### Added
 - `bbox` and `datetime` filter to the `/v1/` endpoint
 - FIRMS provider
 - EM-DAT provider
-- Static data providers (tornado.canada-gov, tornado.australian-bm, tornado.osm-wiki, wildfire.frap.cal, tornado.des-inventar-sendai)
+- Static data providers 
+  - tornado.canada-gov 
+  - tornado.australian-bm
+  - tornado.osm-wiki
+  - wildfire.frap.cal 
+  - tornado.des-inventar-sendai
+  - wildfire.sa-gov
+  - wildfire.qld-des-gov
+  - wildfire.victoria-gov
+  - wildfire.nsw-gov
 - storms.noaa provider
 #### Changed
 - Event versioning is removed 
