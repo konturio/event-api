@@ -13,6 +13,7 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,9 +50,13 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         normalizedDto.setDescription(readString(props, "description"));
         normalizedDto.setEpisodeDescription(readString(props, "description"));
         normalizedDto.setType(defineType(readString(props, "type_ID")));
-        normalizedDto.setStartedAt(readDateTime(props, "start_Date"));
-        normalizedDto.setEndedAt(readDateTime(props, "end_Date"));
         normalizedDto.setSourceUpdatedAt(readDateTime(props, "update_Date"));
+
+        OffsetDateTime startedAt = readDateTime(props, "start_Date");
+        OffsetDateTime endedAt = readDateTime(props, "end_Date");
+        normalizedDto.setStartedAt(startedAt != null ? startedAt : endedAt);
+        normalizedDto.setEndedAt(endedAt != null ? endedAt : startedAt);
+
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
         normalizedDto.setPoint(pointWkt);
 
