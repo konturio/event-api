@@ -19,4 +19,8 @@ public class FeedEventStatusDao {
     public void markAsActual(UUID feedId, UUID eventId, boolean actual) {
         mapper.markAsActual(feedId, eventId, actual);
     }
+
+    public void markAsNonActual(String provider, UUID eventId) {
+        mapper.markAsNonActual(provider, eventId);
+    }
 }

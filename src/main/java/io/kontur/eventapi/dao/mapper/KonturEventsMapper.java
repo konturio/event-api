@@ -13,7 +13,7 @@ import java.util.UUID;
 @Mapper
 public interface KonturEventsMapper {
 
-    int insert(@Param("eventId") UUID eventId, @Param("observationId") UUID observationId);
+    int insert(@Param("eventId") UUID eventId, @Param("observationId") UUID observationId, @Param("provider") String provider);
 
     Optional<KonturEvent> getEventByExternalId(String externalId);
 

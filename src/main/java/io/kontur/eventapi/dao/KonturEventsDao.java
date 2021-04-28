@@ -49,21 +49,10 @@ public class KonturEventsDao {
     }
 
     @Transactional
-    public void insertEvent(KonturEvent event) {
-        List<UUID> notLinkedObservationIds = getNewObservations(event);
-
-        if (!notLinkedObservationIds.isEmpty()) {
-            NormalizedObservation observation = observationsDao.getObservations(notLinkedObservationIds).get(0);
-
-            feedDao.getFeeds().stream()
-                    .filter(f -> f.getProviders().contains(observation.getProvider()))
-                    .forEach(f -> feedEventStatusDao.markAsActual(f.getFeedId(), event.getEventId(), false));
-        }
-
-        notLinkedObservationIds.forEach(observationId -> {
-            mapper.insert(event.getEventId(), observationId);
-            observationsDao.markAsRecombined(observationId);
-        });
+    public void appendObservationIntoEvent(KonturEvent event, NormalizedObservation observation) {
+        feedEventStatusDao.markAsNonActual(observation.getProvider(), event.getEventId());
+        mapper.insert(event.getEventId(), observation.getObservationId(), observation.getProvider());
+        observationsDao.markAsRecombined(observation.getObservationId());
     }
 
     private List<UUID> getNewObservations(KonturEvent event) {
