@@ -40,9 +40,7 @@ class HpSrvMagsNormalizerTest {
         assertEquals(Severity.UNKNOWN, obs.getEventSeverity());
         assertEquals("Flood - New York--Newark, NY--NJ--CT Region, United States", obs.getName());
         assertNull(obs.getDescription());
-        assertEquals(
-                "Automated Flood SmartAlert Area [ 2020-07-22 22:51:20 GMT ] | FLOODIPAWS-WARNING-2020-New York--Newark, NY--NJ--CT",
-                obs.getEpisodeDescription());
+        assertNull(obs.getEpisodeDescription());
         assertEquals(EventType.FLOOD, obs.getType());
         assertEquals(1595457720000L, obs.getStartedAt().toInstant().toEpochMilli());
         assertEquals(1595466000000L, obs.getEndedAt().toInstant().toEpochMilli());

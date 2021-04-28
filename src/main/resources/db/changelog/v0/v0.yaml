@@ -119,6 +119,9 @@ databaseChangeLog:
 #    file: add-gdacs-firms-feed.sql
 - include:
     relativeToChangelogFile: true
+    file: fix-pdc-mags-description.sql
+- include:
+    relativeToChangelogFile: true
     file: add-feed-data-types-column.sql
 - include:
     relativeToChangelogFile: true
