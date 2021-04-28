@@ -4,7 +4,7 @@
 
 CREATE OR REPLACE FUNCTION collectTypesFromEpisodes(episodes jsonb) RETURNS text[]
 AS $$
-    select array_agg(t.type::text)
+    select array_agg(t.type)
     from (select distinct jsonb_array_elements(episodes) ->> 'type' as type) as t
     $$
     LANGUAGE SQL
@@ -13,5 +13,5 @@ AS $$
     PARALLEL SAFE;
 
 alter table feed_data
-    add column collected_types text[] GENERATED ALWAYS AS (collectTypesFromEpisodes(episodes)) STORED;
+    add column episode_types text[] GENERATED ALWAYS AS (collectTypesFromEpisodes(episodes)) STORED;
 

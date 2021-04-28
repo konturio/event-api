@@ -21,4 +21,4 @@ where fd.feed_id = e.feed_id
 
 drop index if exists feed_data_updated_at_idx;
 
-CREATE INDEX if not exists feed_data_updated_at_feed_id_is_latest_version_idx ON public.feed_data USING btree (updated_at, feed_id, is_latest_version);
+CREATE INDEX if not exists feed_data_updated_at_feed_id_is_latest_version_idx ON public.feed_data USING btree (updated_at, feed_id) where is_latest_version;

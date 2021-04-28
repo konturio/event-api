@@ -28,15 +28,15 @@
         select *
         from feed_data fd
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
-            and is_latest_version = true
+            and is_latest_version
             <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty()" >
-                <foreach item="eventType" collection="eventTypes" separator="," open="and collected_types &amp;&amp; array[" close="]">
+                <foreach item="eventType" collection="eventTypes" separator="," open="and episode_types &amp;&amp; array[" close="]">
                     #{eventType}::text
                 </foreach>
             </if>
             <if test="severities!=null &amp;&amp; !severities.isEmpty()"  >
-                and exists(select from jsonb_array_elements(episodes) arr(episode) where 1=1
-                <foreach item="severity" collection="severities" separator="," open="and episode ->> 'severity' in (" close=")">
+                and exists(select from jsonb_array_elements(episodes) arr(episode) where
+                <foreach item="severity" collection="severities" separator="," open="episode ->> 'severity' in (" close=")">
                    #{severity}
                 </foreach>
                 )
