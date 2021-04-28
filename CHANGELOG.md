@@ -1,6 +1,10 @@
 # Release notes
 
-##UNRELEASED
+## UNRELEASED
+#### Added
+#### Changed
+- !BE AWARE! It might take a  while to install this version. Heavy sql scripts will be run.  
+- Denormalize feed_data table in order to improve search speed. #4736 #5183 #5168 
 
 
 ## 0.4 - 2021-04-23
