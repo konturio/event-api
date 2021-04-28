@@ -4,7 +4,6 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
-import org.apache.commons.lang3.StringUtils;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
@@ -46,18 +45,14 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
         String unit = readString(properties, "UNIT_ID");
         normalizedObservation.setName(createName("Wildfire", unit, state, "USA"));
 
-        OffsetDateTime startedAt = parseDate(readString(properties, "ALARM_DATE"));
-        OffsetDateTime endedAt = parseDate(readString(properties, "CONT_DATE"));
+        OffsetDateTime startedAt = parseLocalDate(readString(properties, "ALARM_DATE"));
+        OffsetDateTime endedAt = parseLocalDate(readString(properties, "CONT_DATE"));
         OffsetDateTime dateFromYear = createDateFromYear(readInt(properties, "YEAR_"));
         normalizedObservation.setStartedAt(startedAt != null ? startedAt : endedAt != null ? endedAt : dateFromYear);
         normalizedObservation.setEndedAt(endedAt != null ? endedAt : startedAt != null ? startedAt : dateFromYear);
 
         normalizedObservation.setEventSeverity(Severity.UNKNOWN);
         normalizedObservation.setType(EventType.WILDFIRE);
-    }
-
-    private OffsetDateTime parseDate(String str) {
-        return StringUtils.isBlank(str) ? null : OffsetDateTime.of(LocalDate.parse(str), LocalTime.MIN, ZoneOffset.UTC);
     }
 
     private OffsetDateTime createDateFromYear(Integer year) {

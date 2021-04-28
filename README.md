@@ -91,3 +91,11 @@ scheduler:
     fixedDelay: 60000
 ```
 
+#### Storing static data
+
+AWS S3 bucket `event-api-locker01` is used for storing static data files.
+
+- `PROD/` - for production
+- `TEST QA/` - for testing
+- `TEST DEV/` - for development
+- `EXP/` - for experiments 

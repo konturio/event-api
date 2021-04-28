@@ -4,21 +4,14 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class AwsS3Service {
-
-    private final static Logger LOG = LoggerFactory.getLogger(AwsS3Service.class);
-
     @Value("${staticdata.s3Bucket}")
     private String bucket;
 
@@ -37,14 +30,7 @@ public class AwsS3Service {
                 .collect(Collectors.toList());
     }
 
-    public String getS3ObjectContent(String key) throws IOException {
-        S3Object object = s3.getObject(bucket, key);
-        try (S3ObjectInputStream inputStream = object.getObjectContent()) {
-            return new String(inputStream.readAllBytes());
-        }
-    }
-
-    public Map<String, String> getS3ObjectMetadata(String key) {
-        return s3.getObjectMetadata(bucket, key).getUserMetadata();
+    public S3Object getS3Object(String key) {
+        return s3.getObject(new GetObjectRequest(bucket, key));
     }
 }

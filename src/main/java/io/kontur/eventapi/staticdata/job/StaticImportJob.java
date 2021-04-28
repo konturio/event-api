@@ -1,30 +1,38 @@
 package io.kontur.eventapi.staticdata.job;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.staticdata.service.AwsS3Service;
-import io.kontur.eventapi.staticdata.service.StaticImportService;
+import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.geojson.feature.FeatureJSON;
+import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.stereotype.Component;
-
+import java.io.*;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneOffset;
+import java.util.*;
 
 @Component
 public class StaticImportJob extends AbstractJob {
-    private final static Logger LOG = LoggerFactory.getLogger(StaticImportJob.class);
-
-    private final Map<String, StaticImportService> importServices;
     private final AwsS3Service awsS3Service;
+    private final DataLakeDao dataLakeDao;
 
-    public StaticImportJob(MeterRegistry meterRegistry, Map<String, StaticImportService> importServices,
-                           AwsS3Service awsS3Service) {
+    private static final int maxDataLakesCount = 1000;
+    private static final FeatureJSON featureJson = new FeatureJSON();
+    static {
+        featureJson.setEncodeNullValues(true);
+    }
+
+    public StaticImportJob(MeterRegistry meterRegistry, AwsS3Service awsS3Service, DataLakeDao dataLakeDao) {
         super(meterRegistry);
-        this.importServices = importServices;
         this.awsS3Service = awsS3Service;
+        this.dataLakeDao = dataLakeDao;
     }
 
     @Override
@@ -36,28 +44,44 @@ public class StaticImportJob extends AbstractJob {
     public void execute() throws Exception {
         List<String> keys = awsS3Service.listS3ObjectKeys();
         for (String key : keys) {
-            String content = awsS3Service.getS3ObjectContent(key);
-            Map<String, String> metadata = awsS3Service.getS3ObjectMetadata(key);
-            OffsetDateTime updatedAt = parseDate(metadata.get("updated-at"));
-            String provider = metadata.get("provider");
-            processFile(parseType(key), provider, updatedAt, content);
+            try (S3Object s3Object = awsS3Service.getS3Object(key)) {
+                ObjectMetadata metadata = s3Object.getObjectMetadata();
+                OffsetDateTime updatedAt = convertDate(metadata.getLastModified());
+                String provider = metadata.getUserMetaDataOf("provider");
+                processFile(provider, updatedAt, s3Object.getObjectContent());
+            }
         }
     }
 
-    private OffsetDateTime parseDate(String dateString) {
-        return dateString == null || dateString.equals("-") ? null : OffsetDateTime.parse(dateString);
-    }
-
-    private String parseType(String key) {
-        return StringUtils.substringAfterLast(key, ".");
-    }
-
-    private void processFile(String type, String provider, OffsetDateTime updatedAt, String content) {
-        if (importServices.containsKey(type)) {
-            StaticImportService service = importServices.get(type);
-            service.saveDataLakes(content, provider, updatedAt);
-        } else {
-            LOG.error("There is no service to process file of type: " + type);
+    private void processFile(String provider, OffsetDateTime updatedAt, InputStream content) throws IOException {
+        FeatureIterator<SimpleFeature> features = featureJson.streamFeatureCollection(content);
+        List<DataLake> dataLakes = new ArrayList<>();
+        while (features.hasNext()) {
+            try (OutputStream outputStream = new ByteArrayOutputStream()) {
+                SimpleFeature feature = features.next();
+                featureJson.writeFeature(feature, outputStream);
+                String data = outputStream.toString();
+                String externalId = DigestUtils.md5Hex(data);
+                if (dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, provider).isEmpty()) {
+                    dataLakes.add(createDataLake(externalId, updatedAt, provider, data));
+                }
+            }
+            if (dataLakes.size() > maxDataLakesCount) {
+                dataLakeDao.storeDataLakes(dataLakes);
+                dataLakes.clear();
+            }
         }
+        dataLakeDao.storeDataLakes(dataLakes);
+    }
+
+    private DataLake createDataLake(String externalId, OffsetDateTime updatedAt, String provider, String data) {
+        DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
+        dataLake.setProvider(provider);
+        dataLake.setData(data);
+        return dataLake;
+    }
+
+    private OffsetDateTime convertDate(Date date) {
+        return date == null ? null : OffsetDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC);
     }
 }
