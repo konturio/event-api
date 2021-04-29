@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface FeedEventStatusMapper {
 
     void markAsActual(UUID feedId, UUID eventId, boolean actual);
+
+    void markAsNonActual(String provider, UUID eventId);
 }

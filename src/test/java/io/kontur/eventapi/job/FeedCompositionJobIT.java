@@ -40,18 +40,16 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
     private final FeedCompositionJob feedCompositionJob;
     private final DataLakeDao dataLakeDao;
     private final FeedDao feedDao;
-    private final KonturEventsDao konturEventsDao;
     private final NormalizedObservationsDao observationsDao;
 
     @Autowired
-    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, KonturEventsDao konturEventsDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao) {
+    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao) {
         super(jdbcTemplate);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.dataLakeDao = dataLakeDao;
         this.feedDao = feedDao;
-        this.konturEventsDao = konturEventsDao;
         this.observationsDao = observationsDao;
     }
 
@@ -134,41 +132,6 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         dataLakeDao.storeEventData(dataLake);
         normalizationJob.run();
-    }
-
-    @Test
-    public void testSavedMags() throws IOException {
-        String externalId = "996d6b0a-ce18-47d9-9bd2-b1b8fe5d967a";
-
-        var pdcFeed = feedDao.getFeeds()
-                .stream()
-                .filter(feed -> feed.getAlias().equals("pdc-v0"))
-                .findFirst()
-                .orElseThrow();
-
-        var hazardsLoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2020, 10, 1, 1, 1, 1), ZoneOffset.UTC);
-        var mags01LoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2020, 10, 1, 1, 1, 2), ZoneOffset.UTC);
-        var mags02LoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2020, 10, 1, 1, 3), ZoneOffset.UTC);
-
-        createNormalizations(externalId, hazardsLoadTime, HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard02.json"));
-        eventCombinationJob.run();
-        var eventOptionalVersion1 = konturEventsDao.getEventByExternalId(externalId);
-        assertTrue(eventOptionalVersion1.isPresent());
-        assertEquals(1, eventOptionalVersion1.get().getObservationIds().size());
-
-        createNormalizations(externalId, mags01LoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata02.json"));
-        createNormalizations(externalId, mags02LoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata03.json"));
-        eventCombinationJob.run();
-
-        var eventList = konturEventsDao.getEventsForRolloutEpisodes(pdcFeed.getFeedId())
-                .stream()
-                .filter(event -> event.equals(eventOptionalVersion1.get().getEventId()))
-                .collect(toList());
-
-        assertEquals(3, observationsDao.getObservationsByEventId(getOnlyElement(eventList)).size());
     }
 
     @Test

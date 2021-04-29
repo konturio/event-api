@@ -6,9 +6,7 @@
 
     <insert id="insert" useGeneratedKeys="false">
         INSERT INTO kontur_events (event_id, provider, observation_id)
-        VALUES (#{eventId},
-                (select provider from data_lake where observation_id = #{observationId}),
-                #{observationId})
+        VALUES (#{eventId}, #{provider}, #{observationId})
     </insert>
 
     <select id="getEventByExternalId" resultMap="konturEventDtoMap" >
