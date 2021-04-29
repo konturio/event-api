@@ -24,14 +24,12 @@ public class KonturEventsDao {
     private final KonturEventsMapper mapper;
     private final NormalizedObservationsDao observationsDao;
     private final FeedEventStatusDao feedEventStatusDao;
-    private final FeedDao feedDao;
 
     @Autowired
-    public KonturEventsDao(KonturEventsMapper mapper, NormalizedObservationsDao observationsDao, FeedEventStatusDao feedEventStatusDao, FeedDao feedDao) {
+    public KonturEventsDao(KonturEventsMapper mapper, NormalizedObservationsDao observationsDao, FeedEventStatusDao feedEventStatusDao) {
         this.mapper = mapper;
         this.observationsDao = observationsDao;
         this.feedEventStatusDao = feedEventStatusDao;
-        this.feedDao = feedDao;
     }
 
     public Optional<KonturEvent> getEventByExternalId(String externalId) {
@@ -53,13 +51,6 @@ public class KonturEventsDao {
         feedEventStatusDao.markAsNonActual(observation.getProvider(), event.getEventId());
         mapper.insert(event.getEventId(), observation.getObservationId(), observation.getProvider());
         observationsDao.markAsRecombined(observation.getObservationId());
-    }
-
-    private List<UUID> getNewObservations(KonturEvent event) {
-        List<UUID> observationIds = new ArrayList<>(event.getObservationIds());
-        Optional<KonturEvent> existingEvent = mapper.getEventById(event.getEventId());
-        existingEvent.ifPresent(e -> observationIds.removeAll(e.getObservationIds()));
-        return observationIds;
     }
 
     public Set<UUID> getEventsForRolloutEpisodes(UUID feedId) {

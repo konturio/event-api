@@ -5,7 +5,7 @@
 --precondition-sql-check expectedResult:0 SELECT count(*) FROM information_schema.columns WHERE table_name = 'feed_data' AND column_name = 'is_latest_version';
 
 alter table feed_data
-    add is_latest_version bool default false;
+    add is_latest_version bool default true;
 
 with events as (
     select feed_id, event_id, max(version) as "version"
@@ -13,11 +13,11 @@ with events as (
     group by feed_id, event_id
 )
 update feed_data fd
-set is_latest_version = true
+set is_latest_version = false
 from events e
 where fd.feed_id = e.feed_id
   and fd.event_id = e.event_id
-  and fd.version = e.version;
+  and fd.version < e.version;
 
 drop index if exists feed_data_updated_at_idx;
 
