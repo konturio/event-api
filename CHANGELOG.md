@@ -9,6 +9,10 @@
   `PROD/` for production, `TEST QA/` for testing, `TEST DEV/` for development, `EXP/` for experiments. Default 
   folder is `PROD/`. Folder can be changed in configuration.
 
+## 0.4.1 - 2021-04-30
+#### Added
+- GDACS Wildfire type recognition
+
 ## 0.4 - 2021-04-23
 #### Added
 - `bbox` and `datetime` filter to the `/v1/` endpoint
