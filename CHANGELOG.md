@@ -2,6 +2,9 @@
 
 ##UNRELEASED
 
+## 0.4.1 - 2021-04-30
+#### Added 
+- GDACS Wildfire type recognition 
 
 ## 0.4 - 2021-04-23
 #### Added

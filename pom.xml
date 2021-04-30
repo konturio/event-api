@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>event-api</artifactId>
-	<version>0.4</version>
+	<version>0.4.1</version>
 
 	<name>event-api</name>
 	<description>Kontur Event API</description>
