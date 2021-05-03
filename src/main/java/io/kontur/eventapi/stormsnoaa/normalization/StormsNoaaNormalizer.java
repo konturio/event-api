@@ -39,8 +39,11 @@ public class StormsNoaaNormalizer extends Normalizer {
     private static final WKTReader wktReader = new WKTReader();
 
     private static final Map<String, BigDecimal> COST_UNITS = Map.of(
+            "H", BigDecimal.valueOf(100),
+            "h", BigDecimal.valueOf(100),
             "K", BigDecimal.valueOf(1000),
-            "M", BigDecimal.valueOf(1000000));
+            "M", BigDecimal.valueOf(1000000),
+            "B", BigDecimal.valueOf(1000000000));
 
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
@@ -68,7 +71,10 @@ public class StormsNoaaNormalizer extends Normalizer {
             Map.entry("Volcanic Ash", EventType.VOLCANO),
             Map.entry("Volcanic Ashfall", EventType.VOLCANO),
             Map.entry("Wildfires", EventType.WILDFIRE),
-            Map.entry("Winter Storm", EventType.WINTER_STORM));
+            Map.entry("Winter Storm", EventType.WINTER_STORM),
+            Map.entry("Hurricane", EventType.CYCLONE),
+            Map.entry("Hurricane (Typhoon)", EventType.CYCLONE),
+            Map.entry("Marine Hurricane/Typhoon", EventType.CYCLONE));
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
