@@ -23,6 +23,9 @@ pdc:
 stormsImport:
   host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
 
+tornadoJapanMa:
+  host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -45,6 +48,13 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: P1D
+  tornadoJapanMaImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: P1D
+  historicalTornadoJapanMaImport:
+    enable: true
+    initialDelay: 1000
   normalization:
     enable: true
     initialDelay: 1000

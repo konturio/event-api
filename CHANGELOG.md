@@ -2,6 +2,23 @@
 
 ## UNRELEASED
 #### Added
+
+- tornado.japan-ma provider
+
+```yaml
+tornadoJapanMa:
+  host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
+
+scheduler:
+  tornadoJapanMaImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: P1D
+  historicalTornadoJapanMaImport:
+    enable: true
+    initialDelay: 1000
+```
+
 #### Changed
 - !BE AWARE! It might take a  while to install this version. Heavy sql scripts will be run.  
 - Denormalize feed_data table in order to improve search speed. #4736 #5183 #5168 
@@ -29,6 +46,7 @@
   - wildfire.victoria-gov
   - wildfire.nsw-gov
 - storms.noaa provider
+
 #### Changed
 - Event versioning is removed 
 - Refactored normalization, event and episods jobs

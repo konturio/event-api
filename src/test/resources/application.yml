@@ -21,6 +21,9 @@ staticdata:
   s3Bucket: 'event-api-locker01'
   s3Folder: 'TEST-DEV/'
 
+tornadoJapanMa:
+  host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -47,6 +50,13 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
+  tornadoJapanMaImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  historicalTornadoJapanMaImport:
+    enable: false
+    initialDelay: 999999
   normalization:
     enable: false
     initialDelay: 999999

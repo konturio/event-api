@@ -10,6 +10,8 @@ import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
+import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
+import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,8 @@ public class WorkerScheduler {
     private final EmDatImportJob emDatImportJob;
     private final StaticImportJob staticImportJob;
     private final StormsNoaaImportJob stormsNoaaImportJob;
+    private final TornadoJapanMaImportJob tornadoJapanMaImportJob;
+    private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -51,12 +55,18 @@ public class WorkerScheduler {
     private String staticImportEnabled;
     @Value("${scheduler.stormsNoaaImport.enable}")
     private String stormsNoaaImportEnabled;
+    @Value("${scheduler.tornadoJapanMaImport.enable}")
+    private String tornadoJapanMaImportEnabled;
+    @Value("${scheduler.historicalTornadoJapanMaImport.enable}")
+    private String historicalTornadoJapanMaImportEnabled;
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
                            FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob,
-                           StaticImportJob staticImportJob, StormsNoaaImportJob stormsNoaaImportJob) {
+                           StaticImportJob staticImportJob, StormsNoaaImportJob stormsNoaaImportJob,
+                           TornadoJapanMaImportJob tornadoJapanMaImportJob,
+                           HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -67,6 +77,8 @@ public class WorkerScheduler {
         this.emDatImportJob = emDatImportJob;
         this.staticImportJob = staticImportJob;
         this.stormsNoaaImportJob = stormsNoaaImportJob;
+        this.tornadoJapanMaImportJob = tornadoJapanMaImportJob;
+        this.historicalTornadoJapanMaImportJob = historicalTornadoJapanMaImportJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -120,6 +132,24 @@ public class WorkerScheduler {
             stormsNoaaImportJob.run();
         } else {
             LOG.info("StormsNoaa import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.tornadoJapanMaImport.initialDelay}", fixedDelayString = "${scheduler.tornadoJapanMaImport.fixedDelay}")
+    public void startTornadoJapanMaImport() {
+        if (Boolean.parseBoolean(tornadoJapanMaImportEnabled)) {
+            tornadoJapanMaImportJob.run();
+        } else {
+            LOG.info("TornadoJapanMa import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.historicalTornadoJapanMaImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
+    public void startHistoricalTornadoJapanMaImport() {
+        if (Boolean.parseBoolean(historicalTornadoJapanMaImportEnabled)) {
+            historicalTornadoJapanMaImportJob.run();
+        } else {
+            LOG.info("HistoricalTornadoJapanMa import job invocation is skipped");
         }
     }
 
