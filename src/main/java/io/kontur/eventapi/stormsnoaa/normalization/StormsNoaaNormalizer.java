@@ -76,6 +76,22 @@ public class StormsNoaaNormalizer extends Normalizer {
             Map.entry("Hurricane (Typhoon)", EventType.CYCLONE),
             Map.entry("Marine Hurricane/Typhoon", EventType.CYCLONE));
 
+    private static final Map<String, ZoneOffset> TIMEZONE_OFFSETS = Map.ofEntries(
+            Map.entry("AKST", ZoneOffset.ofHours(-9)),
+            Map.entry("AST", ZoneOffset.ofHours(-4)),
+            Map.entry("CDT", ZoneOffset.ofHours(-5)),
+            Map.entry("CHST", ZoneOffset.ofHours(10)),
+            Map.entry("CST", ZoneOffset.ofHours(-6)),
+            Map.entry("EDT", ZoneOffset.ofHours(-4)),
+            Map.entry("EST", ZoneOffset.ofHours(-5)),
+            Map.entry("GST", ZoneOffset.ofHours(-2)),
+            Map.entry("HST", ZoneOffset.ofHours(-10)),
+            Map.entry("MDT", ZoneOffset.ofHours(-6)),
+            Map.entry("MST", ZoneOffset.ofHours(-7)),
+            Map.entry("PDT", ZoneOffset.ofHours(-7)),
+            Map.entry("PST", ZoneOffset.ofHours(-8)),
+            Map.entry("SST", ZoneOffset.ofHours(-11)));
+
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
         return dataLakeDto.getProvider().equals(STORMS_NOAA_PROVIDER);
@@ -98,11 +114,15 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setDescription(parseString(data, "EPISODE_NARRATIVE"));
         normalizedObservation.setEpisodeDescription(parseString(data, "EVENT_NARRATIVE"));
         normalizedObservation.setCost(getCost(parseString(data, "DAMAGE_PROPERTY")));
-        normalizedObservation.setStartedAt(parseDate(data, "BEGIN_DATE_TIME"));
-        normalizedObservation.setEndedAt(parseDate(data, "END_DATE_TIME"));
         normalizedObservation.setEventSeverity(convertFujitaScale(parseString(data, "TOR_F_SCALE")));
 
         setGeometry(data, normalizedObservation);
+
+        String timezone = parseString(data, "CZ_TIMEZONE");
+        String startedAt = parseString(data, "BEGIN_DATE_TIME");
+        String endedAt = parseString(data, "END_DATE_TIME");
+        normalizedObservation.setStartedAt(convertDate(startedAt, timezone));
+        normalizedObservation.setEndedAt(convertDate(endedAt, timezone));
 
         String eventType = parseString(data, "EVENT_TYPE");
         normalizedObservation.setType(EVENT_TYPES_MAPPER.getOrDefault(eventType, EventType.OTHER));
@@ -160,8 +180,10 @@ public class StormsNoaaNormalizer extends Normalizer {
         return value == null ? null : Double.valueOf(value);
     }
 
-    private OffsetDateTime parseDate(Map<String, String> map, String key) {
-        String value = parseString(map, key);
-        return value == null ? null : OffsetDateTime.of(LocalDateTime.parse(value, formatter), ZoneOffset.UTC);
+    private OffsetDateTime convertDate(String date, String timezone) {
+        ZoneOffset offset = timezone != null && TIMEZONE_OFFSETS.containsKey(timezone)
+                ? TIMEZONE_OFFSETS.get(timezone)
+                : ZoneOffset.UTC;
+        return date == null ? null : OffsetDateTime.of(LocalDateTime.parse(date, formatter), offset);
     }
 }
