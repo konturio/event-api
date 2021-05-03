@@ -10,6 +10,8 @@ import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
+import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
+import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,9 +31,12 @@ class WorkerSchedulerTest {
     private final EmDatImportJob emDatImportJob = mock(EmDatImportJob.class);
     private final StaticImportJob staticImportJob = mock(StaticImportJob.class);
     private final StormsNoaaImportJob stormsNoaaImportJob = mock(StormsNoaaImportJob.class);
+    private final TornadoJapanMaImportJob tornadoJapanMaImportJob = mock(TornadoJapanMaImportJob.class);
+    private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob = mock(HistoricalTornadoJapanMaImportJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
-            feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob);
+            feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
+            historicalTornadoJapanMaImportJob);
 
     @AfterEach
     public void resetMocks() {
@@ -44,6 +49,8 @@ class WorkerSchedulerTest {
         Mockito.reset(eventCombinationJob);
         Mockito.reset(feedCompositionJob);
         Mockito.reset(stormsNoaaImportJob);
+        Mockito.reset(tornadoJapanMaImportJob);
+        Mockito.reset(historicalTornadoJapanMaImportJob);
     }
 
     @Test
@@ -124,6 +131,38 @@ class WorkerSchedulerTest {
         scheduler.startStormNoaaImport();
 
         verify(stormsNoaaImportJob, never()).run();
+    }
+
+    @Test
+    public void startHistoricalTornadoJapanMaImportJob() {
+        ReflectionTestUtils.setField(scheduler, "historicalTornadoJapanMaImportEnabled", "true");
+        scheduler.startHistoricalTornadoJapanMaImport();
+
+        verify(historicalTornadoJapanMaImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipHistoricalTornadoJapanMaImportJob() {
+        ReflectionTestUtils.setField(scheduler, "historicalTornadoJapanMaImportEnabled", "false");
+        scheduler.startHistoricalTornadoJapanMaImport();
+
+        verify(historicalTornadoJapanMaImportJob, never()).run();
+    }
+
+    @Test
+    public void startTornadoJapanMaImportJob() {
+        ReflectionTestUtils.setField(scheduler, "tornadoJapanMaImportEnabled", "true");
+        scheduler.startTornadoJapanMaImport();
+
+        verify(tornadoJapanMaImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipTornadoJapanMaImportJob() {
+        ReflectionTestUtils.setField(scheduler, "tornadoJapanMaImportEnabled", "false");
+        scheduler.startTornadoJapanMaImport();
+
+        verify(tornadoJapanMaImportJob, never()).run();
     }
 
     @Test

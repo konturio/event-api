@@ -164,8 +164,4 @@ public class StormsNoaaNormalizer extends Normalizer {
         String value = parseString(map, key);
         return value == null ? null : OffsetDateTime.of(LocalDateTime.parse(value, formatter), ZoneOffset.UTC);
     }
-
-    private String makeWktLine(Double lon1, Double lat1, Double lon2, Double lat2) {
-        return String.format("LINESTRING(%s %s, %s %s)", lon1, lat1, lon2, lat2);
-    }
 }
