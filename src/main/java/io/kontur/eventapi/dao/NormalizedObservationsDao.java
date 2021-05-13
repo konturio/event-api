@@ -5,6 +5,7 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -49,5 +50,9 @@ public class NormalizedObservationsDao {
 
     public Optional<NormalizedObservation> getNormalizedObservationByExternalEpisodeIdAndProvider(String externalEpisodeId, String provider) {
         return mapper.getNormalizedObservationByExternalEpisodeIdAndProvider(externalEpisodeId, provider);
+    }
+
+    public OffsetDateTime getTimestampAtTimezone(LocalDateTime timestamp, String timezone) {
+        return mapper.getTimestampAtTimezone(timestamp, timezone);
     }
 }

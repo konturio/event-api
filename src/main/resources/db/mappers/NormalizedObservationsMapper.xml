@@ -101,6 +101,10 @@
           AND provider = #{provider}
     </select>
 
+    <select id="getTimestampAtTimezone" resultType="java.time.OffsetDateTime">
+        SELECT #{timestamp}::TIMESTAMP AT TIME ZONE #{timezone};
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>
