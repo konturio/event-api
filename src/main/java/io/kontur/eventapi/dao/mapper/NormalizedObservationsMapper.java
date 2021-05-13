@@ -3,6 +3,7 @@ package io.kontur.eventapi.dao.mapper;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +25,6 @@ public interface NormalizedObservationsMapper {
     Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider);
 
     Optional<NormalizedObservation> getNormalizedObservationByExternalEpisodeIdAndProvider(String externalEpisodeId, String provider);
+
+    OffsetDateTime getTimestampAtTimezone(LocalDateTime timestamp, String timezone);
 }

@@ -1,5 +1,6 @@
 package io.kontur.eventapi.stormsnoaa.normalization;
 
+import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -25,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
@@ -37,6 +39,7 @@ public class StormsNoaaNormalizer extends Normalizer {
     private final static Logger LOG = LoggerFactory.getLogger(StormsNoaaNormalizer.class);
     private static final GeoJSONWriter geoJsonWriter = new GeoJSONWriter();
     private static final WKTReader wktReader = new WKTReader();
+    private final NormalizedObservationsDao normalizedObservationsDao;
 
     private static final Map<String, BigDecimal> COST_UNITS = Map.of(
             "H", BigDecimal.valueOf(100),
@@ -53,6 +56,8 @@ public class StormsNoaaNormalizer extends Normalizer {
             .toFormatter()
             .withLocale(Locale.US);
 
+    private static final Pattern zoneOffsetPattern = Pattern.compile("(-|\\+)?\\d+");
+
     private static final Map<String, EventType> EVENT_TYPES_MAPPER = Map.ofEntries(
             Map.entry("Drought", EventType.DROUGHT),
             Map.entry("Flash Flood", EventType.FLOOD),
@@ -62,35 +67,32 @@ public class StormsNoaaNormalizer extends Normalizer {
             Map.entry("THUNDERSTORM WINDS/ FLOOD", EventType.FLOOD),
             Map.entry("THUNDERSTORM WINDS/FLASH FLOOD", EventType.FLOOD),
             Map.entry("THUNDERSTORM WINDS/FLOODING", EventType.FLOOD),
-            Map.entry("Marine Tropical Storm", EventType.STORM),
-            Map.entry("Tropical Storm", EventType.STORM),
+            Map.entry("Coastal Flood", EventType.FLOOD),
+            Map.entry("Dust Storm", EventType.STORM),
             Map.entry("Tornado", EventType.TORNADO),
             Map.entry("TORNADO/WATERSPOUT", EventType.TORNADO),
             Map.entry("TORNADOES, TSTM WIND, HAIL", EventType.TORNADO),
+            Map.entry("Dust Devil", EventType.TORNADO),
+            Map.entry("Funnel Cloud", EventType.TORNADO),
+            Map.entry("Waterspout", EventType.TORNADO),
+            Map.entry("THUNDERSTORM WINDS FUNNEL CLOU", EventType.TORNADO),
+            Map.entry("Hurricane", EventType.CYCLONE),
+            Map.entry("Hurricane (Typhoon)", EventType.CYCLONE),
+            Map.entry("Marine Hurricane/Typhoon", EventType.CYCLONE),
+            Map.entry("Marine Tropical Storm", EventType.CYCLONE),
+            Map.entry("Tropical Storm", EventType.CYCLONE),
+            Map.entry("Marine Tropical Depression", EventType.CYCLONE),
+            Map.entry("Tropical Depression", EventType.CYCLONE),
             Map.entry("Tsunami", EventType.TSUNAMI),
             Map.entry("Volcanic Ash", EventType.VOLCANO),
             Map.entry("Volcanic Ashfall", EventType.VOLCANO),
-            Map.entry("Wildfires", EventType.WILDFIRE),
+            Map.entry("Wildfire", EventType.WILDFIRE),
             Map.entry("Winter Storm", EventType.WINTER_STORM),
-            Map.entry("Hurricane", EventType.CYCLONE),
-            Map.entry("Hurricane (Typhoon)", EventType.CYCLONE),
-            Map.entry("Marine Hurricane/Typhoon", EventType.CYCLONE));
+            Map.entry("Blizzard", EventType.WINTER_STORM));
 
-    private static final Map<String, ZoneOffset> TIMEZONE_OFFSETS = Map.ofEntries(
-            Map.entry("AKST", ZoneOffset.ofHours(-9)),
-            Map.entry("AST", ZoneOffset.ofHours(-4)),
-            Map.entry("CDT", ZoneOffset.ofHours(-5)),
-            Map.entry("CHST", ZoneOffset.ofHours(10)),
-            Map.entry("CST", ZoneOffset.ofHours(-6)),
-            Map.entry("EDT", ZoneOffset.ofHours(-4)),
-            Map.entry("EST", ZoneOffset.ofHours(-5)),
-            Map.entry("GST", ZoneOffset.ofHours(-2)),
-            Map.entry("HST", ZoneOffset.ofHours(-10)),
-            Map.entry("MDT", ZoneOffset.ofHours(-6)),
-            Map.entry("MST", ZoneOffset.ofHours(-7)),
-            Map.entry("PDT", ZoneOffset.ofHours(-7)),
-            Map.entry("PST", ZoneOffset.ofHours(-8)),
-            Map.entry("SST", ZoneOffset.ofHours(-11)));
+    public StormsNoaaNormalizer(NormalizedObservationsDao normalizedObservationsDao) {
+        this.normalizedObservationsDao = normalizedObservationsDao;
+    }
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -118,11 +120,11 @@ public class StormsNoaaNormalizer extends Normalizer {
 
         setGeometry(data, normalizedObservation);
 
-        String timezone = parseString(data, "CZ_TIMEZONE");
+        String timezone = parseTimezone(parseString(data, "CZ_TIMEZONE"));
         String startedAt = parseString(data, "BEGIN_DATE_TIME");
         String endedAt = parseString(data, "END_DATE_TIME");
-        normalizedObservation.setStartedAt(convertDate(startedAt, timezone));
-        normalizedObservation.setEndedAt(convertDate(endedAt, timezone));
+        normalizedObservation.setStartedAt(convertDate(startedAt != null ? startedAt : endedAt, timezone));
+        normalizedObservation.setEndedAt(convertDate(endedAt != null ? endedAt : startedAt, timezone));
 
         String eventType = parseString(data, "EVENT_TYPE");
         normalizedObservation.setType(EVENT_TYPES_MAPPER.getOrDefault(eventType, EventType.OTHER));
@@ -180,10 +182,22 @@ public class StormsNoaaNormalizer extends Normalizer {
         return value == null ? null : Double.valueOf(value);
     }
 
+    private String parseTimezone(String timezoneAbbr) {
+        if (timezoneAbbr == null || timezoneAbbr.isBlank()) {
+            return "UTC";
+        }
+        if (zoneOffsetPattern.matcher(timezoneAbbr).find()) {
+            return RegExUtils.removePattern(timezoneAbbr, zoneOffsetPattern.pattern());
+        }
+        return timezoneAbbr;
+    }
+
     private OffsetDateTime convertDate(String date, String timezone) {
-        ZoneOffset offset = timezone != null && TIMEZONE_OFFSETS.containsKey(timezone)
-                ? TIMEZONE_OFFSETS.get(timezone)
-                : ZoneOffset.UTC;
-        return date == null ? null : OffsetDateTime.of(LocalDateTime.parse(date, formatter), offset);
+        LocalDateTime timestamp = LocalDateTime.parse(date, formatter);
+        try {
+            return normalizedObservationsDao.getTimestampAtTimezone(timestamp, timezone);
+        } catch (Exception e) {
+            return OffsetDateTime.of(timestamp, ZoneOffset.UTC);
+        }
     }
 }
