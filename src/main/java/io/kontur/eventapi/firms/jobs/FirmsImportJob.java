@@ -17,10 +17,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.firms.FirmsUtil.*;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
@@ -53,7 +51,12 @@ public class FirmsImportJob extends AbstractJob {
         allDataLakes.addAll(dataLakesFromNoaa);
         allDataLakes.addAll(dataLakesFromSuomi);
 
-        dataLakeDao.storeDataLakes(allDataLakes);
+        List<DataLake> sortedDataLakes = allDataLakes.stream()
+                .sorted(Comparator.comparing(DataLake::getUpdatedAt, Comparator.nullsFirst(Comparator.naturalOrder())))
+                .peek(dataLake -> dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime()))
+                .collect(Collectors.toList());
+
+        dataLakeDao.storeDataLakes(sortedDataLakes);
     }
 
     @Override
@@ -77,7 +80,6 @@ public class FirmsImportJob extends AbstractJob {
                 dataLake.setObservationId(UUID.randomUUID());
                 dataLake.setExternalId(externalId);
                 dataLake.setData(csvHeader + "\n" + csvRow);
-                dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
                 dataLake.setProvider(provider);
                 Map<String, String> csvData = parseRow(csvHeader, csvRow);
                 dataLake.setUpdatedAt(extractUpdatedAtValue(csvData));
