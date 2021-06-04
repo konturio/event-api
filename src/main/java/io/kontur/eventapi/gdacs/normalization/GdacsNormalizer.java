@@ -18,6 +18,15 @@ public abstract class GdacsNormalizer extends Normalizer {
             "Forest Fires area", EventType.WILDFIRE
     );
 
+    private static final Map<String, EventType> geometryTypeMap = Map.of(
+            "DR", EventType.DROUGHT,
+            "EQ", EventType.EARTHQUAKE,
+            "FL", EventType.FLOOD,
+            "TC", EventType.CYCLONE,
+            "VO", EventType.VOLCANO,
+            "WF", EventType.WILDFIRE
+    );
+
     private static final Map<String, Severity> severityMap = Map.of(
             "Minor", Severity.MINOR,
             "Moderate", Severity.MODERATE,
@@ -34,5 +43,11 @@ public abstract class GdacsNormalizer extends Normalizer {
         return typeMap.getOrDefault(event, EventType.OTHER);
     }
 
+    protected EventType defineGeometryType(String eventType) {
+        return geometryTypeMap.getOrDefault(eventType, EventType.OTHER);
+    }
 
+    protected String composeExternalEventId(String eventType, String eventId) {
+        return eventType + "_" + eventId;
+    }
 }
