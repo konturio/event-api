@@ -1,30 +1,19 @@
 package io.kontur.eventapi.gdacs.normalization;
 
-import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.normalization.Normalizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.wololo.geojson.FeatureCollection;
+import org.wololo.geojson.GeoJSONFactory;
+
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.Map;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
-
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
-import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
 
 @Component
-public class GdacsGeometryNormalizer extends Normalizer {
-
-    private final static Logger LOG = LoggerFactory.getLogger(GdacsGeometryNormalizer.class);
-
-    private final NormalizedObservationsDao normalizedObservationsDao;
-
-    @Autowired
-    public GdacsGeometryNormalizer(NormalizedObservationsDao normalizedObservationsDao) {
-        this.normalizedObservationsDao = normalizedObservationsDao;
-    }
+public class GdacsGeometryNormalizer extends GdacsNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -33,38 +22,30 @@ public class GdacsGeometryNormalizer extends Normalizer {
 
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
-        var normalizedObservation = getGdacsAlertNormalizedObservation(dataLakeDto.getExternalId());
-        if (normalizedObservation.isPresent()) {
-            var normalizedObservationWithGeometry = new NormalizedObservation();
-            setDataFromNormalizedObservation(normalizedObservationWithGeometry, normalizedObservation.get());
-            setDataFromDataLake(normalizedObservationWithGeometry, dataLakeDto);
-            return normalizedObservationWithGeometry;
-        }
-        throw new RuntimeException(String.format("Observation with provider = %s and externalId = %s has not normalized", GDACS_ALERT_PROVIDER, dataLakeDto.getExternalId()));
+        NormalizedObservation normalizedObservation = new NormalizedObservation();
+        normalizedObservation.setObservationId(dataLakeDto.getObservationId());
+        normalizedObservation.setProvider(dataLakeDto.getProvider());
+        normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
+        normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
+        normalizedObservation.setExternalEpisodeId(dataLakeDto.getExternalId());
+        normalizedObservation.setGeometries(dataLakeDto.getData());
+        normalizedObservation.setActive(true);
+
+        FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(dataLakeDto.getData());
+        Map<String, Object> properties = featureCollection.getFeatures()[0].getProperties();
+
+        String eventType = readString(properties, "eventtype");
+        String eventId = readString(properties, "eventid");
+        normalizedObservation.setType(defineGeometryType(eventType));
+        normalizedObservation.setExternalEventId(composeExternalEventId(eventType, eventId));
+
+        normalizedObservation.setStartedAt(parseDateTime(readString(properties, "fromdate")));
+        normalizedObservation.setEndedAt(parseDateTime(readString(properties, "todate")));
+
+        return normalizedObservation;
     }
 
-    private void setDataFromNormalizedObservation(NormalizedObservation normalizedObservationWithGeometry, NormalizedObservation observation) {
-        normalizedObservationWithGeometry.setSourceUpdatedAt(observation.getSourceUpdatedAt());
-        normalizedObservationWithGeometry.setName(observation.getName());
-        normalizedObservationWithGeometry.setDescription(observation.getDescription());
-        normalizedObservationWithGeometry.setEpisodeDescription(observation.getEpisodeDescription());
-        normalizedObservationWithGeometry.setType(observation.getType());
-        normalizedObservationWithGeometry.setEventSeverity(observation.getEventSeverity());
-        normalizedObservationWithGeometry.setExternalEventId(observation.getExternalEventId());
-        normalizedObservationWithGeometry.setExternalEpisodeId(observation.getExternalEpisodeId());
-        normalizedObservationWithGeometry.setStartedAt(observation.getStartedAt());
-        normalizedObservationWithGeometry.setEndedAt(observation.getEndedAt());
-        normalizedObservationWithGeometry.setActive(observation.getActive());
-    }
-
-    private void setDataFromDataLake(NormalizedObservation normalizedObservationWithGeometry, DataLake dataLake) {
-        normalizedObservationWithGeometry.setObservationId(dataLake.getObservationId());
-        normalizedObservationWithGeometry.setProvider(dataLake.getProvider());
-        normalizedObservationWithGeometry.setLoadedAt(dataLake.getLoadedAt());
-        normalizedObservationWithGeometry.setGeometries(dataLake.getData());
-    }
-
-    private Optional<NormalizedObservation> getGdacsAlertNormalizedObservation(String externalEventId) {
-        return normalizedObservationsDao.getNormalizedObservationByExternalEpisodeIdAndProvider(externalEventId, GDACS_ALERT_PROVIDER);
+    private OffsetDateTime parseDateTime(String dateTimeString) {
+        return OffsetDateTime.of(LocalDateTime.parse(dateTimeString), ZoneOffset.UTC);
     }
 }

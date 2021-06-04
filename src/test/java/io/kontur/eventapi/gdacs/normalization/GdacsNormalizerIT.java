@@ -133,42 +133,26 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
     public void normalizeGdacsGeometry() {
         var observation = gdacsGeometryNormalizer.normalize(dataLakeAlertGeometry);
 
-        String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
-        String name = "Green earthquake alert (Magnitude 4.9M, Depth:28.99km) in Mexico 12/10/2020 07:03 UTC, About 13000 people within 100km.";
-
-        var fromDate = OffsetDateTime.of(
-                LocalDateTime.of(2020, 10, 12, 7, 3, 7),
-                ZoneOffset.UTC
-        );
-        var toDate = OffsetDateTime.of(
-                LocalDateTime.of(2020, 10, 12, 7, 3, 7),
-                ZoneOffset.UTC
-        );
-
-        assertNotEquals(dataLakeAlertGeometry.getExternalId(), observation.getExternalEventId());
-        assertEquals("EQ_1239039", observation.getExternalEventId());
-
         assertEquals(dataLakeAlertGeometry.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLakeAlertGeometry.getObservationId(), observation.getObservationId());
         assertEquals(dataLakeAlertGeometry.getLoadedAt(), observation.getLoadedAt());
         assertEquals(dataLakeAlertGeometry.getExternalId(), observation.getExternalEpisodeId());
-
         assertEquals(GDACS_ALERT_GEOMETRY_PROVIDER, observation.getProvider());
+        assertEquals("EQ_1239039", observation.getExternalEventId());
         assertEquals(EventType.EARTHQUAKE, observation.getType());
-        assertEquals(Severity.MINOR, observation.getEventSeverity());
-
-        assertEquals(name, observation.getName());
-        assertEquals(description, observation.getDescription());
-        assertEquals(description, observation.getEpisodeDescription());
-        assertEquals(fromDate, observation.getStartedAt());
-        assertEquals(toDate, observation.getEndedAt());
-
         assertTrue(observation.getActive());
+        assertEquals(OffsetDateTime.parse("2020-10-12T07:03:07Z"), observation.getStartedAt());
+        assertEquals(OffsetDateTime.parse("2020-10-12T07:03:07Z"), observation.getEndedAt());
+
+        assertNotNull(observation.getGeometries());
+
+        assertNull(observation.getEventSeverity());
+        assertNull(observation.getName());
+        assertNull(observation.getDescription());
+        assertNull(observation.getEpisodeDescription());
         assertNull(observation.getPoint());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
-
-        assertNotNull(observation.getGeometries());
     }
 
     private List<DataLake> getDataLakeList() throws IOException {
