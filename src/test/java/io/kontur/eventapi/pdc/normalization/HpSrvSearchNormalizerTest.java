@@ -63,9 +63,7 @@ class HpSrvSearchNormalizerTest {
         assertEquals(-98.1841, point.getCoordinates()[0]);
         assertEquals(44.4186, point.getCoordinates()[1]);
 
-        assertEquals("The National Weather Service (NWS) ...", feature.getProperties().get("description"));
-        assertEquals(1590590813468L,
-                OffsetDateTime.parse((String) feature.getProperties().get("updatedAt")).toInstant().toEpochMilli());
+        assertEquals("centerPoint", feature.getProperties().get("areaType"));
     }
 
     private DataLake createDataLakeObject() throws IOException {

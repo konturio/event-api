@@ -8,6 +8,10 @@ import java.util.Map;
 
 public abstract class PdcHazardNormalizer extends Normalizer {
 
+    protected static final Map<String, Object> EXPOSURE_PROPERTIES = Map.of("areaType", "exposure");
+    protected final static Map<String, Object> HAZARD_PROPERTIES = Map.of("areaType", "centerPoint");
+    protected final static Map<String, Object> MAG_PROPERTIES = Map.of("areaType", "alertArea");
+
     private static final Map<String, EventType> typeMap = Map.of(
             "FLOOD", EventType.FLOOD,
             "TSUNAMI", EventType.TSUNAMI,

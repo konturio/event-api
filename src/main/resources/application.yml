@@ -29,6 +29,7 @@ spring:
 
 pdc:
   host: 'https://testemops.pdc.org'
+  mapSrvHost: 'https://testapps.pdc.org'
   user: 'eventapi'
   password: 'zvgusf48D'
 
@@ -61,6 +62,10 @@ scheduler:
     enable: false
     initialDelay: 10000
     fixedDelay: 600000
+  pdcMapSrvSearch:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 60000
   gdacsImport:
     enable: true
     cron: 30 0/5 * * * *
@@ -106,9 +111,6 @@ feign:
         connectTimeout: 60000
         readTimeout: 60000
         loggerLevel: headers
-      pdcHpSrvBasicAuth:
-        requestInterceptors:
-          - feign.auth.BasicAuthRequestInterceptor
 
 mybatis:
   mapper-locations: classpath:db/mappers/*Mapper.xml

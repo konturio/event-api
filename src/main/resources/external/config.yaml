@@ -17,6 +17,7 @@ konturApi:
 
 pdc:
   host: 'https://testemops.pdc.org'
+  mapSrvHost: 'https://testapps.pdc.org'
   user: user
   password: password
 
@@ -34,6 +35,10 @@ scheduler:
     enable: true
     initialDelay: 10000
     fixedDelay: 600000
+  pdcMapSrvSearch:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 60000
   gdacsImport:
     enable: true
     cron: 30 0/5 * * * *
