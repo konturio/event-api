@@ -47,11 +47,7 @@ class HpSrvMagsNormalizerTest {
         assertEquals(1595458283232L, obs.getSourceUpdatedAt().toInstant().toEpochMilli());
         FeatureCollection fc = readJson(obs.getGeometries(), FeatureCollection.class);
         assertEquals(1, fc.getFeatures().length);
-        assertEquals(
-                "Automated Flood SmartAlert Area [ 2020-07-22 22:51:20 GMT ] | FLOODIPAWS-WARNING-2020-New York--Newark, NY--NJ--CT",
-                fc.getFeatures()[0].getProperties().get("description"));
-        assertEquals("2020-07-22T22:51:23.232Z", fc.getFeatures()[0].getProperties().get("updatedAt"));
-        assertEquals(false, fc.getFeatures()[0].getProperties().get("active"));
+        assertEquals("alertArea", fc.getFeatures()[0].getProperties().get("areaType"));
     }
 
     private DataLake createDataLakeObject() throws IOException {

@@ -1,5 +1,6 @@
 package io.kontur.eventapi.pdc.converter;
 
+import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.util.JsonUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -8,8 +9,8 @@ import org.wololo.geojson.FeatureCollection;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PdcDataLakeConverterTest {
 
@@ -30,6 +31,23 @@ class PdcDataLakeConverterTest {
 
         compareFeatureCollections(JsonUtil.readJson(dataLakeData2, FeatureCollection.class),
                 JsonUtil.readJson(dataLakes.get(1).getData(), FeatureCollection.class));
+    }
+
+    @Test
+    public void testConvertExposure() throws IOException {
+        String data = readMessageFromFile("PdcDataLakeConverterTest.testConvertExposure.json");
+        String externalId = "testExternalId";
+
+        DataLake dataLake = new PdcDataLakeConverter().convertExposure(data, externalId);
+
+        assertNotNull(dataLake);
+        assertNotNull(dataLake.getObservationId());
+        assertNotNull(dataLake.getLoadedAt());
+        assertNotNull(dataLake.getUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), dataLake.getUpdatedAt());
+        assertEquals(PDC_MAP_SRV_PROVIDER, dataLake.getProvider());
+        assertEquals(data, dataLake.getData());
+        assertEquals(externalId, dataLake.getExternalId());
     }
 
     private void compareFeatureCollections(FeatureCollection expected, FeatureCollection actual) {

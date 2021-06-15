@@ -4,12 +4,20 @@
 #### Added
 
 - tornado.japan-ma provider
+- pdcMapSrv
 
 ```yaml
+
+pdc:
+  mapSrvHost: 'https://testapps.pdc.org'
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
 scheduler:
+  pdcMapSrvSearch:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 60000
   tornadoJapanMaImport:
     enable: true
     initialDelay: 1000
@@ -17,6 +25,17 @@ scheduler:
   historicalTornadoJapanMaImport:
     enable: true
     initialDelay: 1000
+```
+
+#### Removed
+
+```yaml
+feign:
+  client:
+    config:
+      pdcHpSrvBasicAuth:
+        requestInterceptors:
+          - feign.auth.BasicAuthRequestInterceptor
 ```
 
 #### Changed

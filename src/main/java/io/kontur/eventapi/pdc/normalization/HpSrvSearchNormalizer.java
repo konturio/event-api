@@ -71,12 +71,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
 
     private FeatureCollection convertGeometry(String point, Map<String, Object> props) throws ParseException {
         Geometry geometry = geoJSONWriter.write(wktReader.read(point));
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("description", readString(props, "description"));
-        map.put("updatedAt", readDateTime(props, "update_Date"));
-
-        Feature feature = new Feature(geometry, map);
+        Feature feature = new Feature(geometry, HAZARD_PROPERTIES);
 
         return new FeatureCollection(new Feature[] {feature});
 

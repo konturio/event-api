@@ -1,5 +1,6 @@
 pdc:
   host: 'http://localhost:18080'
+  mapSrvHost: 'https://testapps.pdc.org'
   user: u1
   password: p1
 
@@ -29,6 +30,10 @@ scheduler:
     enable: false
     initialDelay: 999999
   hpSrvMagsImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  pdcMapSrvSearch:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999

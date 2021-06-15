@@ -22,6 +22,7 @@ public class PdcDataLakeConverter {
     public final static String HP_SRV_SEARCH_PROVIDER = "hpSrvSearch";
     public final static String HP_SRV_MAG_PROVIDER = "hpSrvMag";
     public final static String PDC_SQS_PROVIDER = "pdcSqs";
+    public final static String PDC_MAP_SRV_PROVIDER = "pdcMapSrv";
     public final static DateTimeFormatter magsDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public DataLake convertHpSrvHazardData(JsonNode node) {
@@ -63,6 +64,20 @@ public class PdcDataLakeConverter {
         dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setData(messageJson);
         dataLake.setExternalId(messageId);
+
+        return dataLake;
+    }
+
+    public DataLake convertExposure(String data, String externalId) {
+        DataLake dataLake = new DataLake();
+        dataLake.setObservationId(UUID.randomUUID());
+        dataLake.setProvider(PDC_MAP_SRV_PROVIDER);
+        dataLake.setData(data);
+        dataLake.setExternalId(externalId);
+
+        OffsetDateTime now = DateTimeUtil.uniqueOffsetDateTime();
+        dataLake.setLoadedAt(now);
+        dataLake.setUpdatedAt(now);
 
         return dataLake;
     }

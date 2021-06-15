@@ -57,6 +57,20 @@
           AND provider = #{provider}
     </select>
 
+    <select id="isNewPdcExposure" resultType="java.lang.Boolean">
+        WITH datalakes AS (
+            SELECT * FROM data_lake
+            WHERE external_id = #{externalId} AND provider = 'pdcMapSrv'
+            ORDER BY updated_at DESC
+            LIMIT 2
+        )
+        SELECT
+            CASE WHEN EXISTS (
+                SELECT * FROM datalakes WHERE (data::jsonb)->'geometry' = (#{geometry})::jsonb
+            ) THEN FALSE ELSE TRUE
+            END
+    </select>
+
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
         <result property="observationId" column="observation_id" />
         <result property="externalId" column="external_id" />

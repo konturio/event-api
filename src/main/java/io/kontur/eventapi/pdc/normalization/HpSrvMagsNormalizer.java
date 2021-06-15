@@ -59,24 +59,9 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
     private FeatureCollection convertGeometries(List<Feature> input) {
         List<Feature> features = new ArrayList<>(input.size());
 
-        input.forEach(feature -> {
-            Map<String, Object> props = feature.getProperties();
-            Map<String, Object> map = new HashMap<>();
-
-            map.put("description", convertDescription(props));
-            map.put("active", readBoolean(props, "isActive"));
-            map.put("updatedAt", readDateTime(props, "updateDate"));
-
-            features.add(new Feature(feature.getGeometry(), map));
-        });
+        input.forEach(feature -> features.add(new Feature(feature.getGeometry(), MAG_PROPERTIES)));
 
         return new FeatureCollection(features.toArray(new Feature[0]));
-    }
-
-    private String convertDescription(Map<String, Object> props) {
-        String commentText = readString(props, "hazard.commentText");
-        commentText = commentText != null ? " | " + commentText : "";
-        return readString(props, "title") + commentText;
     }
 
     @Override

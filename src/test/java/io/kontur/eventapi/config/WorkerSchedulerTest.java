@@ -5,6 +5,7 @@ import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
+import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
@@ -33,10 +34,11 @@ class WorkerSchedulerTest {
     private final StormsNoaaImportJob stormsNoaaImportJob = mock(StormsNoaaImportJob.class);
     private final TornadoJapanMaImportJob tornadoJapanMaImportJob = mock(TornadoJapanMaImportJob.class);
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob = mock(HistoricalTornadoJapanMaImportJob.class);
+    private final PdcMapSrvSearchJob pdcMapSrvSearchJob = mock(PdcMapSrvSearchJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
             feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
-            historicalTornadoJapanMaImportJob);
+            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob);
 
     @AfterEach
     public void resetMocks() {
@@ -51,6 +53,7 @@ class WorkerSchedulerTest {
         Mockito.reset(stormsNoaaImportJob);
         Mockito.reset(tornadoJapanMaImportJob);
         Mockito.reset(historicalTornadoJapanMaImportJob);
+        Mockito.reset(pdcMapSrvSearchJob);
     }
 
     @Test
@@ -83,6 +86,22 @@ class WorkerSchedulerTest {
         scheduler.startPdcMagsImport();
 
         verify(hpSrvMagsJob, never()).run();
+    }
+
+    @Test
+    public void startPdcMapSrvSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "pdcMapSrvSearchEnabled", "true");
+        scheduler.startPdcMapSrvSearch();
+
+        verify(pdcMapSrvSearchJob, times(1)).run();
+    }
+
+    @Test
+    public void skipPdcMapSrvSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "pdcMapSrvSearchEnabled", "false");
+        scheduler.startPdcMapSrvSearch();
+
+        verify(pdcMapSrvSearchJob, never()).run();
     }
 
     @Test

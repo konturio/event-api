@@ -103,27 +103,15 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         try {
             Geometry wktGeometry = wktReader.read((String) ((Map<String, Object>) props.get("wkt")).get("text"));
             org.wololo.geojson.Geometry geoJsonGeometry = geoJSONWriter.write(wktGeometry);
-            Map<String, Object> map = new HashMap<>();
-
-            map.put("description", convertDescription(props));
-            map.put("active", readBoolean(props, "isActive"));
-            map.put("updatedAt", readDateTime(props, "updateDate"));
-            return new FeatureCollection(new Feature[]{new Feature(geoJsonGeometry, map)});
+            return new FeatureCollection(new Feature[]{new Feature(geoJsonGeometry, MAG_PROPERTIES)});
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
     private FeatureCollection convertGeometry(String point, Map<String, Object> props) throws ParseException {
         org.wololo.geojson.Geometry geometry = geoJSONWriter.write(wktReader.read(point));
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("description", readString((Map<String, Object>) props.get("hazardDescription"), "description"));
-        map.put("updatedAt", readDateTime(props, "updateDate"));
-
-        Feature feature = new Feature(geometry, map);
-
+        Feature feature = new Feature(geometry, HAZARD_PROPERTIES);
         return new FeatureCollection(new Feature[] {feature});
     }
 
