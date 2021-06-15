@@ -1,0 +1,199 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+	{
+	  "type": "Feature",
+	  "bbox": [
+		128.2465,
+		28.0647,
+		128.2465,
+		28.0647
+	  ],
+	  "geometry": {
+		"type": "Point",
+		"coordinates": [
+		  128.2465,
+		  28.0647
+		]
+	  },
+	  "properties": {
+		"eventtype": "EQ",
+		"eventid": 1243255,
+		"episodeid": 1342589,
+		"eventname": "",
+		"name": "Earthquake in Japan",
+		"description": "Earthquake in Japan",
+		"htmldescription": "Green M 4.5 Earthquake in Japan at: 15/Jun/2021 07:11:42.",
+		"icon": "https://www.gdacs.org/images/gdacs_icons/maps/Green/EQ.png",
+		"iconoverall": null,
+		"url": {
+		  "geometry": "https://www.gdacs.org/gdacsapi/api/polygons/getgeometry?eventtype=EQ&eventid=1273229&episodeid=1380712",
+		  "report": "https://www.gdacs.org/report.aspx?eventid=1273229&episodeid=1380712&eventtype=EQ",
+		  "details": "https://www.gdacs.org/gdacsapi/api/events/geteventdata?eventtype=EQ&eventid=1273229"
+		},
+		"alertlevel": "Green",
+		"alertscore": 1,
+		"episodealertlevel": "Green",
+		"episodealertscore": 0.0,
+		"istemporary": "false",
+		"iscurrent": "true",
+		"country": "Japan",
+		"fromdate": "2021-06-15T07:11:42",
+		"todate": "2021-06-15T07:11:42",
+		"iso3": "JPN",
+		"polygonlabel": "Centroid",
+		"Class": "Point_Centroid",
+		"severitydata": {
+		  "severity": 4.5,
+		  "severitytext": "Magnitude 4.5M, Depth:10km",
+		  "severityunit": "M"
+		}
+	  }
+	},
+	{
+	  "type": "Feature",
+	  "bbox": [
+		127.226,
+		27.164,
+		129.267,
+		28.966
+	  ],
+	  "geometry": {
+		"type": "Polygon",
+		"coordinates": [
+		  [
+			[
+			  129.267,
+			  28.065
+			],
+			[
+			  129.267,
+			  28.096
+			],
+			[
+			  129.051,
+			  27.51
+			],
+			[
+			  129.072,
+			  27.535
+			],
+			[
+			  129.093,
+			  27.561
+			],
+			[
+			  129.112,
+			  27.587
+			],
+			[
+			  129.131,
+			  27.614
+			],
+			[
+			  129.148,
+			  27.642
+			],
+			[
+			  129.164,
+			  27.67
+			],
+			[
+			  129.179,
+			  27.698
+			],
+			[
+			  129.193,
+			  27.727
+			],
+			[
+			  129.206,
+			  27.757
+			],
+			[
+			  129.217,
+			  27.786
+			],
+			[
+			  129.228,
+			  27.816
+			],
+			[
+			  129.237,
+			  27.847
+			],
+			[
+			  129.245,
+			  27.877
+			],
+			[
+			  129.252,
+			  27.908
+			],
+			[
+			  129.258,
+			  27.939
+			],
+			[
+			  129.262,
+			  27.971
+			],
+			[
+			  129.265,
+			  28.002
+			],
+			[
+			  129.267,
+			  28.033
+			],
+			[
+			  129.267,
+			  28.065
+			],
+			[
+			  129.267,
+			  28.065
+			]
+		  ]
+		]
+	  },
+	  "properties": {
+		"eventtype": "EQ",
+		"eventid": 1273229,
+		"episodeid": 1380712,
+		"eventname": "",
+		"name": "Earthquake in Japan",
+		"description": "Earthquake in Japan",
+		"htmldescription": "Green M 4.5 Earthquake in Japan at: 15/Jun/2021 07:11:42.",
+		"icon": "https://www.gdacs.org/images/gdacs_icons/maps/Green/EQ.png",
+		"iconoverall": null,
+		"url": {
+		  "geometry": "https://www.gdacs.org/gdacsapi/api/polygons/getgeometry?eventtype=EQ&eventid=1273229&episodeid=1380712",
+		  "report": "https://www.gdacs.org/report.aspx?eventid=1273229&episodeid=1380712&eventtype=EQ",
+		  "details": "https://www.gdacs.org/gdacsapi/api/events/geteventdata?eventtype=EQ&eventid=1273229"
+		},
+		"alertlevel": "Green",
+		"alertscore": 1,
+		"episodealertlevel": "Green",
+		"episodealertscore": 0.0,
+		"istemporary": "false",
+		"iscurrent": "true",
+		"country": "Japan",
+		"fromdate": "2021-06-15T07:11:42",
+		"todate": "2021-06-15T07:11:42",
+		"iso3": "JPN",
+		"polygondate": "2021-06-15T09:30:45",
+		"polygonlabel": "100km",
+		"severitydata": {
+		  "severity": 4.5,
+		  "severitytext": "Magnitude 4.5M, Depth:10km",
+		  "severityunit": "M"
+		},
+		"Class": "Poly_Circle",
+		"iconeventlink": "https://www.gdacs.org/images/gdacs_icons/maps/Green/EQ.png",
+		"iconitemlink": "https://www.gdacs.org/images/gdacs_icons/maps/Green/EQ.png"
+	  }
+	}
+  ],
+  "bbox": null
+}
