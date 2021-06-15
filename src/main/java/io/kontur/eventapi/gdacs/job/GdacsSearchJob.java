@@ -64,17 +64,17 @@ public class GdacsSearchJob extends AbstractJob {
         return "gdacsSearch";
     }
 
-    void setPubDate(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+    private void setPubDate(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         XML_PUB_DATE = gdacsAlertParser.getPubDate(xml);
     }
 
-    List<String> getLinks(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+    private List<String> getLinks(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         return gdacsAlertParser.getLinks(xml).stream()
                 .map(link -> link.replace("https://www.gdacs.org", ""))
                 .collect(toList());
     }
 
-    List<ParsedAlert> getSortedParsedAlerts(Map<String, String> alerts) throws XPathExpressionException, ParserConfigurationException {
+    private List<ParsedAlert> getSortedParsedAlerts(Map<String, String> alerts) throws XPathExpressionException, ParserConfigurationException {
         return gdacsAlertParser.getParsedAlertsToGdacsSearchJob(alerts).stream()
                 .sorted(Comparator.comparing(ParsedAlert::getSent))
                 .collect(toList());

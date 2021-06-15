@@ -104,7 +104,7 @@ public class GdacsService {
     }
 
     public void saveGdacs(List<DataLake> dataLakes) {
-        dataLakes.forEach(dataLakeDao::storeEventData);
+        dataLakeDao.storeDataLakes(dataLakes);
     }
 
 
