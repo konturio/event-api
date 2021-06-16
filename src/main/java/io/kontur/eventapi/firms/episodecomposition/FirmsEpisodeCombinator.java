@@ -170,9 +170,9 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         String burntArea = String.format(Locale.US, "%.3f", area);
         String areaName = getBurntAreaName(episodeObservations);
         if (!StringUtils.isEmpty(areaName)) {
-            areaName = "Wildfire in " + areaName + ". ";
+            areaName = "Thermal anomaly in " + areaName + ". ";
         } else {
-            areaName = "Wildfire in an unknown area. ";
+            areaName = "Thermal anomaly in an unknown area. ";
         }
         return areaName + "Burnt area " + burntArea + " km\u00B2" + (burningTime > 24 ? ", burning " + burningTime + " hours." : "");
     }

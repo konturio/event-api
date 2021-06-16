@@ -51,7 +51,7 @@ public class FirmsNormalizer extends Normalizer {
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setExternalEventId(dataLakeDto.getExternalId());
         normalizedObservation.setProvider(dataLakeDto.getProvider());
-        normalizedObservation.setType(EventType.WILDFIRE);
+        normalizedObservation.setType(EventType.THERMAL_ANOMALY);
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
         normalizedObservation.setStartedAt(dataLakeDto.getUpdatedAt());

@@ -4,6 +4,7 @@ public enum EventType {
     FLOOD,
     TSUNAMI,
     WILDFIRE,
+    THERMAL_ANOMALY,
     TORNADO,
     WINTER_STORM,
     EARTHQUAKE,
