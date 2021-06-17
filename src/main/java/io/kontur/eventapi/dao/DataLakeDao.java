@@ -53,8 +53,8 @@ public class DataLakeDao {
         return mapper.getDataLakeByObservationId(observationId);
     }
 
-    public Optional<DataLake> getDataLakeByExternalIdAndProvider(String externalId, String provider) {
-        return mapper.getDataLakeByExternalIdAndProvider(externalId, provider);
+    public Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(String externalId, String provider) {
+        return mapper.getLatestDataLakeByExternalIdAndProvider(externalId, provider);
     }
 
     public Boolean isNewPdcExposure(String externalId, String geometry) {

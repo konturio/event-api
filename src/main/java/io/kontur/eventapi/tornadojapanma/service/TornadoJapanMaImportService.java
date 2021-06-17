@@ -39,7 +39,7 @@ public class TornadoJapanMaImportService {
             try {
                 String data = objectMapper.writeValueAsString(parsedCase);
                 String externalId = DigestUtils.md5Hex(data);
-                if (dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, TORNADO_JAPAN_MA_PROVIDER).isEmpty()) {
+                if (dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, TORNADO_JAPAN_MA_PROVIDER).isEmpty()) {
                     DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
                     dataLake.setProvider(TORNADO_JAPAN_MA_PROVIDER);
                     dataLake.setData(data);
