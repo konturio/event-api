@@ -65,7 +65,7 @@
         SELECT *
         FROM normalized_observations
         WHERE recombined is false
-        ORDER BY collected_geography
+        ORDER BY date_trunc('day', source_updated_at), collected_geography
         LIMIT 30000
     </select>
 
