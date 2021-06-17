@@ -90,7 +90,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertEquals("Wildfire in Brazil, North Region, Para. Burnt area 0.871 km\u00B2, burning 27 hours.", feedData.get(1).getEpisodes().get(1).getName());
+        assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 0.871 km\u00B2, burning 27 hours.", feedData.get(1).getEpisodes().get(1).getName());
         assertEquals(3, feedData.get(1).getEpisodes().get(1).getObservations().size());
 
 
@@ -129,7 +129,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(2, firmsUpdated.get(1).getVersion());
 
         FeedData someFedData = firmsUpdated.get(2);
-        assertEquals("Wildfire in an unknown area. Burnt area 2.613 km\u00B2, burning 35 hours.", someFedData.getName());
+        assertEquals("Thermal anomaly in an unknown area. Burnt area 2.613 km\u00B2, burning 35 hours.", someFedData.getName());
         assertEquals(5, someFedData.getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"),someFedData.getStartedAt());
         assertEquals(parse("2020-11-03T22:50Z"),someFedData.getEndedAt());
@@ -140,7 +140,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
         episodes.sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
 
-        assertEquals("Wildfire in Brazil, North Region, Para. Burnt area 0.871 km\u00B2",
+        assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 0.871 km\u00B2",
                 episodes.get(0).getName());
         assertEquals(2, episodes.get(0).getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt());
@@ -148,21 +148,21 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt());
         assertEquals(Severity.MINOR, episodes.get(0).getSeverity());
 
-        assertEquals("Wildfire in an unknown area. Burnt area 1.742 km\u00B2", episodes.get(1).getName());
+        assertEquals("Thermal anomaly in an unknown area. Burnt area 1.742 km\u00B2", episodes.get(1).getName());
         assertEquals(3, episodes.get(1).getObservations().size());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt());
         assertEquals(Severity.MINOR, episodes.get(1).getSeverity());
 
-        assertEquals("Wildfire in Brazil, North Region, Para. Burnt area 1.742 km\u00B2", episodes.get(2).getName());
+        assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 1.742 km\u00B2", episodes.get(2).getName());
         assertEquals(4, episodes.get(2).getObservations().size());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getStartedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(2).getEndedAt());
         assertEquals(Severity.MINOR, episodes.get(2).getSeverity());
 
-        assertEquals("Wildfire in an unknown area. Burnt area 2.613 km\u00B2, burning 35 hours.", episodes.get(3).getName());
+        assertEquals("Thermal anomaly in an unknown area. Burnt area 2.613 km\u00B2, burning 35 hours.", episodes.get(3).getName());
         assertEquals(5, episodes.get(3).getObservations().size());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getStartedAt());
@@ -186,7 +186,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, firmsUpdated2.size());
         Optional<FeedData> updatedEvent = firmsUpdated2.stream().filter(event -> event.getVersion() == 3).findFirst();
         assertTrue(updatedEvent.isPresent());
-        assertEquals("Wildfire in an unknown area. Burnt area 3.484 km\u00B2, burning 53 hours.", updatedEvent.get().getEpisodes().get(4).getName());
+        assertEquals("Thermal anomaly in an unknown area. Burnt area 3.484 km\u00B2, burning 53 hours.", updatedEvent.get().getEpisodes().get(4).getName());
     }
 
     private void configureKonturApiClient() {
@@ -208,7 +208,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private List<FeedData> searchFeedData() {
         List<FeedData> firms = feedMapper.searchForEvents(
                 "firms",
-                List.of(EventType.WILDFIRE),
+                List.of(EventType.THERMAL_ANOMALY),
                 null,
                 null,
                 OffsetDateTime.parse("2020-11-02T11:00Z"),

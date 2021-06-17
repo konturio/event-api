@@ -56,7 +56,7 @@ public class FirmsNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(dataLake.getUpdatedAt(), observation.getStartedAt());
         assertEquals(FirmsUtil.MODIS_PROVIDER, observation.getProvider());
-        assertEquals(EventType.WILDFIRE, observation.getType());
+        assertEquals(EventType.THERMAL_ANOMALY, observation.getType());
         assertEquals("POINT(133.141 -2.443)", observation.getPoint());
         assertEquals(readFile(this, "firms.geometries.json"), observation.getGeometries());
 
