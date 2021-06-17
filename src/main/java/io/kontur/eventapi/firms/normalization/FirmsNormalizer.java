@@ -15,7 +15,7 @@ import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,7 +64,7 @@ public class FirmsNormalizer extends Normalizer {
         normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
 
         String wktPolygon = createWktPolygon(longitude, latitude);
-        String geometry = writeJson(createGeometry(wktPolygon, dataLakeDto.getUpdatedAt()));
+        String geometry = writeJson(createGeometry(wktPolygon));
         normalizedObservation.setGeometries(geometry);
 
         return normalizedObservation;
@@ -82,7 +82,7 @@ public class FirmsNormalizer extends Normalizer {
         return wktPolygon;
     }
 
-    private FeatureCollection createGeometry(String wktPolygon, OffsetDateTime updatedAt) {
+    private FeatureCollection createGeometry(String wktPolygon) {
         Geometry geometry;
         try {
             geometry = geoJSONWriter.write(wktReader.read(wktPolygon));
@@ -90,7 +90,7 @@ public class FirmsNormalizer extends Normalizer {
             throw new RuntimeException("can not create Geometry", e);
         }
 
-        Feature feature = new Feature(geometry, Map.of("updatedAt", updatedAt));
+        Feature feature = new Feature(geometry, Collections.emptyMap());
 
         return new FeatureCollection(new Feature[]{feature});
     }
