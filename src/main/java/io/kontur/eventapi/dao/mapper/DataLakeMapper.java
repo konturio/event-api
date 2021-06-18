@@ -24,7 +24,7 @@ public interface DataLakeMapper {
 
     DataLake getDataLakeByObservationId(UUID observationId);
 
-    Optional<DataLake> getDataLakeByExternalIdAndProvider(String externalId, String provider);
+    Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(String externalId, String provider);
 
     Boolean isNewPdcExposure(String externalId, String geometry);
 }

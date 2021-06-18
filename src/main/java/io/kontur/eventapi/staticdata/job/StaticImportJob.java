@@ -62,7 +62,7 @@ public class StaticImportJob extends AbstractJob {
                 featureJson.writeFeature(feature, outputStream);
                 String data = outputStream.toString();
                 String externalId = DigestUtils.md5Hex(data);
-                if (dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, provider).isEmpty()) {
+                if (dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, provider).isEmpty()) {
                     dataLakes.add(createDataLake(externalId, updatedAt, provider, data));
                 }
             }

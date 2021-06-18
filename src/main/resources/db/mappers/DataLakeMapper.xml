@@ -50,11 +50,13 @@
         WHERE observation_id = #{observationId}
     </select>
 
-    <select id="getDataLakeByExternalIdAndProvider" resultMap="dataLakeMap">
+    <select id="getLatestDataLakeByExternalIdAndProvider" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake
         WHERE external_id = #{externalId}
           AND provider = #{provider}
+        ORDER BY updated_at DESC
+        LIMIT 1
     </select>
 
     <select id="isNewPdcExposure" resultType="java.lang.Boolean">

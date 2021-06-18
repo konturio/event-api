@@ -8,6 +8,8 @@ import io.kontur.eventapi.stormsnoaa.parser.FileInfo;
 import io.kontur.eventapi.stormsnoaa.parser.StormsNoaaHTMLParser;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -21,6 +23,7 @@ import static io.kontur.eventapi.util.CsvUtil.parseRow;
 @Component
 public class StormsNoaaImportJob extends AbstractJob {
 
+    private final Logger LOG = LoggerFactory.getLogger(StormsNoaaImportJob.class);
     public final static String STORMS_NOAA_PROVIDER = "storms.noaa";
 
     private final StormsNoaaHTMLParser htmlParser;
@@ -52,6 +55,9 @@ public class StormsNoaaImportJob extends AbstractJob {
             try {
                importService.downloadFile(file.getFilename(), tmpPath);
                processFile(tmpPath, file.getUpdatedAt());
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+                break;
             } finally {
                 importService.deleteFile(tmpPath);
             }
@@ -90,7 +96,7 @@ public class StormsNoaaImportJob extends AbstractJob {
     }
 
     private boolean isNewOrUpdatedEvent(String externalId, String data) {
-        Optional<DataLake> existingEvent =  dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, STORMS_NOAA_PROVIDER);
+        Optional<DataLake> existingEvent =  dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, STORMS_NOAA_PROVIDER);
         return existingEvent.isEmpty() || !existingEvent.get().getData().equals(data);
     }
 

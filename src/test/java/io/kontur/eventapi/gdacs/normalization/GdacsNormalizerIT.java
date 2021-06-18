@@ -59,8 +59,8 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         var dataLakes = getDataLakeList();
         dataLakeDao.storeEventData(dataLakes.get(0));
         dataLakeDao.storeEventData(dataLakes.get(1));
-        var dataLakeAlertOpt = dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, GDACS_ALERT_PROVIDER);
-        var dataLakeGeometryOpt = dataLakeDao.getDataLakeByExternalIdAndProvider(externalId, GDACS_ALERT_GEOMETRY_PROVIDER);
+        var dataLakeAlertOpt = dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, GDACS_ALERT_PROVIDER);
+        var dataLakeGeometryOpt = dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, GDACS_ALERT_GEOMETRY_PROVIDER);
 
         assertFalse(dataLakeAlertOpt.isEmpty());
         assertFalse(dataLakeGeometryOpt.isEmpty());
