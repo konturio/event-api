@@ -129,3 +129,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add-feeds-providers-index.sql
+- include:
+    relativeToChangelogFile: true
+    file: insert-pdc-emdat-into-swiss-re-feed.sql
