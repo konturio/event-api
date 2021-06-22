@@ -55,7 +55,7 @@ public class PdcDataLakeConverter {
 
     public DataLake convertSQSMessage(String messageJson, String type, String messageId) {
         if (!"HAZARD".equals(type) && !"MAG".equals(type)) {
-            throw new IllegalStateException("Unexpected SQS message type: " + type);
+            throw new IllegalStateException("Unexpected SQS message type: " + type + "\n" + messageJson);
         }
 
         DataLake dataLake = new DataLake();

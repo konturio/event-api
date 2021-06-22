@@ -29,10 +29,11 @@ public class PdcSqsMessageListener {
         JsonNode sns = JsonUtil.readTree(sqsMessage).get("Sns");
 
         String type = getProductType(sns);
+        // TODO: skip products until it is clear how to handle them
         if ("PING".equals(type)) {
             return;
         } else if ("PRODUCT".equals(type)) {
-            return; //TODO skip products until it is clear how to handle them
+            return;
         }
 
         String messageId = getMessageId(sns);
