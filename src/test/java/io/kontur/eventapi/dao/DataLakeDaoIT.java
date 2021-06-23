@@ -22,15 +22,15 @@ class DataLakeDaoIT extends AbstractCleanableIntegrationTest {
     private final static String externalId = UUID.randomUUID().toString();
 
     private final static String featurePath1 = "DataLakeDaoIT.isNewExposure1.feature.json";
-    private final static String geometryPath1 = "DataLakeDaoIT.isNewExposure1.geometry.json";
+    private final static String geoHash1 = "1dmkgvnjvujx0phrejru77bpbpbpbpbpbpbp";
     private final static OffsetDateTime loadedAt1 = OffsetDateTime.parse("2021-05-10T00:00:00Z");
 
     private final static String featurePath2 = "DataLakeDaoIT.isNewExposure2.feature.json";
-    private final static String geometryPath2 = "DataLakeDaoIT.isNewExposure2.geometry.json";
+    private final static String geoHash2 = "46w9vyfy3kvgc67z43n0v6pbpbpbpbpbpbpb";
     private final static OffsetDateTime loadedAt2 = OffsetDateTime.parse("2021-05-20T00:00:00Z");
 
     private final static String featurePath3 = "DataLakeDaoIT.isNewExposure3.feature.json";
-    private final static String geometryPath3 = "DataLakeDaoIT.isNewExposure3.geometry.json";
+    private final static String geoHash3 = "u0r1qzvzvq02dg9r0fqsm9bzzzzzzzzzzzzz";
     private final static OffsetDateTime loadedAt3 = OffsetDateTime.parse("2021-05-25T00:00:00Z");
 
     @Autowired
@@ -42,21 +42,17 @@ class DataLakeDaoIT extends AbstractCleanableIntegrationTest {
     @Test
     public void testIsNewExposure() throws IOException {
         String feature1 = readFile(featurePath1);
-        String geometry1 = readFile(geometryPath1);
-        String geometry2 = readFile(geometryPath2);
 
         DataLake dataLake1 = generateDataLake(feature1, loadedAt1);
         dataLakeDao.storeEventData(dataLake1);
 
-        assertFalse(dataLakeDao.isNewPdcExposure(externalId, geometry1));
-        assertTrue(dataLakeDao.isNewPdcExposure(externalId, geometry2));
+        assertFalse(dataLakeDao.isNewPdcExposure(externalId, geoHash1));
+        assertTrue(dataLakeDao.isNewPdcExposure(externalId, geoHash2));
     }
 
     @Test
     public void testIsNewExposureWhenNoRecordsInDB() throws IOException {
-        String geometryJson = readFile(geometryPath1);
-
-        assertTrue(dataLakeDao.isNewPdcExposure(externalId, geometryJson));
+        assertTrue(dataLakeDao.isNewPdcExposure(externalId, geoHash1));
     }
 
     @Test
@@ -65,15 +61,11 @@ class DataLakeDaoIT extends AbstractCleanableIntegrationTest {
         DataLake dataLake2 = generateDataLake(readFile(featurePath2), loadedAt2);
         DataLake dataLake3 = generateDataLake(readFile(featurePath3), loadedAt3);
 
-        String geometry1 = readFile(geometryPath1);
-        String geometry2 = readFile(geometryPath2);
-        String geometry3 = readFile(geometryPath3);
-
         dataLakeDao.storeDataLakes(List.of(dataLake1, dataLake2, dataLake3));
 
-        assertTrue(dataLakeDao.isNewPdcExposure(externalId, geometry1));
-        assertFalse(dataLakeDao.isNewPdcExposure(externalId, geometry2));
-        assertFalse(dataLakeDao.isNewPdcExposure(externalId, geometry3));
+        assertTrue(dataLakeDao.isNewPdcExposure(externalId, geoHash1));
+        assertFalse(dataLakeDao.isNewPdcExposure(externalId, geoHash2));
+        assertFalse(dataLakeDao.isNewPdcExposure(externalId, geoHash3));
     }
 
     public DataLake generateDataLake(String data, OffsetDateTime loadedAt) {

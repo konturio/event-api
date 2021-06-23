@@ -60,7 +60,9 @@ class PdcMapSrvSearchJobTest {
     private void prepareMocks(int exposureCount) {
         Feature[] features = new Feature[exposureCount];
         for (int i = 0; i < exposureCount; i++) {
-            features[i] = new Feature(new Point(new double[] {0, 0}), Map.of("hazard_uuid", UUID.randomUUID().toString()));
+            features[i] = new Feature(new Point(new double[] {0, 0}), Map.of(
+                    "hazard_uuid", UUID.randomUUID().toString(),
+                    "geohash", UUID.randomUUID().toString()));
         }
         String exposures = new FeatureCollection(features).toString();
 

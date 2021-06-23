@@ -42,7 +42,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
         List<DataLake> dataLakes = new ArrayList<>();
         for (Feature feature : featureCollection.getFeatures()) {
             String externalId = String.valueOf(feature.getProperties().get("hazard_uuid"));
-            if (dataLakeDao.isNewPdcExposure(externalId, writeJson(feature.getGeometry()))) {
+            if (dataLakeDao.isNewPdcExposure(externalId, (String) feature.getProperties().get("geohash"))) {
                 dataLakes.add(pdcDataLakeConverter.convertExposure(feature.toString(), externalId));
             }
         }
