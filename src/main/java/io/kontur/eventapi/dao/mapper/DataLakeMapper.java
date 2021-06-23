@@ -26,5 +26,5 @@ public interface DataLakeMapper {
 
     Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(String externalId, String provider);
 
-    Boolean isNewPdcExposure(String externalId, String geometry);
+    Boolean isNewPdcExposure(String externalId, String geoHash);
 }

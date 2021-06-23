@@ -68,7 +68,8 @@
         )
         SELECT
             CASE WHEN EXISTS (
-                SELECT * FROM datalakes WHERE (data::jsonb)->'geometry' = (#{geometry})::jsonb
+                SELECT * FROM datalakes
+                WHERE jsonb_object_field_text((data::jsonb)->'properties', 'geohash') = #{geoHash}
             ) THEN FALSE ELSE TRUE
             END
     </select>
