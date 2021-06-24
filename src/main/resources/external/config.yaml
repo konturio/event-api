@@ -54,11 +54,11 @@ scheduler:
     initialDelay: 1000
     fixedDelay: P1D
   tornadoJapanMaImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: P1D
   historicalTornadoJapanMaImport:
-    enable: true
+    enable: false
     initialDelay: 1000
   normalization:
     enable: true

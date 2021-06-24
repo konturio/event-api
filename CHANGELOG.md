@@ -3,7 +3,7 @@
 ## UNRELEASED
 #### Added
 
-- tornado.japan-ma provider
+- tornado.japan-ma provider (currently disabled)
 - pdcMapSrv
 
 ```yaml
@@ -19,11 +19,11 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 60000
   tornadoJapanMaImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: P1D
   historicalTornadoJapanMaImport:
-    enable: true
+    enable: false
     initialDelay: 1000
 ```
 
