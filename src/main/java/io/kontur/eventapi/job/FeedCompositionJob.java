@@ -12,13 +12,11 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -30,9 +28,11 @@ import static org.springframework.util.StringUtils.isEmpty;
 public class FeedCompositionJob extends AbstractJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeedCompositionJob.class);
+    @Value("${scheduler.feedComposition.alias}")
+    private String[] alias;
 
     private final KonturEventsDao eventsDao;
-    private final FeedDao feedDao;
+    protected final FeedDao feedDao;
     private final NormalizedObservationsDao observationsDao;
     private final List<EpisodeCombinator> episodeCombinators;
 
@@ -47,7 +47,7 @@ public class FeedCompositionJob extends AbstractJob {
 
     @Override
     public void execute() {
-        List<Feed> feeds = feedDao.getFeeds();
+        List<Feed> feeds = feedDao.getFeedsByAliases(Arrays.asList(alias));
         feeds.forEach(this::updateFeed);
     }
 
@@ -56,7 +56,7 @@ public class FeedCompositionJob extends AbstractJob {
         return "feedComposition";
     }
 
-    private void updateFeed(Feed feed) {
+    protected void updateFeed(Feed feed) {
         Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
         eventsIds

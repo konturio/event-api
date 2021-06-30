@@ -15,6 +15,8 @@ public interface FeedMapper {
 
     List<Feed> getFeeds();
 
+    List<Feed> getFeedsByAliases(@Param("aliases") List<String> aliases);
+
     int insertFeedData(
             UUID eventId, UUID feedId, Long version, String name, String description,
             OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt,

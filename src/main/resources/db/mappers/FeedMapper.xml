@@ -9,6 +9,12 @@
         from feeds
     </select>
 
+    <select id="getFeedsByAliases" resultMap="feedDtoMap">
+        select *
+        from feeds
+        where (#{aliases, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})::text[] @> ('{}'::text[] || alias)
+    </select>
+
     <insert id="insertFeedData" useGeneratedKeys="false">
         insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes, is_latest_version)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt},
