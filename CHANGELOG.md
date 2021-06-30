@@ -5,6 +5,8 @@
 
 - tornado.japan-ma provider (currently disabled)
 - pdcMapSrv
+- Change time of jobs delay: normalization, eventCombination, feedComposition - from 60000 to 1000 ms.
+  Added firms feed composition job. Added alias values to feedComposition.
 
 ```yaml
 
@@ -25,6 +27,18 @@ scheduler:
   historicalTornadoJapanMaImport:
     enable: false
     initialDelay: 1000
+  normalization:
+    fixedDelay: 1000
+  eventCombination:
+    fixedDelay: 1000
+  feedComposition:
+    fixedDelay: 1000
+    alias: gdacs, em-dat, pdc-v0, swissre-02
+  firmsFeedComposition:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
+    alias: firms
 ```
 
 #### Removed

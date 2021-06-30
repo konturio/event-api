@@ -63,15 +63,21 @@ scheduler:
   normalization:
     enable: true
     initialDelay: 1000
-    fixedDelay: 60000
+    fixedDelay: 1000
   eventCombination:
     enable: true
-    initialDelay: 10000
-    fixedDelay: 60000
+    initialDelay: 1000
+    fixedDelay: 1000
   feedComposition:
     enable: true
-    initialDelay: 20000
-    fixedDelay: 60000
+    initialDelay: 1000
+    fixedDelay: 1000
+    alias: gdacs, em-dat, pdc-v0, swissre-02
+  firmsFeedComposition:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
+    alias: firms
 
 aws:
   sqs:

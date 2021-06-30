@@ -4,6 +4,7 @@ import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
+import io.kontur.eventapi.firms.feedcomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
@@ -35,10 +36,11 @@ class WorkerSchedulerTest {
     private final TornadoJapanMaImportJob tornadoJapanMaImportJob = mock(TornadoJapanMaImportJob.class);
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob = mock(HistoricalTornadoJapanMaImportJob.class);
     private final PdcMapSrvSearchJob pdcMapSrvSearchJob = mock(PdcMapSrvSearchJob.class);
+    private final FirmsFeedCompositionJob firmsFeedCompositionJob = mock(FirmsFeedCompositionJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
             feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
-            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob);
+            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob);
 
     @AfterEach
     public void resetMocks() {

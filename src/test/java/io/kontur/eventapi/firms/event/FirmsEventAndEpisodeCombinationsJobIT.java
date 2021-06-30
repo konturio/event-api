@@ -8,7 +8,7 @@ import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.job.EventCombinationJob;
-import io.kontur.eventapi.job.FeedCompositionJob;
+import io.kontur.eventapi.firms.feedcomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import io.kontur.eventapi.util.JsonUtil;
@@ -33,7 +33,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private final FirmsImportJob firmsImportJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
-    private final FeedCompositionJob feedCompositionJob;
+    private final FirmsFeedCompositionJob feedCompositionJob;
     private final FeedMapper feedMapper;
     private final KonturEventsDao konturEventsDao;
     private final NormalizedObservationsDao observationsDao;
@@ -44,7 +44,10 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private KonturApiClient konturApiClient;
 
     @Autowired
-    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, FeedMapper feedMapper, KonturEventsDao konturEventsDao, NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
+    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob,
+                                                 EventCombinationJob eventCombinationJob, FirmsFeedCompositionJob feedCompositionJob,
+                                                 FeedMapper feedMapper, KonturEventsDao konturEventsDao,
+                                                 NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
         this.firmsImportJob = firmsImportJob;
         this.normalizationJob = normalizationJob;

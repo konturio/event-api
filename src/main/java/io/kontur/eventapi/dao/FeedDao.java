@@ -30,6 +30,10 @@ public class FeedDao {
         return mapper.getFeeds();
     }
 
+    public List<Feed> getFeedsByAliases(List<String> aliases) {
+        return mapper.getFeedsByAliases(aliases);
+    }
+
     @Transactional
     public void insertFeedData(FeedData feedData) {
         String episodesJson = writeJson(feedData.getEpisodes());

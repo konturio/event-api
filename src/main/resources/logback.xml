@@ -30,6 +30,23 @@
         </encoder>
     </appender>
 
+    <appender name="FILE-JOB" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/event-api-job.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>log/archived/event-api-job.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+        </encoder>
+    </appender>
+
     <appender name="FILE-HTTP-TRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>log/event-api-http-trace.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -59,6 +76,16 @@
 
     <logger name="httptrace" additivity="false">
         <appender-ref ref="FILE-HTTP-TRACE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="io.kontur.eventapi.job" additivity="false">
+        <appender-ref ref="FILE-JOB"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="io.kontur.eventapi.firms.feedcomposition" additivity="false">
+        <appender-ref ref="FILE-JOB"/>
         <appender-ref ref="STDOUT"/>
     </logger>
 
