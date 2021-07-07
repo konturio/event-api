@@ -2,13 +2,13 @@ package io.kontur.eventapi.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
-import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.SortOrder;
+import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,6 @@ import java.util.UUID;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -119,7 +118,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         feedCompositionJob.run();
 
         return feedDao.searchForEvents("pdc-v0", List.of(), null,
-                null, null, 1, List.of(), SortOrder.ASC, null).get(0);
+                null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
     }
 
     private void createNormalizations(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {
@@ -157,8 +156,8 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(), null,
-                null, startTimeForSearchingFeed, 1, List.of(), SortOrder.ASC, null).get(0);
+        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(), null, null, startTimeForSearchingFeed,
+                1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(2, feed.getEpisodes().size());
 
         boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
@@ -202,8 +201,8 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(EventType.WILDFIRE), null,
-                null, loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null).get(0);
+        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(EventType.WILDFIRE), null, null,
+                loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }
 

@@ -10,6 +10,7 @@ import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.firms.feedcomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
+import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import io.kontur.eventapi.util.JsonUtil;
 import org.junit.jupiter.api.Test;
@@ -221,7 +222,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
                 null,
                 null,
                 null,
-                null
+                null,
+                EpisodeFilterType.ANY
         );
         firms.sort(Comparator.comparing(f -> f.getObservations().size()));
         return firms;
