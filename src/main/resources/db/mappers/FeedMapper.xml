@@ -31,7 +31,19 @@
     </update>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        select *
+        select event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, collected_geometry, episode_types, is_latest_version,
+        <choose>
+            <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                jsonb_build_array((
+                    select episode from jsonb_array_elements(episodes) episode
+                    order by (episode ->> 'updatedAt')::timestamptz desc
+                    limit 1
+                )) as episodes
+            </when>
+            <otherwise>
+                episodes
+            </otherwise>
+        </choose>
         from feed_data fd
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
             and is_latest_version
@@ -41,11 +53,26 @@
                 </foreach>
             </if>
             <if test="severities!=null &amp;&amp; !severities.isEmpty()"  >
-                and exists(select from jsonb_array_elements(episodes) arr(episode) where
-                <foreach item="severity" collection="severities" separator="," open="episode ->> 'severity' in (" close=")">
-                   #{severity}
-                </foreach>
-                )
+                <if test='"ANY".equalsIgnoreCase(episodeFilterType)'>
+                    and exists(select from jsonb_array_elements(episodes) arr(episode) where
+                    <foreach item="severity" collection="severities" separator="," open="episode ->> 'severity' in (" close=")">
+                        #{severity}
+                    </foreach>
+                    )
+                </if>
+                <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                    and exists (
+                        with latest_episode as (
+                            select episode as ep from jsonb_array_elements(episodes) episode
+                            order by (episode ->> 'updatedAt')::timestamptz desc
+                            limit 1
+                        )
+                        select * from latest_episode where
+                        <foreach item="severity" collection="severities" separator="," open="ep ->> 'severity' in (" close=")">
+                            #{severity}
+                        </foreach>
+                    )
+                </if>
             </if>
             <if test='from != null'>
                 <![CDATA[

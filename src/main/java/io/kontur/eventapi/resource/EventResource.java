@@ -6,6 +6,7 @@ import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.DateTimeRange;
+import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.resource.validation.ValidBbox;
 import io.kontur.eventapi.service.EventResourceService;
@@ -53,13 +54,17 @@ public class EventResource {
     @ApiResponse(responseCode = "204", description = "No content. Try to check filters values.", content = @Content())
     @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
     public ResponseEntity<DataPaginationDTO> searchEvents(
-            @Parameter(description = "Feed name") @RequestParam(value = "feed")
+            @Parameter(description = "Feed name")
+            @RequestParam(value = "feed")
                     String feed,
-            @Parameter(description = "Filters events by type. More than one can be chosen at once") @RequestParam(value = "types", defaultValue = "")
+            @Parameter(description = "Filters events by type. More than one can be chosen at once")
+            @RequestParam(value = "types", defaultValue = "")
                     List<EventType> eventTypes,
-            @Parameter(description = "Filters events by severity. More than one can be chosen at once") @RequestParam(value = "severities", defaultValue = "")
+            @Parameter(description = "Filters events by severity. More than one can be chosen at once")
+            @RequestParam(value = "severities", defaultValue = "")
                     List<Severity> severities,
-            @Parameter(description = "Includes events that were updated after this time. `updatedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")") @RequestParam(value = "after", required = false)
+            @Parameter(description = "Includes events that were updated after this time. `updatedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")")
+            @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                     OffsetDateTime updatedAfter,
             @Parameter(schema = @Schema(type = "string"),
@@ -76,14 +81,26 @@ public class EventResource {
                     "<li>Upper right corner, coordinate axis 1</li>" +
                     "<li>Upper right corner, coordinate axis 2</li></ul>" +
                     "The coordinate reference system of the values is WGS 84 longitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84). For WGS 84 longitude/latitude the values are the sequence of minimum longitude, minimum latitude, maximum longitude and maximum latitude.")
-            @RequestParam(value = "bbox", required = false) @ValidBbox List<BigDecimal> bbox,
-            @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000")) @RequestParam(value = "limit", defaultValue = "20")
-            @Min(1) @Max(1000) int limit,
-            @Parameter(description = "Sort selection. Default value is ASC") @RequestParam(value = "sortOrder", defaultValue = "ASC") SortOrder sortOrder) {
+            @RequestParam(value = "bbox", required = false)
+            @ValidBbox
+                    List<BigDecimal> bbox,
+            @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000", example = "20", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000"))
+            @RequestParam(value = "limit", defaultValue = "20")
+            @Min(1)
+            @Max(1000)
+                    int limit,
+            @Parameter(description = "Sort selection. Default value is ASC")
+            @RequestParam(value = "sortOrder", defaultValue = "ASC")
+                    SortOrder sortOrder,
+            @Parameter(description = "Type of filtering for event episodes (by severity): " +
+                    "<ul><li>ANY - one or more episodes match filters, all episodes are returned</li>" +
+                    "<li>LATEST - the latest episode matches filters, the latest episode is returned</li></ul>")
+            @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
+                    EpisodeFilterType episodeFilterType) {
         List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

@@ -1,6 +1,7 @@
 package io.kontur.eventapi.dao.mapper;
 
 import io.kontur.eventapi.entity.*;
+import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,7 +30,8 @@ public interface FeedMapper {
 
     List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime to,
                                    OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
-                                   BigDecimal xMin, BigDecimal xMax, BigDecimal yMin, BigDecimal yMax);
+                                   BigDecimal xMin, BigDecimal xMax, BigDecimal yMin, BigDecimal yMax,
+                                   EpisodeFilterType episodeFilterType);
 
     Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, Long version);
 

@@ -77,7 +77,7 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: firms
+    alias: firms, gdacs-firms
 
 aws:
   sqs:

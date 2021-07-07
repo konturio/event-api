@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.SortOrder;
+import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -149,7 +150,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 1 ASC
         List<EventDto> page1Asc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.ASC, null);
+                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.ASC, null, EpisodeFilterType.ANY);
 
         //then
         assertEquals(2, page1Asc.size());
@@ -158,7 +159,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 2 ASC
         List<EventDto> page2Asc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.ASC, null);
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.ASC, null, EpisodeFilterType.ANY);
 
         //then
         assertEquals(1, page2Asc.size());
@@ -166,7 +167,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 1 DESC
         List<EventDto> page1Desc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.DESC, null);
+                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.DESC, null, EpisodeFilterType.ANY);
 
         //then
         assertEquals(2, page1Desc.size());
@@ -175,7 +176,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 2 DESC
         List<EventDto> page2Desc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.DESC, null);
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.DESC, null, EpisodeFilterType.ANY);
 
         //then
         assertEquals(1, page2Desc.size());
@@ -201,7 +202,8 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
                 1,
                 List.of(),
                 SortOrder.ASC,
-                null
+                null,
+                EpisodeFilterType.ANY
         );
     }
 
@@ -215,7 +217,8 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
                 1,
                 List.of(),
                 SortOrder.ASC,
-                bbox
+                bbox,
+                EpisodeFilterType.ANY
         );
     }
 }
