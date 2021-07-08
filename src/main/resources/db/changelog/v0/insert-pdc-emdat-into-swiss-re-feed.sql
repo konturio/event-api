@@ -1,10 +1,11 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:insert-pdc-emdat-into-swiss-re-feed.sql runOnChange:false
+--changeset event-api-migrations:insert-pdc-emdat-into-swiss-re-feed.sql runOnChange:true
 
 
 insert into feed_event_status (feed_id, event_id, actual)
 select distinct on (event_id) fs.feed_id, event_id, false
 from kontur_events, feeds fs
 where provider in ('hpSrvMag', 'hpSrvSearch', 'pdcSqs', 'pdcMapSrv', 'em-dat')
-  and alias = 'swissre-02';
+  and alias = 'swissre-02'
+on conflict do nothing;
