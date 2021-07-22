@@ -3,6 +3,11 @@
 ## UNRELEASED
 #### Added
 
+####Changed
+
+## 0.5 - 2021-07-22
+#### Added
+
 - tornado.japan-ma provider (currently disabled)
 - pdcMapSrv
 - Change time of jobs delay: normalization, eventCombination, feedComposition - from 60000 to 1000 ms.
