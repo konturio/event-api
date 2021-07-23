@@ -73,7 +73,8 @@ public class FirmsImportJob extends AbstractJob {
             String csvRow = csvRows[i];
             String externalId = DigestUtils.md5Hex(csvRow);
 
-            boolean doesRowNotExistInDataLake = dataLakeDao.getDataLakesByExternalId(externalId).isEmpty();
+            boolean doesRowNotExistInDataLake = dataLakeDao.getDataLakesByExternalId(externalId).isEmpty()
+                    && dataLakes.stream().noneMatch(dataLake -> dataLake.getExternalId().equals(externalId));
             if (doesRowNotExistInDataLake) {
                 DataLake dataLake = new DataLake();
 
