@@ -8,33 +8,53 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.*;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static io.kontur.eventapi.gdacs.service.GdacsService.ALERT_BY_LINK;
 import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 @Component
 public class GdacsAlertXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
+
+    private static final String DATE_MODIFIED = "datemodified";
+    private static final String EVENT_ID = "eventid";
+    private static final String EVENT_TYPE = "eventtype";
+    private static final String CURRENT_EPISODE_ID = "currentepisodeid";
+    private static final String FROM_DATE = "fromdate";
+    private static final String TO_DATE = "todate";
+    private static final String EVENT = "event";
+    private static final String HEADLINE = "headline";
+    private static final String SEVERITY = "severity";
+    private static final String DESCRIPTION = "description";
+    private static final String PARAMETER = "parameter";
+    private static final String IDENTIFIER = "identifier";
+    private static final String ALERT = "alert";
+    private static final String VALUE = "value";
+    private static final String VALUE_NAME = "valueName";
+
+    private static final String NS = "*";
+    private static final String PREFIX = "cap:";
 
     public OffsetDateTime getPubDate(String xml) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
         var xmlDocument = getXmlDocument(xml);
@@ -44,92 +64,65 @@ public class GdacsAlertXmlParser {
         return parseDateTimeFromString(pubDateString);
     }
 
-    public List<String> getLinks(String xml) throws XPathExpressionException, IOException, SAXException, ParserConfigurationException {
-        var links = new ArrayList<String>();
+    public List<String> getAlerts(String xml) throws IOException, SAXException, ParserConfigurationException {
+        List<String> alerts = new ArrayList<>();
+        Document xmlDocument = getXmlDocument(xml);
+        NodeList nodeList = xmlDocument.getElementsByTagNameNS(NS, ALERT);
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            try {
+                StringWriter writer = new StringWriter();
 
-        var xmlDocument = getXmlDocument(xml);
-        var xPath = XPathFactory.newInstance().newXPath();
-        String pathToLinks = "/rss/channel/item/link/text()";
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.transform(new DOMSource(nodeList.item(i)), new StreamResult(writer));
 
-        var linkNodeList = (NodeList) xPath.compile(pathToLinks).evaluate(xmlDocument, XPathConstants.NODESET);
-
-        for (int i = 0; i < linkNodeList.getLength(); i++) {
-            links.add(linkNodeList.item(i).getNodeValue());
+                alerts.add(writer.toString());
+            } catch (TransformerException e) {
+                LOG.error(e.getMessage(), e);
+            }
         }
-        return links;
+        return alerts;
     }
 
-    public List<ParsedAlert> getParsedAlertsToGdacsSearchJob(Map<String, String> alertsByLinks) throws ParserConfigurationException, XPathExpressionException {
-        var parsedAlerts = new ArrayList<ParsedAlert>();
-
-        var xPath = XPathFactory.newInstance().newXPath();
-
-        String pathToExternalId = "/alert/identifier/text()";
-        String pathToDateModified = "/alert/info/parameter";
-        String pathToSent = "/alert/sent/text()";
-
-        var externalIdExpression = xPath.compile(pathToExternalId);
-        var xPathExpressionToParameters = xPath.compile(pathToDateModified);
-        var xPathExpressionToSent = xPath.compile(pathToSent);
-
-        for (Map.Entry<String, String> alertXml : alertsByLinks.entrySet()) {
-            parseAlert(externalIdExpression, xPathExpressionToParameters,
-                    xPathExpressionToSent, alertXml.getKey(), alertXml.getValue()).ifPresent(parsedAlerts::add);
+    public List<ParsedAlert> getParsedAlertsToGdacsSearchJob(List<String> alertsXml) throws ParserConfigurationException {
+        List<ParsedAlert> parsedAlerts = new ArrayList<>();
+        for (String alertXml : alertsXml) {
+            parseAlert(alertXml).ifPresent(parsedAlerts::add);
         }
-
         return parsedAlerts;
     }
 
-    private Optional<ParsedAlert> parseAlert(XPathExpression externalIdExpression, XPathExpression xPathExpressionToParameters,
-                                             XPathExpression xPathExpressionToSent, String link, String alertXml) throws ParserConfigurationException {
-        String externalId = "";
+    private Optional<ParsedAlert> parseAlert(String alertXml) throws ParserConfigurationException {
         try {
+            Document xmlDocument = getXmlDocument(alertXml);
 
-            var xmlDocument = getXmlDocument(alertXml);
-            var parameterNodeList = (NodeList) xPathExpressionToParameters.evaluate(xmlDocument, XPathConstants.NODESET);
-            var sentDateTimeString = (String) xPathExpressionToSent.evaluate(xmlDocument, XPathConstants.STRING);
-            externalId = (String) externalIdExpression.evaluate(xmlDocument, XPathConstants.STRING);
-
-            String eventId = "";
-            String eventType = "";
-            String dateModified = "";
-            String currentEpisodeId = "";
-
-            for (int i = 0; i < parameterNodeList.getLength(); i++) {
-                String valueName = getValueNameByParameterName(parameterNodeList, i);
-                switch (valueName) {
-                    case "datemodified":
-                        dateModified = getValueByParameterName(parameterNodeList, i);
-                        break;
-                    case "eventid":
-                        eventId = getValueByParameterName(parameterNodeList, i);
-                        break;
-                    case "eventtype":
-                        eventType = getValueByParameterName(parameterNodeList, i);
-                        break;
-                    case "currentepisodeid":
-                        currentEpisodeId = getValueByParameterName(parameterNodeList, i);
-                        break;
-                }
+            String externalId = getValueByTagName(alertXml, xmlDocument, IDENTIFIER);
+            if (StringUtils.isEmpty(externalId)) {
+                LOG.warn("Alert does not have identifier: \n" +  alertXml);
+                return Optional.empty();
             }
-            if (StringUtils.isEmpty(eventType) || StringUtils.isEmpty(eventId) || StringUtils.isEmpty(dateModified)) {
-                LOG.warn(ALERT_BY_LINK + " does not have parameter: {}", link, alertXml);
+
+            NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(NS, PARAMETER);
+            Set<String> parameterNames = Set.of(DATE_MODIFIED, EVENT_ID, EVENT_TYPE, CURRENT_EPISODE_ID);
+            Map<String, String> parameters = parseParameters(parameterNodeList, parameterNames);
+
+            if (parameters.values().stream().anyMatch(StringUtils::isEmpty)) {
+                LOG.warn("Alert does not have parameter: \n" +  alertXml);
                 return Optional.empty();
             }
 
             return Optional.of(new ParsedAlert(
-                    OffsetDateTime.parse(dateModified, DateTimeFormatter.RFC_1123_DATE_TIME),
-                    OffsetDateTime.parse(sentDateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                    OffsetDateTime.parse(parameters.get(DATE_MODIFIED), DateTimeFormatter.RFC_1123_DATE_TIME),
                     externalId,
-                    eventId,
-                    eventType,
-                    currentEpisodeId,
+                    parameters.get(EVENT_ID),
+                    parameters.get(EVENT_TYPE),
+                    parameters.get(CURRENT_EPISODE_ID),
                     alertXml));
 
-        } catch (IOException | SAXException | XPathExpressionException e) {
-            LOG.warn(ALERT_BY_LINK + " is not valid and can not be parsed: {}", link, alertXml);
+        } catch (IOException | SAXException e) {
+            LOG.warn("Alert is not valid and can not be parsed: \n" + alertXml);
         } catch (DateTimeParseException e) {
-            LOG.warn(ALERT_BY_LINK + " value of parameter datemodified or sent can not be parsed: {}", link, externalId);
+            LOG.warn("Alert value of parameter 'datemodified' can not be parsed: \n" + alertXml);
         }
         return Optional.empty();
     }
@@ -137,83 +130,67 @@ public class GdacsAlertXmlParser {
     public ParsedAlert getParsedAlertToNormalization(String xml) throws ParserConfigurationException,
             IOException, SAXException, XPathExpressionException, FeignException {
 
-        var xmlDocument = getXmlDocument(xml);
-        var xPath = XPathFactory.newInstance().newXPath();
+        Document xmlDocument = getXmlDocument(xml);
+        ParsedAlert parsedAlert = new ParsedAlert();
 
-        String pathToEvent = "/alert/info/event/text()";
-        String pathToHeadline = "/alert/info/headline/text()";
-        String pathToSeverity = "/alert/info/severity/text()";
-        String pathToDescription = "/alert/info/description/text()";
-        String pathToParameters = "/alert/info/parameter";
+        parsedAlert.setHeadLine(getValueByTagName(xml, xmlDocument, HEADLINE));
+        parsedAlert.setDescription(getValueByTagName(xml, xmlDocument, DESCRIPTION));
+        parsedAlert.setEvent(getValueByTagName(xml, xmlDocument, EVENT));
+        parsedAlert.setSeverity(getValueByTagName(xml, xmlDocument, SEVERITY));
 
-        var event = (String) xPath.compile(pathToEvent).evaluate(xmlDocument, XPathConstants.STRING);
-        var headline = (String) xPath.compile(pathToHeadline).evaluate(xmlDocument, XPathConstants.STRING);
-        var severity = (String) xPath.compile(pathToSeverity).evaluate(xmlDocument, XPathConstants.STRING);
-        var description = (String) xPath.compile(pathToDescription).evaluate(xmlDocument, XPathConstants.STRING);
+        NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(NS, PARAMETER);
+        Set<String> parameterNames = Set.of(EVENT_ID, EVENT_TYPE, CURRENT_EPISODE_ID, FROM_DATE, TO_DATE);
+        Map<String, String> parameters = parseParameters(parameterNodeList, parameterNames);
 
-        var parsedAlert = new ParsedAlert();
+        parsedAlert.setEventId(parameters.get(EVENT_ID));
+        parsedAlert.setEventType(parameters.get(EVENT_TYPE));
+        parsedAlert.setCurrentEpisodeId(parameters.get(CURRENT_EPISODE_ID));
+        parsedAlert.setFromDate(parseDateTimeFromString(parameters.get(FROM_DATE)));
+        parsedAlert.setToDate(parseDateTimeFromString(parameters.get(TO_DATE)));
 
-        parsedAlert.setHeadLine(headline);
-        parsedAlert.setDescription(description);
-        parsedAlert.setEvent(event);
-        parsedAlert.setSeverity(severity);
-
-        var parameterNodeList = (NodeList) xPath.compile(pathToParameters)
-                .evaluate(xmlDocument, XPathConstants.NODESET);
-        setDataFromParameters(parsedAlert, parameterNodeList);
         return parsedAlert;
     }
 
-    private void setDataFromParameters(ParsedAlert parsedAlert, NodeList parameterNodeList) throws DateTimeParseException {
-
-        for (int i = 0; i < parameterNodeList.getLength(); i++) {
-            String valueName = getValueNameByParameterName(parameterNodeList, i);
-            switch (valueName) {
-                case "eventid":
-                    parsedAlert.setEventId(getValueByParameterName(parameterNodeList, i));
-                    break;
-                case "eventtype":
-                    parsedAlert.setEventType(getValueByParameterName(parameterNodeList, i));
-                    break;
-                case "currentepisodeid":
-                    parsedAlert.setCurrentEpisodeId(getValueByParameterName(parameterNodeList, i));
-                    break;
-                case "fromdate":
-                    parsedAlert.setFromDate(parseDateTimeFromString(getValueByParameterName(parameterNodeList, i)));
-                    break;
-                case "todate":
-                    parsedAlert.setToDate(parseDateTimeFromString(getValueByParameterName(parameterNodeList, i)));
-                    break;
-            }
-        }
-    }
-
     private Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
-        var builderFactory = DocumentBuilderFactory.newInstance();
-        var builder = builderFactory.newDocumentBuilder();
-        var inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setNamespaceAware(true);
+        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+        InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         return builder.parse(inputStream);
     }
 
-    private String getValueNameByParameterName(NodeList parameterNodeList, int index) {
-        var childNodes = parameterNodeList.item(index).getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            var node = childNodes.item(i);
-            if (node.getNodeName().equals("valueName")) {
+    private Map<String, String> parseParameters(NodeList parameterNodes, Set<String> parameterNames) {
+        Map<String, String> parameters = parameterNames.stream().map(name -> Map.entry(name, ""))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        for (int i = 0; i < parameterNodes.getLength(); i++) {
+            NodeList parameterChildNodes = parameterNodes.item(i).getChildNodes();
+            String parameterName = getNodeValueByName(parameterChildNodes, PREFIX + VALUE_NAME);
+            if (parameters.containsKey(parameterName)) {
+                parameters.replace(parameterName, getNodeValueByName(parameterChildNodes, PREFIX + VALUE));
+            }
+        }
+        return parameters;
+    }
+
+    private String getNodeValueByName(NodeList nodes, String childNodeName) {
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node.getNodeName().equals(childNodeName)) {
                 return node.getTextContent();
             }
         }
         return "";
     }
 
-    private String getValueByParameterName(NodeList parameterNodeList, int index) {
-        var childNodes = parameterNodeList.item(index).getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            var node = childNodes.item(i);
-            if (node.getNodeName().equals("value")) {
-                return node.getTextContent();
-            }
+    private String getValueByTagName(String xml, Document xmlDocument, String tagName) {
+        NodeList nodeList = xmlDocument.getElementsByTagNameNS(NS, tagName);
+        if (nodeList.getLength() == 0) {
+            LOG.warn("Alert does not contain tag '{}': \n" + xml, tagName);
+            return "";
         }
-        return "";
+        if (nodeList.getLength() > 1) {
+            LOG.warn("Alert contains more than one tag '{}': \n" + xml, tagName);
+        }
+        return nodeList.item(0).getTextContent();
     }
 }

@@ -1,22 +1,20 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<alert
-	xmlns="urn:oasis:names:tc:emergency:cap:1.2">
-	<identifier>GDACS_EQ_1239035_1337371</identifier>
-	<sender>info-gdacs@gdacs.org</sender>
-	<sent>2020-10-12T04:06:56-00:00</sent>
-	<status>Actual</status>
-	<msgType>Alert</msgType>
-	<scope>Public</scope>
-	<incidents>1239035</incidents>
-	<info>
-		<category>Geo</category>
-		<event>Earthquake</event>
-		<urgency>Past</urgency>
-		<severity>Moderate</severity>
-		<certainty>Observed</certainty>
-		<senderName>Global Disaster Alert and Coordination System</senderName>
-		<headline>Green earthquake alert (Magnitude 5.1M, Depth:100.49km) in Guatemala 12/10/2020 06:06 UTC, 6480000 people within 100km.</headline>
-		<description>On 10/12/2020 6:06:56 AM, an earthquake occurred in Guatemala potentially affecting 6480000 people within 100km. The earthquake had Magnitude 5.1M, Depth:100.49km.</description>
-		<web>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1239035</web>
-	</info>
-</alert>
+﻿<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+	<cap:identifier>GDACS_EQ_1278636_1387465</cap:identifier>
+	<cap:sender>info-gdacs@gdacs.org</cap:sender>
+	<cap:sent>2021-07-25T23:05:15-00:00</cap:sent>
+	<cap:status>Actual</cap:status>
+	<cap:msgType>Alert</cap:msgType>
+	<cap:scope>Public</cap:scope>
+	<cap:incidents>1278636</cap:incidents>
+	<cap:info>
+		<cap:category>Geo</cap:category>
+		<cap:event>Earthquake</cap:event>
+		<cap:urgency>Past</cap:urgency>
+		<cap:severity>Minor</cap:severity>
+		<cap:certainty>Observed</cap:certainty>
+		<cap:senderName>Global Disaster Alert and Coordination System</cap:senderName>
+		<cap:headline>Green earthquake alert (Magnitude 4.5M, Depth:10km) in Argentina 26/07/2021 01:05 UTC, 180000 people within 100km.</cap:headline>
+		<cap:description>On 7/26/2021 1:05:15 AM, an earthquake occurred in Argentina potentially affecting 180000 people within 100km. The earthquake had Magnitude 4.5M, Depth:10km.</cap:description>
+		<cap:web>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1278636</cap:web>
+	</cap:info>
+</cap:alert>

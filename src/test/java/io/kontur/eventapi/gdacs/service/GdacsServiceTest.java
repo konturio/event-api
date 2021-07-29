@@ -58,33 +58,6 @@ class GdacsServiceTest {
     }
 
     @Test
-    public void testFetchAlerts() throws IOException {
-        String link = "https://www.gdacs.org/contentdata/resources/EQ/1243255/cap_1243255.xml";
-        String alert = readFile("alert.xml");
-        when(gdacsClient.getAlertByLink(link)).thenReturn(alert);
-
-        Map<String, String> alerts = gdacsService.fetchAlerts(List.of(link));
-
-        assertTrue(alerts.containsKey(link));
-        assertEquals(alert, alerts.get(link));
-        assertEquals(1, alerts.size());
-    }
-
-    @Test
-    public void testFetchAlertsWhenEmpty() {
-        when(gdacsClient.getAlertByLink(anyString())).thenReturn("");
-        Map<String, String> alerts = gdacsService.fetchAlerts(List.of("test-link"));
-        assertEquals(0, alerts.size());
-    }
-
-    @Test
-    public void testFetchAlertsWhenThrows() {
-        when(gdacsClient.getAlertByLink(anyString())).thenThrow(FeignException.class);
-        Map<String, String> alerts = gdacsService.fetchAlerts(List.of("test-link"));
-        assertEquals(0, alerts.size());
-    }
-
-    @Test
     public void testCreateDataLakeListWithAlertsAndGeometry() throws IOException {
         ParsedAlert alert = getParsedAlert();
         String geometry = readFile("geometry.json");
@@ -134,7 +107,6 @@ class GdacsServiceTest {
     private ParsedAlert getParsedAlert() throws IOException {
         return new ParsedAlert(
                 OffsetDateTime.parse("Tue, 10 Nov 2020 06:07:49 GMT", DateTimeFormatter.RFC_1123_DATE_TIME),
-                OffsetDateTime.parse("2020-11-10T03:41:51-00:00"),
                 "GDACS_EQ_1243255_1342589",
                 "1243255",
                 "EQ",

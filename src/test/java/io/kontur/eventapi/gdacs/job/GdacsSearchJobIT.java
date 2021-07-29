@@ -1,5 +1,6 @@
 package io.kontur.eventapi.gdacs.job;
 
+import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
@@ -13,10 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,7 +22,7 @@ import java.util.List;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
@@ -44,52 +41,45 @@ class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
 
     @Test
     public void testJob() throws IOException {
-        String alert = readMessageFromFile("alert01.xml");
-        String geometry = readMessageFromFile("geometry01.json");
-
-        Mockito.when(gdacsClient.getXml()).thenReturn(readMessageFromFile("cap1.xml"));
-        Mockito.when(gdacsClient.getAlertByLink(anyString())).thenReturn(alert);
-        Mockito.when(gdacsClient.getGeometryByLink("EQ", "1243255", "1342589")).thenReturn(geometry);
-
-        gdacsSearchJob.run();
-
-        checkDataLakes(dataLakeDao.getDenormalizedEvents(), alert, geometry);
-    }
-
-    public void testJobWhenNoGeometryForAlert() throws IOException {
-        String alert1 = readMessageFromFile("alert01.xml");
-        String alert2 = readMessageFromFile("alert02.xml");
         String geometry = readMessageFromFile("geometry01.json");
 
         Mockito.when(gdacsClient.getXml()).thenReturn(readMessageFromFile("cap2.xml"));
-        Mockito.when(gdacsClient.getAlertByLink("https://www.gdacs.org/contentdata/resources/EQ/1243255/cap_1243255.xml")).thenReturn(alert1);
-        Mockito.when(gdacsClient.getAlertByLink("https://www.gdacs.org/contentdata/resources/TC/1000742/cap_1000742.xml")).thenReturn(alert2);
-        Mockito.when(gdacsClient.getGeometryByLink("EQ", "1243255", "1342589")).thenReturn(geometry);
+        Mockito.when(gdacsClient.getGeometryByLink("EQ", "1279052", "1387993")).thenReturn(geometry);
 
         gdacsSearchJob.run();
 
-        checkDataLakes(dataLakeDao.getDenormalizedEvents(), alert1, geometry);
+        checkDataLakes(dataLakeDao.getDenormalizedEvents());
+    }
+
+    @Test
+    public void testJobWhenNoGeometryForAlert() throws IOException {
+        Mockito.when(gdacsClient.getXml()).thenReturn(readMessageFromFile("cap2.xml"));
+        Mockito.when(gdacsClient.getGeometryByLink(any(), any(), any())).thenThrow(FeignException.class);
+
+        gdacsSearchJob.run();
+
+        assertEquals(0, dataLakeDao.getDenormalizedEvents().size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
         return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
     }
 
-    private void checkDataLakes(List<DataLake> dataLakes, String alert, String geometry) {
+    private void checkDataLakes(List<DataLake> dataLakes) {
         assertEquals(2, dataLakes.size());
 
         DataLake alertDataLake = dataLakes.get(0);
         DataLake geometryDataLake = dataLakes.get(1);
 
-        assertEquals("GDACS_EQ_1243255_1342589", alertDataLake.getExternalId());
-        assertEquals(OffsetDateTime.parse("Tue, 10 Nov 2020 06:07:49 GMT", DateTimeFormatter.RFC_1123_DATE_TIME), alertDataLake.getUpdatedAt());
+        assertEquals("GDACS_EQ_1279052_1387993", alertDataLake.getExternalId());
+        assertEquals(OffsetDateTime.parse("Thu, 29 Jul 2021 07:16 GMT", DateTimeFormatter.RFC_1123_DATE_TIME), alertDataLake.getUpdatedAt());
         assertEquals(GDACS_ALERT_PROVIDER, alertDataLake.getProvider());
-        assertEquals(alert, alertDataLake.getData());
+        assertNotNull(alertDataLake.getData());
 
-        assertEquals("GDACS_EQ_1243255_1342589", geometryDataLake.getExternalId());
-        assertEquals(OffsetDateTime.parse("Tue, 10 Nov 2020 06:07:49 GMT", DateTimeFormatter.RFC_1123_DATE_TIME), geometryDataLake.getUpdatedAt());
+        assertEquals("GDACS_EQ_1279052_1387993", geometryDataLake.getExternalId());
+        assertEquals(OffsetDateTime.parse("Thu, 29 Jul 2021 07:16 GMT", DateTimeFormatter.RFC_1123_DATE_TIME), geometryDataLake.getUpdatedAt());
         assertEquals(GDACS_ALERT_GEOMETRY_PROVIDER, geometryDataLake.getProvider());
-        assertEquals(geometry, geometryDataLake.getData());
+        assertNotNull(geometryDataLake.getData());
     }
 
 }

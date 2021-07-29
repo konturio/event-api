@@ -5,29 +5,28 @@ import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GdacsAlertXmlParserTest {
 
     @Test
-    public void testNumberOfItems() throws ParserConfigurationException, SAXException, XPathExpressionException, IOException {
+    public void testNumberOfItems() throws ParserConfigurationException, SAXException, IOException {
         String xml = readMessageFromFile("gdacs.xml");
-        int itemsCount = 65;
-        assertEquals(itemsCount, new GdacsAlertXmlParser().getLinks(xml).size());
+        int itemsCount = 64;
+        assertEquals(itemsCount, new GdacsAlertXmlParser().getAlerts(xml).size());
     }
 
     @Test
-    public void testAlerts() throws IOException, ParserConfigurationException, XPathExpressionException {
-        var listOfAlerts = Map.of(
-                "1", readMessageFromFile("alert01_valid.xml"),
-                "2", readMessageFromFile("alert02_without_identifier.xml"),
-                "3", readMessageFromFile("alert02_without_parameters.xml"),
-                "4", readMessageFromFile("alert02_invaliddate.xml"),
-                "5", readMessageFromFile("alert02_valid.xml")
+    public void testAlerts() throws IOException, ParserConfigurationException {
+        List<String> listOfAlerts = List.of(
+                readMessageFromFile("alert01_valid.xml"),
+                readMessageFromFile("alert02_without_identifier.xml"),
+                readMessageFromFile("alert02_without_parameters.xml"),
+                readMessageFromFile("alert02_invaliddate.xml"),
+                readMessageFromFile("alert02_valid.xml")
         );
 
         int alertCount = 2;

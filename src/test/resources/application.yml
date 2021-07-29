@@ -39,7 +39,7 @@ scheduler:
     fixedDelay: 999999
   gdacsImport:
     enable: false
-    cron: 30 30 23 25 12 SUN
+    cron: 30 30 23 24 12 SUN
   firmsImport:
     enable: false
     initialDelay: 999999
