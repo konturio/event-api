@@ -1,131 +1,42 @@
-<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
-    <identifier>GDACS_EQ_1243255_1342589</identifier>
-    <sender>info-gdacs@gdacs.org</sender>
-    <sent>2020-11-10T03:41:51-00:00</sent>
-    <status>Actual</status>
-    <msgType>Alert</msgType>
-    <scope>Public</scope>
-    <incidents>1243255</incidents>
-    <info>
-        <category>Geo</category>
-        <event>Earthquake</event>
-        <urgency>Past</urgency>
-        <severity>Minor</severity>
-        <certainty>Observed</certainty>
-        <senderName>Global Disaster Alert and Coordination System</senderName>
-        <headline>Green earthquake alert (Magnitude 4.8M, Depth:35km) in Guam 10/11/2020 04:41 UTC, No people within
+<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+    <cap:identifier>GDACS_EQ_1243255_1342589</cap:identifier>
+    <cap:sent>2020-11-10T03:41:51-00:00</cap:sent>
+    <cap:info>
+        <cap:event>Earthquake</cap:event>
+        <cap:severity>Minor</cap:severity>
+        <cap:headline>Green earthquake alert (Magnitude 4.8M, Depth:35km) in Guam 10/11/2020 04:41 UTC, No people within
             100km.
-        </headline>
-        <description>On 11/10/2020 4:41:51 AM, an earthquake occurred in Guam potentially affecting No people within
+        </cap:headline>
+        <cap:description>On 11/10/2020 4:41:51 AM, an earthquake occurred in Guam potentially affecting No people within
             100km. The earthquake had Magnitude 4.8M, Depth:35km.
-        </description>
-        <web>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1243255</web>
-        <parameter>
-            <valueName>eventid</valueName>
-            <value>1243255</value>
-        </parameter>
-        <parameter>
-            <valueName>currentepisodeid</valueName>
-            <value>1342589</value>
-        </parameter>
-        <parameter>
-            <valueName>glide</valueName>
-            <value/>
-        </parameter>
-        <parameter>
-            <valueName>version</valueName>
-            <value>1</value>
-        </parameter>
-        <parameter>
-            <valueName>fromdate</valueName>
-            <value>Tue, 10 Nov 2020 04:41:51 GMT</value>
-        </parameter>
-        <parameter>
-            <valueName>todate</valueName>
-            <value>Tue, 10 Nov 2020 04:41:51 GMT</value>
-        </parameter>
-        <parameter>
-            <valueName>eventtype</valueName>
-            <value>EQ</value>
-        </parameter>
-        <parameter>
-            <valueName>alertlevel</valueName>
-            <value>Green</value>
-        </parameter>
-        <parameter>
-            <valueName>alerttype</valueName>
-            <value>automatic</value>
-        </parameter>
-        <parameter>
-            <valueName>link</valueName>
-            <value>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1243255</value>
-        </parameter>
-        <parameter>
-            <valueName>country</valueName>
-            <value>Guam</value>
-        </parameter>
-        <parameter>
-            <valueName>eventname</valueName>
-            <value/>
-        </parameter>
-        <parameter>
-            <valueName>severity</valueName>
-            <value>Magnitude 4.8M, Depth:35km</value>
-        </parameter>
-        <parameter>
-            <valueName>population</valueName>
-            <value>No people within 100km</value>
-        </parameter>
-        <parameter>
-            <valueName>vulnerability</valueName>
-            <value/>
-        </parameter>
-        <parameter>
-            <valueName>sourceid</valueName>
-            <value>NEIC</value>
-        </parameter>
-        <parameter>
-            <valueName>iso3</valueName>
-            <value>GUM</value>
-        </parameter>
-        <parameter>
-            <valueName>hazardcomponents</valueName>
-            <value>EQ,magnitude=4.8,depth=35,alertleveltype=EQ;JETS=true</value>
-        </parameter>
-        <parameter>
-            <valueName>datemodified</valueName>
-            <value>Tue, 10 Nov 2020 06:07:49 GMT</value>
-        </parameter>
-        <area>
-            <areaDesc>Polygon</areaDesc>
-            <polygon>12.21,141.182 12.242,141.181 12.273,141.18 12.305,141.177 12.336,141.173 12.367,141.168
-                12.398,141.162 12.428,141.155 12.459,141.146 12.489,141.137 12.519,141.126 12.548,141.115 12.577,141.102
-                12.605,141.089 12.633,141.074 12.661,141.058 12.688,141.042 12.714,141.024 12.74,141.006 12.765,140.987
-                12.79,140.966 12.813,140.945 12.836,140.923 12.859,140.901 12.88,140.877 12.901,140.853 12.92,140.828
-                12.939,140.802 12.957,140.776 12.975,140.749 12.991,140.721 13.006,140.693 13.02,140.664 13.034,140.635
-                13.046,140.605 13.057,140.575 13.067,140.545 13.077,140.514 13.085,140.483 13.092,140.452 13.098,140.42
-                13.103,140.388 13.106,140.357 13.109,140.324 13.111,140.292 13.111,140.26 13.111,140.228 13.109,140.196
-                13.106,140.164 13.103,140.132 13.098,140.1 13.092,140.069 13.085,140.037 13.077,140.006 13.067,139.975
-                13.057,139.945 13.046,139.915 13.034,139.885 13.02,139.856 13.006,139.827 12.991,139.799 12.975,139.772
-                12.957,139.745 12.939,139.718 12.92,139.693 12.901,139.668 12.88,139.643 12.859,139.62 12.836,139.597
-                12.813,139.575 12.79,139.554 12.765,139.534 12.74,139.514 12.714,139.496 12.688,139.479 12.661,139.462
-                12.633,139.446 12.605,139.432 12.577,139.418 12.548,139.406 12.519,139.394 12.489,139.384 12.459,139.374
-                12.428,139.366 12.398,139.359 12.367,139.352 12.336,139.347 12.305,139.343 12.273,139.341 12.242,139.339
-                12.21,139.338 12.179,139.339 12.148,139.341 12.116,139.343 12.085,139.347 12.054,139.352 12.023,139.359
-                11.993,139.366 11.962,139.374 11.932,139.384 11.902,139.394 11.873,139.406 11.844,139.418 11.816,139.432
-                11.788,139.446 11.76,139.462 11.733,139.479 11.707,139.496 11.681,139.514 11.656,139.534 11.631,139.554
-                11.608,139.575 11.585,139.597 11.562,139.62 11.541,139.643 11.52,139.668 11.501,139.693 11.482,139.718
-                11.464,139.745 11.446,139.772 11.43,139.799 11.415,139.827 11.401,139.856 11.387,139.885 11.375,139.915
-                11.364,139.945 11.354,139.975 11.344,140.006 11.336,140.037 11.329,140.069 11.323,140.1 11.318,140.132
-                11.315,140.164 11.312,140.196 11.31,140.228 11.31,140.26 11.31,140.292 11.312,140.324 11.315,140.357
-                11.318,140.388 11.323,140.42 11.329,140.452 11.336,140.483 11.344,140.514 11.354,140.545 11.364,140.575
-                11.375,140.605 11.387,140.635 11.401,140.664 11.415,140.693 11.43,140.721 11.446,140.749 11.464,140.776
-                11.482,140.802 11.501,140.828 11.52,140.853 11.541,140.877 11.562,140.901 11.585,140.923 11.608,140.945
-                11.631,140.966 11.656,140.987 11.681,141.006 11.707,141.024 11.733,141.042 11.76,141.058 11.788,141.074
-                11.816,141.089 11.844,141.102 11.873,141.115 11.902,141.126 11.932,141.137 11.962,141.146 11.993,141.155
-                12.023,141.162 12.054,141.168 12.085,141.173 12.116,141.177 12.148,141.18 12.179,141.181 12.21,141.182
-                12.21,141.182
-            </polygon>
-        </area>
-    </info>
-</alert>
+        </cap:description>
+        <cap:parameter>
+            <cap:valueName>eventid</cap:valueName>
+            <cap:value>1243255</cap:value>
+        </cap:parameter>
+        <cap:parameter>
+            <cap:valueName>currentepisodeid</cap:valueName>
+            <cap:value>1342589</cap:value>
+        </cap:parameter>
+        <cap:parameter>
+            <cap:valueName>fromdate</cap:valueName>
+            <cap:value>Tue, 10 Nov 2020 04:41:51 GMT</cap:value>
+        </cap:parameter>
+        <cap:parameter>
+            <cap:valueName>todate</cap:valueName>
+            <cap:value>Tue, 10 Nov 2020 04:41:51 GMT</cap:value>
+        </cap:parameter>
+        <cap:parameter>
+            <cap:valueName>eventtype</cap:valueName>
+            <cap:value>EQ</cap:value>
+        </cap:parameter>
+        <cap:parameter>
+            <cap:valueName>severity</cap:valueName>
+            <cap:value>Magnitude 4.8M, Depth:35km</cap:value>
+        </cap:parameter>
+        <cap:parameter>
+            <cap:valueName>datemodified</cap:valueName>
+            <cap:value>Tue, 10 Nov 2020 06:07:49 GMT</cap:value>
+        </cap:parameter>
+    </cap:info>
+</cap:alert>

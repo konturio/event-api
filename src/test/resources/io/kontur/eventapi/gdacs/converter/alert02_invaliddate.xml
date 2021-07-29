@@ -1,30 +1,100 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<alert
-	xmlns="urn:oasis:names:tc:emergency:cap:1.2">
-	<identifier>GDACS_EQ_1239035_1337371</identifier>
-	<sender>info-gdacs@gdacs.org</sender>
-	<sent>2020-10-12T04:06:56-00:00</sent>
-	<status>Actual</status>
-	<msgType>Alert</msgType>
-	<scope>Public</scope>
-	<incidents>1239035</incidents>
-	<info>
-		<category>Geo</category>
-		<event>Earthquake</event>
-		<urgency>Past</urgency>
-		<severity>Moderate</severity>
-		<certainty>Observed</certainty>
-		<senderName>Global Disaster Alert and Coordination System</senderName>
-		<headline>Green earthquake alert (Magnitude 5.1M, Depth:100.49km) in Guatemala 12/10/2020 06:06 UTC, 6480000 people within 100km.</headline>
-		<description>On 10/12/2020 6:06:56 AM, an earthquake occurred in Guatemala potentially affecting 6480000 people within 100km. The earthquake had Magnitude 5.1M, Depth:100.49km.</description>
-		<web>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1239035</web>
-		<parameter>
-			<valueName>datemodified</valueName>
-			<value>sdgfgfgdfgdf</value>
-		</parameter>
-		<area>
-			<areaDesc>Polygon</areaDesc>
-			<polygon>14.624,-90.729 14.655,-90.73 14.687,-90.731 14.718,-90.734 14.749,-90.738 14.78,-90.743 14.811,-90.749 14.842,-90.757 14.872,-90.765 14.902,-90.775 14.932,-90.785 14.961,-90.797 14.99,-90.81 15.019,-90.823 15.047,-90.838 15.074,-90.854 15.101,-90.871 15.127,-90.888 15.153,-90.907 15.178,-90.926 15.203,-90.947 15.227,-90.968 15.25,-90.99 15.272,-91.013 15.293,-91.037 15.314,-91.062 15.334,-91.087 15.353,-91.113 15.371,-91.139 15.388,-91.167 15.404,-91.195 15.419,-91.223 15.433,-91.252 15.447,-91.281 15.459,-91.311 15.47,-91.342 15.481,-91.372 15.49,-91.403 15.498,-91.435 15.505,-91.467 15.511,-91.498 15.516,-91.531 15.52,-91.563 15.522,-91.595 15.524,-91.628 15.525,-91.66 15.524,-91.693 15.522,-91.725 15.52,-91.757 15.516,-91.79 15.511,-91.822 15.505,-91.854 15.498,-91.885 15.49,-91.917 15.481,-91.948 15.47,-91.979 15.459,-92.009 15.447,-92.039 15.433,-92.068 15.419,-92.097 15.404,-92.126 15.388,-92.153 15.371,-92.181 15.353,-92.207 15.334,-92.233 15.314,-92.259 15.293,-92.283 15.272,-92.307 15.25,-92.33 15.227,-92.352 15.203,-92.373 15.178,-92.394 15.153,-92.413 15.127,-92.432 15.101,-92.45 15.074,-92.466 15.047,-92.482 15.019,-92.497 14.99,-92.511 14.961,-92.523 14.932,-92.535 14.902,-92.546 14.872,-92.555 14.842,-92.564 14.811,-92.571 14.78,-92.577 14.749,-92.582 14.718,-92.586 14.687,-92.589 14.655,-92.591 14.624,-92.591 14.592,-92.591 14.561,-92.589 14.53,-92.586 14.498,-92.582 14.467,-92.577 14.436,-92.571 14.406,-92.564 14.375,-92.555 14.345,-92.546 14.316,-92.535 14.286,-92.523 14.257,-92.511 14.229,-92.497 14.201,-92.482 14.173,-92.466 14.146,-92.45 14.12,-92.432 14.094,-92.413 14.069,-92.394 14.045,-92.373 14.021,-92.352 13.998,-92.33 13.976,-92.307 13.954,-92.283 13.934,-92.259 13.914,-92.233 13.895,-92.207 13.877,-92.181 13.86,-92.153 13.843,-92.126 13.828,-92.097 13.814,-92.068 13.801,-92.039 13.788,-92.009 13.777,-91.979 13.767,-91.948 13.758,-91.917 13.75,-91.885 13.742,-91.854 13.736,-91.822 13.732,-91.79 13.728,-91.757 13.725,-91.725 13.723,-91.693 13.723,-91.66 13.723,-91.628 13.725,-91.595 13.728,-91.563 13.732,-91.531 13.736,-91.498 13.742,-91.467 13.75,-91.435 13.758,-91.403 13.767,-91.372 13.777,-91.342 13.788,-91.311 13.801,-91.281 13.814,-91.252 13.828,-91.223 13.843,-91.195 13.86,-91.167 13.877,-91.139 13.895,-91.113 13.914,-91.087 13.934,-91.062 13.954,-91.037 13.976,-91.013 13.998,-90.99 14.021,-90.968 14.045,-90.947 14.069,-90.926 14.094,-90.907 14.12,-90.888 14.146,-90.871 14.173,-90.854 14.201,-90.838 14.229,-90.823 14.257,-90.81 14.286,-90.797 14.316,-90.785 14.345,-90.775 14.375,-90.765 14.406,-90.757 14.436,-90.749 14.467,-90.743 14.498,-90.738 14.53,-90.734 14.561,-90.731 14.592,-90.73 14.624,-90.729 14.624,-90.729</polygon>
-		</area>
-	</info>
-</alert>
+﻿<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+	<cap:identifier>GDACS_EQ_1278647_1387486</cap:identifier>
+	<cap:sender>info-gdacs@gdacs.org</cap:sender>
+	<cap:sent>2021-07-26T01:48:10-00:00</cap:sent>
+	<cap:status>Actual</cap:status>
+	<cap:msgType>Alert</cap:msgType>
+	<cap:scope>Public</cap:scope>
+	<cap:incidents>1278647</cap:incidents>
+	<cap:info>
+		<cap:category>Geo</cap:category>
+		<cap:event>Earthquake</cap:event>
+		<cap:urgency>Past</cap:urgency>
+		<cap:severity>Minor</cap:severity>
+		<cap:certainty>Observed</cap:certainty>
+		<cap:senderName>Global Disaster Alert and Coordination System</cap:senderName>
+		<cap:headline>Green earthquake alert (Magnitude 4.6M, Depth:10km) in Panama 26/07/2021 03:48 UTC, About 25000 people within 100km.</cap:headline>
+		<cap:description>On 7/26/2021 3:48:10 AM, an earthquake occurred in Panama potentially affecting About 25000 people within 100km. The earthquake had Magnitude 4.6M, Depth:10km.</cap:description>
+		<cap:web>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1278647</cap:web>
+		<cap:parameter>
+			<cap:valueName>eventid</cap:valueName>
+			<cap:value>1278647</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>currentepisodeid</cap:valueName>
+			<cap:value>1387486</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>glide</cap:valueName>
+			<cap:value/>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>version</cap:valueName>
+			<cap:value>1</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>fromdate</cap:valueName>
+			<cap:value>Mon, 26 Jul 2021 03:48 GMT</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>todate</cap:valueName>
+			<cap:value>Mon, 26 Jul 2021 03:48 GMT</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>eventtype</cap:valueName>
+			<cap:value>EQ</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>alertlevel</cap:valueName>
+			<cap:value>Green</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>alerttype</cap:valueName>
+			<cap:value>automatic</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>link</cap:valueName>
+			<cap:value>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1278647</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>country</cap:valueName>
+			<cap:value>Panama</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>eventname</cap:valueName>
+			<cap:value/>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>severity</cap:valueName>
+			<cap:value>Magnitude 4.6M, Depth:10km</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>population</cap:valueName>
+			<cap:value>About 25000 people within 100km</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>vulnerability</cap:valueName>
+			<cap:value/>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>sourceid</cap:valueName>
+			<cap:value>NEIC</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>iso3</cap:valueName>
+			<cap:value>PAN</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>hazardcomponents</cap:valueName>
+			<cap:value>EQ,magnitude=4.6,depth=10,alertleveltype=EQ;JETS=true</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>datemodified</cap:valueName>
+			<cap:value>Mon, 52 Jul 2021 04:28 GMT</cap:value>
+		</cap:parameter>
+		<cap:area>
+			<cap:areaDesc>Polygon</cap:areaDesc>
+			<cap:polygon>7.416,-81.881 7.448,-81.882 7.479,-81.884 7.511,-81.886 7.542,-81.89 7.573,-81.895 7.604,-81.901 7.634,-81.908 7.665,-81.916 7.695,-81.926 7.725,-81.936 7.754,-81.947 7.783,-81.96 7.811,-81.973 7.839,-81.988 7.867,-82.003 7.894,-82.019 7.92,-82.037 7.946,-82.055 7.971,-82.074 7.996,-82.094 8.019,-82.115 8.042,-82.136 8.065,-82.159 8.086,-82.182 8.107,-82.206 8.126,-82.23 8.145,-82.256 8.163,-82.282 8.181,-82.308 8.197,-82.336 8.212,-82.363 8.226,-82.392 8.24,-82.42 8.252,-82.449 8.263,-82.479 8.273,-82.509 8.283,-82.539 8.291,-82.57 8.298,-82.601 8.304,-82.632 8.309,-82.663 8.312,-82.695 8.315,-82.726 8.317,-82.758 8.317,-82.79 8.317,-82.822 8.315,-82.853 8.312,-82.885 8.309,-82.916 8.304,-82.948 8.298,-82.979 8.291,-83.01 8.283,-83.04 8.273,-83.071 8.263,-83.101 8.252,-83.13 8.24,-83.159 8.226,-83.188 8.212,-83.216 8.197,-83.244 8.181,-83.271 8.163,-83.298 8.145,-83.324 8.126,-83.349 8.107,-83.374 8.086,-83.398 8.065,-83.421 8.042,-83.443 8.019,-83.465 7.996,-83.486 7.971,-83.506 7.946,-83.525 7.92,-83.543 7.894,-83.56 7.867,-83.577 7.839,-83.592 7.811,-83.606 7.783,-83.62 7.754,-83.632 7.725,-83.644 7.695,-83.654 7.665,-83.663 7.634,-83.671 7.604,-83.678 7.573,-83.684 7.542,-83.689 7.511,-83.693 7.479,-83.696 7.448,-83.698 7.416,-83.698 7.385,-83.698 7.354,-83.696 7.322,-83.693 7.291,-83.689 7.26,-83.684 7.229,-83.678 7.199,-83.671 7.168,-83.663 7.138,-83.654 7.108,-83.644 7.079,-83.632 7.05,-83.62 7.022,-83.606 6.994,-83.592 6.966,-83.577 6.939,-83.56 6.913,-83.543 6.887,-83.525 6.862,-83.506 6.837,-83.486 6.814,-83.465 6.791,-83.443 6.768,-83.421 6.747,-83.398 6.726,-83.374 6.707,-83.349 6.688,-83.324 6.67,-83.298 6.652,-83.271 6.636,-83.244 6.621,-83.216 6.607,-83.188 6.593,-83.159 6.581,-83.13 6.57,-83.101 6.56,-83.071 6.55,-83.04 6.542,-83.01 6.535,-82.979 6.529,-82.948 6.524,-82.916 6.521,-82.885 6.518,-82.853 6.516,-82.822 6.516,-82.79 6.516,-82.758 6.518,-82.726 6.521,-82.695 6.524,-82.663 6.529,-82.632 6.535,-82.601 6.542,-82.57 6.55,-82.539 6.56,-82.509 6.57,-82.479 6.581,-82.449 6.593,-82.42 6.607,-82.392 6.621,-82.363 6.636,-82.336 6.652,-82.308 6.67,-82.282 6.688,-82.256 6.707,-82.23 6.726,-82.206 6.747,-82.182 6.768,-82.159 6.791,-82.136 6.814,-82.115 6.837,-82.094 6.862,-82.074 6.887,-82.055 6.913,-82.037 6.939,-82.019 6.966,-82.003 6.994,-81.988 7.022,-81.973 7.05,-81.96 7.079,-81.947 7.108,-81.936 7.138,-81.926 7.168,-81.916 7.199,-81.908 7.229,-81.901 7.26,-81.895 7.291,-81.89 7.322,-81.886 7.354,-81.884 7.385,-81.882 7.416,-81.881 7.416,-81.881</cap:polygon>
+		</cap:area>
+	</cap:info>
+</cap:alert>

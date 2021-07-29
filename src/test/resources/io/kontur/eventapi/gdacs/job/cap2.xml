@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.0"
+     xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+     xmlns:asgard="http://asgard.jrc.it" xmlns:gdacs="http://www.gdacs.org" xmlns:glide="http://glidenumber.net"
+     xmlns:georss="http://www.georss.org/georss" xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+    <channel>
+        <title>GDACS CAP information</title>
+        <link>https://www.gdacs.org</link>
+        <description>Near real-time CAP (Common Alerting Protocol) alerts about earthquakes with a potential
+            humanitarian impact
+        </description>
+        <managingEditor>info-gdacs@gdacs.org</managingEditor>
+        <webMaster>info-gdacs@gdacs.org</webMaster>
+        <pubDate>Thu, 29 Jul 2021 07:35 GMT</pubDate>
+        <item>
+            <title>Green earthquake alert (Magnitude 4.6M, Depth:14.2km) in United States 29/07/2021 06:57 UTC, No
+                people within 100km.
+            </title>
+            <description>On 7/29/2021 6:57:01 AM, an earthquake occurred in United States potentially affecting No
+                people within 100km. The earthquake had Magnitude 4.6M, Depth:14.2km.
+            </description>
+            <link>https://www.gdacs.org/contentdata/resources/EQ/1279052/cap_1279052.xml</link>
+            <pubDate>Thu, 29 Jul 2021 06:57 GMT</pubDate>
+            <guid isPermaLink="false">EQ1279052_1387993</guid>
+            <geo:Point>
+                <geo:lat>55.171</geo:lat>
+                <geo:long>-157.1018</geo:long>
+            </geo:Point>
+            <cap:alert>
+                <cap:identifier>GDACS_EQ_1279052_1387993</cap:identifier>
+                <cap:sender>info-gdacs@gdacs.org</cap:sender>
+                <cap:sent>2021-07-29T04:57:01-00:00</cap:sent>
+                <cap:status>Actual</cap:status>
+                <cap:msgType>Alert</cap:msgType>
+                <cap:scope>Public</cap:scope>
+                <cap:incidents>1279052</cap:incidents>
+                <cap:info>
+                    <cap:category>Geo</cap:category>
+                    <cap:event>Earthquake</cap:event>
+                    <cap:urgency>Past</cap:urgency>
+                    <cap:severity>Minor</cap:severity>
+                    <cap:certainty>Observed</cap:certainty>
+                    <cap:senderName>Global Disaster Alert and Coordination System</cap:senderName>
+                    <cap:headline>Green earthquake alert (Magnitude 4.6M, Depth:14.2km) in United States 29/07/2021
+                        06:57 UTC, No people within 100km.
+                    </cap:headline>
+                    <cap:description>On 7/29/2021 6:57:01 AM, an earthquake occurred in United States potentially
+                        affecting No people within 100km. The earthquake had Magnitude 4.6M, Depth:14.2km.
+                    </cap:description>
+                    <cap:web>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1279052</cap:web>
+                    <cap:parameter>
+                        <cap:valueName>eventid</cap:valueName>
+                        <cap:value>1279052</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>currentepisodeid</cap:valueName>
+                        <cap:value>1387993</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>glide</cap:valueName>
+                        <cap:value/>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>version</cap:valueName>
+                        <cap:value>1</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>fromdate</cap:valueName>
+                        <cap:value>Thu, 29 Jul 2021 06:57 GMT</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>todate</cap:valueName>
+                        <cap:value>Thu, 29 Jul 2021 06:57 GMT</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>eventtype</cap:valueName>
+                        <cap:value>EQ</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>alertlevel</cap:valueName>
+                        <cap:value>Green</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>alerttype</cap:valueName>
+                        <cap:value>automatic</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>link</cap:valueName>
+                        <cap:value>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1279052</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>country</cap:valueName>
+                        <cap:value>United States</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>eventname</cap:valueName>
+                        <cap:value/>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>severity</cap:valueName>
+                        <cap:value>Magnitude 4.6M, Depth:14.2km</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>population</cap:valueName>
+                        <cap:value>No people within 100km</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>vulnerability</cap:valueName>
+                        <cap:value/>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>sourceid</cap:valueName>
+                        <cap:value>ALASKA EC</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>iso3</cap:valueName>
+                        <cap:value>USA</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>hazardcomponents</cap:valueName>
+                        <cap:value>EQ,magnitude=4.6,depth=14.2,alertleveltype=SM;JETS=true</cap:value>
+                    </cap:parameter>
+                    <cap:parameter>
+                        <cap:valueName>datemodified</cap:valueName>
+                        <cap:value>Thu, 29 Jul 2021 07:16 GMT</cap:value>
+                    </cap:parameter>
+                    <cap:area>
+                        <cap:areaDesc>Polygon</cap:areaDesc>
+                        <cap:polygon>55.171,-155.524 55.202,-155.525 55.234,-155.528 55.265,-155.533 55.296,-155.54
+                            55.327,-155.548 55.358,-155.559 55.389,-155.571 55.419,-155.586 55.449,-155.602
+                            55.479,-155.62 55.508,-155.639 55.537,-155.661 55.566,-155.684 55.594,-155.709
+                            55.621,-155.736 55.648,-155.764 55.675,-155.794 55.701,-155.826 55.726,-155.859
+                            55.75,-155.893 55.774,-155.93 55.797,-155.967 55.819,-156.006 55.84,-156.046 55.861,-156.088
+                            55.881,-156.131 55.9,-156.175 55.918,-156.22 55.935,-156.266 55.951,-156.313 55.966,-156.361
+                            55.981,-156.41 55.994,-156.46 56.006,-156.511 56.018,-156.562 56.028,-156.614
+                            56.037,-156.667 56.045,-156.72 56.052,-156.774 56.058,-156.828 56.063,-156.882
+                            56.067,-156.937 56.07,-156.992 56.071,-157.047 56.072,-157.102 56.071,-157.157
+                            56.07,-157.212 56.067,-157.267 56.063,-157.321 56.058,-157.376 56.052,-157.43
+                            56.045,-157.483 56.037,-157.537 56.028,-157.589 56.018,-157.641 56.006,-157.693
+                            55.994,-157.743 55.981,-157.793 55.966,-157.842 55.951,-157.891 55.935,-157.938
+                            55.918,-157.984 55.9,-158.029 55.881,-158.073 55.861,-158.116 55.84,-158.157 55.819,-158.198
+                            55.797,-158.236 55.774,-158.274 55.75,-158.31 55.726,-158.345 55.701,-158.378 55.675,-158.41
+                            55.648,-158.44 55.621,-158.468 55.594,-158.495 55.566,-158.52 55.537,-158.543
+                            55.508,-158.564 55.479,-158.584 55.449,-158.602 55.419,-158.618 55.389,-158.632
+                            55.358,-158.645 55.327,-158.655 55.296,-158.664 55.265,-158.671 55.234,-158.675
+                            55.202,-158.678 55.171,-158.679 55.14,-158.678 55.108,-158.675 55.077,-158.671
+                            55.046,-158.664 55.015,-158.655 54.984,-158.645 54.953,-158.632 54.923,-158.618
+                            54.893,-158.602 54.863,-158.584 54.834,-158.564 54.805,-158.543 54.776,-158.52
+                            54.748,-158.495 54.721,-158.468 54.694,-158.44 54.667,-158.41 54.641,-158.378
+                            54.616,-158.345 54.592,-158.31 54.568,-158.274 54.545,-158.236 54.523,-158.198
+                            54.502,-158.157 54.481,-158.116 54.461,-158.073 54.442,-158.029 54.424,-157.984
+                            54.407,-157.938 54.391,-157.891 54.376,-157.842 54.361,-157.793 54.348,-157.743
+                            54.336,-157.693 54.324,-157.641 54.314,-157.589 54.305,-157.537 54.297,-157.483
+                            54.29,-157.43 54.284,-157.376 54.279,-157.321 54.275,-157.267 54.272,-157.212
+                            54.271,-157.157 54.27,-157.102 54.271,-157.047 54.272,-156.992 54.275,-156.937
+                            54.279,-156.882 54.284,-156.828 54.29,-156.774 54.297,-156.72 54.305,-156.667
+                            54.314,-156.614 54.324,-156.562 54.336,-156.511 54.348,-156.46 54.361,-156.41
+                            54.376,-156.361 54.391,-156.313 54.407,-156.266 54.424,-156.22 54.442,-156.175
+                            54.461,-156.131 54.481,-156.088 54.502,-156.046 54.523,-156.006 54.545,-155.967
+                            54.568,-155.93 54.592,-155.893 54.616,-155.859 54.641,-155.826 54.667,-155.794
+                            54.694,-155.764 54.721,-155.736 54.748,-155.709 54.776,-155.684 54.805,-155.661
+                            54.834,-155.639 54.863,-155.62 54.893,-155.602 54.923,-155.586 54.953,-155.571
+                            54.984,-155.559 55.015,-155.548 55.046,-155.54 55.077,-155.533 55.108,-155.528
+                            55.14,-155.525 55.171,-155.524 55.171,-155.524
+                        </cap:polygon>
+                    </cap:area>
+                </cap:info>
+            </cap:alert>
+        </item>
+    </channel>
+</rss>

@@ -1,93 +1,99 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<alert
-	xmlns="urn:oasis:names:tc:emergency:cap:1.2">
-	<sender>info-gdacs@gdacs.org</sender>
-	<sent>2020-10-12T04:06:56-00:00</sent>
-	<status>Actual</status>
-	<msgType>Alert</msgType>
-	<scope>Public</scope>
-	<incidents>1239035</incidents>
-	<info>
-		<category>Geo</category>
-		<event>Earthquake</event>
-		<urgency>Past</urgency>
-		<severity>Moderate</severity>
-		<certainty>Observed</certainty>
-		<senderName>Global Disaster Alert and Coordination System</senderName>
-		<headline>Green earthquake alert (Magnitude 5.1M, Depth:100.49km) in Guatemala 12/10/2020 06:06 UTC, 6480000 people within 100km.</headline>
-		<description>On 10/12/2020 6:06:56 AM, an earthquake occurred in Guatemala potentially affecting 6480000 people within 100km. The earthquake had Magnitude 5.1M, Depth:100.49km.</description>
-		<web>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1239035</web>
-		<parameter>
-			<valueName>currentepisodeid</valueName>
-			<value>1337371</value>
-		</parameter>
-		<parameter>
-			<valueName>glide</valueName>
-			<value />
-		</parameter>
-		<parameter>
-			<valueName>version</valueName>
-			<value>1</value>
-		</parameter>
-		<parameter>
-			<valueName>fromdate</valueName>
-			<value>Mon, 12 Oct 2020 06:06:56 GMT</value>
-		</parameter>
-		<parameter>
-			<valueName>todate</valueName>
-			<value>Mon, 12 Oct 2020 06:06:56 GMT</value>
-		</parameter>
-		<parameter>
-			<valueName>alertlevel</valueName>
-			<value>Green</value>
-		</parameter>
-		<parameter>
-			<valueName>alerttype</valueName>
-			<value>automatic</value>
-		</parameter>
-		<parameter>
-			<valueName>link</valueName>
-			<value>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;amp;eventid=1239035</value>
-		</parameter>
-		<parameter>
-			<valueName>country</valueName>
-			<value>Guatemala</value>
-		</parameter>
-		<parameter>
-			<valueName>eventname</valueName>
-			<value />
-		</parameter>
-		<parameter>
-			<valueName>severity</valueName>
-			<value>Magnitude 5.1M, Depth:100.49km</value>
-		</parameter>
-		<parameter>
-			<valueName>population</valueName>
-			<value>6480000 people within 100km</value>
-		</parameter>
-		<parameter>
-			<valueName>vulnerability</valueName>
-			<value />
-		</parameter>
-		<parameter>
-			<valueName>sourceid</valueName>
-			<value>NEIC</value>
-		</parameter>
-		<parameter>
-			<valueName>iso3</valueName>
-			<value>GTM</value>
-		</parameter>
-		<parameter>
-			<valueName>hazardcomponents</valueName>
-			<value>EQ,magnitude=5.1,depth=100.49,alertleveltype=EQ;JETS=true</value>
-		</parameter>
-		<parameter>
-			<valueName>datemodified</valueName>
-			<value>Mon, 12 Oct 2020 08:37:13 GMT</value>
-		</parameter>
-		<area>
-			<areaDesc>Polygon</areaDesc>
-			<polygon>14.624,-90.729 14.655,-90.73 14.687,-90.731 14.718,-90.734 14.749,-90.738 14.78,-90.743 14.811,-90.749 14.842,-90.757 14.872,-90.765 14.902,-90.775 14.932,-90.785 14.961,-90.797 14.99,-90.81 15.019,-90.823 15.047,-90.838 15.074,-90.854 15.101,-90.871 15.127,-90.888 15.153,-90.907 15.178,-90.926 15.203,-90.947 15.227,-90.968 15.25,-90.99 15.272,-91.013 15.293,-91.037 15.314,-91.062 15.334,-91.087 15.353,-91.113 15.371,-91.139 15.388,-91.167 15.404,-91.195 15.419,-91.223 15.433,-91.252 15.447,-91.281 15.459,-91.311 15.47,-91.342 15.481,-91.372 15.49,-91.403 15.498,-91.435 15.505,-91.467 15.511,-91.498 15.516,-91.531 15.52,-91.563 15.522,-91.595 15.524,-91.628 15.525,-91.66 15.524,-91.693 15.522,-91.725 15.52,-91.757 15.516,-91.79 15.511,-91.822 15.505,-91.854 15.498,-91.885 15.49,-91.917 15.481,-91.948 15.47,-91.979 15.459,-92.009 15.447,-92.039 15.433,-92.068 15.419,-92.097 15.404,-92.126 15.388,-92.153 15.371,-92.181 15.353,-92.207 15.334,-92.233 15.314,-92.259 15.293,-92.283 15.272,-92.307 15.25,-92.33 15.227,-92.352 15.203,-92.373 15.178,-92.394 15.153,-92.413 15.127,-92.432 15.101,-92.45 15.074,-92.466 15.047,-92.482 15.019,-92.497 14.99,-92.511 14.961,-92.523 14.932,-92.535 14.902,-92.546 14.872,-92.555 14.842,-92.564 14.811,-92.571 14.78,-92.577 14.749,-92.582 14.718,-92.586 14.687,-92.589 14.655,-92.591 14.624,-92.591 14.592,-92.591 14.561,-92.589 14.53,-92.586 14.498,-92.582 14.467,-92.577 14.436,-92.571 14.406,-92.564 14.375,-92.555 14.345,-92.546 14.316,-92.535 14.286,-92.523 14.257,-92.511 14.229,-92.497 14.201,-92.482 14.173,-92.466 14.146,-92.45 14.12,-92.432 14.094,-92.413 14.069,-92.394 14.045,-92.373 14.021,-92.352 13.998,-92.33 13.976,-92.307 13.954,-92.283 13.934,-92.259 13.914,-92.233 13.895,-92.207 13.877,-92.181 13.86,-92.153 13.843,-92.126 13.828,-92.097 13.814,-92.068 13.801,-92.039 13.788,-92.009 13.777,-91.979 13.767,-91.948 13.758,-91.917 13.75,-91.885 13.742,-91.854 13.736,-91.822 13.732,-91.79 13.728,-91.757 13.725,-91.725 13.723,-91.693 13.723,-91.66 13.723,-91.628 13.725,-91.595 13.728,-91.563 13.732,-91.531 13.736,-91.498 13.742,-91.467 13.75,-91.435 13.758,-91.403 13.767,-91.372 13.777,-91.342 13.788,-91.311 13.801,-91.281 13.814,-91.252 13.828,-91.223 13.843,-91.195 13.86,-91.167 13.877,-91.139 13.895,-91.113 13.914,-91.087 13.934,-91.062 13.954,-91.037 13.976,-91.013 13.998,-90.99 14.021,-90.968 14.045,-90.947 14.069,-90.926 14.094,-90.907 14.12,-90.888 14.146,-90.871 14.173,-90.854 14.201,-90.838 14.229,-90.823 14.257,-90.81 14.286,-90.797 14.316,-90.785 14.345,-90.775 14.375,-90.765 14.406,-90.757 14.436,-90.749 14.467,-90.743 14.498,-90.738 14.53,-90.734 14.561,-90.731 14.592,-90.73 14.624,-90.729 14.624,-90.729</polygon>
-		</area>
-	</info>
-</alert>
+﻿<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+	<cap:sender>info-gdacs@gdacs.org</cap:sender>
+	<cap:sent>2021-07-26T00:16:16-00:00</cap:sent>
+	<cap:status>Actual</cap:status>
+	<cap:msgType>Alert</cap:msgType>
+	<cap:scope>Public</cap:scope>
+	<cap:incidents>1278641</cap:incidents>
+	<cap:info>
+		<cap:category>Geo</cap:category>
+		<cap:event>Earthquake</cap:event>
+		<cap:urgency>Past</cap:urgency>
+		<cap:severity>Moderate</cap:severity>
+		<cap:certainty>Observed</cap:certainty>
+		<cap:senderName>Global Disaster Alert and Coordination System</cap:senderName>
+		<cap:headline>Green earthquake alert (Magnitude 5.1M, Depth:56.77km) in Japan 26/07/2021 02:16 UTC, 140000 people within 100km.</cap:headline>
+		<cap:description>On 7/26/2021 2:16:16 AM, an earthquake occurred in Japan potentially affecting 140000 people within 100km. The earthquake had Magnitude 5.1M, Depth:56.77km.</cap:description>
+		<cap:web>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1278641</cap:web>
+		<cap:parameter>
+			<cap:valueName>eventid</cap:valueName>
+			<cap:value>1278641</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>currentepisodeid</cap:valueName>
+			<cap:value>1387471</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>glide</cap:valueName>
+			<cap:value/>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>version</cap:valueName>
+			<cap:value>1</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>fromdate</cap:valueName>
+			<cap:value>Mon, 26 Jul 2021 02:16 GMT</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>todate</cap:valueName>
+			<cap:value>Mon, 26 Jul 2021 02:16 GMT</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>eventtype</cap:valueName>
+			<cap:value>EQ</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>alertlevel</cap:valueName>
+			<cap:value>Green</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>alerttype</cap:valueName>
+			<cap:value>automatic</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>link</cap:valueName>
+			<cap:value>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1278641</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>country</cap:valueName>
+			<cap:value>Japan</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>eventname</cap:valueName>
+			<cap:value/>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>severity</cap:valueName>
+			<cap:value>Magnitude 5.1M, Depth:56.77km</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>population</cap:valueName>
+			<cap:value>140000 people within 100km</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>vulnerability</cap:valueName>
+			<cap:value/>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>sourceid</cap:valueName>
+			<cap:value>NEIC</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>iso3</cap:valueName>
+			<cap:value>JPN</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>hazardcomponents</cap:valueName>
+			<cap:value>EQ,magnitude=5.1,depth=56.77,alertleveltype=EQ;JETS=true</cap:value>
+		</cap:parameter>
+		<cap:parameter>
+			<cap:valueName>datemodified</cap:valueName>
+			<cap:value>Mon, 26 Jul 2021 02:56 GMT</cap:value>
+		</cap:parameter>
+		<cap:area>
+			<cap:areaDesc>Polygon</cap:areaDesc>
+			<cap:polygon>41.487,143.264 41.518,143.263 41.55,143.261 41.581,143.257 41.612,143.252 41.643,143.246 41.674,143.238 41.705,143.228 41.735,143.217 41.765,143.205 41.795,143.192 41.824,143.176 41.853,143.16 41.882,143.142 41.91,143.123 41.937,143.103 41.964,143.081 41.991,143.058 42.016,143.034 42.041,143.009 42.066,142.983 42.09,142.955 42.113,142.927 42.135,142.897 42.156,142.866 42.177,142.834 42.197,142.802 42.216,142.768 42.234,142.734 42.251,142.699 42.267,142.663 42.282,142.626 42.297,142.589 42.31,142.551 42.322,142.512 42.333,142.473 42.344,142.433 42.353,142.393 42.361,142.352 42.368,142.311 42.374,142.27 42.379,142.229 42.383,142.187 42.386,142.145 42.387,142.103 42.388,142.061 42.387,142.019 42.386,141.978 42.383,141.936 42.379,141.894 42.374,141.853 42.368,141.811 42.361,141.77 42.353,141.73 42.344,141.69 42.333,141.65 42.322,141.611 42.31,141.572 42.297,141.534 42.282,141.497 42.267,141.46 42.251,141.424 42.234,141.389 42.216,141.355 42.197,141.321 42.177,141.288 42.156,141.257 42.135,141.226 42.113,141.196 42.09,141.168 42.066,141.14 42.041,141.114 42.016,141.088 41.991,141.064 41.964,141.042 41.937,141.02 41.91,141 41.882,140.98 41.853,140.963 41.824,140.946 41.795,140.931 41.765,140.918 41.735,140.905 41.705,140.894 41.674,140.885 41.643,140.877 41.612,140.87 41.581,140.865 41.55,140.862 41.518,140.86 41.487,140.859 41.455,140.86 41.424,140.862 41.393,140.865 41.361,140.87 41.33,140.877 41.299,140.885 41.269,140.894 41.238,140.905 41.208,140.918 41.179,140.931 41.149,140.946 41.12,140.963 41.092,140.98 41.064,141 41.036,141.02 41.009,141.042 40.983,141.064 40.957,141.088 40.932,141.114 40.908,141.14 40.884,141.168 40.861,141.196 40.839,141.226 40.817,141.257 40.797,141.288 40.777,141.321 40.758,141.355 40.74,141.389 40.723,141.424 40.707,141.46 40.691,141.497 40.677,141.534 40.664,141.572 40.651,141.611 40.64,141.65 40.63,141.69 40.621,141.73 40.613,141.77 40.606,141.811 40.6,141.853 40.595,141.894 40.591,141.936 40.588,141.978 40.586,142.019 40.586,142.061 40.586,142.103 40.588,142.145 40.591,142.187 40.595,142.229 40.6,142.27 40.606,142.311 40.613,142.352 40.621,142.393 40.63,142.433 40.64,142.473 40.651,142.512 40.664,142.551 40.677,142.589 40.691,142.626 40.707,142.663 40.723,142.699 40.74,142.734 40.758,142.768 40.777,142.802 40.797,142.834 40.817,142.866 40.839,142.897 40.861,142.927 40.884,142.955 40.908,142.983 40.932,143.009 40.957,143.034 40.983,143.058 41.009,143.081 41.036,143.103 41.064,143.123 41.092,143.142 41.12,143.16 41.149,143.176 41.179,143.192 41.208,143.205 41.238,143.217 41.269,143.228 41.299,143.238 41.33,143.246 41.361,143.252 41.393,143.257 41.424,143.261 41.455,143.263 41.487,143.264 41.487,143.264</cap:polygon>
+		</cap:area>
+	</cap:info>
+</cap:alert>
