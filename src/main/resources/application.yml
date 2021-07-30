@@ -44,6 +44,9 @@ emdat:
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
 
+konturApps:
+  host: 'https://test-apps02.konturlabs.com/'
+
 stormsNoaa:
   host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
 
@@ -109,6 +112,10 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 1000
     alias: firms, gdacs-firms
+  enrichment:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
 
 feign:
   client:

@@ -10,6 +10,7 @@ public class Feed {
     private String alias;
     private List<String> providers;
     private List<String> roles;
+    private List<String> enrichment;
 
     public UUID getFeedId() {
         return feedId;
@@ -49,5 +50,13 @@ public class Feed {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public List<String> getEnrichment() {
+        return enrichment;
+    }
+
+    public void setEnrichment(List<String> enrichment) {
+        this.enrichment = enrichment;
     }
 }

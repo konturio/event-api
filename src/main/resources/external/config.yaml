@@ -15,6 +15,9 @@ auth0:
 konturApi:
   host: 'https://api.kontur.io/'
 
+konturApps:
+  host: 'https://test-apps02.konturlabs.com/'
+
 pdc:
   host: 'https://testemops.pdc.org'
   mapSrvHost: 'https://testapps.pdc.org'
@@ -78,6 +81,10 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 1000
     alias: firms, gdacs-firms
+  enrichment:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
 
 aws:
   sqs:

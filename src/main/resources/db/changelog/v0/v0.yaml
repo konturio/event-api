@@ -132,3 +132,15 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: insert-pdc-emdat-into-swiss-re-feed.sql
+- include:
+    relativeToChangelogFile: true
+    file: analytic-enrichment-changes.sql
+- include:
+    relativeToChangelogFile: true
+    file: feed-analytics.sql
+- include:
+    relativeToChangelogFile: true
+    file: update-feed-data-is-latest-version-index.sql
+- include:
+      relativeToChangelogFile: true
+      file: add-event-geometries-in-feed-data.sql

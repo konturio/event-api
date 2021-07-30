@@ -1,9 +1,9 @@
 package io.kontur.eventapi.entity;
 
+import org.wololo.geojson.FeatureCollection;
+
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class FeedData {
 
@@ -17,6 +17,9 @@ public class FeedData {
     private OffsetDateTime updatedAt;
     private List<UUID> observations = new ArrayList<>();
     private List<FeedEpisode> episodes = new ArrayList<>();
+    private FeatureCollection geometries;
+    private Map<String, Object> eventDetails;
+    private Boolean enriched;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;
@@ -104,6 +107,30 @@ public class FeedData {
         this.updatedAt = updatedAt;
     }
 
+    public Map<String, Object> getEventDetails() {
+        return eventDetails;
+    }
+
+    public void setEventDetails(Map<String, Object> eventDetails) {
+        this.eventDetails = eventDetails;
+    }
+
+    public Boolean getEnriched() {
+        return enriched;
+    }
+
+    public void setEnriched(Boolean enriched) {
+        this.enriched = enriched;
+    }
+
+    public FeatureCollection getGeometries() {
+        return geometries;
+    }
+
+    public void setGeometries(FeatureCollection geometries) {
+        this.geometries = geometries;
+    }
+
     @Override
     public String toString() {
         return "FeedData{" +
@@ -115,6 +142,8 @@ public class FeedData {
                 ", updatedAt=" + updatedAt +
                 ", observations=" + observations +
                 ", episodes=" + episodes +
+                ", eventDetails=" + eventDetails +
+                ", enriched=" + enriched +
                 '}';
     }
 }

@@ -15,6 +15,9 @@ emdat:
 konturApi:
   host: 'https://api.kontur.io/'
 
+konturApps:
+  host: 'https://test-apps02.konturlabs.com/'
+
 stormsNoaa:
   host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
 
@@ -80,6 +83,10 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
     alias: firms
+  enrichment:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
 
 auth0:
   audience: localhost
