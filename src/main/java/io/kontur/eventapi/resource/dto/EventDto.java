@@ -1,11 +1,10 @@
 package io.kontur.eventapi.resource.dto;
 
 import io.kontur.eventapi.entity.FeedEpisode;
+import org.wololo.geojson.FeatureCollection;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class EventDto {
 
@@ -18,6 +17,8 @@ public class EventDto {
     private OffsetDateTime updatedAt;
     private List<UUID> observations;
     private List<FeedEpisode> episodes = new ArrayList<>();
+    private Map<String, Object> eventDetails = new HashMap<>();
+    private FeatureCollection geometries;
 
     public UUID getEventId() {
         return eventId;
@@ -89,5 +90,21 @@ public class EventDto {
 
     public void setEpisodes(List<FeedEpisode> episodes) {
         this.episodes = episodes;
+    }
+
+    public Map<String, Object> getEventDetails() {
+        return eventDetails;
+    }
+
+    public void setEventDetails(Map<String, Object> eventDetails) {
+        this.eventDetails = eventDetails;
+    }
+
+    public FeatureCollection getGeometries() {
+        return geometries;
+    }
+
+    public void setGeometries(FeatureCollection geometries) {
+        this.geometries = geometries;
     }
 }

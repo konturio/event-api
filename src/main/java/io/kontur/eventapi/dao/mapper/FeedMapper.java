@@ -19,9 +19,9 @@ public interface FeedMapper {
     List<Feed> getFeedsByAliases(@Param("aliases") List<String> aliases);
 
     int insertFeedData(
-            UUID eventId, UUID feedId, Long version, String name, String description,
-            OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime updatedAt,
-            @Param("observations") List<UUID> observations, @Param("episodes") String episodes);
+            UUID eventId, UUID feedId, Long version, String name, String description, OffsetDateTime startedAt,
+            OffsetDateTime endedAt, OffsetDateTime updatedAt, @Param("observations") List<UUID> observations,
+            @Param("episodes") String episodes, Boolean enriched);
 
     /**
      * Mark events below specified version outdated
@@ -36,4 +36,9 @@ public interface FeedMapper {
     Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, Long version);
 
     Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId);
+
+    List<FeedData> getNotEnrichedEventsForFeed(UUID feedId);
+
+    void addAnalytics(UUID feedId, UUID eventId, Long version,
+                      @Param("eventDetails") String eventDetails, Boolean enriched, @Param("episodes") String episodes);
 }

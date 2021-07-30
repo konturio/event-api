@@ -64,6 +64,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         Geometry write = geoJSONWriter.write(wktReader.read("POLYGON ((10 20, 11 21, 12 22, 10 20))"));
         feedEpisode.setGeometries(new FeatureCollection(new Feature[]{new Feature(write, Map.of())}));
         feedData.getEpisodes().add(feedEpisode);
+        feedData.setEnriched(true);
         feedDao.insertFeedData(feedData);
 
         //when-then
@@ -86,6 +87,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         feedData.setUpdatedAt(OffsetDateTime.now());
         feedData.setStartedAt(dateTimeOf(2020, 5, 1));
         feedData.setEndedAt(dateTimeOf(2020, 6, 1));
+        feedData.setEnriched(true);
         feedDao.insertFeedData(feedData);
 
         var resultOfSearching01 = findEvent(dateTimeOf(2020, 4, 15), dateTimeOf(2020, 5, 15));
@@ -138,14 +140,17 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         var earliestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         earliestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 22), ZoneOffset.UTC));
+        earliestEvent.setEnriched(true);
         feedDao.insertFeedData(earliestEvent);
 
         var middleEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         middleEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 23), ZoneOffset.UTC));
+        middleEvent.setEnriched(true);
         feedDao.insertFeedData(middleEvent);
 
         var latestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         latestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 24), ZoneOffset.UTC));
+        latestEvent.setEnriched(true);
         feedDao.insertFeedData(latestEvent);
 
         //when page 1 ASC

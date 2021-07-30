@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class FeedDao {
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getDescription(),
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
-                feedData.getObservations(), episodesJson);
+                feedData.getObservations(), episodesJson, feedData.getEnriched());
 
         mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
@@ -69,5 +70,15 @@ public class FeedDao {
 
     public Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId) {
         return mapper.getLastFeedDataVersion(eventId, feedId);
+    }
+
+    public List<FeedData> getNotEnrichedEventsForFeed(UUID feedId) {
+        return mapper.getNotEnrichedEventsForFeed(feedId);
+    }
+
+    @Transactional
+    public void addAnalytics(FeedData event) {
+        mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
+                writeJson(event.getEventDetails()), event.getEnriched(), writeJson(event.getEpisodes()));
     }
 }

@@ -16,9 +16,9 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes, is_latest_version)
+        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes, is_latest_version, enriched)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt},
-                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb, true)
+                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb, true, #{enriched})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -31,7 +31,7 @@
     </update>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        select event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, collected_geometry, episode_types, is_latest_version,
+        select event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched,
         <choose>
             <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                 jsonb_build_array((
@@ -47,6 +47,7 @@
         from feed_data fd
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
             and is_latest_version
+            and enriched
             <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty()" >
                 <foreach item="eventType" collection="eventTypes" separator="," open="and episode_types &amp;&amp; array[" close="]">
                     #{eventType}::text
@@ -127,12 +128,28 @@
             AND feed_id = #{feedId}
     </select>
 
+    <select id="getNotEnrichedEventsForFeed" resultMap="feedDataDtoMap">
+        select * from feed_data fd
+        where feed_id = #{feedId} and not enriched
+        order by updated_at
+        limit 30000
+    </select>
+
+    <update id="addAnalytics">
+        UPDATE feed_data
+        SET event_details = #{eventDetails}::jsonb,
+            enriched = #{enriched},
+            episodes = #{episodes}::jsonb
+        WHERE feed_id = #{feedId} AND event_id = #{eventId} AND version = #{version}
+    </update>
+
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">
         <result property="feedId" column="feed_id" />
         <result property="description" column="description"/>
         <result property="alias" column="alias"/>
         <result property="providers" column="providers" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="roles" column="roles" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+        <result property="enrichment" column="enrichment" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
     </resultMap>
 
     <resultMap id="feedDataDtoMap" type="io.kontur.eventapi.entity.FeedData">
@@ -146,5 +163,8 @@
         <result property="updatedAt" column="updated_at" />
         <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
         <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
+        <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
+        <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
+        <result property="enriched" column="enriched"/>
     </resultMap>
 </mapper>

@@ -3,9 +3,7 @@ package io.kontur.eventapi.entity;
 import org.wololo.geojson.FeatureCollection;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class FeedEpisode {
 
@@ -19,6 +17,7 @@ public class FeedEpisode {
     private OffsetDateTime updatedAt;
     private OffsetDateTime sourceUpdatedAt;
     private List<UUID> observations = new ArrayList<>();
+    private Map<String, Object> episodeDetails;
 
     private FeatureCollection geometries;
 
@@ -102,6 +101,14 @@ public class FeedEpisode {
         this.sourceUpdatedAt = sourceUpdatedAt;
     }
 
+    public Map<String, Object> getEpisodeDetails() {
+        return episodeDetails;
+    }
+
+    public void setEpisodeDetails(Map<String, Object> episodeDetails) {
+        this.episodeDetails = episodeDetails;
+    }
+
     @Override
     public String toString() {
         return "FeedEpisode{" +
@@ -115,6 +122,7 @@ public class FeedEpisode {
                 ", updatedAt=" + updatedAt +
                 ", sourceUpdatedAt=" + sourceUpdatedAt +
                 ", geometries=" + geometries +
+                ", episodeDetails=" + episodeDetails +
                 '}';
     }
 

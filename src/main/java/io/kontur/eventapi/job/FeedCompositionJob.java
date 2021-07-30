@@ -78,6 +78,8 @@ public class FeedCompositionJob extends AbstractJob {
             fillEpisodes(eventObservations, feedData);
             fillFeedData(feedData);
 
+            feedData.setEnriched(feed.getEnrichment().isEmpty());
+
             feedDao.insertFeedData(feedData);
         } catch (Exception e) {
             LOG.error(

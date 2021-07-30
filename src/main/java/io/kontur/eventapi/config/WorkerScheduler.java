@@ -1,6 +1,7 @@
 package io.kontur.eventapi.config;
 
 import io.kontur.eventapi.firms.feedcomposition.FirmsFeedCompositionJob;
+import io.kontur.eventapi.job.EnrichmentJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
@@ -38,6 +39,7 @@ public class WorkerScheduler {
     private final TornadoJapanMaImportJob tornadoJapanMaImportJob;
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob;
     private final PdcMapSrvSearchJob pdcMapSrvSearchJob;
+    private final EnrichmentJob enrichmentJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -67,6 +69,8 @@ public class WorkerScheduler {
     private String historicalTornadoJapanMaImportEnabled;
     @Value("${scheduler.pdcMapSrvSearch.enable}")
     private String pdcMapSrvSearchEnabled;
+    @Value("${scheduler.enrichment.enable}")
+    private String enrichmentEnabled;
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
@@ -75,7 +79,8 @@ public class WorkerScheduler {
                            StaticImportJob staticImportJob, StormsNoaaImportJob stormsNoaaImportJob,
                            TornadoJapanMaImportJob tornadoJapanMaImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
-                           PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob) {
+                           PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
+                           EnrichmentJob enrichmentJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -90,6 +95,7 @@ public class WorkerScheduler {
         this.historicalTornadoJapanMaImportJob = historicalTornadoJapanMaImportJob;
         this.pdcMapSrvSearchJob = pdcMapSrvSearchJob;
         this.firmsFeedCompositionJob = firmsFeedCompositionJob;
+        this.enrichmentJob = enrichmentJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -206,6 +212,15 @@ public class WorkerScheduler {
             firmsFeedCompositionJob.run();
         } else {
             LOG.info("Firms Feed Compose job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.enrichment.initialDelay}", fixedDelayString = "${scheduler.enrichment.fixedDelay}")
+    public void startEnrichmentJob() {
+        if (Boolean.parseBoolean(enrichmentEnabled)) {
+            enrichmentJob.run();
+        } else {
+            LOG.info("Enrichment job invocation is skipped");
         }
     }
 

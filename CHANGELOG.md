@@ -12,14 +12,19 @@
 - pdcMapSrv
 - Change time of jobs delay: normalization, eventCombination, feedComposition - from 60000 to 1000 ms.
   Added firms feed composition job. Added alias values to feedComposition.
+- Enrichment step
 
 ```yaml
 
 pdc:
   mapSrvHost: 'https://testapps.pdc.org'
+  
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
+konturApps:
+  host: 'https://test-apps02.konturlabs.com/'
+  
 scheduler:
   pdcMapSrvSearch:
     enable: true
@@ -44,6 +49,10 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 1000
     alias: firms
+  enrichment:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
 ```
 
 #### Removed
