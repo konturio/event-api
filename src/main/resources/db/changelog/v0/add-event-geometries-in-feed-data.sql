@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:v0/add-event-geometries-in-feed-data.sql runOnChange:false splitStatements:false
+--changeset event-api-migrations:v0/add-event-geometries-in-feed-data.sql runOnChange:true splitStatements:false
 
 CREATE OR REPLACE FUNCTION collectEventGeometries(jsonb) RETURNS JSONB
 AS $$
@@ -9,7 +9,7 @@ AS $$
     from (
         select
             f.feature -> 'properties' -> 'areaType' as areaType,
-            st_union(st_geomfromgeojson(NULLIF(feature -> 'geometry', 'null'::jsonb))) as geom
+            st_union(st_makevalid(st_geomfromgeojson(NULLIF(feature -> 'geometry', 'null'::jsonb)))) as geom
         from (
             select jsonb_array_elements(e -> 'geometries' -> 'features') as feature
             from jsonb_array_elements($1) e
