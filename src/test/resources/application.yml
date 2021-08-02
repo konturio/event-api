@@ -88,9 +88,6 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
 
-auth0:
-  audience: localhost
-
 spring:
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
@@ -100,7 +97,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://konturlabs.us.auth0.com/
+          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag
+          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag/protocol/openid-connect/certs
 
 mybatis:
   mapper-locations: classpath:db/mappers/*Mapper.xml

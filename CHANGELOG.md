@@ -3,6 +3,18 @@
 ## UNRELEASED
 #### Added
 
+- Keycloak auth, we need to use ISSUER_URI as follows - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]`,
+  and JWK_SET_URI - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/protocol/openid-connect/certs`
+
+```yaml
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: [ISSUER_URI]
+        jwk-set-uri: [JWK_SET_URI]
+```
+
 ####Changed
 
 ## 0.5 - 2021-07-22

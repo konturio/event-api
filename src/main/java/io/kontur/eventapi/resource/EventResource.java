@@ -52,7 +52,7 @@ public class EventResource {
             "<li>nextAfterValue equals to the latest updatedAt event value on the page.</li></ul>")
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DataPaginationDTO.class)))
     @ApiResponse(responseCode = "204", description = "No content. Try to check filters values.", content = @Content())
-    @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
+    @PreAuthorize("hasAuthority('read:feed:'+#feed)")
     public ResponseEntity<DataPaginationDTO> searchEvents(
             @Parameter(description = "Feed name")
             @RequestParam(value = "feed")
@@ -109,7 +109,7 @@ public class EventResource {
 
     @GetMapping(path = "/observations/{observationId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @Operation(tags = "Events", summary = "returns raw data", description = "Returns raw data which was used to combine events and episodes.")
-    @PreAuthorize("hasAuthority('SCOPE_read:raw-data')")
+    @PreAuthorize("hasAuthority('read:raw-data')")
     public ResponseEntity<String> rawData(@Parameter(description = "Observation UUID. May be gathered from event's 'observations' field") @PathVariable UUID observationId) {
         String rawData = eventResourceService.getRawData(observationId);
         if (StringUtils.isEmpty(rawData)) {
@@ -125,7 +125,7 @@ public class EventResource {
 
     @GetMapping(path = "/event", produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(tags = "Events", summary = "returns event", description = "Returns event by its version, id and feed alias. If no version is provided the latest event version is returned.")
-    @PreAuthorize("hasAuthority('SCOPE_read:feed:'+#feed)")
+    @PreAuthorize("hasAuthority('read:feed:'+#feed)")
     public ResponseEntity<FeedData> getLastEventById(@Parameter(description = "Feed name") @RequestParam(value = "feed") String feed,
                                                      @Parameter(description = "Version") @RequestParam(value = "version", required = false) Long version,
                                                      @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId) {
