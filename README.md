@@ -43,12 +43,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: 'ISSUER_URI'
-auth0:
-  audience: 'APP_URL'
+          issuer-uri: [ISSUER_URI]
+          jwk-set-uri: [JWK_SET_URI]
 ```
- - `APP_URL` - should match Identifier value from auth0 API configuration.
- - `ISSUER_URI` -  Auth0 tenant URL. E.g. `https://konturlabs.us.auth0.com/`
+
+- `ISSUER_URI` -  the base Keycloak Authorization Server URI. Like `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/`
+- `JWK_SET_URI` - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/protocol/openid-connect/certs`
 
 #####Providers configuration
 

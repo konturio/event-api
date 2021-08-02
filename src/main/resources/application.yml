@@ -3,9 +3,6 @@ server:
     contextPath: /events
   port: 8624
 
-auth0:
-  audience: https://test-apps02.konturlabs.com/events/
-
 spring:
   datasource:
     platform: postgres
@@ -20,7 +17,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://konturlabs.us.auth0.com/
+          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag
+          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag/protocol/openid-connect/certs
   cloud:
     discovery:
       client:

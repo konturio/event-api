@@ -8,9 +8,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: 'https://konturlabs.us.auth0.com/'
-auth0:
-  audience: 'https://test-apps02.konturlabs.com/events/'
+          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag
+          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag/protocol/openid-connect/certs
 
 konturApi:
   host: 'https://api.kontur.io/'
