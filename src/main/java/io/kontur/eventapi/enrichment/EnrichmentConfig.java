@@ -12,6 +12,10 @@ public class EnrichmentConfig {
     public static final String PEOPLE_WITHOUT_OSM_OBJECTS = "peopleWithoutOsmObjects";
     public static final String AREA_WITHOUT_OSM_OBJECTS_KM2 = "areaWithoutOsmObjectsKm2";
     public static final String OSM_GAPS_PERCENTAGE = "osmGapsPercentage";
+    public static final String INDUSTRIAL_AREA_KM2 = " industrialAreaKm2";
+    public static final String FOREST_AREA_KM2 = "forestAreaKm2";
+    public static final String VOLCANOES_COUNT = "volcanoesCount";
+    public static final String HOTSPOT_DAYS_PER_YEAR_MAX = "hotspotDaysPerYearMax";
 
     public static final Set<String> osmQuality = Set.of(
             OSM_GAPS_PERCENTAGE,
@@ -23,6 +27,12 @@ public class EnrichmentConfig {
             AREA_WITHOUT_OSM_OBJECTS_KM2);
 
     public static final Set<String> population = Set.of(POPULATION);
+
+    public static final Set<String> thermalSpotStatistic = Set.of(
+            INDUSTRIAL_AREA_KM2,
+            FOREST_AREA_KM2,
+            VOLCANOES_COUNT,
+            HOTSPOT_DAYS_PER_YEAR_MAX);
 
     public static final Set<String> humanitarianImpact = Set.of(HUMANITARIAN_IMPACT);
 }

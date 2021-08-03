@@ -27,7 +27,7 @@ public class EnrichmentJob extends AbstractJob {
     protected final FeedDao feedDao;
     private final KonturAppsClient konturAppsClient;
 
-    private static final String paramsPattern = "populationStatistic { osmQuality { %s } population { %s } %s }";
+    private static final String paramsPattern = "analytics { osmQuality { %s } population { %s } thermalSpotStatistic { %s } %s }";
     private static final String queryPattern = "{ polygonStatistic(polygonStatisticRequest: {polygon: \"%s\"}) { %s } }";
 
     public EnrichmentJob(MeterRegistry meterRegistry, FeedDao feedDao, KonturAppsClient konturAppsClient) {
@@ -50,10 +50,7 @@ public class EnrichmentJob extends AbstractJob {
 
     protected void enrichFeed(Feed feed) {
         List<String> feedEnrichment = feed.getEnrichment();
-        String osmQualityString = formatQueryParam(osmQuality, feedEnrichment);
-        String populationString = formatQueryParam(population, feedEnrichment);
-        String humanitarianImpactString = formatQueryParam(humanitarianImpact, feedEnrichment);
-        String feedParamsString = String.format(paramsPattern, osmQualityString, populationString, humanitarianImpactString);
+        String feedParamsString = formatQueryParams(feedEnrichment);
 
         List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
         LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
@@ -83,6 +80,15 @@ public class EnrichmentJob extends AbstractJob {
             LOG.error(e.getMessage() + "\n" + query);
             return null;
         }
+    }
+
+    private String formatQueryParams(List<String> feedEnrichment) {
+        String osmQualityString = formatQueryParam(osmQuality, feedEnrichment);
+        String populationString = formatQueryParam(population, feedEnrichment);
+        String thermalSpotStatisticString = formatQueryParam(thermalSpotStatistic, feedEnrichment);
+        String humanitarianImpactString = formatQueryParam(humanitarianImpact, feedEnrichment);
+        return String.format(paramsPattern, osmQualityString, populationString, thermalSpotStatisticString,
+                humanitarianImpactString);
     }
 
     private String formatQueryParam(Set<String> allParams, List<String> requiredParams) {

@@ -16,13 +16,14 @@ public class InsightsApiResponse {
 
     @Data
     public static class PolygonStatistic {
-        private PopulationStatistic populationStatistic;
+        private Analytics analytics;
     }
 
     @Data
-    public static class PopulationStatistic {
+    public static class Analytics {
         private OsmQuality osmQuality;
         private Population population;
+        private ThermalSpotStatistic thermalSpotStatistic;
         private String humanitarianImpact;
     }
 
@@ -40,6 +41,14 @@ public class InsightsApiResponse {
     @Data
     public static class Population {
         private Long population;
+    }
+
+    @Data
+    public static class ThermalSpotStatistic {
+        private Long volcanoesCount;
+        private Double forestAreaKm2;
+        private Double industrialAreaKm2;
+        private Long hotspotDaysPerYearMax;
     }
 
     @Data

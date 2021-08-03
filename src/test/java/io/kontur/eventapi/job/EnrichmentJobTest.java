@@ -110,11 +110,11 @@ public class EnrichmentJobTest {
         osmQuality.setOsmGapsPercentage(0.);
         InsightsApiResponse.Population population = new InsightsApiResponse.Population();
         population.setPopulation(0L);
-        InsightsApiResponse.PopulationStatistic populationStatistic = new InsightsApiResponse.PopulationStatistic();
+        InsightsApiResponse.Analytics populationStatistic = new InsightsApiResponse.Analytics();
         populationStatistic.setOsmQuality(osmQuality);
         populationStatistic.setPopulation(population);
         InsightsApiResponse.PolygonStatistic polygonStatistic = new InsightsApiResponse.PolygonStatistic();
-        polygonStatistic.setPopulationStatistic(populationStatistic);
+        polygonStatistic.setAnalytics(populationStatistic);
         InsightsApiResponse.ResponseData responseData = new InsightsApiResponse.ResponseData();
         responseData.setPolygonStatistic(polygonStatistic);
         InsightsApiResponse response = new InsightsApiResponse();
