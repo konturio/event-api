@@ -1,100 +1,100 @@
-﻿<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
-	<cap:identifier>GDACS_EQ_1278648_1387485</cap:identifier>
-	<cap:sender>info-gdacs@gdacs.org</cap:sender>
-	<cap:sent>2021-07-26T01:52:03-00:00</cap:sent>
-	<cap:status>Actual</cap:status>
-	<cap:msgType>Alert</cap:msgType>
-	<cap:scope>Public</cap:scope>
-	<cap:incidents>1278648</cap:incidents>
-	<cap:info>
-		<cap:category>Geo</cap:category>
-		<cap:event>Earthquake</cap:event>
-		<cap:urgency>Past</cap:urgency>
-		<cap:severity>Moderate</cap:severity>
-		<cap:certainty>Observed</cap:certainty>
-		<cap:senderName>Global Disaster Alert and Coordination System</cap:senderName>
-		<cap:headline>Green earthquake alert (Magnitude 5.7M, Depth:18.15km) in Indonesia 26/07/2021 03:52 UTC, 340000 people within 100km.</cap:headline>
-		<cap:description>On 7/26/2021 3:52:03 AM, an earthquake occurred in Indonesia potentially affecting 340000 people within 100km. The earthquake had Magnitude 5.7M, Depth:18.15km.</cap:description>
-		<cap:web>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1278648</cap:web>
-		<cap:parameter>
-			<cap:valueName>eventid</cap:valueName>
-			<cap:value>1278648</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>currentepisodeid</cap:valueName>
-			<cap:value>1387485</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>glide</cap:valueName>
-			<cap:value/>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>version</cap:valueName>
-			<cap:value>1</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>fromdate</cap:valueName>
-			<cap:value>Mon, 26 Jul 2021 03:52 GMT</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>todate</cap:valueName>
-			<cap:value>Mon, 26 Jul 2021 03:52 GMT</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>eventtype</cap:valueName>
-			<cap:value>EQ</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>alertlevel</cap:valueName>
-			<cap:value>Green</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>alerttype</cap:valueName>
-			<cap:value>automatic</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>link</cap:valueName>
-			<cap:value>https://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1278648</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>country</cap:valueName>
-			<cap:value>Indonesia</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>eventname</cap:valueName>
-			<cap:value/>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>severity</cap:valueName>
-			<cap:value>Magnitude 5.7M, Depth:18.15km</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>population</cap:valueName>
-			<cap:value>340000 people within 100km</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>vulnerability</cap:valueName>
-			<cap:value/>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>sourceid</cap:valueName>
-			<cap:value>NEIC</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>iso3</cap:valueName>
-			<cap:value>IDN</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>hazardcomponents</cap:valueName>
-			<cap:value>EQ,magnitude=5.7,depth=18.15,alertleveltype=SM;JETS=true</cap:value>
-		</cap:parameter>
-		<cap:parameter>
-			<cap:valueName>datemodified</cap:valueName>
-			<cap:value>Tue, 27 Jul 2021 03:56 GMT</cap:value>
-		</cap:parameter>
-		<cap:area>
-			<cap:areaDesc>Polygon</cap:areaDesc>
-			<cap:polygon>-0.728,122.831 -0.697,122.83 -0.665,122.828 -0.634,122.826 -0.603,122.822 -0.572,122.817 -0.541,122.811 -0.51,122.804 -0.48,122.796 -0.45,122.787 -0.42,122.776 -0.391,122.765 -0.362,122.753 -0.333,122.739 -0.305,122.725 -0.278,122.71 -0.251,122.694 -0.225,122.677 -0.199,122.659 -0.174,122.64 -0.149,122.62 -0.125,122.599 -0.102,122.578 -0.08,122.556 -0.059,122.533 -0.038,122.509 -0.018,122.484 0.001,122.459 0.019,122.434 0.036,122.407 0.052,122.38 0.067,122.353 0.081,122.325 0.095,122.296 0.107,122.267 0.118,122.238 0.129,122.208 0.138,122.178 0.146,122.148 0.153,122.117 0.159,122.086 0.164,122.055 0.168,122.024 0.17,121.993 0.172,121.961 0.173,121.93 0.172,121.898 0.17,121.867 0.168,121.836 0.164,121.804 0.159,121.773 0.153,121.742 0.146,121.712 0.138,121.681 0.129,121.651 0.118,121.622 0.107,121.592 0.095,121.563 0.081,121.535 0.067,121.507 0.052,121.479 0.036,121.452 0.019,121.426 0.001,121.4 -0.018,121.375 -0.038,121.351 -0.059,121.327 -0.08,121.304 -0.102,121.282 -0.125,121.26 -0.149,121.24 -0.174,121.22 -0.199,121.201 -0.225,121.183 -0.251,121.166 -0.278,121.149 -0.305,121.134 -0.333,121.12 -0.362,121.107 -0.391,121.094 -0.42,121.083 -0.45,121.073 -0.48,121.064 -0.51,121.055 -0.541,121.048 -0.572,121.042 -0.603,121.037 -0.634,121.034 -0.665,121.031 -0.697,121.029 -0.728,121.029 -0.76,121.029 -0.791,121.031 -0.822,121.034 -0.854,121.037 -0.885,121.042 -0.916,121.048 -0.946,121.055 -0.977,121.064 -1.007,121.073 -1.036,121.083 -1.066,121.094 -1.095,121.107 -1.123,121.12 -1.151,121.134 -1.179,121.149 -1.206,121.166 -1.232,121.183 -1.258,121.201 -1.283,121.22 -1.307,121.24 -1.331,121.26 -1.354,121.282 -1.376,121.304 -1.398,121.327 -1.418,121.351 -1.438,121.375 -1.457,121.4 -1.475,121.426 -1.492,121.452 -1.509,121.479 -1.524,121.507 -1.538,121.535 -1.551,121.563 -1.564,121.592 -1.575,121.622 -1.585,121.651 -1.594,121.681 -1.602,121.712 -1.61,121.742 -1.616,121.773 -1.62,121.804 -1.624,121.836 -1.627,121.867 -1.629,121.898 -1.629,121.93 -1.629,121.961 -1.627,121.993 -1.624,122.024 -1.62,122.055 -1.616,122.086 -1.61,122.117 -1.602,122.148 -1.594,122.178 -1.585,122.208 -1.575,122.238 -1.564,122.267 -1.551,122.296 -1.538,122.325 -1.524,122.353 -1.509,122.38 -1.492,122.407 -1.475,122.434 -1.457,122.459 -1.438,122.484 -1.418,122.509 -1.398,122.533 -1.376,122.556 -1.354,122.578 -1.331,122.599 -1.307,122.62 -1.283,122.64 -1.258,122.659 -1.232,122.677 -1.206,122.694 -1.179,122.71 -1.151,122.725 -1.123,122.739 -1.095,122.753 -1.066,122.765 -1.036,122.776 -1.007,122.787 -0.977,122.796 -0.946,122.804 -0.916,122.811 -0.885,122.817 -0.854,122.822 -0.822,122.826 -0.791,122.828 -0.76,122.83 -0.728,122.831 -0.728,122.831</cap:polygon>
-		</cap:area>
-	</cap:info>
-</cap:alert>
+﻿<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+	<identifier>GDACS_EQ_1279931_1389192</identifier>
+	<sender>info-gdacs@gdacs.org</sender>
+	<sent>2021-08-03T05:28:23-00:00</sent>
+	<status>Actual</status>
+	<msgType>Alert</msgType>
+	<scope>Public</scope>
+	<incidents>1279931</incidents>
+	<info>
+		<category>Geo</category>
+		<event>Earthquake</event>
+		<urgency>Past</urgency>
+		<severity>Minor</severity>
+		<certainty>Observed</certainty>
+		<senderName>Global Disaster Alert and Coordination System</senderName>
+		<headline>Green earthquake alert (Magnitude 4.6M, Depth:19.09km) in Japan 03/08/2021 07:28 UTC, No people within 100km.</headline>
+		<description>On 8/3/2021 7:28:23 AM, an earthquake occurred in Japan potentially affecting No people within 100km. The earthquake had Magnitude 4.6M, Depth:19.09km.</description>
+		<web>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1279931</web>
+		<parameter>
+			<valueName>eventid</valueName>
+			<value>1279931</value>
+		</parameter>
+		<parameter>
+			<valueName>currentepisodeid</valueName>
+			<value>1389192</value>
+		</parameter>
+		<parameter>
+			<valueName>glide</valueName>
+			<value/>
+		</parameter>
+		<parameter>
+			<valueName>version</valueName>
+			<value>1</value>
+		</parameter>
+		<parameter>
+			<valueName>fromdate</valueName>
+			<value>Tue, 03 Aug 2021 07:28:23 GMT</value>
+		</parameter>
+		<parameter>
+			<valueName>todate</valueName>
+			<value>Tue, 03 Aug 2021 07:28:23 GMT</value>
+		</parameter>
+		<parameter>
+			<valueName>eventtype</valueName>
+			<value>EQ</value>
+		</parameter>
+		<parameter>
+			<valueName>alertlevel</valueName>
+			<value>Green</value>
+		</parameter>
+		<parameter>
+			<valueName>alerttype</valueName>
+			<value>automatic</value>
+		</parameter>
+		<parameter>
+			<valueName>link</valueName>
+			<value>http://www.gdacs.org/report.aspx?eventtype=EQ&amp;eventid=1279931</value>
+		</parameter>
+		<parameter>
+			<valueName>country</valueName>
+			<value>Japan</value>
+		</parameter>
+		<parameter>
+			<valueName>eventname</valueName>
+			<value/>
+		</parameter>
+		<parameter>
+			<valueName>severity</valueName>
+			<value>Magnitude 4.6M, Depth:19.09km</value>
+		</parameter>
+		<parameter>
+			<valueName>population</valueName>
+			<value>No people within 100km</value>
+		</parameter>
+		<parameter>
+			<valueName>vulnerability</valueName>
+			<value/>
+		</parameter>
+		<parameter>
+			<valueName>sourceid</valueName>
+			<value>NEIC</value>
+		</parameter>
+		<parameter>
+			<valueName>iso3</valueName>
+			<value>JPN</value>
+		</parameter>
+		<parameter>
+			<valueName>hazardcomponents</valueName>
+			<value>EQ,magnitude=4.6,depth=19.09,alertleveltype=EQ;JETS=true</value>
+		</parameter>
+		<parameter>
+			<valueName>datemodified</valueName>
+			<value>Tue, 03 Aug 2021 10:23:24 GMT</value>
+		</parameter>
+		<area>
+			<areaDesc>Polygon</areaDesc>
+			<polygon>36.194,143.047 36.225,143.046 36.257,143.044 36.288,143.041 36.319,143.036 36.35,143.03 36.381,143.023 36.412,143.014 36.442,143.004 36.472,142.992 36.502,142.98 36.531,142.966 36.56,142.951 36.589,142.934 36.617,142.916 36.644,142.897 36.671,142.877 36.698,142.856 36.724,142.834 36.749,142.81 36.773,142.786 36.797,142.76 36.82,142.734 36.842,142.706 36.863,142.678 36.884,142.648 36.904,142.618 36.923,142.587 36.941,142.555 36.958,142.522 36.974,142.489 36.989,142.455 37.004,142.42 37.017,142.385 37.029,142.349 37.041,142.313 37.051,142.276 37.06,142.238 37.068,142.201 37.075,142.163 37.081,142.125 37.086,142.086 37.09,142.047 37.093,142.009 37.094,141.97 37.095,141.931 37.094,141.892 37.093,141.853 37.09,141.814 37.086,141.775 37.081,141.737 37.075,141.699 37.068,141.661 37.06,141.623 37.051,141.586 37.041,141.549 37.029,141.513 37.017,141.477 37.004,141.441 36.989,141.407 36.974,141.373 36.958,141.339 36.941,141.306 36.923,141.275 36.904,141.243 36.884,141.213 36.863,141.184 36.842,141.155 36.82,141.128 36.797,141.101 36.773,141.076 36.749,141.051 36.724,141.028 36.698,141.005 36.671,140.984 36.644,140.964 36.617,140.945 36.589,140.927 36.56,140.911 36.531,140.896 36.502,140.882 36.472,140.869 36.442,140.858 36.412,140.848 36.381,140.839 36.35,140.831 36.319,140.825 36.288,140.82 36.257,140.817 36.225,140.815 36.194,140.814 36.163,140.815 36.131,140.817 36.1,140.82 36.069,140.825 36.038,140.831 36.007,140.839 35.976,140.848 35.946,140.858 35.916,140.869 35.886,140.882 35.857,140.896 35.828,140.911 35.799,140.927 35.771,140.945 35.744,140.964 35.717,140.984 35.69,141.005 35.664,141.028 35.639,141.051 35.615,141.076 35.591,141.101 35.568,141.128 35.546,141.155 35.525,141.184 35.504,141.213 35.484,141.243 35.465,141.275 35.447,141.306 35.43,141.339 35.414,141.373 35.399,141.407 35.384,141.441 35.371,141.477 35.359,141.513 35.347,141.549 35.337,141.586 35.328,141.623 35.32,141.661 35.313,141.699 35.307,141.737 35.302,141.775 35.298,141.814 35.295,141.853 35.294,141.892 35.293,141.931 35.294,141.97 35.295,142.009 35.298,142.047 35.302,142.086 35.307,142.125 35.313,142.163 35.32,142.201 35.328,142.238 35.337,142.276 35.347,142.313 35.359,142.349 35.371,142.385 35.384,142.42 35.399,142.455 35.414,142.489 35.43,142.522 35.447,142.555 35.465,142.587 35.484,142.618 35.504,142.648 35.525,142.678 35.546,142.706 35.568,142.734 35.591,142.76 35.615,142.786 35.639,142.81 35.664,142.834 35.69,142.856 35.717,142.877 35.744,142.897 35.771,142.916 35.799,142.934 35.828,142.951 35.857,142.966 35.886,142.98 35.916,142.992 35.946,143.004 35.976,143.014 36.007,143.023 36.038,143.03 36.069,143.036 36.1,143.041 36.131,143.044 36.163,143.046 36.194,143.047 36.194,143.047</polygon>
+		</area>
+	</info>
+</alert>
