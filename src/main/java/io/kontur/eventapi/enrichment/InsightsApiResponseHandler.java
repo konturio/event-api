@@ -19,11 +19,11 @@ public class InsightsApiResponseHandler {
             throw new Exception(message);
         }
         Map<String, Object> analytics = new HashMap<>();
-        enrichmentParams.forEach(param -> analytics.put(param, getParamFromResponse(param, response.getData().getPolygonStatistic().getPopulationStatistic())));
+        enrichmentParams.forEach(param -> analytics.put(param, getParamFromResponse(param, response.getData().getPolygonStatistic().getAnalytics())));
         return analytics;
     }
 
-    private static Object getParamFromResponse(String param, InsightsApiResponse.PopulationStatistic data) {
+    private static Object getParamFromResponse(String param, InsightsApiResponse.Analytics data) {
         switch (param) {
             case POPULATION: return data.getPopulation().getPopulation();
             case HUMANITARIAN_IMPACT: return readJson(data.getHumanitarianImpact(), FeatureCollection.class);
@@ -34,6 +34,10 @@ public class InsightsApiResponseHandler {
             case PEOPLE_WITHOUT_OSM_OBJECTS: return data.getOsmQuality().getPeopleWithoutOsmObjects();
             case AREA_WITHOUT_OSM_OBJECTS_KM2: return data.getOsmQuality().getAreaWithoutOsmObjectsKm2();
             case OSM_GAPS_PERCENTAGE: return data.getOsmQuality().getOsmGapsPercentage();
+            case INDUSTRIAL_AREA_KM2: return data.getThermalSpotStatistic().getIndustrialAreaKm2();
+            case FOREST_AREA_KM2: return data.getThermalSpotStatistic().getForestAreaKm2();
+            case VOLCANOES_COUNT: return data.getThermalSpotStatistic().getVolcanoesCount();
+            case HOTSPOT_DAYS_PER_YEAR_MAX: return data.getThermalSpotStatistic().getHotspotDaysPerYearMax();
             default: return null;
         }
     }
