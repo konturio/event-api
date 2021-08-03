@@ -54,7 +54,6 @@ public class GdacsAlertXmlParser {
     private static final String VALUE_NAME = "valueName";
 
     private static final String NS = "*";
-    private static final String PREFIX = "cap:";
 
     public OffsetDateTime getPubDate(String xml) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
         var xmlDocument = getXmlDocument(xml);
@@ -120,9 +119,9 @@ public class GdacsAlertXmlParser {
                     alertXml));
 
         } catch (IOException | SAXException e) {
-            LOG.warn("Alert is not valid and can not be parsed: \n" + alertXml);
+            LOG.warn("Alert is not valid and can not be parsed: \n" + alertXml, e);
         } catch (DateTimeParseException e) {
-            LOG.warn("Alert value of parameter 'datemodified' can not be parsed: \n" + alertXml);
+            LOG.warn("Alert value of parameter 'datemodified' can not be parsed: \n" + alertXml, e);
         }
         return Optional.empty();
     }
@@ -164,9 +163,9 @@ public class GdacsAlertXmlParser {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         for (int i = 0; i < parameterNodes.getLength(); i++) {
             NodeList parameterChildNodes = parameterNodes.item(i).getChildNodes();
-            String parameterName = getNodeValueByName(parameterChildNodes, PREFIX + VALUE_NAME);
+            String parameterName = getNodeValueByName(parameterChildNodes, VALUE_NAME);
             if (parameters.containsKey(parameterName)) {
-                parameters.replace(parameterName, getNodeValueByName(parameterChildNodes, PREFIX + VALUE));
+                parameters.replace(parameterName, getNodeValueByName(parameterChildNodes, VALUE));
             }
         }
         return parameters;
@@ -175,7 +174,7 @@ public class GdacsAlertXmlParser {
     private String getNodeValueByName(NodeList nodes, String childNodeName) {
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
-            if (node.getNodeName().equals(childNodeName)) {
+            if (StringUtils.equals(node.getLocalName(), childNodeName)) {
                 return node.getTextContent();
             }
         }
