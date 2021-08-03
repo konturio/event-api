@@ -15,7 +15,8 @@ public abstract class GdacsNormalizer extends Normalizer {
             "Tropical Cyclone", EventType.CYCLONE,
             "Volcano Eruption", EventType.VOLCANO,
             "Forest Fires", EventType.WILDFIRE,
-            "Forest Fires area", EventType.WILDFIRE
+            "Forest Fires area", EventType.WILDFIRE,
+            "WildFire area", EventType.WILDFIRE
     );
 
     private static final Map<String, EventType> geometryTypeMap = Map.of(
