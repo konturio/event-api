@@ -1,10 +1,10 @@
 package io.kontur.eventapi.enrichment;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EnrichmentConfig {
     public static final String POPULATION = "population";
-    public static final String HUMANITARIAN_IMPACT = "humanitarianImpact";
     public static final String PEOPLE_WITHOUT_OSM_BUILDINGS = "peopleWithoutOsmBuildings";
     public static final String AREA_WITHOUT_OSM_BUILDINGS_KM2 = "areaWithoutOsmBuildingsKm2";
     public static final String PEOPLE_WITHOUT_OSM_ROADS = "peopleWithoutOsmRoads";
@@ -12,27 +12,34 @@ public class EnrichmentConfig {
     public static final String PEOPLE_WITHOUT_OSM_OBJECTS = "peopleWithoutOsmObjects";
     public static final String AREA_WITHOUT_OSM_OBJECTS_KM2 = "areaWithoutOsmObjectsKm2";
     public static final String OSM_GAPS_PERCENTAGE = "osmGapsPercentage";
-    public static final String INDUSTRIAL_AREA_KM2 = " industrialAreaKm2";
+    public static final String INDUSTRIAL_AREA_KM2 = "industrialAreaKm2";
     public static final String FOREST_AREA_KM2 = "forestAreaKm2";
     public static final String VOLCANOES_COUNT = "volcanoesCount";
     public static final String HOTSPOT_DAYS_PER_YEAR_MAX = "hotspotDaysPerYearMax";
+    public static final String HUMANITARIAN_IMPACT = "humanitarianImpact";
 
-    public static final Set<String> osmQuality = Set.of(
-            OSM_GAPS_PERCENTAGE,
-            PEOPLE_WITHOUT_OSM_BUILDINGS,
-            AREA_WITHOUT_OSM_BUILDINGS_KM2,
-            PEOPLE_WITHOUT_OSM_ROADS,
-            AREA_WITHOUT_OSM_ROADS_KM2,
-            PEOPLE_WITHOUT_OSM_OBJECTS,
-            AREA_WITHOUT_OSM_OBJECTS_KM2);
+    public static final String OSM_QUALITY_GROUP = "osmQuality";
+    public static final String POPULATION_GROUP = "population";
+    public static final String THERMAL_SPOT_STATISTIC_GROUP = "thermalSpotStatistic";
+    public static final String NO_GROUP = "no group";
 
-    public static final Set<String> population = Set.of(POPULATION);
+    public static Map<String, String> groups = new HashMap<>();
+    static {
+        groups.put(POPULATION, POPULATION_GROUP);
 
-    public static final Set<String> thermalSpotStatistic = Set.of(
-            INDUSTRIAL_AREA_KM2,
-            FOREST_AREA_KM2,
-            VOLCANOES_COUNT,
-            HOTSPOT_DAYS_PER_YEAR_MAX);
+        groups.put(PEOPLE_WITHOUT_OSM_BUILDINGS, OSM_QUALITY_GROUP);
+        groups.put(AREA_WITHOUT_OSM_BUILDINGS_KM2, OSM_QUALITY_GROUP);
+        groups.put(PEOPLE_WITHOUT_OSM_OBJECTS, OSM_QUALITY_GROUP);
+        groups.put(AREA_WITHOUT_OSM_OBJECTS_KM2, OSM_QUALITY_GROUP);
+        groups.put(PEOPLE_WITHOUT_OSM_ROADS, OSM_QUALITY_GROUP);
+        groups.put(AREA_WITHOUT_OSM_ROADS_KM2, OSM_QUALITY_GROUP);
+        groups.put(OSM_GAPS_PERCENTAGE, OSM_QUALITY_GROUP);
 
-    public static final Set<String> humanitarianImpact = Set.of(HUMANITARIAN_IMPACT);
+        groups.put(INDUSTRIAL_AREA_KM2, THERMAL_SPOT_STATISTIC_GROUP);
+        groups.put(FOREST_AREA_KM2, THERMAL_SPOT_STATISTIC_GROUP);
+        groups.put(VOLCANOES_COUNT, THERMAL_SPOT_STATISTIC_GROUP);
+        groups.put(HOTSPOT_DAYS_PER_YEAR_MAX, THERMAL_SPOT_STATISTIC_GROUP);
+
+        groups.put(HUMANITARIAN_IMPACT, NO_GROUP);
+    }
 }
