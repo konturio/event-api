@@ -8,16 +8,15 @@ import io.kontur.eventapi.entity.Feed;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.commons.lang3.RegExUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.FeatureCollection;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
+import static io.kontur.eventapi.enrichment.InsightsApiRequestBuilder.buildParams;
+import static io.kontur.eventapi.enrichment.InsightsApiRequestBuilder.buildRequest;
 import static io.kontur.eventapi.enrichment.InsightsApiResponseHandler.processResponse;
 
 @Component
@@ -26,9 +25,6 @@ public class EnrichmentJob extends AbstractJob {
     private final Logger LOG = LoggerFactory.getLogger(EnrichmentJob.class);
     protected final FeedDao feedDao;
     private final KonturAppsClient konturAppsClient;
-
-    private static final String paramsPattern = "analytics { osmQuality { %s } population { %s } thermalSpotStatistic { %s } %s }";
-    private static final String queryPattern = "{ polygonStatistic(polygonStatisticRequest: {polygon: \"%s\"}) { %s } }";
 
     public EnrichmentJob(MeterRegistry meterRegistry, FeedDao feedDao, KonturAppsClient konturAppsClient) {
         super(meterRegistry);
@@ -50,7 +46,7 @@ public class EnrichmentJob extends AbstractJob {
 
     protected void enrichFeed(Feed feed) {
         List<String> feedEnrichment = feed.getEnrichment();
-        String feedParamsString = formatQueryParams(feedEnrichment);
+        String feedParamsString = buildParams(feedEnrichment);
 
         List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
         LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
@@ -71,28 +67,14 @@ public class EnrichmentJob extends AbstractJob {
     }
 
     private Map<String, Object> getAnalytics(FeatureCollection geometry, List<String> feedEnrichment, String feedParamsString) {
-        String geometryString = RegExUtils.replaceAll(geometry.toString(), "\"", "\\\\\\\"");
-        String query = String.format(queryPattern, geometryString, feedParamsString);
+        InsightsApiRequest request = buildRequest(geometry, feedParamsString);
         try {
-            InsightsApiResponse response = konturAppsClient.graphql(new InsightsApiRequest(query));
+            InsightsApiResponse response = konturAppsClient.graphql(request);
             return processResponse(response, feedEnrichment);
         } catch (Exception e) {
-            LOG.error(e.getMessage() + "\n" + query);
+            LOG.error(e.getMessage() + "\n" + request.getQuery());
             return null;
         }
-    }
-
-    private String formatQueryParams(List<String> feedEnrichment) {
-        String osmQualityString = formatQueryParam(osmQuality, feedEnrichment);
-        String populationString = formatQueryParam(population, feedEnrichment);
-        String thermalSpotStatisticString = formatQueryParam(thermalSpotStatistic, feedEnrichment);
-        String humanitarianImpactString = formatQueryParam(humanitarianImpact, feedEnrichment);
-        return String.format(paramsPattern, osmQualityString, populationString, thermalSpotStatisticString,
-                humanitarianImpactString);
-    }
-
-    private String formatQueryParam(Set<String> allParams, List<String> requiredParams) {
-        return allParams.stream().filter(requiredParams::contains).collect(Collectors.joining(" "));
     }
 
     private boolean needsEnrichment(Map<String, Object> details, FeatureCollection geometries) {
