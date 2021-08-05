@@ -5,6 +5,8 @@
 
 - Keycloak auth, we need to use ISSUER_URI as follows - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]`,
   and JWK_SET_URI - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/protocol/openid-connect/certs`
+- Enrichment step
+- Added public feed
 
 ```yaml
 security:
@@ -13,6 +15,14 @@ security:
       jwt:
         issuer-uri: [ISSUER_URI]
         jwk-set-uri: [JWK_SET_URI]
+
+scheduler:
+  feedComposition:
+    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
+  enrichment:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
 ```
 
 ####Changed
@@ -24,7 +34,6 @@ security:
 - pdcMapSrv
 - Change time of jobs delay: normalization, eventCombination, feedComposition - from 60000 to 1000 ms.
   Added firms feed composition job. Added alias values to feedComposition.
-- Enrichment step
 
 ```yaml
 
@@ -61,10 +70,6 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 1000
     alias: firms
-  enrichment:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1000
 ```
 
 #### Removed

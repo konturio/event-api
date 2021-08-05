@@ -142,5 +142,8 @@ databaseChangeLog:
     relativeToChangelogFile: true
     file: update-feed-data-is-latest-version-index.sql
 - include:
-      relativeToChangelogFile: true
-      file: add-event-geometries-in-feed-data.sql
+    relativeToChangelogFile: true
+    file: add-event-geometries-in-feed-data.sql
+- include:
+    relativeToChangelogFile: true
+    file: add-public-feed.sql
