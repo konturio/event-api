@@ -74,7 +74,7 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: gdacs, em-dat, pdc-v0, swissre-02
+    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
   firmsFeedComposition:
     enable: true
     initialDelay: 1000
