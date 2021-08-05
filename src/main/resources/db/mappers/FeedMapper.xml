@@ -132,7 +132,7 @@
         select * from feed_data fd
         where feed_id = #{feedId} and not enriched
         order by updated_at
-        limit 30000
+        limit 100
     </select>
 
     <update id="addAnalytics">
