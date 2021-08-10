@@ -7,6 +7,7 @@ import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -75,14 +76,14 @@ public class FirmsImportJob extends AbstractJob {
 
             boolean doesRowNotExistInDataLake = dataLakeDao.getDataLakesByExternalId(externalId).isEmpty()
                     && dataLakes.stream().noneMatch(dataLake -> dataLake.getExternalId().equals(externalId));
-            if (doesRowNotExistInDataLake) {
+            Map<String, String> csvData = parseRow(csvHeader, csvRow);
+            if (doesRowNotExistInDataLake && isValidData(csvData)) {
                 DataLake dataLake = new DataLake();
 
                 dataLake.setObservationId(UUID.randomUUID());
                 dataLake.setExternalId(externalId);
                 dataLake.setData(csvHeader + "\n" + csvRow);
                 dataLake.setProvider(provider);
-                Map<String, String> csvData = parseRow(csvHeader, csvRow);
                 dataLake.setUpdatedAt(extractUpdatedAtValue(csvData));
 
                 dataLakes.add(dataLake);
@@ -97,5 +98,11 @@ public class FirmsImportJob extends AbstractJob {
                 LocalDate.parse(collect.get("acq_date")),
                 LocalTime.parse(collect.get("acq_time"), FIRMS_DATE_TIME_FORMATTER),
                 ZoneOffset.UTC);
+    }
+
+    private boolean isValidData(Map<String, String> csvData) {
+        String date = csvData.get("acq_date");
+        String time = csvData.get("acq_time");
+        return StringUtils.isNotBlank(date) && StringUtils.isNotBlank(time);
     }
 }
