@@ -4,6 +4,8 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import org.locationtech.jts.geom.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -19,6 +21,7 @@ import static io.kontur.eventapi.util.JsonUtil.writeJson;
 @Component
 public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
+    private final static Logger LOG = LoggerFactory.getLogger(PdcMapSrvNormalizer.class);
     private final static GeoJSONReader reader = new GeoJSONReader();
 
     @Override
@@ -54,7 +57,12 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
     }
 
     private String getCentroid(Geometry geometry) {
-        Point centroid = reader.read(geometry).getCentroid();
-        return makeWktPoint(centroid.getX(), centroid.getY());
+        try {
+            Point centroid = reader.read(geometry).getCentroid();
+            return makeWktPoint(centroid.getX(), centroid.getY());
+        } catch (Exception e) {
+            LOG.warn("Can't find centroid", e);
+        }
+        return null;
     }
 }
