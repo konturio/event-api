@@ -15,10 +15,14 @@ AS $$
             from jsonb_array_elements($1) e
         ) f
         group by areaType
-    ) t(areaType, geom);
+    ) t(areaType, geom)
+    where geom is not null;
     $$
     LANGUAGE SQL
     STRICT
     IMMUTABLE PARALLEL SAFE;
 
+ALTER TABLE feed_data DROP COLUMN IF EXISTS geometries;
+
 ALTER TABLE feed_data ADD COLUMN IF NOT EXISTS geometries JSONB GENERATED ALWAYS AS (collectEventGeometries(episodes)) STORED;
+
