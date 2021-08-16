@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -37,20 +36,21 @@ public class GdacsSearchJob extends AbstractJob {
 
     @Override
     public void execute() {
-        try {
-            var xmlOpt = gdacsService.fetchGdacsXml();
-            if (xmlOpt.isPresent()) {
-                String xml = makeValid(xmlOpt.get());
+        var xmlOpt = gdacsService.fetchGdacsXml();
+        if (xmlOpt.isPresent()) {
+            String xml = xmlOpt.get();
+            try {
                 setPubDate(xml);
                 var alerts = gdacsAlertParser.getAlerts(xml);
                 var parsedAlerts = gdacsAlertParser.getParsedAlertsToGdacsSearchJob(alerts);
                 var dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(parsedAlerts);
                 gdacsService.saveGdacs(dataLakes);
+            } catch (DateTimeParseException e) {
+                LOG.error("Parsing pubDate from Gdacs was failed");
+            } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
+                LOG.error(e.getMessage(), e);
+                LOG.error(xml);
             }
-        } catch (DateTimeParseException e) {
-            LOG.error("Parsing pubDate from Gdacs was failed");
-        } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
-            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -61,11 +61,6 @@ public class GdacsSearchJob extends AbstractJob {
 
     private void setPubDate(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         XML_PUB_DATE = gdacsAlertParser.getPubDate(xml);
-    }
-
-    private String makeValid(String xml) {
-        byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
-        return new String(bytes, StandardCharsets.UTF_8);
     }
 }
 
