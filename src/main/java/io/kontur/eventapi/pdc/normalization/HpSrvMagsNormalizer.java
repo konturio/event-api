@@ -13,7 +13,6 @@ import java.util.*;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.magsDateTimeFormatter;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
-import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
@@ -35,7 +34,7 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
             List<Feature> features = Arrays.asList(fc.getFeatures());
             features.sort(Comparator.comparing(f -> readDateTime(f.getProperties(), "updateDate")));
 
-            normalizedDto.setGeometries(writeJson(convertGeometries(features)));
+            normalizedDto.setGeometries(convertGeometries(features));
 
             Map<String, Object> props = features.get(features.size() - 1).getProperties(); //take last updated feature
             normalizedDto.setExternalEventId(readString(props, "hazard.uuid"));

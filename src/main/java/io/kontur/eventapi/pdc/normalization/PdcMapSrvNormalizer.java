@@ -16,7 +16,6 @@ import org.wololo.jts2geojson.GeoJSONReader;
 import java.util.Map;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
-import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
@@ -47,7 +46,7 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
         Geometry geometry = feature.getGeometry();
 
         normalizedObservation.setType(defineType(readString(properties, "type_id")));
-        normalizedObservation.setGeometries(writeJson(convertGeometries(geometry)));
+        normalizedObservation.setGeometries(convertGeometries(geometry));
         normalizedObservation.setPoint(getCentroid(geometry));
         return normalizedObservation;
     }

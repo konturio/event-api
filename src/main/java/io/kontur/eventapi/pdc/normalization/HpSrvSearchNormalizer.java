@@ -14,12 +14,10 @@ import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
-import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
@@ -61,7 +59,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         normalizedDto.setPoint(pointWkt);
 
         try {
-            normalizedDto.setGeometries(writeJson(convertGeometry(pointWkt, props)));
+            normalizedDto.setGeometries(convertGeometry(pointWkt, props));
         } catch (ParseException e) {
             LOG.warn(e.getMessage(), e);
         }

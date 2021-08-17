@@ -42,7 +42,7 @@ public class AustraliaWildfireNormalizer extends StaticNormalizer {
         normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
 
         Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}).toString());
+        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}));
 
         normalizedObservation.setEventSeverity(Severity.UNKNOWN);
         normalizedObservation.setType(EventType.WILDFIRE);

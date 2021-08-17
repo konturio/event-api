@@ -1,5 +1,7 @@
 package io.kontur.eventapi.entity;
 
+import org.wololo.geojson.FeatureCollection;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -11,7 +13,7 @@ public class NormalizedObservation {
     private String externalEpisodeId;
     private String provider;
     private String point;
-    private String geometries; //TODO use FeatureCollection. Convert to string during insert
+    private FeatureCollection geometries;
     private Severity eventSeverity;
     private String name;
     private String description;
@@ -67,11 +69,11 @@ public class NormalizedObservation {
         this.point = point;
     }
 
-    public String getGeometries() {
+    public FeatureCollection getGeometries() {
         return geometries;
     }
 
-    public void setGeometries(String geometries) {
+    public void setGeometries(FeatureCollection geometries) {
         this.geometries = geometries;
     }
 

@@ -45,7 +45,7 @@
         FROM feed_event_status
         WHERE feed_id = #{feedId}
             AND actual is false
-        LIMIT 100000;
+        LIMIT 10000;
     </select>
 
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">

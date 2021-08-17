@@ -104,7 +104,7 @@ public class EmDatNormalizer extends Normalizer {
                 .obtainGeometries(csvData.get("Country"), csvData.get("Location"))
                 .or(() -> normalizationService.convertWktPointIntoGeometry(obs.getPoint()))
                 .orElse(null);
-        obs.setGeometries(createFeatureCollection(geom, csvData).toString());
+        obs.setGeometries(createFeatureCollection(geom, csvData));
 
         return obs;
     }
