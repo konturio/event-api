@@ -33,7 +33,7 @@ class PdcMapSrvNormalizerTest {
         assertEquals(dataLake.getExternalId(), observation.getExternalEventId());
         assertEquals(dataLake.getProvider(), observation.getProvider());
         assertNotNull(observation.getPoint());
-        assertEquals(getGeometries(), observation.getGeometries());
+        assertEquals(getGeometries(), observation.getGeometries().toString());
         assertEquals(Severity.UNKNOWN, observation.getEventSeverity());
         assertNull(observation.getName());
         assertNull(observation.getDescription());

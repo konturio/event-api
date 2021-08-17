@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -128,12 +127,12 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private Geometry calculateGeometry(List<NormalizedObservation> observations) {
-        return observations
+        Collection<Geometry> geometries = observations
                 .stream()
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
-                .distinct()
-                .reduce(Geometry::union)
-                .get();
+                .collect(Collectors.toCollection(HashSet::new));
+        Geometry geometryCollection = geometryFactory.buildGeometry(geometries);
+        return geometryCollection.buffer(0);
     }
 
     private FeatureCollection createEpisodeGeometryFeatureCollection(NormalizedObservation observation, Geometry geometry) {
@@ -238,7 +237,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return areaInKm;
     }
 
-    private Geometry toGeometry(String geometries) {
+    private Geometry toGeometry(FeatureCollection geometries) {
         return toGeometry(getFirmFeature(geometries));
     }
 
@@ -246,16 +245,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return geoJSONReader.read(firmFeature.getGeometry(), geometryFactory);
     }
 
-    private Feature getFirmFeature(String geometries) {
-        return getFirmFeature(getFeatureCollection(geometries));
-    }
-
     private Feature getFirmFeature(FeatureCollection featureCollection) {
         return getOnlyElement(asList(featureCollection.getFeatures()));
-    }
-
-    private FeatureCollection getFeatureCollection(String geometries) {
-        return readJson(geometries, FeatureCollection.class);
     }
 
     private List<NormalizedObservation> readObservations(List<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {

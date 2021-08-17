@@ -28,12 +28,12 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
         normalizedObservation.setExternalEpisodeId(dataLakeDto.getExternalId());
-        normalizedObservation.setGeometries(dataLakeDto.getData());
         normalizedObservation.setActive(true);
 
         FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(dataLakeDto.getData());
         Map<String, Object> properties = featureCollection.getFeatures()[0].getProperties();
 
+        normalizedObservation.setGeometries(featureCollection);
         String eventType = readString(properties, "eventtype");
         String eventId = readString(properties, "eventid");
         normalizedObservation.setType(defineGeometryType(eventType));

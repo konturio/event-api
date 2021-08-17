@@ -32,7 +32,7 @@ public class CommonStaticNormalizer extends StaticNormalizer {
         Double lat = readDouble(properties, "latitude");
         normalizedObservation.setPoint(makeWktPoint(lon, lat));
         Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}).toString());
+        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}));
 
         String name = readString(properties, "name");
         String admin0 = readString(properties, "admin0");

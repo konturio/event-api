@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static io.kontur.eventapi.util.JsonUtil.writeJson;
+
 @Component
 public class NormalizedObservationsDao {
 
@@ -23,9 +25,14 @@ public class NormalizedObservationsDao {
     }
 
     @Transactional
-    public int insert(NormalizedObservation observation) {
-        dataLakeDao.markAsNormalized(observation.getObservationId());
-        return mapper.insert(observation);
+    public int insert(NormalizedObservation obs) {
+        dataLakeDao.markAsNormalized(obs.getObservationId());
+        String geometries = writeJson(obs.getGeometries());
+        return mapper.insert(obs.getObservationId(), obs.getExternalEventId(), obs.getExternalEpisodeId(),
+                obs.getProvider(), obs.getPoint(), geometries, obs.getEventSeverity(), obs.getName(),
+                obs.getDescription(), obs.getEpisodeDescription(), obs.getType(), obs.getActive(), obs.getCost(),
+                obs.getRegion(), obs.getLoadedAt(), obs.getStartedAt(), obs.getEndedAt(), obs.getSourceUpdatedAt(),
+                obs.getSourceUri(), obs.getRecombined());
     }
 
     public void markAsRecombined(UUID observationId) {

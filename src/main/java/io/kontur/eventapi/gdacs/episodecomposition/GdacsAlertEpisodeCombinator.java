@@ -5,14 +5,12 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.springframework.stereotype.Component;
-import org.wololo.geojson.FeatureCollection;
 
 import java.util.Optional;
 import java.util.Set;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
-import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 
 /**
@@ -33,7 +31,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
         if (geometryObservation.isPresent()) {
             Optional<FeedEpisode> feedEpisode = createDefaultEpisode(observation);
             feedEpisode.ifPresent(episode -> {
-                episode.setGeometries(readJson(geometryObservation.get().getGeometries(), FeatureCollection.class));
+                episode.setGeometries(geometryObservation.get().getGeometries());
                 episode.addObservation(geometryObservation.get().getObservationId());
             });
             return feedEpisode;

@@ -101,7 +101,7 @@ public class TornadoJapanMaNormalizer extends Normalizer {
         try {
             Geometry geometry = geom == null ? null : geoJsonWriter.write(wktReader.read(geom));
             Feature feature = new Feature(geometry, Collections.emptyMap());
-            normalizedObservation.setGeometries(new FeatureCollection(new Feature[]{feature}).toString());
+            normalizedObservation.setGeometries(new FeatureCollection(new Feature[]{feature}));
         } catch (ParseException e) {
             LOG.warn(e.getMessage(), e);
         }

@@ -6,14 +6,12 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
-import io.kontur.eventapi.util.JsonUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Point;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,8 +52,7 @@ class HpSrvSearchNormalizerTest {
         checkGeometriesValue(obs.getGeometries());
     }
 
-    private void checkGeometriesValue(String geometries) {
-        var fc = JsonUtil.readJson(geometries, FeatureCollection.class);
+    private void checkGeometriesValue(FeatureCollection fc) {
         assertEquals(1, fc.getFeatures().length);
         var feature = fc.getFeatures()[0];
         assertTrue(feature.getGeometry() instanceof Point);

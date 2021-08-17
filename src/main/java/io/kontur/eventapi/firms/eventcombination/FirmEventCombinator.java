@@ -11,7 +11,6 @@ import org.wololo.geojson.Geometry;
 import java.util.Optional;
 
 import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
-import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
@@ -34,7 +33,7 @@ public class FirmEventCombinator implements EventCombinator {
     }
 
     private String getGeometry(NormalizedObservation observation) {
-        FeatureCollection featureCollection = readJson(observation.getGeometries(), FeatureCollection.class);
+        FeatureCollection featureCollection = observation.getGeometries();
 
         int featureCollectionLength = featureCollection.getFeatures().length;
         if (featureCollectionLength != 1) {

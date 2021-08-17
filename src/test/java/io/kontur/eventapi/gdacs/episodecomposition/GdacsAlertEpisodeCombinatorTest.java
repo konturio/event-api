@@ -5,6 +5,8 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.wololo.geojson.FeatureCollection;
+import org.wololo.geojson.GeoJSONFactory;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -30,7 +32,8 @@ class GdacsAlertEpisodeCombinatorTest {
     @Test
     public void testProcessObservation() throws IOException {
         NormalizedObservation alertObservation = createObservation(GDACS_ALERT_PROVIDER, null);
-        NormalizedObservation geometryObservation = createObservation(GDACS_ALERT_GEOMETRY_PROVIDER, readFile("geometry.json"));
+        FeatureCollection geometries = (FeatureCollection) GeoJSONFactory.create(readFile("geometry.json"));
+        NormalizedObservation geometryObservation = createObservation(GDACS_ALERT_GEOMETRY_PROVIDER, geometries);
         FeedData feedData = new FeedData(UUID.randomUUID(), UUID.randomUUID(), 1L);
 
         Optional<FeedEpisode> feedEpisodeOpt = episodeCombinator.processObservation(alertObservation,
@@ -53,7 +56,7 @@ class GdacsAlertEpisodeCombinatorTest {
                 episodeCombinator.processObservation(alertObservation, feedData, Set.of(alertObservation)));
     }
 
-    private NormalizedObservation createObservation(String provider, String geometries) {
+    private NormalizedObservation createObservation(String provider, FeatureCollection geometries) {
         NormalizedObservation observation = new NormalizedObservation();
         observation.setObservationId(UUID.randomUUID());
         observation.setProvider(provider);

@@ -13,7 +13,6 @@ import org.wololo.geojson.FeatureCollection;
 import java.io.IOException;
 import java.util.UUID;
 
-import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HpSrvMagsNormalizerTest {
@@ -45,7 +44,7 @@ class HpSrvMagsNormalizerTest {
         assertEquals(1595457720000L, obs.getStartedAt().toInstant().toEpochMilli());
         assertEquals(1595466000000L, obs.getEndedAt().toInstant().toEpochMilli());
         assertEquals(1595458283232L, obs.getSourceUpdatedAt().toInstant().toEpochMilli());
-        FeatureCollection fc = readJson(obs.getGeometries(), FeatureCollection.class);
+        FeatureCollection fc = obs.getGeometries();
         assertEquals(1, fc.getFeatures().length);
         assertEquals("alertArea", fc.getFeatures()[0].getProperties().get("areaType"));
     }

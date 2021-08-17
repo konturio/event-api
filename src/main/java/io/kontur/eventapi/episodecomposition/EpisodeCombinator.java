@@ -4,12 +4,9 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.job.Applicable;
-import org.wololo.geojson.FeatureCollection;
 
 import java.util.Optional;
 import java.util.Set;
-
-import static io.kontur.eventapi.util.JsonUtil.readJson;
 
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
 
@@ -29,7 +26,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         feedEpisode.addObservation(observation.getObservationId());
 
         if (observation.getGeometries() != null) {
-            feedEpisode.setGeometries(readJson(observation.getGeometries(), FeatureCollection.class));
+            feedEpisode.setGeometries(observation.getGeometries());
         }
 
         return Optional.of(feedEpisode);

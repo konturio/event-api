@@ -14,13 +14,10 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
-
-import java.util.HashMap;
 import java.util.Map;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
-import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
 @Component
 public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
@@ -69,7 +66,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         normalizedDto.setExternalEpisodeId(uniqueExternalId);
         convertHazardTypeProperties(normalizedDto, (Map<String, Object>) props.get("hazard"));
         normalizedDto.setActive(readBoolean(props, "isActive"));
-        normalizedDto.setGeometries(writeJson(convertGeometries(props)));
+        normalizedDto.setGeometries(convertGeometries(props));
     }
 
     @SuppressWarnings("unchecked")
@@ -92,7 +89,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         }
 
         try {
-            normalizedDto.setGeometries(writeJson(convertGeometry(pointWkt, props)));
+            normalizedDto.setGeometries(convertGeometry(pointWkt, props));
         } catch (ParseException e) {
             LOG.warn(e.getMessage(), e);
         }

@@ -39,7 +39,7 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
         Point point = multiPolygon.getCentroid();
         normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
         Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}).toString());
+        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}));
 
         String state = readString(properties, "STATE");
         String unit = readString(properties, "UNIT_ID");
