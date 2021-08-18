@@ -13,6 +13,8 @@ import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.operation.overlayng.OverlayNGRobust;
+import org.locationtech.jts.operation.overlayng.UnaryUnionNG;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
@@ -131,8 +133,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .stream()
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
                 .collect(Collectors.toCollection(HashSet::new));
-        Geometry geometryCollection = geometryFactory.buildGeometry(geometries);
-        return geometryCollection.buffer(0);
+        return OverlayNGRobust.union(geometries);
     }
 
     private FeatureCollection createEpisodeGeometryFeatureCollection(NormalizedObservation observation, Geometry geometry) {
