@@ -42,8 +42,8 @@ class GdacsAlertEpisodeCombinatorTest {
         assertTrue(feedEpisodeOpt.isPresent());
         FeedEpisode feedEpisode = feedEpisodeOpt.get();
         assertEquals(2, feedEpisode.getObservations().size());
-        assertEquals(alertObservation.getObservationId(), feedEpisode.getObservations().get(0));
-        assertEquals(geometryObservation.getObservationId(), feedEpisode.getObservations().get(1));
+        assertTrue(feedEpisode.getObservations().contains(alertObservation.getObservationId()));
+        assertTrue(feedEpisode.getObservations().contains(geometryObservation.getObservationId()));
         assertNotNull(feedEpisode.getGeometries());
     }
 
