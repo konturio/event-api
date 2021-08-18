@@ -249,7 +249,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return getOnlyElement(asList(featureCollection.getFeatures()));
     }
 
-    private List<NormalizedObservation> readObservations(List<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {
+    private List<NormalizedObservation> readObservations(Set<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {
         List<NormalizedObservation> observationsByIds = eventObservations
                 .stream()
                 .filter(e -> observationsIds.contains(e.getObservationId()))

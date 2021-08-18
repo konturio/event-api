@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
@@ -43,7 +44,7 @@ public class NormalizedObservationsDao {
         return mapper.getObservationsNotLinkedToEvent();
     }
 
-    public List<NormalizedObservation> getObservations(List<UUID> observationIds) {
+    public List<NormalizedObservation> getObservations(Set<UUID> observationIds) {
         return observationIds.isEmpty() ? List.of() : mapper.getObservations(observationIds);
     }
 

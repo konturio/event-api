@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Mapper
@@ -25,7 +26,7 @@ public interface NormalizedObservationsMapper {
 
     List<NormalizedObservation> getObservationsNotLinkedToEvent();
 
-    List<NormalizedObservation> getObservations(List<UUID> observationIds);
+    List<NormalizedObservation> getObservations(Set<UUID> observationIds);
 
     List<NormalizedObservation> getObservationsByEventId(UUID eventId);
 

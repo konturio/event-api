@@ -26,6 +26,7 @@ import java.util.*;
 import static io.kontur.eventapi.TestUtil.readFile;
 import static java.time.OffsetDateTime.parse;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -204,7 +205,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         return eventsForRolloutEpisodes1
                 .stream()
                 .map(e -> new KonturEvent(e).setObservationIds(observationsDao.getObservationsByEventId(e).stream()
-                        .map(NormalizedObservation::getObservationId).collect(toList())))
+                        .map(NormalizedObservation::getObservationId).collect(toSet())))
                 .sorted(Comparator.comparing(e -> e.getObservationIds().size()))
                 .collect(toList());
     }

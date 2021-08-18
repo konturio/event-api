@@ -1,12 +1,10 @@
 package io.kontur.eventapi.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class KonturEvent {
     private UUID eventId;
-    private List<UUID> observationIds = new ArrayList<>();
+    private Set<UUID> observationIds = new HashSet<>();
 
     public KonturEvent(UUID eventId) {
         this.eventId = eventId;
@@ -20,11 +18,11 @@ public class KonturEvent {
         this.eventId = eventId;
     }
 
-    public List<UUID> getObservationIds() {
+    public Set<UUID> getObservationIds() {
         return observationIds;
     }
 
-    public KonturEvent setObservationIds(List<UUID> observationIds) {
+    public KonturEvent setObservationIds(Set<UUID> observationIds) {
         this.observationIds = observationIds;
         return this;
     }

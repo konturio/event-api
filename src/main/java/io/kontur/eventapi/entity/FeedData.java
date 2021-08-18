@@ -15,7 +15,7 @@ public class FeedData {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
-    private List<UUID> observations = new ArrayList<>();
+    private Set<UUID> observations = new HashSet<>();
     private List<FeedEpisode> episodes = new ArrayList<>();
     private FeatureCollection geometries;
     private Map<String, Object> eventDetails;
@@ -83,11 +83,11 @@ public class FeedData {
         this.endedAt = endedAt;
     }
 
-    public List<UUID> getObservations() {
+    public Set<UUID> getObservations() {
         return observations;
     }
 
-    public void setObservations(List<UUID> observations) {
+    public void setObservations(Set<UUID> observations) {
         this.observations = observations;
     }
 

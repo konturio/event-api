@@ -21,7 +21,7 @@ import java.util.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.StringUtils.isEmpty;
 
 @Component
@@ -74,7 +74,7 @@ public class FeedCompositionJob extends AbstractJob {
                     lastFeedDataVersion.map(v -> v + 1).orElse(1L));
 
             feedData.setObservations(
-                    eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toList()));
+                    eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
             fillEpisodes(eventObservations, feedData);
             fillFeedData(feedData);
 

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Mapper
@@ -20,7 +21,7 @@ public interface FeedMapper {
 
     int insertFeedData(
             UUID eventId, UUID feedId, Long version, String name, String description, OffsetDateTime startedAt,
-            OffsetDateTime endedAt, OffsetDateTime updatedAt, @Param("observations") List<UUID> observations,
+            OffsetDateTime endedAt, OffsetDateTime updatedAt, @Param("observations") Set<UUID> observations,
             @Param("episodes") String episodes, Boolean enriched);
 
     /**
