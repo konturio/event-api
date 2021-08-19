@@ -34,7 +34,7 @@ public interface FeedMapper {
                                    BigDecimal xMin, BigDecimal xMax, BigDecimal yMin, BigDecimal yMax,
                                    EpisodeFilterType episodeFilterType);
 
-    Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, Long version);
+    Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, @Param("version") Long version);
 
     Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId);
 

@@ -19,7 +19,7 @@ public interface KonturEventsMapper {
 
     Optional<KonturEvent> getEventById(UUID evenId);
 
-    Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers);
+    Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, @Param("providers") List<String> providers);
 
     Set<UUID> getEventsForRolloutEpisodes(UUID feedId);
 }
