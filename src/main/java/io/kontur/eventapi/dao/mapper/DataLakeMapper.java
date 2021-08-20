@@ -2,6 +2,7 @@ package io.kontur.eventapi.dao.mapper;
 
 import io.kontur.eventapi.entity.DataLake;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,19 +13,21 @@ public interface DataLakeMapper {
 
     void create(DataLake dataLake);
 
-    void markAsNormalized(UUID observationId);
+    void markAsNormalized(@Param("observationId") UUID observationId);
 
-    Optional<DataLake> getLatestUpdatedEventForProvider(String provider);
+    Optional<DataLake> getLatestUpdatedEventForProvider(@Param("provider") String provider);
 
     List<DataLake> getPdcHpSrvHazardsWithoutAreas();
 
     List<DataLake> getDenormalizedEvents();
 
-    List<DataLake> getDataLakesByExternalId(String externalId);
+    List<DataLake> getDataLakesByExternalId(@Param("externalId") String externalId);
 
-    DataLake getDataLakeByObservationId(UUID observationId);
+    DataLake getDataLakeByObservationId(@Param("observationId") UUID observationId);
 
-    Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(String externalId, String provider);
+    Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(@Param("externalId") String externalId,
+                                                                @Param("provider") String provider);
 
-    Boolean isNewPdcExposure(String externalId, String geoHash);
+    Boolean isNewPdcExposure(@Param("externalId") String externalId,
+                             @Param("geoHash") String geoHash);
 }
