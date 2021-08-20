@@ -4,6 +4,7 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,23 +17,44 @@ import java.util.UUID;
 @Mapper
 public interface NormalizedObservationsMapper {
 
-    int insert(UUID observationId, String externalEventId, String externalEpisodeId, String provider, String point,
-               String geometries, Severity eventSeverity, String name, String description, String episodeDescription,
-               EventType type, Boolean active, BigDecimal cost, String region, OffsetDateTime loadedAt,
-               OffsetDateTime startedAt, OffsetDateTime endedAt, OffsetDateTime sourceUpdatedAt,
-               String sourceUri, boolean recombined);
+    int insert(@Param("observationId") UUID observationId,
+               @Param("externalEventId") String externalEventId,
+               @Param("externalEpisodeId") String externalEpisodeId,
+               @Param("provider") String provider,
+               @Param("point") String point,
+               @Param("geometries") String geometries,
+               @Param("eventSeverity") Severity eventSeverity,
+               @Param("name") String name,
+               @Param("description") String description,
+               @Param("episodeDescription") String episodeDescription,
+               @Param("type") EventType type,
+               @Param("active") Boolean active,
+               @Param("cost") BigDecimal cost,
+               @Param("region") String region,
+               @Param("loadedAt") OffsetDateTime loadedAt,
+               @Param("startedAt") OffsetDateTime startedAt,
+               @Param("endedAt") OffsetDateTime endedAt,
+               @Param("sourceUpdatedAt") OffsetDateTime sourceUpdatedAt,
+               @Param("sourceUri") String sourceUri,
+               @Param("recombined") boolean recombined);
 
-    void markAsRecombined(UUID observationId);
+    void markAsRecombined(@Param("observationId") UUID observationId);
 
     List<NormalizedObservation> getObservationsNotLinkedToEvent();
 
-    List<NormalizedObservation> getObservations(Set<UUID> observationIds);
+    List<NormalizedObservation> getObservations(@Param("observationIds") Set<UUID> observationIds);
 
-    List<NormalizedObservation> getObservationsByEventId(UUID eventId);
+    List<NormalizedObservation> getObservationsByEventId(@Param("eventId") UUID eventId);
 
-    Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider);
+    Optional<NormalizedObservation> getDuplicateObservation(@Param("loadedAt") OffsetDateTime loadedAt,
+                                                            @Param("externalEpisodeId") String externalEpisodeId,
+                                                            @Param("observationId") UUID observationId,
+                                                            @Param("provider") String provider);
 
-    Optional<NormalizedObservation> getNormalizedObservationByExternalEpisodeIdAndProvider(String externalEpisodeId, String provider);
+    Optional<NormalizedObservation> getNormalizedObservationByExternalEpisodeIdAndProvider(
+            @Param("externalEpisodeId") String externalEpisodeId,
+            @Param("provider") String provider);
 
-    OffsetDateTime getTimestampAtTimezone(LocalDateTime timestamp, String timezone);
+    OffsetDateTime getTimestampAtTimezone(@Param("timestamp") LocalDateTime timestamp,
+                                          @Param("timezone") String timezone);
 }

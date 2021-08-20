@@ -19,27 +19,52 @@ public interface FeedMapper {
 
     List<Feed> getFeedsByAliases(@Param("aliases") List<String> aliases);
 
-    int insertFeedData(
-            UUID eventId, UUID feedId, Long version, String name, String description, OffsetDateTime startedAt,
-            OffsetDateTime endedAt, OffsetDateTime updatedAt, @Param("observations") Set<UUID> observations,
-            @Param("episodes") String episodes, Boolean enriched);
+    int insertFeedData(@Param("eventId") UUID eventId,
+                       @Param("feedId") UUID feedId,
+                       @Param("version") Long version,
+                       @Param("name") String name,
+                       @Param("description") String description,
+                       @Param("startedAt") OffsetDateTime startedAt,
+                       @Param("endedAt") OffsetDateTime endedAt,
+                       @Param("updatedAt") OffsetDateTime updatedAt,
+                       @Param("observations") Set<UUID> observations,
+                       @Param("episodes") String episodes,
+                       @Param("enriched") Boolean enriched);
 
     /**
      * Mark events below specified version outdated
      */
-    void markOutdatedEventsVersions(UUID eventId, UUID feedId, Long version);
+    void markOutdatedEventsVersions(@Param("eventId") UUID eventId,
+                                    @Param("feedId") UUID feedId,
+                                    @Param("version") Long version);
 
-    List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime to,
-                                   OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
-                                   BigDecimal xMin, BigDecimal xMax, BigDecimal yMin, BigDecimal yMax,
-                                   EpisodeFilterType episodeFilterType);
+    List<FeedData> searchForEvents(@Param("feedAlias") String feedAlias,
+                                   @Param("eventTypes") List<EventType> eventTypes,
+                                   @Param("from") OffsetDateTime from,
+                                   @Param("to") OffsetDateTime to,
+                                   @Param("updatedAfter") OffsetDateTime updatedAfter,
+                                   @Param("limit") int limit,
+                                   @Param("severities") List<Severity> severities,
+                                   @Param("sortOrder") SortOrder sortOrder,
+                                   @Param("xMin") BigDecimal xMin,
+                                   @Param("xMax") BigDecimal xMax,
+                                   @Param("yMin") BigDecimal yMin,
+                                   @Param("yMax") BigDecimal yMax,
+                                   @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 
-    Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feedAlias, @Param("version") Long version);
+    Optional<FeedData> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
+                                                           @Param("feedAlias") String feedAlias,
+                                                           @Param("version") Long version);
 
-    Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId);
+    Optional<Long> getLastFeedDataVersion(@Param("eventId") UUID eventId,
+                                          @Param("feedId") UUID feedId);
 
-    List<FeedData> getNotEnrichedEventsForFeed(UUID feedId);
+    List<FeedData> getNotEnrichedEventsForFeed(@Param("feedId") UUID feedId);
 
-    void addAnalytics(UUID feedId, UUID eventId, Long version,
-                      @Param("eventDetails") String eventDetails, Boolean enriched, @Param("episodes") String episodes);
+    void addAnalytics(@Param("feedId") UUID feedId,
+                      @Param("eventId") UUID eventId,
+                      @Param("version") Long version,
+                      @Param("eventDetails") String eventDetails,
+                      @Param("enriched") Boolean enriched,
+                      @Param("episodes") String episodes);
 }
