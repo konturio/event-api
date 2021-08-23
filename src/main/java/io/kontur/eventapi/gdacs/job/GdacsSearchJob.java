@@ -49,7 +49,6 @@ public class GdacsSearchJob extends AbstractJob {
                 LOG.error("Parsing pubDate from Gdacs was failed");
             } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
                 LOG.error(e.getMessage(), e);
-                LOG.error(xml);
             }
         }
     }
