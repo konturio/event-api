@@ -14,6 +14,7 @@ import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 
@@ -47,7 +48,7 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
         normalizedObservation.setType(defineType(readString(properties, "type_id")));
         normalizedObservation.setGeometries(convertGeometries(geometry));
-        normalizedObservation.setPoint(getCentroid(geometry));
+        normalizedObservation.setPoint(getCentroid(geometry, normalizedObservation.getObservationId()));
         return normalizedObservation;
     }
 
@@ -55,12 +56,12 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
         return new FeatureCollection(new Feature[] {new Feature(geometry, EXPOSURE_PROPERTIES)});
     }
 
-    private String getCentroid(Geometry geometry) {
+    private String getCentroid(Geometry geometry, UUID observationID) {
         try {
             Point centroid = reader.read(geometry).getCentroid();
             return makeWktPoint(centroid.getX(), centroid.getY());
         } catch (Exception e) {
-            LOG.warn("Can't find centroid", e);
+            LOG.warn("Can't find center point for observation. Observation ID: {}", observationID);
         }
         return null;
     }
