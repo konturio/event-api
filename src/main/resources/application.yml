@@ -69,7 +69,7 @@ scheduler:
     fixedDelay: 60000
   gdacsImport:
     enable: true
-    cron: 30 0/5 * * * *
+    cron: 0 1/5 * * * *
   firmsImport:
     enable: true
     initialDelay: 1000

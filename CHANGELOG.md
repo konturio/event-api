@@ -1,33 +1,63 @@
 # Release notes
 
 ## UNRELEASED
+
 #### Added
 
-- Keycloak auth, we need to use ISSUER_URI as follows - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]`,
-  and JWK_SET_URI - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/protocol/openid-connect/certs`
-- Enrichment step
-- Added public feed
+#### Changed
+
+#### Removed
+
+
+## 0.6 - 2021-08-26
+
+#### Added
+
+- Analytic Enrichment step
 
 ```yaml
-security:
-  oauth2:
-    resourceserver:
-      jwt:
-        issuer-uri: [ISSUER_URI]
-        jwk-set-uri: [JWK_SET_URI]
+konturApps:
+  host: 'https://apps.kontur.io/'
 
 scheduler:
-  feedComposition:
-    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
   enrichment:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
 ```
 
-####Changed
+#### Changed
+
+- Keycloak auth, we need to use ISSUER_URI as follows - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]`,
+  and JWK_SET_URI - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/protocol/openid-connect/certs`
+- Added public feed
+- Fixed GDACS job timing to prevent getting corrupted XML (job starts in 1 min after each time 
+  GDACS loads CAP feed)
+
+```yaml
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: https://keycloak01.kontur.io/auth/realms/kontur/
+        jwk-set-uri: https://keycloak01.kontur.io/auth/realms/kontur/protocol/openid-connect/certs
+scheduler:
+  gdacsImport:
+    cron: 0 1/5 * * * *
+feedComposition:
+    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
+```
+
+#### Removed
+
+```yaml
+auth0:
+  audience: 'https://apps.kontur.io/events/'
+```
+
 
 ## 0.5 - 2021-07-22
+
 #### Added
 
 - tornado.japan-ma provider (currently disabled)
@@ -84,18 +114,25 @@ feign:
 ```
 
 #### Changed
+
 - !BE AWARE! It might take a  while to install this version. Heavy sql scripts will be run.  
 - Denormalize feed_data table in order to improve search speed. #4736 #5183 #5168 
 - Static data files stored in AWS S3 bucket `event-api-locker01`. The following folders are used: 
   `PROD/` for production, `TEST QA/` for testing, `TEST DEV/` for development, `EXP/` for experiments. Default 
   folder is `PROD/`. Folder can be changed in configuration.
 
+
 ## 0.4.1 - 2021-04-30
+
 #### Added
+
 - GDACS Wildfire type recognition
 
+
 ## 0.4 - 2021-04-23
+
 #### Added
+
 - `bbox` and `datetime` filter to the `/v1/` endpoint
 - FIRMS provider
 - EM-DAT provider
@@ -112,11 +149,14 @@ feign:
 - storms.noaa provider
 
 #### Changed
+
 - Event versioning is removed 
 - Refactored normalization, event and episods jobs
 
 ### Configuration changes
+
 #### Added
+
 ```yaml
 emdat:
   user: 'username'
@@ -151,16 +191,23 @@ scheduler:
     fixedDelay: P30D # every 30 days
 ```
 
+
 ## 0.3 - 2020-11-18
+
 #### Added
+
 - GDACS provider
 - `/v1/event` endpoint
 - `types` and `severities` filter to the `/v1/` endpoint
+
 #### Changed
+
 - Changed `/v1/` endpoint pagination to cursor based.
 
 ### Configuration changes
+
 #### Added
+
 ```yaml
 gdacs:
   host: 'https://www.gdacs.org'
