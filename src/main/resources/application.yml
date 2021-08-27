@@ -111,7 +111,7 @@ scheduler:
     fixedDelay: 1000
     alias: firms, gdacs-firms
   enrichment:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 1000
 
