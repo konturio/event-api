@@ -21,7 +21,7 @@ konturApps:
 
 scheduler:
   enrichment:
-    enable: false
+    enable: true
     initialDelay: 30000
     fixedDelay: 10000
 ```
