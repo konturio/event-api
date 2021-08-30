@@ -6,7 +6,16 @@
 
 #### Changed
 
+- Fix empty event.observations in events/v1 endpoint
+
 #### Removed
+
+
+## 0.6.1 - 2021-08-27
+
+#### Changed
+
+- `geometries` filed in `feed_data` is calculated only for new events
 
 
 ## 0.6 - 2021-08-26
