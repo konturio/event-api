@@ -13,7 +13,9 @@ Several profiles can be activated at once via `,` separator: `profile1,profile2`
 ## Installation
 
 #### Requirements
-#####Postgresql extensions 
+
+##### Postgresql extensions
+
  - Postgis
  - uuid-ossp
  
@@ -24,7 +26,7 @@ To configure additional external config file for Spring Boot application set up 
 
 #### Config file
 
-#####DB config
+##### DB config
 
 ```yaml
 spring:
@@ -35,7 +37,7 @@ spring:
     password: 'CHANGE_ME_TO_SECURE_PASSWORD'
 ```
 
-#####Authorization config
+##### Authorization config
 
 ```yaml
 spring:
@@ -50,7 +52,7 @@ spring:
 - `ISSUER_URI` -  the base Keycloak Authorization Server URI. Like `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/`
 - `JWK_SET_URI` - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/protocol/openid-connect/certs`
 
-#####Providers configuration
+##### Providers configuration
 
 ```yaml
 pdc:
