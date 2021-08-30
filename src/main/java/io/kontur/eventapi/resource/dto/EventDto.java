@@ -15,7 +15,7 @@ public class EventDto {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
-    private List<UUID> observations;
+    private Set<UUID> observations;
     private List<FeedEpisode> episodes = new ArrayList<>();
     private Map<String, Object> eventDetails = new HashMap<>();
     private FeatureCollection geometries;
@@ -76,11 +76,11 @@ public class EventDto {
         this.updatedAt = updatedAt;
     }
 
-    public List<UUID> getObservations() {
+    public Set<UUID> getObservations() {
         return observations;
     }
 
-    public void setObservations(List<UUID> observations) {
+    public void setObservations(Set<UUID> observations) {
         this.observations = observations;
     }
 
