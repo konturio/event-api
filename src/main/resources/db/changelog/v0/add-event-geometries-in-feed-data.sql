@@ -24,5 +24,5 @@ AS $$
 
 ALTER TABLE feed_data DROP COLUMN IF EXISTS geometries;
 
-ALTER TABLE feed_data ADD COLUMN IF NOT EXISTS geometries JSONB GENERATED ALWAYS AS (collectEventGeometries(episodes)) STORED;
+ALTER TABLE feed_data ADD COLUMN IF NOT EXISTS geometries JSONB;
 
