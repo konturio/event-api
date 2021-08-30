@@ -6,9 +6,14 @@
 
 #### Changed
 
-- Fix empty event.observations in events/v1 endpoint
-
 #### Removed
+
+
+## 0.6.2 - 2021-08-30
+
+#### Changed
+
+- Fix empty event.observations in events/v1 endpoint
 
 
 ## 0.6.1 - 2021-08-27
