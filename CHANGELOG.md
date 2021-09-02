@@ -9,6 +9,7 @@
 #### Changed
 
 - Async events enrichment execution
+- Increased feign timeout from 1 to 3 minutes
 
 #### Removed
 
