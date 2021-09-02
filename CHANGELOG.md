@@ -4,7 +4,11 @@
 
 #### Added
 
+- Added index on `feed_data` - `feed_data_updated_at_feed_id_is_not_enriched_idx`
+
 #### Changed
+
+- Async events enrichment execution
 
 #### Removed
 

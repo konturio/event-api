@@ -2,6 +2,7 @@ package io.kontur.eventapi.job;
 
 import io.kontur.eventapi.client.KonturAppsClient;
 import io.kontur.eventapi.dao.FeedDao;
+import io.kontur.eventapi.enrichment.EventEnrichmentTask;
 import io.kontur.eventapi.enrichment.InsightsApiRequest;
 import io.kontur.eventapi.enrichment.InsightsApiResponse;
 import io.kontur.eventapi.entity.Feed;
@@ -56,7 +57,8 @@ public class EnrichmentJobTest {
         when(feedDao.getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(notEnrichedFeedData));
         doNothing().when(feedDao).addAnalytics(any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createResponse());
-        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, konturAppsClient);
+        EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao);
+        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
 
         enrichmentJob.run();
 
@@ -74,7 +76,8 @@ public class EnrichmentJobTest {
         when(feedDao.getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(notEnrichedFeedData));
         doNothing().when(feedDao).addAnalytics(any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createErrorResponse());
-        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, konturAppsClient);
+        EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao);
+        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
 
         enrichmentJob.run();
 
