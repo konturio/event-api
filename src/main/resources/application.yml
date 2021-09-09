@@ -113,7 +113,7 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 1000
     alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
-    firmsAlias: firms, gdacs-firms
+    firmsAlias: firms, disaster-ninja-02
   enrichment:
     enable: true
     initialDelay: 1000

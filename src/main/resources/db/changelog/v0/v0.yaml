@@ -114,9 +114,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: update-swiss-re-feed.sql
-#- include:
-#    relativeToChangelogFile: true
-#    file: add-gdacs-firms-feed.sql
 - include:
     relativeToChangelogFile: true
     file: fix-pdc-mags-description.sql
@@ -150,3 +147,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: feed_data_enrichment_index.sql
+- include:
+    relativeToChangelogFile: true
+    file: add-gdacs-firms-feed.sql
