@@ -84,7 +84,12 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="io.kontur.eventapi.firms.feedcomposition" additivity="false">
+    <logger name="io.kontur.eventapi.firms.episodecomposition" additivity="false">
+        <appender-ref ref="FILE-JOB"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="io.kontur.eventapi.firms.eventcombination" additivity="false">
         <appender-ref ref="FILE-JOB"/>
         <appender-ref ref="STDOUT"/>
     </logger>

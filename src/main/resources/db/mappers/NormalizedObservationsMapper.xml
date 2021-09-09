@@ -65,7 +65,21 @@
         SELECT *
         FROM normalized_observations
         WHERE recombined is false
-        ORDER BY date_trunc('day', source_updated_at), collected_geography
+        <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
+            #{provider}
+        </foreach>
+        ORDER BY loaded_at
+        LIMIT 30000
+    </select>
+
+    <select id="getObservationsNotLinkedToEventOrderByGeography" resultMap="normalizedObservationsDtoMap">
+        SELECT *
+        FROM normalized_observations
+        WHERE recombined is false
+        <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
+            #{provider}
+        </foreach>
+        ORDER BY collected_geography
         LIMIT 30000
     </select>
 

@@ -73,16 +73,20 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
+    providers:
+      em-dat,
+      gdacsAlert, gdacsAlertGeometry,
+      hpSrvMag, hpSrvSearch, pdcMapSrv, pdcSqs,
+      tornado.canada-gov, tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai,
+      storms.noaa,
+      wildfire.frap.cal, wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov
+    firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
-    alias: gdacs, em-dat, pdc-v0, swissre-02
-  firmsFeedComposition:
-    enable: false
-    initialDelay: 999999
-    fixedDelay: 999999
-    alias: firms
+    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
+    firmsAlias: firms, gdacs-firms
   enrichment:
     enable: false
     initialDelay: 999999

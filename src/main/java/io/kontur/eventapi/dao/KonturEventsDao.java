@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,8 +41,8 @@ public class KonturEventsDao {
         }
     }
 
-    public Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers) {
-        return mapper.getEventWithClosestObservation(updatedAt, geometry, providers);
+    public Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers, Set<UUID> eventIds) {
+        return mapper.getEventWithClosestObservation(updatedAt, geometry, providers, eventIds);
     }
 
     @Transactional

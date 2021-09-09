@@ -5,14 +5,29 @@
 #### Added
 
 - Added index on `feed_data` - `feed_data_updated_at_feed_id_is_not_enriched_idx`
+- Separate firms event combination, combine firms events iteratively
 
 #### Changed
 
 - Async events enrichment execution
 - Increased feign timeout from 1 to 3 minutes
 
+```yaml
+scheduler:
+  feedComposition:
+    firmsAlias: firms, gdacs-firms
+```
+
 #### Removed
 
+```yaml
+scheduler:
+  firmsFeedComposition:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
+    alias: firms, gdacs-firms
+```
 
 ## 0.6.2 - 2021-08-30
 
