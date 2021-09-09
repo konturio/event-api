@@ -29,7 +29,7 @@ public class FirmEventCombinator implements EventCombinator {
     @Override
     public Optional<KonturEvent> findEventForObservation(NormalizedObservation observation) {
         String geometry = getGeometry(observation);
-        return eventsDao.getEventWithClosestObservation(observation.getSourceUpdatedAt(), geometry, FIRMS_PROVIDERS);
+        return eventsDao.getEventWithClosestObservation(observation.getSourceUpdatedAt(), geometry, FIRMS_PROVIDERS, null);
     }
 
     private String getGeometry(NormalizedObservation observation) {

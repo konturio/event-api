@@ -32,6 +32,11 @@
         FROM kontur_events ev inner join normalized_observations no on ev.observation_id = no.observation_id
         WHERE
             no.source_updated_at between #{updatedAt} - interval '24 hours' and #{updatedAt} + interval '24 hours'
+            <if test='eventIds != null'>
+                <foreach item="eventId" collection="eventIds" separator="," open="AND ev.event_id in (" close=")">
+                    #{eventId}
+                </foreach>
+            </if>
             AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, no.collected_geography, 1000)
             <foreach item="provider" collection="providers" separator="," open="AND no.provider in (" close=")">
              #{provider}

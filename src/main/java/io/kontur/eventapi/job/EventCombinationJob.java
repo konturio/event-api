@@ -8,8 +8,10 @@ import io.kontur.eventapi.eventcombination.EventCombinator;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,9 +20,12 @@ import java.util.UUID;
 public class EventCombinationJob extends AbstractJob  {
     public static final Logger LOG = LoggerFactory.getLogger(EventCombinationJob.class);
 
-    private final NormalizedObservationsDao observationsDao;
-    private final KonturEventsDao eventsDao;
-    private final List<EventCombinator> eventCombinators;
+    protected final NormalizedObservationsDao observationsDao;
+    protected final KonturEventsDao eventsDao;
+    protected final List<EventCombinator> eventCombinators;
+
+    @Value("${scheduler.eventCombination.providers}")
+    private String[] sequentialProviders;
 
     public EventCombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao, List<EventCombinator> eventCombinators, MeterRegistry meterRegistry) {
         super(meterRegistry);
@@ -31,7 +36,8 @@ public class EventCombinationJob extends AbstractJob  {
 
     @Override
     public void execute() {
-        List<NormalizedObservation> observations = observationsDao.getObservationsNotLinkedToEvent();
+        List<NormalizedObservation> observations = observationsDao
+                .getObservationsNotLinkedToEvent(Arrays.asList(sequentialProviders));
 
         LOG.info("Combination processing: {} events", observations.size());
 
@@ -49,7 +55,7 @@ public class EventCombinationJob extends AbstractJob  {
         eventsDao.appendObservationIntoEvent(event, observation);
     }
 
-    private Optional<KonturEvent> findEvent(NormalizedObservation normalizedObservation) {
+    protected Optional<KonturEvent> findEvent(NormalizedObservation normalizedObservation) {
         EventCombinator eventCombinator = Applicable.get(eventCombinators, normalizedObservation);
         return eventCombinator.findEventForObservation(normalizedObservation);
     }

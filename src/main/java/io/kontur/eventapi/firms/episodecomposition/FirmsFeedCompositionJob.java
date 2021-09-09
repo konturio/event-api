@@ -1,4 +1,4 @@
-package io.kontur.eventapi.firms.feedcomposition;
+package io.kontur.eventapi.firms.episodecomposition;
 
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class FirmsFeedCompositionJob extends FeedCompositionJob {
 
-    @Value("${scheduler.firmsFeedComposition.alias}")
+    @Value("${scheduler.feedComposition.firmsAlias}")
     private String[] alias;
 
     public FirmsFeedCompositionJob(KonturEventsDao eventsDao, FeedDao feedDao, NormalizedObservationsDao observationsDao,
@@ -28,5 +28,10 @@ public class FirmsFeedCompositionJob extends FeedCompositionJob {
     public void execute() {
         List<Feed> feeds = feedDao.getFeedsByAliases(Arrays.asList(alias));
         feeds.forEach(this::updateFeed);
+    }
+
+    @Override
+    public String getName() {
+        return "firmsFeedComposition";
     }
 }

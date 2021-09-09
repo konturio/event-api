@@ -1,6 +1,7 @@
 package io.kontur.eventapi.config;
 
-import io.kontur.eventapi.firms.feedcomposition.FirmsFeedCompositionJob;
+import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
+import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.job.EnrichmentJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
@@ -31,6 +32,7 @@ public class WorkerScheduler {
     private final FirmsImportJob firmsImportJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
+    private final FirmsEventCombinationJob firmsEventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
     private final FirmsFeedCompositionJob firmsFeedCompositionJob;
     private final EmDatImportJob emDatImportJob;
@@ -55,8 +57,6 @@ public class WorkerScheduler {
     private String eventCombinationEnabled;
     @Value("${scheduler.feedComposition.enable}")
     private String feedCompositionEnabled;
-    @Value("${scheduler.firmsFeedComposition.enable}")
-    private String firmsFeedCompositionEnabled;
     @Value("${scheduler.emDatImport.enable}")
     private String emDatImportEnabled;
     @Value("${scheduler.staticImport.enable}")
@@ -74,8 +74,8 @@ public class WorkerScheduler {
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
-                           EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
-                           FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob,
+                           EventCombinationJob eventCombinationJob, FirmsEventCombinationJob firmsEventCombinationJob,
+                           FeedCompositionJob feedCompositionJob, FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob,
                            StaticImportJob staticImportJob, StormsNoaaImportJob stormsNoaaImportJob,
                            TornadoJapanMaImportJob tornadoJapanMaImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
@@ -86,6 +86,7 @@ public class WorkerScheduler {
         this.gdacsSearchJob = gdacsSearchJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
+        this.firmsEventCombinationJob = firmsEventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.firmsImportJob = firmsImportJob;
         this.emDatImportJob = emDatImportJob;
@@ -197,6 +198,15 @@ public class WorkerScheduler {
         }
     }
 
+    @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedDelayString = "${scheduler.eventCombination.fixedDelay}")
+    public void startFirmsCombinationJob() {
+        if (Boolean.parseBoolean(eventCombinationEnabled)) {
+            firmsEventCombinationJob.run();
+        } else {
+            LOG.info("Firms Combination job invocation is skipped");
+        }
+    }
+
     @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
     public void startFeedCompositionJob() {
         if (Boolean.parseBoolean(feedCompositionEnabled)) {
@@ -206,9 +216,9 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.firmsFeedComposition.initialDelay}", fixedDelayString = "${scheduler.firmsFeedComposition.fixedDelay}")
+    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
     public void startFirmsFeedCompositionJob() {
-        if (Boolean.parseBoolean(firmsFeedCompositionEnabled)) {
+        if (Boolean.parseBoolean(feedCompositionEnabled)) {
             firmsFeedCompositionJob.run();
         } else {
             LOG.info("Firms Feed Compose job invocation is skipped");

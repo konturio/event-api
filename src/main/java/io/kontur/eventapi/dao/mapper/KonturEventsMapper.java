@@ -19,11 +19,12 @@ public interface KonturEventsMapper {
 
     Optional<KonturEvent> getEventByExternalId(@Param("externalId") String externalId);
 
-    Optional<KonturEvent> getEventById(@Param("evenId") UUID evenId);
+    Optional<KonturEvent> getEventById(@Param("eventId") UUID evenId);
 
     Optional<KonturEvent> getEventWithClosestObservation(@Param("updatedAt") OffsetDateTime updatedAt,
                                                          @Param("geometry") String geometry,
-                                                         @Param("providers") List<String> providers);
+                                                         @Param("providers") List<String> providers,
+                                                         @Param("eventIds") Set<UUID> eventIds);
 
     Set<UUID> getEventsForRolloutEpisodes(@Param("feedId") UUID feedId);
 }

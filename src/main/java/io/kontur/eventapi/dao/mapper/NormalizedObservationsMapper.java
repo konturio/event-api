@@ -40,7 +40,9 @@ public interface NormalizedObservationsMapper {
 
     void markAsRecombined(@Param("observationId") UUID observationId);
 
-    List<NormalizedObservation> getObservationsNotLinkedToEvent();
+    List<NormalizedObservation> getObservationsNotLinkedToEvent(@Param("providers") List<String> providers);
+
+    List<NormalizedObservation> getObservationsNotLinkedToEventOrderByGeography(@Param("providers") List<String> providers);
 
     List<NormalizedObservation> getObservations(@Param("observationIds") Set<UUID> observationIds);
 

@@ -6,9 +6,9 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
+import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportJob;
-import io.kontur.eventapi.job.EventCombinationJob;
-import io.kontur.eventapi.firms.feedcomposition.FirmsFeedCompositionJob;
+import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableIntegrationTest {
     private final FirmsImportJob firmsImportJob;
     private final NormalizationJob normalizationJob;
-    private final EventCombinationJob eventCombinationJob;
+    private final FirmsEventCombinationJob eventCombinationJob;
     private final FirmsFeedCompositionJob feedCompositionJob;
     private final FeedMapper feedMapper;
     private final KonturEventsDao konturEventsDao;
@@ -47,7 +47,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
     @Autowired
     public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob,
-                                                 EventCombinationJob eventCombinationJob, FirmsFeedCompositionJob feedCompositionJob,
+                                                 FirmsEventCombinationJob eventCombinationJob, FirmsFeedCompositionJob feedCompositionJob,
                                                  FeedMapper feedMapper, KonturEventsDao konturEventsDao,
                                                  NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);

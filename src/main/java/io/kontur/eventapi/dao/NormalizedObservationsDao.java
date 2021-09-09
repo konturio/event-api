@@ -40,8 +40,12 @@ public class NormalizedObservationsDao {
         mapper.markAsRecombined(observationId);
     }
 
-    public List<NormalizedObservation> getObservationsNotLinkedToEvent() {
-        return mapper.getObservationsNotLinkedToEvent();
+    public List<NormalizedObservation> getObservationsNotLinkedToEvent(List<String> providers) {
+        return mapper.getObservationsNotLinkedToEvent(providers);
+    }
+
+    public List<NormalizedObservation> getObservationsNotLinkedToEventOrderByGeography(List<String> providers) {
+        return mapper.getObservationsNotLinkedToEventOrderByGeography(providers);
     }
 
     public List<NormalizedObservation> getObservations(Set<UUID> observationIds) {
