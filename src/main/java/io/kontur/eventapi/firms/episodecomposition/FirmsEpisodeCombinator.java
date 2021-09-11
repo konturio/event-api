@@ -14,7 +14,6 @@ import net.sf.geographiclib.PolygonArea;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.overlayng.OverlayNGRobust;
-import org.locationtech.jts.operation.overlayng.UnaryUnionNG;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
@@ -35,6 +34,7 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Component
 public class FirmsEpisodeCombinator extends EpisodeCombinator {
@@ -66,7 +66,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                         .filter(ob -> ob.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt()))
                         .isPresent()
                 )
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
         FeedEpisode feedEpisode = getOnlyElement(existingEpisodeForObservation, new FeedEpisode());
         populateMissedFields(feedEpisode, observation, feedData, eventObservations);
@@ -87,10 +87,9 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
         episode.setEndedAt(firstNonNull(episode.getEndedAt(), calculateEndedDate(observation, eventObservations)));
 
-        List<NormalizedObservation> feedObservations = readObservations(feedData.getObservations(), eventObservations);
-        List<NormalizedObservation> episodeObservations;
+        Set<NormalizedObservation> episodeObservations;
         if (episode.getObservations().isEmpty()) {
-            episodeObservations = findObservationsForEpisode(observation, feedObservations);
+            episodeObservations = findObservationsForEpisode(observation, eventObservations);
             List<UUID> episodeObservationsIds = episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toList());
 
             episode.getObservations().addAll(episodeObservationsIds);
@@ -99,13 +98,20 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         }
 
         episode.setUpdatedAt(calculateUpdatedDate(episodeObservations));
-        Geometry episodeGeometry = calculateGeometry(episodeObservations);
-        episode.setGeometries(firstNonNull(episode.getGeometries(), () -> createEpisodeGeometryFeatureCollection(observation, episodeGeometry)));
+        if (episode.getGeometries() == null) {
+            Geometry episodeGeometry = calculateGeometry(episodeObservations);
+            episode.setGeometries(createEpisodeGeometryFeatureCollection(observation, episodeGeometry));
+        } else {
+            episode.setGeometries(episode.getGeometries());
+        }
         episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
 
-        feedObservations.sort(comparing(NormalizedObservation::getStartedAt));
-        Double area = calculateBurntAreaUpToCurrentObservation(observation, feedObservations);
-        long burningTime = feedObservations.get(0).getStartedAt().until(episode.getEndedAt(), ChronoUnit.HOURS);
+        Double area = calculateBurntAreaUpToCurrentObservation(observation, eventObservations);
+        long burningTime = eventObservations.stream()
+                .map(NormalizedObservation::getStartedAt)
+                .min(OffsetDateTime::compareTo)
+                .get()
+                .until(episode.getEndedAt(), ChronoUnit.HOURS);
 
         episode.setSeverity(calculateSeverity(area, burningTime));
         episode.setName(calculateName(episodeObservations, area, burningTime));
@@ -120,7 +126,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .orElse(observation.getStartedAt().plusHours(24));
     }
 
-    private OffsetDateTime calculateUpdatedDate(List<NormalizedObservation> episodeObservations) {
+    private OffsetDateTime calculateUpdatedDate(Set<NormalizedObservation> episodeObservations) {
         return episodeObservations
                 .stream()
                 .map(NormalizedObservation::getLoadedAt)
@@ -128,7 +134,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .get();
     }
 
-    private Geometry calculateGeometry(List<NormalizedObservation> observations) {
+    private Geometry calculateGeometry(Set<NormalizedObservation> observations) {
         Collection<Geometry> geometries = observations
                 .stream()
                 .map(normalizedObservation -> toGeometry(normalizedObservation.getGeometries()))
@@ -140,13 +146,13 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return createFeatureCollection(geometry, getFirmFeature(observation.getGeometries()).getProperties());
     }
 
-    private List<NormalizedObservation> findObservationsForEpisode(NormalizedObservation observation, List<NormalizedObservation> observations) {
+    private Set<NormalizedObservation> findObservationsForEpisode(NormalizedObservation observation, Set<NormalizedObservation> observations) {
         OffsetDateTime oneDayBeforeObservation = observation.getSourceUpdatedAt().minus(24, ChronoUnit.HOURS);
 
         return observations.stream()
                 .filter(o -> o.getSourceUpdatedAt().isAfter(oneDayBeforeObservation) || o.getSourceUpdatedAt().isEqual(oneDayBeforeObservation))
                 .filter(o -> o.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt()) || o.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
-                .collect(toList());
+                .collect(toSet());
     }
 
     private Severity calculateSeverity(Double area, long burningTime) {
@@ -166,7 +172,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return Severity.EXTREME;
     }
 
-    private String calculateName(List<NormalizedObservation> episodeObservations, Double area, long burningTime) {
+    private String calculateName(Set<NormalizedObservation> episodeObservations, Double area, long burningTime) {
         String burntArea = String.format(Locale.US, "%.3f", area);
         String areaName = getBurntAreaName(episodeObservations);
         if (!StringUtils.isEmpty(areaName)) {
@@ -177,7 +183,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return areaName + "Burnt area " + burntArea + " km\u00B2" + (burningTime > 24 ? ", burning " + burningTime + " hours." : "");
     }
 
-    private String getBurntAreaName(List<NormalizedObservation> episodeObservations) {
+    private String getBurntAreaName(Set<NormalizedObservation> episodeObservations) {
         Geometry centroid = calculateH3Centroid(calculateCentroid(episodeObservations));
 
         FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 10);
@@ -202,7 +208,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .collect(Collectors.joining(", "));
     }
 
-    private Point calculateCentroid(List<NormalizedObservation> episodeObservations) {
+    private Point calculateCentroid(Set<NormalizedObservation> episodeObservations) {
         List<Geometry> geometries = episodeObservations
                 .stream()
                 .map(no -> toGeometry(no.getGeometries()))
@@ -216,11 +222,11 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private Double calculateBurntAreaUpToCurrentObservation(NormalizedObservation observation,
-                                                            List<NormalizedObservation> feedObservations) {
-        List<NormalizedObservation> previousObservations = feedObservations.stream()
+                                                            Set<NormalizedObservation> feedObservations) {
+        Set<NormalizedObservation> previousObservations = feedObservations.stream()
                 .filter(o -> o.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt())
                         || o.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
-                .collect(toList());
+                .collect(toSet());
 
         Geometry geometry = calculateGeometry(previousObservations);
 
@@ -250,11 +256,11 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return getOnlyElement(asList(featureCollection.getFeatures()));
     }
 
-    private List<NormalizedObservation> readObservations(Set<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {
-        List<NormalizedObservation> observationsByIds = eventObservations
+    private Set<NormalizedObservation> readObservations(Set<UUID> observationsIds, Set<NormalizedObservation> eventObservations) {
+        Set<NormalizedObservation> observationsByIds = eventObservations
                 .stream()
                 .filter(e -> observationsIds.contains(e.getObservationId()))
-                .collect(toList());
+                .collect(toSet());
 
         checkState(observationsByIds.size() == observationsIds.size(),
                 "can not find all needed observations in event");
