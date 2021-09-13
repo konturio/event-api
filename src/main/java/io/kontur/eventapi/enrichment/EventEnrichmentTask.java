@@ -2,6 +2,7 @@ package io.kontur.eventapi.enrichment;
 
 import io.kontur.eventapi.client.KonturAppsClient;
 import io.kontur.eventapi.dao.FeedDao;
+import io.kontur.eventapi.enrichment.postprocessor.EnrichmentPostProcessor;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import org.slf4j.Logger;
@@ -23,10 +24,13 @@ public class EventEnrichmentTask {
     private final Logger LOG = LoggerFactory.getLogger(EventEnrichmentTask.class);
     private final KonturAppsClient konturAppsClient;
     private final FeedDao feedDao;
+    private final List<EnrichmentPostProcessor> postProcessors;
 
-    public EventEnrichmentTask(KonturAppsClient konturAppsClient, FeedDao feedDao) {
+    public EventEnrichmentTask(KonturAppsClient konturAppsClient, FeedDao feedDao,
+                               List<EnrichmentPostProcessor> postProcessors) {
         this.konturAppsClient = konturAppsClient;
         this.feedDao = feedDao;
+        this.postProcessors = postProcessors;
     }
 
 
@@ -40,6 +44,10 @@ public class EventEnrichmentTask {
                 episode.setEpisodeDetails(fetchAnalytics(episode.getGeometries(), feedEnrichment, feedParamsString));
             }
         }
+        postProcessors
+                .stream()
+                .filter(postProcessor -> postProcessor.isApplicable(event))
+                .forEach(postProcessor -> postProcessor.process(event));
         event.setEnriched(enriched(event));
         feedDao.addAnalytics(event);
         return CompletableFuture.completedFuture(event);

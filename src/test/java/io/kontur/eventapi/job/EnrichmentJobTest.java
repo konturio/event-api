@@ -2,6 +2,7 @@ package io.kontur.eventapi.job;
 
 import io.kontur.eventapi.client.KonturAppsClient;
 import io.kontur.eventapi.dao.FeedDao;
+import io.kontur.eventapi.enrichment.postprocessor.EnrichmentPostProcessor;
 import io.kontur.eventapi.enrichment.EventEnrichmentTask;
 import io.kontur.eventapi.enrichment.InsightsApiRequest;
 import io.kontur.eventapi.enrichment.InsightsApiResponse;
@@ -15,6 +16,7 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Point;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +28,7 @@ public class EnrichmentJobTest {
 
     private final FeedDao feedDao = mock(FeedDao.class);
     private final KonturAppsClient konturAppsClient = mock(KonturAppsClient.class);
+    private final List<EnrichmentPostProcessor> postProcessors = new ArrayList<>();
 
     private static final Feed feedWithEnrichment;
     static {
@@ -57,7 +60,7 @@ public class EnrichmentJobTest {
         when(feedDao.getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(notEnrichedFeedData));
         doNothing().when(feedDao).addAnalytics(any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createResponse());
-        EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao);
+        EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors);
         EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
 
         enrichmentJob.run();
@@ -76,7 +79,7 @@ public class EnrichmentJobTest {
         when(feedDao.getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(notEnrichedFeedData));
         doNothing().when(feedDao).addAnalytics(any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createErrorResponse());
-        EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao);
+        EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors);
         EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
 
         enrichmentJob.run();
