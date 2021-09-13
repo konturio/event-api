@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Arrays.asList;
-import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -62,10 +61,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Set<FeedEpisode> existingEpisodeForObservation = feedData.getEpisodes()
                 .stream()
-                .filter(ep -> getLatestObservationInEpisode(ep, eventObservations)
-                        .filter(ob -> ob.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt()))
-                        .isPresent()
-                )
+                .filter(ep -> ep.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt()))
                 .collect(toSet());
 
         FeedEpisode feedEpisode = getOnlyElement(existingEpisodeForObservation, new FeedEpisode());
@@ -74,47 +70,45 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return existingEpisodeForObservation.isEmpty() ? Optional.of(feedEpisode) : Optional.empty();
     }
 
-    private Optional<NormalizedObservation> getLatestObservationInEpisode(FeedEpisode episode, Set<NormalizedObservation> eventObservations) {
-        return readObservations(episode.getObservations(), eventObservations)
-                .stream()
-                .max(comparing(NormalizedObservation::getSourceUpdatedAt));
-    }
-
     private void populateMissedFields(FeedEpisode episode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+        Set<NormalizedObservation> episodeObservations;
+        if (episode.getObservations().isEmpty()) {
+            episodeObservations = findObservationsForEpisode(observation, eventObservations);
+            episode.getObservations().addAll(episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
+        } else {
+            episodeObservations = readObservations(episode.getObservations(), eventObservations);
+        }
+
+        if (episode.getGeometries() == null) {
+            Geometry episodeGeometry = calculateGeometry(episodeObservations);
+            episode.setGeometries(createEpisodeGeometryFeatureCollection(observation, episodeGeometry));
+        }
+
         episode.setDescription(firstNonNull(episode.getDescription(), observation.getEpisodeDescription()));
         episode.setType(firstNonNull(episode.getType(), observation.getType()));
         episode.setActive(firstNonNull(episode.getActive(), observation.getActive()));
         episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
         episode.setEndedAt(firstNonNull(episode.getEndedAt(), calculateEndedDate(observation, eventObservations)));
-
-        Set<NormalizedObservation> episodeObservations;
-        if (episode.getObservations().isEmpty()) {
-            episodeObservations = findObservationsForEpisode(observation, eventObservations);
-            List<UUID> episodeObservationsIds = episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toList());
-
-            episode.getObservations().addAll(episodeObservationsIds);
-        } else {
-            episodeObservations = readObservations(episode.getObservations(), eventObservations);
-        }
-
-        episode.setUpdatedAt(calculateUpdatedDate(episodeObservations));
-        if (episode.getGeometries() == null) {
-            Geometry episodeGeometry = calculateGeometry(episodeObservations);
-            episode.setGeometries(createEpisodeGeometryFeatureCollection(observation, episodeGeometry));
-        } else {
-            episode.setGeometries(episode.getGeometries());
-        }
+        episode.setUpdatedAt(firstNonNull(episode.getUpdatedAt(), calculateUpdatedDate(episodeObservations)));
         episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
 
-        Double area = calculateBurntAreaUpToCurrentObservation(observation, eventObservations);
-        long burningTime = eventObservations.stream()
-                .map(NormalizedObservation::getStartedAt)
-                .min(OffsetDateTime::compareTo)
-                .get()
-                .until(episode.getEndedAt(), ChronoUnit.HOURS);
+        if (episode.getSeverity() == null || episode.getName() == null) {
+            Set<NormalizedObservation> observationsUpToCurrentEpisode = eventObservations
+                    .stream()
+                    .filter(ob -> ob.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt())
+                            || ob.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
+                    .collect(toSet());
+            long burningTime = observationsUpToCurrentEpisode.stream()
+                    .map(NormalizedObservation::getStartedAt)
+                    .min(OffsetDateTime::compareTo)
+                    .get()
+                    .until(episode.getEndedAt(), ChronoUnit.HOURS);
+            Double area = calculateBurntAreaUpToCurrentEpisode(observation, observationsUpToCurrentEpisode);
 
-        episode.setSeverity(calculateSeverity(area, burningTime));
-        episode.setName(calculateName(episodeObservations, area, burningTime));
+            episode.setSeverity(calculateSeverity(area, burningTime));
+            episode.setName(calculateName(episodeObservations, area, burningTime));
+        }
+
     }
 
     private OffsetDateTime calculateEndedDate(NormalizedObservation observation, Set<NormalizedObservation> eventObservations) {
@@ -221,15 +215,9 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return geometryFactory.createPoint(new Coordinate(geoCoord.lng, geoCoord.lat));
     }
 
-    private Double calculateBurntAreaUpToCurrentObservation(NormalizedObservation observation,
-                                                            Set<NormalizedObservation> feedObservations) {
-        Set<NormalizedObservation> previousObservations = feedObservations.stream()
-                .filter(o -> o.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt())
-                        || o.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
-                .collect(toSet());
-
-        Geometry geometry = calculateGeometry(previousObservations);
-
+    private Double calculateBurntAreaUpToCurrentEpisode(NormalizedObservation observation,
+                                                        Set<NormalizedObservation> observationsUpToCurrentEpisode) {
+        Geometry geometry = calculateGeometry(observationsUpToCurrentEpisode);
         return calculateArea(geometry);
     }
 
