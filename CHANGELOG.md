@@ -5,9 +5,10 @@
 #### Added
 
 - Added index on `feed_data` - `feed_data_updated_at_feed_id_is_not_enriched_idx`
-- Separate firms event combination, combine firms events iteratively
+- Separate firms' event combination, combine firms events iteratively
 - Added disaster-ninja-02 feed (for zigzag renamed gdacs-firms feed)
   !!! BE AWARE !!! We should change DN configuration in sync
+- Change `THERMAL_ANOMALY` type according to analytics 
 
 #### Changed
 
