@@ -6,13 +6,13 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
-import org.wololo.geojson.Geometry;
 import org.wololo.geojson.GeometryCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.util.Arrays;
 
 import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
+import static io.kontur.eventapi.util.GeometryUtil.calculateAreaKm2;
 
 @Component
 public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor {
@@ -30,7 +30,7 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
                     long volcanoesCount = toLong(episode.getEpisodeDetails().get(VOLCANOES_COUNT));
                     long hotspotDaysPerYearMax = toLong(episode.getEpisodeDetails().get(HOTSPOT_DAYS_PER_YEAR_MAX));
 
-                    double area = geoJSONReader.read(toGeometryCollection(episode.getGeometries())).getArea();
+                    double area = getArea(episode.getGeometries());
 
                     if (industrialAreaKm2 > 0) {
                         episode.setType(EventType.INDUSTRIAL_HEAT);
@@ -58,10 +58,11 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
                 && episode.getEpisodeDetails().containsKey(HOTSPOT_DAYS_PER_YEAR_MAX);
     }
 
-    private GeometryCollection toGeometryCollection(FeatureCollection featureCollection) {
-        return new GeometryCollection(Arrays.stream(featureCollection.getFeatures())
+    private Double getArea(FeatureCollection fc) {
+        GeometryCollection geometryCollection = new GeometryCollection(Arrays.stream(fc.getFeatures())
                 .map(Feature::getGeometry)
-                .toArray(Geometry[]::new));
+                .toArray(org.wololo.geojson.Geometry[]::new));
+        return calculateAreaKm2(geoJSONReader.read(geometryCollection));
     }
 
     private Double toDouble(Object value) {

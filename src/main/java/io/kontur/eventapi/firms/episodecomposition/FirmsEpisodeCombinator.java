@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
+import static io.kontur.eventapi.util.GeometryUtil.calculateAreaKm2;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -218,18 +219,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private Double calculateBurntAreaUpToCurrentEpisode(NormalizedObservation observation,
                                                         Set<NormalizedObservation> observationsUpToCurrentEpisode) {
         Geometry geometry = calculateGeometry(observationsUpToCurrentEpisode);
-        return calculateArea(geometry);
-    }
-
-    private Double calculateArea(Geometry geometry) {
-        double areaInMeters = 0;
-        for (int i = 0; i < geometry.getNumGeometries(); i++) {
-            PolygonArea polygonArea = new PolygonArea(Geodesic.WGS84, false);
-            Arrays.stream(geometry.getGeometryN(i).getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
-            areaInMeters += Math.abs(polygonArea.Compute().area);
-        }
-        double areaInKm = areaInMeters / 1_000_000;
-        return areaInKm;
+        return calculateAreaKm2(geometry);
     }
 
     private Geometry toGeometry(FeatureCollection geometries) {
