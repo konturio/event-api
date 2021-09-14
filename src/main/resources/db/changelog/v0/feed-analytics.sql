@@ -2,5 +2,5 @@
 
 --changeset event-api-migrations:feed-analytics.sql runOnChange:true
 
-update feeds set enrichment = '{"population", "peopleWithoutOsmBuildings", "areaWithoutOsmBuildingsKm2", "peopleWithoutOsmRoads", "areaWithoutOsmRoadsKm2", "peopleWithoutOsmObjects", "areaWithoutOsmObjectsKm2", "osmGapsPercentage", "industrialAreaKm2", "forestAreaKm2", "volcanoesCount", "hotspotDaysPerYearMax"}' where alias = 'gdacs-firms';
-update feeds set enrichment = '{"population", "peopleWithoutOsmBuildings", "areaWithoutOsmBuildingsKm2", "peopleWithoutOsmRoads", "areaWithoutOsmRoadsKm2", "peopleWithoutOsmObjects", "areaWithoutOsmObjectsKm2", "osmGapsPercentage"}' where alias = 'gdacs';
+update feeds set enrichment = '{"population", "peopleWithoutOsmBuildings", "areaWithoutOsmBuildingsKm2", "peopleWithoutOsmRoads", "areaWithoutOsmRoadsKm2", "peopleWithoutOsmObjects", "areaWithoutOsmObjectsKm2", "osmGapsPercentage", "industrialAreaKm2", "forestAreaKm2", "volcanoesCount", "hotspotDaysPerYearMax", "urbanCorePopulation", "urbanCoreAreaKm2", "totalPopulatedAreaKm2"}' where alias = 'disaster-ninja-02';
+update feeds set enrichment = '{"population", "peopleWithoutOsmBuildings", "areaWithoutOsmBuildingsKm2", "peopleWithoutOsmRoads", "areaWithoutOsmRoadsKm2", "peopleWithoutOsmObjects", "areaWithoutOsmObjectsKm2", "osmGapsPercentage", "urbanCorePopulation", "urbanCoreAreaKm2", "totalPopulatedAreaKm2"}' where alias = 'gdacs';

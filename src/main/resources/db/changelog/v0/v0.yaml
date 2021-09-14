@@ -134,9 +134,6 @@ databaseChangeLog:
     file: analytic-enrichment-changes.sql
 - include:
     relativeToChangelogFile: true
-    file: feed-analytics.sql
-- include:
-    relativeToChangelogFile: true
     file: update-feed-data-is-latest-version-index.sql
 - include:
     relativeToChangelogFile: true
@@ -150,3 +147,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: add-gdacs-firms-feed.sql
+- include:
+    relativeToChangelogFile: true
+    file: feed-analytics.sql

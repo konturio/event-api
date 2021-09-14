@@ -51,6 +51,7 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
 
     public boolean isApplicable(FeedEpisode episode) {
         return episode.getType() == EventType.THERMAL_ANOMALY
+                && episode.getEpisodeDetails() != null
                 && episode.getEpisodeDetails().containsKey(INDUSTRIAL_AREA_KM2)
                 && episode.getEpisodeDetails().containsKey(FOREST_AREA_KM2)
                 && episode.getEpisodeDetails().containsKey(VOLCANOES_COUNT)

@@ -16,11 +16,15 @@ public class EnrichmentConfig {
     public static final String FOREST_AREA_KM2 = "forestAreaKm2";
     public static final String VOLCANOES_COUNT = "volcanoesCount";
     public static final String HOTSPOT_DAYS_PER_YEAR_MAX = "hotspotDaysPerYearMax";
+    public static final String URBAN_CORE_POPULATION = "urbanCorePopulation";
+    public static final String URBAN_CORE_AREA_KM2 = "urbanCoreAreaKm2";
+    public static final String TOTAL_POPULATION_AREA_KM2 = "totalPopulatedAreaKm2";
     public static final String HUMANITARIAN_IMPACT = "humanitarianImpact";
 
     public static final String OSM_QUALITY_GROUP = "osmQuality";
     public static final String POPULATION_GROUP = "population";
     public static final String THERMAL_SPOT_STATISTIC_GROUP = "thermalSpotStatistic";
+    public static final String URBAN_CORE_GROUP = "urbanCore";
     public static final String NO_GROUP = "no group";
 
     public static Map<String, String> groups = new HashMap<>();
@@ -39,6 +43,10 @@ public class EnrichmentConfig {
         groups.put(FOREST_AREA_KM2, THERMAL_SPOT_STATISTIC_GROUP);
         groups.put(VOLCANOES_COUNT, THERMAL_SPOT_STATISTIC_GROUP);
         groups.put(HOTSPOT_DAYS_PER_YEAR_MAX, THERMAL_SPOT_STATISTIC_GROUP);
+
+        groups.put(URBAN_CORE_POPULATION, URBAN_CORE_GROUP);
+        groups.put(URBAN_CORE_AREA_KM2, URBAN_CORE_GROUP);
+        groups.put(TOTAL_POPULATION_AREA_KM2, URBAN_CORE_GROUP);
 
         groups.put(HUMANITARIAN_IMPACT, NO_GROUP);
     }
