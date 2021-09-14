@@ -97,8 +97,8 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
 
     /**
      * Observations are sorted by geography.
-     * Create event, add all possible observations
-     * to this event, than create next and repeat.
+     * Store all the created events and try to link
+     * new observation to all of the created events.
      *
      * We only make one iteration by observations here
      *
@@ -106,11 +106,12 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
      */
     private void addObservationsToNewEvents(List<NormalizedObservation> observations) {
         if (!observations.isEmpty()) {
-            UUID eventId = createEvent(observations.get(0));
+            Set<UUID> createdEvents = new HashSet<>();
+            createdEvents.add(createEvent(observations.get(0)));
             for (int i = 1; i < observations.size(); i++) {
                 NormalizedObservation observation = observations.get(i);
-                if (tryFindEvent(observation, Set.of(eventId)).isEmpty()) {
-                    eventId = createEvent(observation);
+                if (tryFindEvent(observation, createdEvents).isEmpty()) {
+                    createdEvents.add(createEvent(observation));
                 }
             }
         }
