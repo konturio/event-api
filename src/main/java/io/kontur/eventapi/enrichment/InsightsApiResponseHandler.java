@@ -38,6 +38,9 @@ public class InsightsApiResponseHandler {
             case FOREST_AREA_KM2: return data.getThermalSpotStatistic().getForestAreaKm2();
             case VOLCANOES_COUNT: return data.getThermalSpotStatistic().getVolcanoesCount();
             case HOTSPOT_DAYS_PER_YEAR_MAX: return data.getThermalSpotStatistic().getHotspotDaysPerYearMax();
+            case URBAN_CORE_POPULATION: return data.getUrbanCore().getUrbanCorePopulation();
+            case URBAN_CORE_AREA_KM2: return data.getUrbanCore().getUrbanCoreAreaKm2();
+            case TOTAL_POPULATION_AREA_KM2: return data.getUrbanCore().getTotalPopulatedAreaKm2();
             default: return null;
         }
     }

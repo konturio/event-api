@@ -25,6 +25,7 @@ public class InsightsApiResponse {
         private Population population;
         private ThermalSpotStatistic thermalSpotStatistic;
         private String humanitarianImpact;
+        private UrbanCore urbanCore;
     }
 
     @Data
@@ -49,6 +50,13 @@ public class InsightsApiResponse {
         private Double forestAreaKm2;
         private Double industrialAreaKm2;
         private Long hotspotDaysPerYearMax;
+    }
+
+    @Data
+    public static class UrbanCore {
+        private Long urbanCorePopulation;
+        private Double urbanCoreAreaKm2;
+        private Double totalPopulatedAreaKm2;
     }
 
     @Data
