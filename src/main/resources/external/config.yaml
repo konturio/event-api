@@ -1,91 +1,19 @@
 spring:
   datasource:
-    platform: postgres
-    url: 'jdbc:postgresql://localhost:5432/event_api'
-    username: event_api_user01
-    password: 'CHANGE_ME_TO_SECURE_PASSWORD'
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag
-          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag/protocol/openid-connect/certs
-
-konturApi:
-  host: 'https://api.kontur.io/'
-
-konturApps:
-  host: 'https://test-apps02.konturlabs.com/'
+    url: 'URL'
+    username: 'USERNAME'
+    password: 'PASSWORD'
+  profiles:
+    active: 'dev | test | prod'
 
 pdc:
-  host: 'https://testemops.pdc.org'
-  mapSrvHost: 'https://testapps.pdc.org'
-  user: user
-  password: password
+  user: 'PDC_USER'
+  password: 'PDC_PASSWORD'
 
-stormsImport:
-  host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
-
-tornadoJapanMa:
-  host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
-
-scheduler:
-  hpSrvImport:
-    enable: false
-    initialDelay: 1000
-  hpSrvMagsImport:
-    enable: true
-    initialDelay: 10000
-    fixedDelay: 600000
-  pdcMapSrvSearch:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 60000
-  gdacsImport:
-    enable: true
-    cron: 30 0/5 * * * *
-  firmsImport:
-    enable: true
-  emDatImport:
-    enable: true
-  staticImport:
-    enable: true
-    initialDelay: 1000
-  stormsNoaaImport:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: P1D
-  tornadoJapanMaImport:
-    enable: false
-    initialDelay: 1000
-    fixedDelay: P1D
-  historicalTornadoJapanMaImport:
-    enable: false
-    initialDelay: 1000
-  normalization:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1000
-  eventCombination:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1000
-  feedComposition:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1000
-    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
-  firmsFeedComposition:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1000
-    alias: firms, gdacs-firms
-  enrichment:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1000
+emdat:
+  user: 'EM_DAT_USER'
+  password: 'EM_DAT_PASSWORD'
 
 aws:
   sqs:
-    enabled: true
-    url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo
+    url: 'AWS_SQS_URL'

@@ -23,7 +23,7 @@ stormsNoaa:
 
 staticdata:
   s3Bucket: 'event-api-locker01'
-  s3Folder: 'TEST-DEV/'
+  s3Folder: 'EXP/'
 
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
@@ -75,11 +75,22 @@ scheduler:
     fixedDelay: 999999
     providers:
       em-dat,
-      gdacsAlert, gdacsAlertGeometry,
-      hpSrvMag, hpSrvSearch, pdcMapSrv, pdcSqs,
-      tornado.canada-gov, tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai,
+      gdacsAlert,
+      gdacsAlertGeometry,
+      hpSrvMag,
+      hpSrvSearch,
+      pdcMapSrv,
+      pdcSqs,
+      tornado.canada-gov,
+      tornado.australian-bm,
+      tornado.osm-wiki,
+      tornado.des-inventar-sendai,
       storms.noaa,
-      wildfire.frap.cal, wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov
+      wildfire.frap.cal,
+      wildfire.sa-gov,
+      wildfire.qld-des-gov,
+      wildfire.victoria-gov,
+      wildfire.nsw-gov
     firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: false

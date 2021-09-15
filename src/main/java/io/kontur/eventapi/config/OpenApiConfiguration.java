@@ -32,9 +32,9 @@ public class OpenApiConfiguration {
                 .description("Disaster footprints & alerts"))
                 .servers(Collections.singletonList(server));
 
-        boolean isDevelopProfileActive = Arrays.asList(environment.getActiveProfiles()).contains("develop");
+        boolean isJwtAuthDisabledProfileActive = Arrays.asList(environment.getActiveProfiles()).contains("jwtAuthDisabled");
 
-        if (!isDevelopProfileActive) {
+        if (!isJwtAuthDisabledProfileActive) {
             String securitySchemeName = "bearerAuth";
 
             openAPI.addSecurityItem(new SecurityRequirement().addList(securitySchemeName))

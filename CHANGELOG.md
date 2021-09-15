@@ -6,31 +6,19 @@
 
 - Added index on `feed_data` - `feed_data_updated_at_feed_id_is_not_enriched_idx`
 - Separate firms' event combination, combine firms events iteratively
-- Added disaster-ninja-02 feed (for zigzag renamed gdacs-firms feed)
-  !!! BE AWARE !!! We should change DN configuration in sync
-- Change `THERMAL_ANOMALY` type according to analytics 
+- **!!! BE AWARE !!!** Added `disaster-ninja-02` feed (for zigzag renamed `gdacs-firms` feed).
+  We should change DN configuration in sync and add new role to Keycloak - `read:feed:disaster-ninja-02`
+- Change `THERMAL_ANOMALY` type according to analytics
 
 #### Changed
 
 - Async events enrichment execution
 - Increased feign timeout from 1 to 3 minutes
-
-```yaml
-scheduler:
-  feedComposition:
-    firmsAlias: firms, disaster-ninja-02
-```
+- Configs by profiles: `dev`, `test`, `prod`. We should leave only properties from
+  `external/config.yaml` for external properties 
 
 #### Removed
 
-```yaml
-scheduler:
-  firmsFeedComposition:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1000
-    alias: firms, gdacs-firms
-```
 
 ## 0.6.2 - 2021-08-30
 

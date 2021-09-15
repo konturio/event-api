@@ -1,0 +1,24 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/sonic
+          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/sonic/protocol/openid-connect/certs
+
+konturApi:
+  host: 'https://test-api.konturlabs.com/'
+
+konturApps:
+  host: 'https://test-apps.konturlabs.com/'
+
+pdc:
+  host: 'https://testemops.pdc.org'
+  mapSrvHost: 'https://testapps.pdc.org'
+
+staticdata:
+  s3Folder: 'TEST QA/'
+
+aws:
+  sqs:
+    enabled: true
