@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@Profile("!develop")
+@Profile("!jwtAuthDisabled")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {

@@ -1,8 +1,13 @@
 ## Profiles
 
 Available profiles:
-- `develop` - Disables JWT authorization
-- `awsSqsDisabled` - Disables AWS SQS integration
+- For local use:
+  - `jwtAuthDisabled` - Disables JWT authorization
+  - `awsSqsDisabled` - Disables AWS SQS integration
+- For external use:
+  - `dev` - for DEV environment
+  - `test` - for TEST environment
+  - `prod` - for PROD environment
 
 Profiles can be activated several ways:
 - using system parameter `-Dspring.profiles.active={profile_name}`
@@ -25,6 +30,18 @@ To configure additional external config file for Spring Boot application set up 
 `SPRING_CONFIG_ADDITIONAL_LOCATION="file:%h/config.local.yaml"`
 
 #### Config file
+
+There are 5 config files:
+- `application.yml` - default config file
+- `application-dev.yml` - config file for DEV environment
+- `application-test.yml` - config file for TEST environment
+- `application-prod.yml` - config file for PROD environment
+- `config.yaml` - template of external config
+
+We should use `dev`, `test` and `prod` config files to store properties that
+are different for different environments.
+
+Secure data should be stored in external config file: `config.local.yaml`
 
 ##### DB config
 
@@ -63,12 +80,16 @@ pdc:
 
 ##### Job configuration
 
-There are 4 jobs collecting the data.
-- `hpSrvImport` - collects the raw data from PDC's Hazard and Product service (HpSrv); 
-- `gdacsImport` - collects the raw data from Gdacs; 
-- `normalization` - normalizes the raw data;
-- `eventCombination` - combines episodes from normalized records into Kontur events;
-- `feedComposition` - creates customer feeds from normalized episodes.
+Jobs for data import:
+- `hpSrvImport` - collects the raw data from PDC's Hazard and Product service (HpSrv)
+- `gdacsImport` - collects the raw data from Gdacs
+- ...
+
+Jobs for data processing:
+- `normalization` - normalizes the raw data
+- `eventCombination` - combines episodes from normalized records into Kontur events
+- `feedComposition` - creates customer feeds from normalized episodes
+- `enrichment` - enriches events and episodes with analytics
 
 ```yaml
 scheduler:
@@ -77,20 +98,23 @@ scheduler:
     initialDelay: 1000
   gdacsImport:
     enable: true
-    initialDelay: 1000
-    fixedRate: 300000
+    cron: 0 1/5 * * * *
   normalization:
     enable: true
     initialDelay: 1000
-    fixedDelay: 60000
+    fixedDelay: 10000
   eventCombination:
     enable: true
     initialDelay: 10000
-    fixedDelay: 60000
+    fixedDelay: 10000
   feedComposition:
     enable: true
     initialDelay: 20000
-    fixedDelay: 60000
+    fixedDelay: 10000
+  enrichment:
+    enable: true
+    initialDelay: 30000
+    fixedDelay: 10000
 ```
 
 #### Storing static data

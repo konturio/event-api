@@ -1,0 +1,24 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag
+          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/zigzag/protocol/openid-connect/certs
+
+konturApi:
+  host: 'https://test-api02.konturlabs.com/'
+
+konturApps:
+  host: 'https://test-apps02.konturlabs.com/'
+
+pdc:
+  host: 'https://testemops.pdc.org'
+  mapSrvHost: 'https://testapps.pdc.org'
+
+staticdata:
+  s3Folder: 'TEST DEV/'
+
+aws:
+  sqs:
+    enabled: true
