@@ -13,9 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 public class FirmsEventCombinationJob extends EventCombinationJob {
@@ -31,14 +34,15 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
     }
 
     /**
-     * 1. Search for existing events iteratively.
-     * 2. Create new events and add remaining observations
-     *    to them iteratively
+     * 1. Obtain observations for 24 hours
+     * 2. Search for existing events iteratively.
+     * 3. Cluster remaining observations by geometry
+     *    and create events.
      */
     @Override
     public void execute() {
         List<NormalizedObservation> observations = observationsDao
-                .getObservationsNotLinkedToEventOrderByGeography(Arrays.asList(sequentialProviders));
+                .getObservationsNotLinkedToEventFor24Hours(Arrays.asList(sequentialProviders));
 
         LOG.info("Firms Combination processing: {} events", observations.size());
 
@@ -96,25 +100,20 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
     }
 
     /**
-     * Observations are sorted by geography.
-     * Store all the created events and try to link
-     * new observation to all of the created events.
-     *
-     * We only make one iteration by observations here
+     * Cluster observations by geometry to get
+     * new events.
      *
      * @param observations unmatched observations
      */
     private void addObservationsToNewEvents(List<NormalizedObservation> observations) {
-        if (!observations.isEmpty()) {
-            Set<UUID> createdEvents = new HashSet<>();
-            createdEvents.add(createEvent(observations.get(0)));
-            for (int i = 1; i < observations.size(); i++) {
-                NormalizedObservation observation = observations.get(i);
-                if (tryFindEvent(observation, createdEvents).isEmpty()) {
-                    createdEvents.add(createEvent(observation));
-                }
-            }
+        if (observations.isEmpty()) {
+            return;
         }
+        Map<UUID, NormalizedObservation> observationsByIds = observations.stream()
+                .collect(toMap(NormalizedObservation::getObservationId, Function.identity()));
+        List<Set<UUID>> clusters = observationsDao.clusterObservationsByGeography(observationsByIds.keySet());
+        clusters.forEach(clusterObservationIds -> createEvent(
+                clusterObservationIds.stream().map(observationsByIds::get).collect(toList())));
     }
 
     private Optional<UUID> tryFindEvent(NormalizedObservation observation, Set<UUID> eventIds) {
@@ -128,10 +127,9 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
         return Optional.empty();
     }
 
-    private UUID createEvent(NormalizedObservation observation) {
-        UUID eventId = UUID.randomUUID();
-        addToEvent(observation, new KonturEvent(eventId));
-        return eventId;
+    private void createEvent(List<NormalizedObservation> observations) {
+        KonturEvent event = new KonturEvent(UUID.randomUUID());
+        observations.forEach(observation -> addToEvent(observation, event));
     }
 
     private void addToEvent(NormalizedObservation observation, KonturEvent event) {
