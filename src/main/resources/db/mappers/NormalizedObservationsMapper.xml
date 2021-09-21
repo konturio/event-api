@@ -72,15 +72,36 @@
         LIMIT 30000
     </select>
 
-    <select id="getObservationsNotLinkedToEventOrderByGeography" resultMap="normalizedObservationsDtoMap">
-        SELECT *
-        FROM normalized_observations
-        WHERE recombined is false
-        <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
-            #{provider}
-        </foreach>
-        ORDER BY collected_geography
+    <select id="getObservationsNotLinkedToEventFor24Hours" resultMap="normalizedObservationsDtoMap">
+        WITH obs AS (
+            SELECT min(source_updated_at) as min_sua
+            FROM normalized_observations
+            WHERE recombined IS FALSE
+                <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
+                    #{provider}
+                </foreach>
+        )
+        SELECT * FROM normalized_observations
+        WHERE recombined IS FALSE
+            <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
+                #{provider}
+            </foreach>
+            and source_updated_at between (select min_sua from obs) - interval '1s' and (select min_sua from obs) + interval '24 hours'
+        ORDER BY source_updated_at
         LIMIT 30000
+    </select>
+
+    <select id="clusterObservationsByGeography" resultType="java.util.Set">
+        select array_agg(observation_id)::uuid[] from (
+            SELECT
+                ST_ClusterDBSCAN(ST_Transform(collected_geography::geometry, 54032), 2000, 1) over() as cid,
+                observation_id
+            FROM normalized_observations
+            <foreach item="observationId" collection="observationIds" separator="," open="WHERE observation_id in (" close=")">
+                  #{observationId}
+            </foreach>
+        ) as clusters
+        group by cid
     </select>
 
     <select id="getObservationsByEventId" resultMap="normalizedObservationsDtoMap">

@@ -7,10 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 
@@ -44,8 +41,12 @@ public class NormalizedObservationsDao {
         return mapper.getObservationsNotLinkedToEvent(providers);
     }
 
-    public List<NormalizedObservation> getObservationsNotLinkedToEventOrderByGeography(List<String> providers) {
-        return mapper.getObservationsNotLinkedToEventOrderByGeography(providers);
+    public List<NormalizedObservation> getObservationsNotLinkedToEventFor24Hours(List<String> providers) {
+        return mapper.getObservationsNotLinkedToEventFor24Hours(providers);
+    }
+
+    public List<Set<UUID>> clusterObservationsByGeography(Set<UUID> observationIds) {
+        return mapper.clusterObservationsByGeography(observationIds);
     }
 
     public List<NormalizedObservation> getObservations(Set<UUID> observationIds) {

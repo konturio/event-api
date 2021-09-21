@@ -37,7 +37,7 @@
                     #{eventId}
                 </foreach>
             </if>
-            AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, no.collected_geography, 1000)
+            AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, no.collected_geography, 2000)
             <foreach item="provider" collection="providers" separator="," open="AND no.provider in (" close=")">
              #{provider}
             </foreach>
