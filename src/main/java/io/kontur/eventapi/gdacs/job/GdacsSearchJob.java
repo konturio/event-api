@@ -4,6 +4,7 @@ import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 @Component
 public class GdacsSearchJob extends AbstractJob {
@@ -32,6 +34,9 @@ public class GdacsSearchJob extends AbstractJob {
         super(meterRegistry);
         this.gdacsService = gdacsService;
         this.gdacsAlertParser = gdacsAlertParser;
+        Gauge.builder("gdacsFeedXML", XML_PUB_DATE, (x) -> XML_PUB_DATE.until(OffsetDateTime.now(), ChronoUnit.HOURS))
+                .description("Gdacs CAP feed did not update (hours). Last pubDate: " + XML_PUB_DATE)
+                .register(meterRegistry);
     }
 
     @Override
