@@ -41,7 +41,7 @@ public class InsightsApiResponseHandler {
             case URBAN_CORE_POPULATION: return data.getUrbanCore().getUrbanCorePopulation();
             case URBAN_CORE_AREA_KM2: return data.getUrbanCore().getUrbanCoreAreaKm2();
             case TOTAL_POPULATION_AREA_KM2: return data.getUrbanCore().getTotalPopulatedAreaKm2();
-            default: return null;
+            default: throw new RuntimeException("Unexpected enrichment param: " + param);
         }
     }
 }
