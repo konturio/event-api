@@ -6,6 +6,8 @@ import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class GdacsSearchJob extends AbstractJob {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
 
-    public static OffsetDateTime XML_PUB_DATE = DateTimeUtil.uniqueOffsetDateTime();
+    public static PubDate XML_PUB_DATE = new PubDate(DateTimeUtil.uniqueOffsetDateTime());
 
     private final GdacsService gdacsService;
     private final GdacsAlertXmlParser gdacsAlertParser;
@@ -34,8 +36,8 @@ public class GdacsSearchJob extends AbstractJob {
         super(meterRegistry);
         this.gdacsService = gdacsService;
         this.gdacsAlertParser = gdacsAlertParser;
-        Gauge.builder("gdacsFeedXML", XML_PUB_DATE, (x) -> XML_PUB_DATE.until(OffsetDateTime.now(), ChronoUnit.HOURS))
-                .description("Gdacs CAP feed did not update (hours). Last pubDate: " + XML_PUB_DATE)
+        Gauge.builder("gdacsFeedXML", XML_PUB_DATE, (pub) -> pub.getPubDate().until(DateTimeUtil.uniqueOffsetDateTime(), ChronoUnit.HOURS))
+                .description("Gdacs CAP feed did not update (hours)")
                 .register(meterRegistry);
     }
 
@@ -64,7 +66,12 @@ public class GdacsSearchJob extends AbstractJob {
     }
 
     private void setPubDate(String xml) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
-        XML_PUB_DATE = gdacsAlertParser.getPubDate(xml);
+        XML_PUB_DATE.setPubDate(gdacsAlertParser.getPubDate(xml));
+    }
+
+    @Data @AllArgsConstructor
+    private static class PubDate {
+        private OffsetDateTime pubDate;
     }
 }
 
