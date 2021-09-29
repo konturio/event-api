@@ -49,6 +49,9 @@ public class EventEnrichmentTask {
                 .filter(postProcessor -> postProcessor.isApplicable(event))
                 .forEach(postProcessor -> postProcessor.process(event));
         event.setEnriched(enriched(event));
+        if (!event.getEnriched()) {
+            LOG.warn("Event was not enriched: " + event.getEventId());
+        }
         feedDao.addAnalytics(event);
         return CompletableFuture.completedFuture(event);
     }
