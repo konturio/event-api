@@ -36,23 +36,27 @@ public class EventEnrichmentTask {
 
     @Async("enrichmentExecutor")
     public CompletableFuture<FeedData> enrichEvent(FeedData event, List<String> feedEnrichment, String feedParamsString) {
-        if (needsEnrichment(event.getEventDetails(), event.getGeometries())) {
-            event.setEventDetails(fetchAnalytics(event.getGeometries(), feedEnrichment, feedParamsString));
-        }
-        for (FeedEpisode episode : event.getEpisodes()) {
-            if (needsEnrichment(episode.getEpisodeDetails(), episode.getGeometries())) {
-                episode.setEpisodeDetails(fetchAnalytics(episode.getGeometries(), feedEnrichment, feedParamsString));
+        try {
+            if (needsEnrichment(event.getEventDetails(), event.getGeometries())) {
+                event.setEventDetails(fetchAnalytics(event.getGeometries(), feedEnrichment, feedParamsString));
             }
+            for (FeedEpisode episode : event.getEpisodes()) {
+                if (needsEnrichment(episode.getEpisodeDetails(), episode.getGeometries())) {
+                    episode.setEpisodeDetails(fetchAnalytics(episode.getGeometries(), feedEnrichment, feedParamsString));
+                }
+            }
+            postProcessors
+                    .stream()
+                    .filter(postProcessor -> postProcessor.isApplicable(event))
+                    .forEach(postProcessor -> postProcessor.process(event));
+            event.setEnriched(enriched(event));
+            if (!event.getEnriched()) {
+                LOG.error("Event was not enriched: " + event.getEventId());
+            }
+            feedDao.addAnalytics(event);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage());
         }
-        postProcessors
-                .stream()
-                .filter(postProcessor -> postProcessor.isApplicable(event))
-                .forEach(postProcessor -> postProcessor.process(event));
-        event.setEnriched(enriched(event));
-        if (!event.getEnriched()) {
-            LOG.error("Event was not enriched: " + event.getEventId());
-        }
-        feedDao.addAnalytics(event);
         return CompletableFuture.completedFuture(event);
     }
 
