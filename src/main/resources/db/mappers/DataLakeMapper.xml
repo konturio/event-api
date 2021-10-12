@@ -63,8 +63,6 @@
         WITH datalakes AS (
             SELECT * FROM data_lake
             WHERE external_id = #{externalId} AND provider = 'pdcMapSrv'
-            ORDER BY updated_at DESC
-            LIMIT 2
         )
         SELECT
             CASE WHEN EXISTS (

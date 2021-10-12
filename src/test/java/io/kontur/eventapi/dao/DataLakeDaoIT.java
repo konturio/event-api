@@ -51,7 +51,7 @@ class DataLakeDaoIT extends AbstractCleanableIntegrationTest {
     }
 
     @Test
-    public void testIsNewExposureWhenNoRecordsInDB() throws IOException {
+    public void testIsNewExposureWhenNoRecordsInDB() {
         assertTrue(dataLakeDao.isNewPdcExposure(externalId, geoHash1));
     }
 
@@ -63,7 +63,7 @@ class DataLakeDaoIT extends AbstractCleanableIntegrationTest {
 
         dataLakeDao.storeDataLakes(List.of(dataLake1, dataLake2, dataLake3));
 
-        assertTrue(dataLakeDao.isNewPdcExposure(externalId, geoHash1));
+        assertFalse(dataLakeDao.isNewPdcExposure(externalId, geoHash1));
         assertFalse(dataLakeDao.isNewPdcExposure(externalId, geoHash2));
         assertFalse(dataLakeDao.isNewPdcExposure(externalId, geoHash3));
     }

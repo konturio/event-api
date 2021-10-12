@@ -21,6 +21,7 @@ build:
   extends: .default-job-settings
   stage: build
   script:
+    - ln -svf /usr/local/jdk-15/bin/* /usr/bin/
     - mvn $MAVEN_CLI_OPTS clean install -U -Prelease
     - mv target/*.zip .
   artifacts:
