@@ -66,10 +66,14 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
     }
 
     private Double toDouble(Object value) {
-        return value == null ? 0 : (Double) value;
+        return value == null ? 0.0 : (Double) value;
     }
 
     private Long toLong(Object value) {
-        return value == null ? 0 : (Long) value;
+        try {
+            return value == null ? 0L : (Long) value;
+        } catch (Exception e) {
+            return 0L;
+        }
     }
 }
