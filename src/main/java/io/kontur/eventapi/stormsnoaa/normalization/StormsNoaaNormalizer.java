@@ -164,12 +164,17 @@ public class StormsNoaaNormalizer extends Normalizer {
     }
 
     private BigDecimal getCost(String damageProperty) {
-        if (StringUtils.isBlank(damageProperty)) return null;
-        String unitStr = RegExUtils.removePattern(damageProperty, "[0-9\\.]");
-        String costStr = RegExUtils.removePattern(damageProperty, "[a-zA-Z]");
-        BigDecimal unitValue = COST_UNITS.getOrDefault(unitStr, BigDecimal.ONE);
-        BigDecimal costValue = costStr.isBlank() ? BigDecimal.ONE : NumberUtils.createBigDecimal(costStr);
-        return costValue.multiply(unitValue);
+        try {
+            if (StringUtils.isBlank(damageProperty)) return null;
+            String unitStr = RegExUtils.removePattern(damageProperty, "[0-9\\.]");
+            String costStr = RegExUtils.removePattern(damageProperty, "[a-zA-Z]");
+            BigDecimal unitValue = COST_UNITS.getOrDefault(unitStr, BigDecimal.ONE);
+            BigDecimal costValue = costStr.isBlank() ? BigDecimal.ONE : NumberUtils.createBigDecimal(costStr);
+            return costValue.multiply(unitValue);
+        } catch (Exception e) {
+            LOG.warn("Couldn't parse cost from DAMAGE_PROPERTY: " + damageProperty);
+            return null;
+        }
     }
 
     private String parseString(Map<String, String> map, String key) {
