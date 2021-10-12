@@ -50,7 +50,7 @@ public class EventEnrichmentTask {
                 .forEach(postProcessor -> postProcessor.process(event));
         event.setEnriched(enriched(event));
         if (!event.getEnriched()) {
-            LOG.warn("Event was not enriched: " + event.getEventId());
+            LOG.error("Event was not enriched: " + event.getEventId());
         }
         feedDao.addAnalytics(event);
         return CompletableFuture.completedFuture(event);
@@ -62,7 +62,7 @@ public class EventEnrichmentTask {
             InsightsApiResponse response = konturAppsClient.graphql(request);
             return processResponse(response, feedEnrichment);
         } catch (Exception e) {
-            LOG.error(e.getMessage() + "\n" + request.getQuery());
+            LOG.error(e.getMessage());
             return null;
         }
     }
