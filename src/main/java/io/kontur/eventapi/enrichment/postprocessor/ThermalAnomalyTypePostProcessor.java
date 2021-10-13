@@ -10,14 +10,22 @@ import org.wololo.geojson.GeometryCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
 
 import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
 import static io.kontur.eventapi.util.GeometryUtil.calculateAreaKm2;
+import static java.util.Comparator.comparing;
 
 @Component
 public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor {
 
     private final static GeoJSONReader geoJSONReader = new GeoJSONReader();
+    private final static Map<EventType, String> typeNames = Map.of(
+            EventType.INDUSTRIAL_HEAT, "Industrial heat",
+            EventType.VOLCANO, "Volcano",
+            EventType.WILDFIRE, "Wildfire"
+    );
 
     @Override
     public void process(FeedData event) {
@@ -41,7 +49,13 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
                     } else {
                         episode.setType(EventType.THERMAL_ANOMALY);
                     }
+                    episode.setName(updateName(episode.getName(), episode.getType()));
                 });
+        event.setName(event.getEpisodes()
+                .stream()
+                .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getName)
+                .orElse(event.getName()));
     }
 
     @Override
@@ -75,5 +89,9 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
         } catch (Exception e) {
             return 0L;
         }
+    }
+
+    private String updateName(String oldName, EventType type) {
+        return typeNames.containsKey(type) ? oldName.replace("Thermal anomaly", typeNames.get(type)) : oldName;
     }
 }
