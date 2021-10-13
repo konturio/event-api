@@ -1,6 +1,5 @@
 package io.kontur.eventapi.pdc.job;
 
-import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
@@ -51,7 +50,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                 }
             }
             dataLakeDao.storeDataLakes(dataLakes);
-        } catch (FeignException e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage());
         }
     }
