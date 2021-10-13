@@ -9,6 +9,7 @@
 - **!!! BE AWARE !!!** Added `disaster-ninja-02` feed (for zigzag renamed `gdacs-firms` feed).
   We should change DN configuration in sync and add new role to Keycloak - `read:feed:disaster-ninja-02`
 - Change `THERMAL_ANOMALY` type according to analytics
+- Added enrichment metrics
 
 #### Changed
 

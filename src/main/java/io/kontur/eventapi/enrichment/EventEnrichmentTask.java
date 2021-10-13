@@ -14,6 +14,7 @@ import org.wololo.geojson.FeatureCollection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.kontur.eventapi.enrichment.InsightsApiRequestBuilder.buildRequest;
 import static io.kontur.eventapi.enrichment.InsightsApiResponseHandler.processResponse;
@@ -25,12 +26,17 @@ public class EventEnrichmentTask {
     private final KonturAppsClient konturAppsClient;
     private final FeedDao feedDao;
     private final List<EnrichmentPostProcessor> postProcessors;
+    private final AtomicInteger enrichmentSuccess;
+    private final AtomicInteger enrichmentFail;
 
     public EventEnrichmentTask(KonturAppsClient konturAppsClient, FeedDao feedDao,
-                               List<EnrichmentPostProcessor> postProcessors) {
+                               List<EnrichmentPostProcessor> postProcessors, AtomicInteger enrichmentSuccessGauge,
+                               AtomicInteger enrichmentFailGauge) {
         this.konturAppsClient = konturAppsClient;
         this.feedDao = feedDao;
         this.postProcessors = postProcessors;
+        this.enrichmentSuccess = enrichmentSuccessGauge;
+        this.enrichmentFail = enrichmentFailGauge;
     }
 
 
@@ -50,12 +56,16 @@ public class EventEnrichmentTask {
                     .filter(postProcessor -> postProcessor.isApplicable(event))
                     .forEach(postProcessor -> postProcessor.process(event));
             event.setEnriched(enriched(event));
-            if (!event.getEnriched()) {
-                LOG.error("Event was not enriched: " + event.getEventId());
-            }
             feedDao.addAnalytics(event);
         } catch (Exception e) {
             LOG.warn(e.getMessage());
+        }
+        if (!event.getEnriched()) {
+            LOG.error("Event was not enriched: " + event.getEventId());
+            enrichmentFail.incrementAndGet();
+        }
+        else {
+            enrichmentSuccess.incrementAndGet();
         }
         return CompletableFuture.completedFuture(event);
     }

@@ -135,6 +135,10 @@
         limit 100
     </select>
 
+    <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
+        select count(*) from feed_data where not enriched;
+    </select>
+
     <update id="addAnalytics">
         UPDATE feed_data
         SET event_details = #{eventDetails}::jsonb,

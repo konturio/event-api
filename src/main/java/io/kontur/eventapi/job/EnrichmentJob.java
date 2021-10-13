@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.kontur.eventapi.enrichment.InsightsApiRequestBuilder.buildParams;
 
@@ -20,11 +21,19 @@ public class EnrichmentJob extends AbstractJob {
     private final Logger LOG = LoggerFactory.getLogger(EnrichmentJob.class);
     protected final FeedDao feedDao;
     private final EventEnrichmentTask eventEnrichmentTask;
+    private final AtomicInteger enrichmentSuccess;
+    private final AtomicInteger enrichmentFail;
+    private final AtomicInteger enrichmentQueueSize;
 
-    public EnrichmentJob(MeterRegistry meterRegistry, FeedDao feedDao, EventEnrichmentTask eventEnrichmentTask) {
+    public EnrichmentJob(MeterRegistry meterRegistry, FeedDao feedDao, EventEnrichmentTask eventEnrichmentTask,
+                         AtomicInteger enrichmentSuccessGauge, AtomicInteger enrichmentFailGauge,
+                         AtomicInteger enrichmentQueueSizeGauge) {
         super(meterRegistry);
         this.feedDao = feedDao;
         this.eventEnrichmentTask = eventEnrichmentTask;
+        this.enrichmentSuccess = enrichmentSuccessGauge;
+        this.enrichmentFail = enrichmentFailGauge;
+        this.enrichmentQueueSize = enrichmentQueueSizeGauge;
     }
 
     @Override
@@ -32,6 +41,9 @@ public class EnrichmentJob extends AbstractJob {
         feedDao.getFeeds().stream()
                 .filter(feed -> !feed.getEnrichment().isEmpty())
                 .forEach(this::enrichFeed);
+        enrichmentSuccess.set(0);
+        enrichmentFail.set(0);
+        enrichmentQueueSize.set(feedDao.getNotEnrichedEventsCount());
     }
 
     @Override
@@ -40,15 +52,19 @@ public class EnrichmentJob extends AbstractJob {
     }
 
     protected void enrichFeed(Feed feed) {
-        List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
-        LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
+        try {
+            List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
+            LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
 
-        List<String> feedEnrichment = feed.getEnrichment();
-        String feedParamsString = buildParams(feedEnrichment);
+            List<String> feedEnrichment = feed.getEnrichment();
+            String feedParamsString = buildParams(feedEnrichment);
 
-        var eventEnrichmentTasks = events.stream()
-                .map(event -> eventEnrichmentTask.enrichEvent(event, feedEnrichment, feedParamsString))
-                .toArray(CompletableFuture[]::new);
-        CompletableFuture.allOf(eventEnrichmentTasks).join();
+            var eventEnrichmentTasks = events.stream()
+                    .map(event -> eventEnrichmentTask.enrichEvent(event, feedEnrichment, feedParamsString))
+                    .toArray(CompletableFuture[]::new);
+            CompletableFuture.allOf(eventEnrichmentTasks).join();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
     }
 }
