@@ -143,7 +143,8 @@
         UPDATE feed_data
         SET event_details = #{eventDetails}::jsonb,
             enriched = #{enriched},
-            episodes = #{episodes}::jsonb
+            episodes = #{episodes}::jsonb,
+            name = #{name}
         WHERE feed_id = #{feedId} AND event_id = #{eventId} AND version = #{version}
     </update>
 

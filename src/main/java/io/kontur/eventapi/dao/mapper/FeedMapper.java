@@ -66,7 +66,8 @@ public interface FeedMapper {
                       @Param("version") Long version,
                       @Param("eventDetails") String eventDetails,
                       @Param("enriched") Boolean enriched,
-                      @Param("episodes") String episodes);
+                      @Param("episodes") String episodes,
+                      @Param("name") String name);
 
     Integer getNotEnrichedEventsCount();
 }

@@ -78,8 +78,8 @@ public class FeedDao {
 
     @Transactional
     public void addAnalytics(FeedData event) {
-        mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
-                writeJson(event.getEventDetails()), event.getEnriched(), writeJson(event.getEpisodes()));
+        mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(), writeJson(event.getEventDetails()),
+                event.getEnriched(), writeJson(event.getEpisodes()), event.getName());
     }
 
     public Integer getNotEnrichedEventsCount() {
