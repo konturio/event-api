@@ -81,4 +81,8 @@ public class FeedDao {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
                 writeJson(event.getEventDetails()), event.getEnriched(), writeJson(event.getEpisodes()));
     }
+
+    public Integer getNotEnrichedEventsCount() {
+        return mapper.getNotEnrichedEventsCount();
+    }
 }
