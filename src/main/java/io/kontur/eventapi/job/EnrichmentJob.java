@@ -38,12 +38,12 @@ public class EnrichmentJob extends AbstractJob {
 
     @Override
     public void execute() throws Exception {
+        enrichmentQueueSize.set(feedDao.getNotEnrichedEventsCount());
         feedDao.getFeeds().stream()
                 .filter(feed -> !feed.getEnrichment().isEmpty())
                 .forEach(this::enrichFeed);
         enrichmentSuccess.set(0);
         enrichmentFail.set(0);
-        enrichmentQueueSize.set(feedDao.getNotEnrichedEventsCount());
     }
 
     @Override
