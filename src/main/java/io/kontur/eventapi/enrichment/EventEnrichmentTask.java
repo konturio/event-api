@@ -55,7 +55,8 @@ public class EventEnrichmentTask {
                     .stream()
                     .filter(postProcessor -> postProcessor.isApplicable(event))
                     .forEach(postProcessor -> postProcessor.process(event));
-            event.setEnriched(enriched(event));
+            event.setEnrichmentAttempts(event.getEnrichmentAttempts() == null ? 1L : event.getEnrichmentAttempts() + 1L);
+            event.setEnriched(event.getEnrichmentAttempts() > 1 || enriched(event));
             feedDao.addAnalytics(event);
         } catch (Exception e) {
             LOG.warn(e.getMessage());

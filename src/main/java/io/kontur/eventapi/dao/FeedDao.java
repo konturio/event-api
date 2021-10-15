@@ -80,7 +80,7 @@ public class FeedDao {
     public void addAnalytics(FeedData event) {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
                 writeJson(event.getEventDetails()), event.getEnriched(), writeJson(event.getEpisodes()),
-                event.getName(), event.getEnrichmentAttempts() == null ? 1L : event.getEnrichmentAttempts() + 1L);
+                event.getName(), event.getEnrichmentAttempts());
     }
 
     public Integer getNotEnrichedEventsCount() {
