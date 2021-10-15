@@ -143,10 +143,13 @@ databaseChangeLog:
     file: add-public-feed.sql
 - include:
     relativeToChangelogFile: true
-    file: feed_data_enrichment_index.sql
-- include:
-    relativeToChangelogFile: true
     file: add-gdacs-firms-feed.sql
 - include:
     relativeToChangelogFile: true
     file: feed-analytics.sql
+- include:
+    relativeToChangelogFile: true
+    file: add-feed-data-enrichment-attempts-field.sql
+- include:
+    relativeToChangelogFile: true
+    file: feed_data_enrichment_index.sql

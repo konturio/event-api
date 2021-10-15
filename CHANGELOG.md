@@ -10,6 +10,7 @@
   We should change DN configuration in sync and add new role to Keycloak - `read:feed:disaster-ninja-02`
 - Change `THERMAL_ANOMALY` type according to analytics, update name for events and episodes according to the type
 - Added enrichment metrics
+- Added `enrichment_attempts` column into `feed_data` table
 
 #### Changed
 

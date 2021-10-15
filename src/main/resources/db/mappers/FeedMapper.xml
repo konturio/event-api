@@ -16,9 +16,9 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes, is_latest_version, enriched, geometries)
+        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations, episodes, is_latest_version, enriched, geometries, enrichment_attempts)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt}, #{updatedAt},
-                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb, true, #{enriched}, collectEventGeometries(#{episodes}::jsonb))
+                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb, true, #{enriched}, collectEventGeometries(#{episodes}::jsonb), 0)
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -129,14 +129,14 @@
     </select>
 
     <select id="getNotEnrichedEventsForFeed" resultMap="feedDataDtoMap">
-        select * from feed_data fd
-        where feed_id = #{feedId} and not enriched
-        order by updated_at
-        limit 100
+        SELECT * FROM feed_data fd
+        WHERE feed_id = #{feedId} AND NOT enriched
+        ORDER BY enrichment_attempts ASC NULLS FIRST, updated_at ASC
+        LIMIT 100
     </select>
 
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
-        select count(*) from feed_data where not enriched;
+        SELECT count(*) FROM feed_data WHERE NOT enriched;
     </select>
 
     <update id="addAnalytics">
@@ -144,7 +144,8 @@
         SET event_details = #{eventDetails}::jsonb,
             enriched = #{enriched},
             episodes = #{episodes}::jsonb,
-            name = #{name}
+            name = #{name},
+            enrichment_attempts = #{enrichmentAttempts}
         WHERE feed_id = #{feedId} AND event_id = #{eventId} AND version = #{version}
     </update>
 
@@ -171,5 +172,6 @@
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
         <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="enriched" column="enriched"/>
+        <result property="enrichmentAttempts" column="enrichment_attempts" />
     </resultMap>
 </mapper>
