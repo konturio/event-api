@@ -20,6 +20,7 @@ public class FeedData {
     private FeatureCollection geometries;
     private Map<String, Object> eventDetails;
     private Boolean enriched;
+    private Long enrichmentAttempts;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;
@@ -129,6 +130,14 @@ public class FeedData {
 
     public void setGeometries(FeatureCollection geometries) {
         this.geometries = geometries;
+    }
+
+    public Long getEnrichmentAttempts() {
+        return enrichmentAttempts;
+    }
+
+    public void setEnrichmentAttempts(Long enrichmentAttempts) {
+        this.enrichmentAttempts = enrichmentAttempts;
     }
 
     @Override
