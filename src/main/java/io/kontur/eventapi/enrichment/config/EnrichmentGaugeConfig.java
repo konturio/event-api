@@ -10,9 +10,13 @@ public class EnrichmentGaugeConfig {
 
     private final AtomicInteger enrichmentSuccess;
     private final AtomicInteger enrichmentFail;
+    private final AtomicInteger totalEnrichmentSuccess;
+    private final AtomicInteger totalEnrichmentFail;
     private final AtomicInteger enrichmentQueueSize;
 
     public EnrichmentGaugeConfig(MeterRegistry registry) {
+        this.totalEnrichmentSuccess = registry.gauge("total.enrichment.success", new AtomicInteger(0));
+        this.totalEnrichmentFail = registry.gauge("total.enrichment.success", new AtomicInteger(0));
         this.enrichmentSuccess = registry.gauge("enrichment.success", new AtomicInteger(0));
         this.enrichmentFail = registry.gauge("enrichment.fail", new AtomicInteger(0));
         this.enrichmentQueueSize = registry.gauge("enrichment.queueSize", new AtomicInteger(0));
@@ -31,5 +35,15 @@ public class EnrichmentGaugeConfig {
     @Bean
     public AtomicInteger enrichmentQueueSizeGauge() {
         return enrichmentQueueSize;
+    }
+
+    @Bean
+    public AtomicInteger totalEnrichmentSuccessGauge() {
+        return totalEnrichmentSuccess;
+    }
+
+    @Bean
+    public AtomicInteger totalEnrichmentFailGauge() {
+        return totalEnrichmentFail;
     }
 }
