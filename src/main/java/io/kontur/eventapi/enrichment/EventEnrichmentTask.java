@@ -61,12 +61,12 @@ public class EventEnrichmentTask {
         } catch (Exception e) {
             LOG.warn(e.getMessage());
         }
-        if (!event.getEnriched()) {
-            LOG.error("Event was not enriched: " + event.getEventId());
-            enrichmentFail.incrementAndGet();
+        if (event.getEnriched()) {
+            enrichmentSuccess.incrementAndGet();
         }
         else {
-            enrichmentSuccess.incrementAndGet();
+            LOG.error("Event was not enriched: " + event.getEventId());
+            enrichmentFail.incrementAndGet();
         }
         return CompletableFuture.completedFuture(event);
     }
