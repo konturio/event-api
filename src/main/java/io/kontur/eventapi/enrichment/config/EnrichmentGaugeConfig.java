@@ -16,7 +16,7 @@ public class EnrichmentGaugeConfig {
 
     public EnrichmentGaugeConfig(MeterRegistry registry) {
         this.totalEnrichmentSuccess = registry.gauge("total.enrichment.success", new AtomicInteger(0));
-        this.totalEnrichmentFail = registry.gauge("total.enrichment.success", new AtomicInteger(0));
+        this.totalEnrichmentFail = registry.gauge("total.enrichment.fail", new AtomicInteger(0));
         this.enrichmentSuccess = registry.gauge("enrichment.success", new AtomicInteger(0));
         this.enrichmentFail = registry.gauge("enrichment.fail", new AtomicInteger(0));
         this.enrichmentQueueSize = registry.gauge("enrichment.queueSize", new AtomicInteger(0));
