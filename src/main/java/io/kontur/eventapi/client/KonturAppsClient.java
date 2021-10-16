@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public interface KonturAppsClient {
     @PostMapping(value = "/insights-api/graphql", headers = "Content-Type=application/json")
     @ResponseBody
-    @Timed(value = "httpClient.insightsAPI.graphQL", longTask = true)
+    @Timed(value = "httpClient.insightsAPI.graphQL")
     InsightsApiResponse graphql(@RequestBody InsightsApiRequest request);
 }
