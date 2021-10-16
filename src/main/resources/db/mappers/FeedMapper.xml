@@ -132,7 +132,7 @@
         SELECT * FROM feed_data fd
         WHERE feed_id = #{feedId} AND NOT enriched
         ORDER BY enrichment_attempts ASC NULLS FIRST, updated_at ASC
-        LIMIT 100
+        LIMIT 1000
     </select>
 
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">

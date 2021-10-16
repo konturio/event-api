@@ -101,7 +101,7 @@ scheduler:
     fixedDelay: 10000
   eventCombination:
     enable: true
-    initialDelay: 10000
+    initialDelay: 1000
     fixedDelay: 10000
     providers:
       em-dat,
@@ -124,14 +124,14 @@ scheduler:
     firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: true
-    initialDelay: 20000
-    fixedDelay: 10000
+    initialDelay: 1000
+    fixedDelay: 1000
     alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
     firmsAlias: firms, disaster-ninja-02
   enrichment:
     enable: true
-    initialDelay: 30000
-    fixedDelay: 10000
+    initialDelay: 1000
+    fixedDelay: 1000
 
 feign:
   client:
