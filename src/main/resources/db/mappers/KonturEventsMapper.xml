@@ -53,6 +53,10 @@
         LIMIT 10000;
     </select>
 
+    <select id="getFeedCompositionQueueSize" resultType="java.lang.Integer">
+        SELECT count(*) FROM feed_event_status WHERE NOT actual;
+    </select>
+
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">
         <result property="eventId" column="event_id"/>
         <result property="observationIds" column="observation_ids" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler"/>

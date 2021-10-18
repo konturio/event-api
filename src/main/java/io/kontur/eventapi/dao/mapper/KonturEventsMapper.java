@@ -27,4 +27,6 @@ public interface KonturEventsMapper {
                                                          @Param("eventIds") Set<UUID> eventIds);
 
     Set<UUID> getEventsForRolloutEpisodes(@Param("feedId") UUID feedId);
+
+    Integer getFeedCompositionQueueSize();
 }

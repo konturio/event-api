@@ -55,4 +55,8 @@ public class KonturEventsDao {
     public Set<UUID> getEventsForRolloutEpisodes(UUID feedId) {
         return mapper.getEventsForRolloutEpisodes(feedId);
     }
+
+    public Integer getFeedCompositionQueueSize() {
+        return mapper.getFeedCompositionQueueSize();
+    }
 }
