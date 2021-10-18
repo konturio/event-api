@@ -9,6 +9,8 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.firms.FirmsUtil;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -59,6 +61,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
+    @Counted(value = "firmsEpisodeCombinator.processObservation.counter")
+    @Timed(value = "firmsEpisodeCombinator.processObservation.timer")
     public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Set<FeedEpisode> existingEpisodeForObservation = feedData.getEpisodes()
                 .stream()

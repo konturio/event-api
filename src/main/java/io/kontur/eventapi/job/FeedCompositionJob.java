@@ -31,7 +31,7 @@ public class FeedCompositionJob extends AbstractJob {
     @Value("${scheduler.feedComposition.alias}")
     private String[] alias;
 
-    private final KonturEventsDao eventsDao;
+    protected final KonturEventsDao eventsDao;
     protected final FeedDao feedDao;
     private final NormalizedObservationsDao observationsDao;
     private final List<EpisodeCombinator> episodeCombinators;

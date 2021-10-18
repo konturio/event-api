@@ -11,13 +11,14 @@
 - Change `THERMAL_ANOMALY` type according to analytics, update name for events and episodes according to the type
 - Added enrichment metrics
 - Added `enrichment_attempts` column into `feed_data` table
+- Added feed composition metrics
 
 #### Changed
 
 - Async events enrichment execution
-- Increased feign timeout from 1 to 3 minutes
 - Configs by profiles: `dev`, `test`, `prod`. We should leave only properties from
   `external/config.yaml` for external properties 
+- Increased application heap memory size
 
 #### Removed
 
