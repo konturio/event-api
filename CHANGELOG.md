@@ -19,6 +19,7 @@
 - Configs by profiles: `dev`, `test`, `prod`. We should leave only properties from
   `external/config.yaml` for external properties 
 - Increased application heap memory size
+- Parallel Firms Feed Composition execution
 
 #### Removed
 
