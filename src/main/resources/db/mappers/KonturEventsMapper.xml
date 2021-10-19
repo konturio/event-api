@@ -50,7 +50,7 @@
         FROM feed_event_status
         WHERE feed_id = #{feedId}
             AND actual is false
-        LIMIT 10000;
+        LIMIT 30000;
     </select>
 
     <select id="getFeedCompositionQueueSize" resultType="java.lang.Integer">

@@ -63,7 +63,7 @@ public class FeedCompositionJob extends AbstractJob {
                 .forEach(event -> createFeedData(event, feed));
     }
 
-    private void createFeedData(UUID eventId, Feed feed) {
+    protected void createFeedData(UUID eventId, Feed feed) {
         try {
             List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
             eventObservations.sort(comparing(NormalizedObservation::getStartedAt)
