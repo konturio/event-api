@@ -16,7 +16,7 @@ public class EnrichmentExecutorConfig {
     @Bean(name = "enrichmentExecutor")
     public Executor getAsyncExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
+        executor.setCorePoolSize(5);
         executor.setMaxPoolSize(5);
         executor.setQueueCapacity(5000);
         executor.setThreadNamePrefix("EnrichmentThread-");
