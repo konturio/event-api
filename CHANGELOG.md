@@ -10,8 +10,9 @@
   We should change DN configuration in sync and add new role to Keycloak - `read:feed:disaster-ninja-02`
 - Change `THERMAL_ANOMALY` type according to analytics, update name for events and episodes according to the type
 - Added enrichment metrics
-- Added `enrichment_attempts` column into `feed_data` table
+- Added `enrichment_attempts` column into `feed_data` table which indicates the number of attempts to enrich event
 - Added feed composition metrics
+- Added `enrichment_skipped` column into `feed_data` table which indicates whether event has been skipped during enrichment or not
 
 #### Changed
 

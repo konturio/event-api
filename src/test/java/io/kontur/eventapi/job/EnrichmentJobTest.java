@@ -9,6 +9,8 @@ import io.kontur.eventapi.enrichment.InsightsApiResponse;
 import io.kontur.eventapi.entity.Feed;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,14 @@ public class EnrichmentJobTest {
     private final FeedDao feedDao = mock(FeedDao.class);
     private final KonturAppsClient konturAppsClient = mock(KonturAppsClient.class);
     private final List<EnrichmentPostProcessor> postProcessors = new ArrayList<>();
+    private final Counter enrichmentSuccess;
+    private final Counter enrichmentFail;
+
+    public EnrichmentJobTest() {
+        MeterRegistry registry = new SimpleMeterRegistry();
+        this.enrichmentSuccess = registry.counter("enrichment.success.counter");
+        this.enrichmentFail = registry.counter("enrichment.fail.counter");
+    }
 
     private static final Feed feedWithEnrichment;
     static {
@@ -62,10 +72,9 @@ public class EnrichmentJobTest {
         doNothing().when(feedDao).addAnalytics(any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors,
-                new AtomicInteger(0), new AtomicInteger(0));
+                enrichmentSuccess, enrichmentFail);
         EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask,
-                new AtomicInteger(0), new AtomicInteger(0), new AtomicInteger(0),
-                new AtomicInteger(0), new AtomicInteger(0));
+                new AtomicInteger(0));
 
         enrichmentJob.run();
 
@@ -84,10 +93,9 @@ public class EnrichmentJobTest {
         doNothing().when(feedDao).addAnalytics(any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createErrorResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors,
-                new AtomicInteger(0), new AtomicInteger(0));
+                enrichmentSuccess, enrichmentFail);
         EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask,
-                new AtomicInteger(0), new AtomicInteger(0), new AtomicInteger(0),
-                new AtomicInteger(0), new AtomicInteger(0));
+                new AtomicInteger(0));
 
         enrichmentJob.run();
 

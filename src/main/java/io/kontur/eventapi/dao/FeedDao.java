@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -80,7 +79,7 @@ public class FeedDao {
     public void addAnalytics(FeedData event) {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
                 writeJson(event.getEventDetails()), event.getEnriched(), writeJson(event.getEpisodes()),
-                event.getName(), event.getEnrichmentAttempts());
+                event.getName(), event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
     }
 
     public Integer getNotEnrichedEventsCount() {
