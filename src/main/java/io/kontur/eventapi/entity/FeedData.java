@@ -21,6 +21,7 @@ public class FeedData {
     private Map<String, Object> eventDetails;
     private Boolean enriched;
     private Long enrichmentAttempts;
+    private Boolean enrichmentSkipped;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;
@@ -138,6 +139,14 @@ public class FeedData {
 
     public void setEnrichmentAttempts(Long enrichmentAttempts) {
         this.enrichmentAttempts = enrichmentAttempts;
+    }
+
+    public Boolean getEnrichmentSkipped() {
+        return enrichmentSkipped;
+    }
+
+    public void setEnrichmentSkipped(Boolean enrichmentSkipped) {
+        this.enrichmentSkipped = enrichmentSkipped;
     }
 
     @Override

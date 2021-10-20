@@ -145,7 +145,8 @@
             enriched = #{enriched},
             episodes = #{episodes}::jsonb,
             name = #{name},
-            enrichment_attempts = #{enrichmentAttempts}
+            enrichment_attempts = #{enrichmentAttempts},
+            enrichment_skipped = #{enrichmentSkipped}
         WHERE feed_id = #{feedId} AND event_id = #{eventId} AND version = #{version}
     </update>
 
@@ -173,5 +174,6 @@
         <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="enriched" column="enriched"/>
         <result property="enrichmentAttempts" column="enrichment_attempts" />
+        <result property="enrichmentSkipped" column="enrichment_skipped" />
     </resultMap>
 </mapper>

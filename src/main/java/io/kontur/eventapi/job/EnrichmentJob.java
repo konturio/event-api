@@ -21,24 +21,15 @@ public class EnrichmentJob extends AbstractJob {
     private final Logger LOG = LoggerFactory.getLogger(EnrichmentJob.class);
     protected final FeedDao feedDao;
     private final EventEnrichmentTask eventEnrichmentTask;
-    private final AtomicInteger enrichmentSuccess;
-    private final AtomicInteger enrichmentFail;
     private final AtomicInteger enrichmentQueueSize;
-    private final AtomicInteger totalEnrichmentSuccess;
-    private final AtomicInteger totalEnrichmentFail;
+
 
     public EnrichmentJob(MeterRegistry meterRegistry, FeedDao feedDao, EventEnrichmentTask eventEnrichmentTask,
-                         AtomicInteger enrichmentSuccessGauge, AtomicInteger enrichmentFailGauge,
-                         AtomicInteger enrichmentQueueSizeGauge, AtomicInteger totalEnrichmentSuccessGauge,
-                         AtomicInteger totalEnrichmentFailGauge) {
+                         AtomicInteger enrichmentQueueSizeGauge) {
         super(meterRegistry);
         this.feedDao = feedDao;
         this.eventEnrichmentTask = eventEnrichmentTask;
-        this.enrichmentSuccess = enrichmentSuccessGauge;
-        this.enrichmentFail = enrichmentFailGauge;
         this.enrichmentQueueSize = enrichmentQueueSizeGauge;
-        this.totalEnrichmentSuccess = totalEnrichmentSuccessGauge;
-        this.totalEnrichmentFail = totalEnrichmentFailGauge;
     }
 
     @Override
@@ -47,10 +38,6 @@ public class EnrichmentJob extends AbstractJob {
         feedDao.getFeeds().stream()
                 .filter(feed -> !feed.getEnrichment().isEmpty())
                 .forEach(this::enrichFeed);
-        totalEnrichmentSuccess.set(enrichmentSuccess.get());
-        totalEnrichmentFail.set(enrichmentFail.get());
-        enrichmentSuccess.set(0);
-        enrichmentFail.set(0);
     }
 
     @Override

@@ -153,3 +153,6 @@ databaseChangeLog:
 - include:
     relativeToChangelogFile: true
     file: feed_data_enrichment_index.sql
+- include:
+    relativeToChangelogFile: true
+    file: add-skipped-column-to-feed-data.sql
