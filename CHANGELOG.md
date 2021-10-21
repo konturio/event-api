@@ -1,6 +1,6 @@
 # Release notes
 
-## UNRELEASED
+## 0.7 - 2021-10-21
 
 #### Added
 
@@ -21,9 +21,6 @@
   `external/config.yaml` for external properties 
 - Increased application heap memory size
 - Parallel Firms Feed Composition execution
-
-#### Removed
-
 
 ## 0.6.2 - 2021-08-30
 
