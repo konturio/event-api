@@ -59,7 +59,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http
+                .headers().cacheControl().disable()
+                .and()
+                .authorizeRequests()
                 .antMatchers("/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .antMatchers("/actuator", "/actuator/**").permitAll() //TODO security temporarily disabled
 //                .antMatchers("/actuator", "/actuator/**").hasAuthority("SCOPE_read:actuator")

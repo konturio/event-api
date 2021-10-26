@@ -1,5 +1,17 @@
 # Release notes
 
+## UNRELEASED
+
+#### Added
+
+- Added DEBUG logs to REST API
+
+#### Changed
+
+#### Removed
+
+- Removed `Cache-Control` header from response
+
 ## 0.7 - 2021-10-21
 
 #### Added
@@ -21,6 +33,7 @@
   `external/config.yaml` for external properties 
 - Increased application heap memory size
 - Parallel Firms Feed Composition execution
+
 
 ## 0.6.2 - 2021-08-30
 

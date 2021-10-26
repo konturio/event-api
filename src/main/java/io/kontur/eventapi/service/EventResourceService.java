@@ -6,6 +6,8 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.EventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +22,7 @@ public class EventResourceService {
 
     private final FeedDao feedDao;
     private final DataLakeDao dataLakeDao;
+    private final static Logger LOG = LoggerFactory.getLogger(EventResourceService.class);
 
     public EventResourceService(FeedDao feedDao, DataLakeDao dataLakeDao) {
         this.feedDao = feedDao;
@@ -29,10 +32,11 @@ public class EventResourceService {
     public List<EventDto> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime to,
                                        OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
                                        List<BigDecimal> bbox, EpisodeFilterType episodeFilterType) {
-
+        LOG.debug("Start searchEvents DB call");
         List<FeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities,
                 sortOrder, bbox, episodeFilterType);
-
+        LOG.debug("Finished searchEvents DB call");
+        LOG.debug("Process result");
         return feedData.stream()
                 .map(EventDtoConverter::convert)
                 .collect(Collectors.toList());
