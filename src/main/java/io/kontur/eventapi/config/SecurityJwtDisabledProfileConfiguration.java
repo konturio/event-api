@@ -11,7 +11,10 @@ public class SecurityJwtDisabledProfileConfiguration extends WebSecurityConfigur
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http
+                .headers().cacheControl().disable()
+                .and()
+                .authorizeRequests()
                 .antMatchers("/**").permitAll();
     }
 }

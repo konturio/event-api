@@ -2,6 +2,8 @@ server:
   servlet:
     contextPath: /events
   port: 8624
+  jetty:
+    connection-idle-timeout: 3600000
 
 spring:
   datasource:

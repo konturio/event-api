@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -38,6 +41,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EventResource {
 
     private final EventResourceService eventResourceService;
+    private static final Logger LOG = LoggerFactory.getLogger(EventResource.class);
 
     public EventResource(EventResourceService eventResourceService) {
         this.eventResourceService = eventResourceService;
@@ -97,10 +101,13 @@ public class EventResource {
                     "<li>LATEST - the latest episode matches filters, the latest episode is returned</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
                     EpisodeFilterType episodeFilterType) {
+        String currentRequestURL = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
+        LOG.debug("Received request: " + currentRequestURL);
         List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+        LOG.debug("Finish request processing: " + currentRequestURL);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
