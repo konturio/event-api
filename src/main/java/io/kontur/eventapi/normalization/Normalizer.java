@@ -1,5 +1,6 @@
 package io.kontur.eventapi.normalization;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.job.Applicable;
@@ -12,6 +13,7 @@ import java.util.Map;
 public abstract class Normalizer implements Applicable<DataLake> {
 
     public abstract NormalizedObservation normalize(DataLake dataLakeDto);
+    protected final static ObjectMapper mapper = new ObjectMapper();
 
     protected String readString(Map<String, Object> map, String key) {
         Object value = map.get(key);
@@ -41,6 +43,12 @@ public abstract class Normalizer implements Applicable<DataLake> {
     protected OffsetDateTime readDateTime(Map<String, Object> map, String key) {
         Long value = readLong(map, key);
         return value == null ? null : OffsetDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneOffset.UTC);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> readMap(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return value == null ? null : mapper.convertValue(value, Map.class);
     }
 
     protected String makeWktPoint(Double lon, Double lat) {

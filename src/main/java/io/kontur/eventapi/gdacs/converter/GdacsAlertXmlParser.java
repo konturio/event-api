@@ -43,6 +43,7 @@ public class GdacsAlertXmlParser {
     private static final String CURRENT_EPISODE_ID = "currentepisodeid";
     private static final String FROM_DATE = "fromdate";
     private static final String TO_DATE = "todate";
+    private static final String LINK = "link";
     private static final String EVENT = "event";
     private static final String HEADLINE = "headline";
     private static final String SEVERITY = "severity";
@@ -138,7 +139,7 @@ public class GdacsAlertXmlParser {
         parsedAlert.setSeverity(getValueByTagName(xml, xmlDocument, SEVERITY));
 
         NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(NS, PARAMETER);
-        Set<String> parameterNames = Set.of(EVENT_ID, EVENT_TYPE, CURRENT_EPISODE_ID, FROM_DATE, TO_DATE);
+        Set<String> parameterNames = Set.of(EVENT_ID, EVENT_TYPE, CURRENT_EPISODE_ID, FROM_DATE, TO_DATE, LINK);
         Map<String, String> parameters = parseParameters(parameterNodeList, parameterNames);
 
         parsedAlert.setEventId(parameters.get(EVENT_ID));
@@ -146,6 +147,7 @@ public class GdacsAlertXmlParser {
         parsedAlert.setCurrentEpisodeId(parameters.get(CURRENT_EPISODE_ID));
         parsedAlert.setFromDate(parseDateTimeFromString(parameters.get(FROM_DATE)));
         parsedAlert.setToDate(parseDateTimeFromString(parameters.get(TO_DATE)));
+        parsedAlert.setLink(parameters.get(LINK));
 
         return parsedAlert;
     }

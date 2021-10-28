@@ -5,6 +5,8 @@ import org.wololo.geojson.FeatureCollection;
 import java.time.OffsetDateTime;
 import java.util.*;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class FeedEpisode {
 
     private String name;
@@ -18,6 +20,7 @@ public class FeedEpisode {
     private OffsetDateTime sourceUpdatedAt;
     private Set<UUID> observations = new HashSet<>();
     private Map<String, Object> episodeDetails;
+    private List<String> urls = new ArrayList<>();
 
     private FeatureCollection geometries;
 
@@ -107,6 +110,20 @@ public class FeedEpisode {
 
     public void setEpisodeDetails(Map<String, Object> episodeDetails) {
         this.episodeDetails = episodeDetails;
+    }
+
+    public List<String> getUrls() {
+        return urls;
+    }
+
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
+    }
+
+    public void addUrlIfNotExists(String url) {
+        if (isNotBlank(url) && !this.urls.contains(url)) {
+            this.urls.add(url);
+        }
     }
 
     @Override

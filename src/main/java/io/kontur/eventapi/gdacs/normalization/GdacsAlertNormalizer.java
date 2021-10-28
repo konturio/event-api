@@ -63,6 +63,6 @@ public class GdacsAlertNormalizer extends GdacsNormalizer {
         normalizedObservation.setExternalEventId(composeExternalEventId(parsedAlert.getEventType(), parsedAlert.getEventId()));
         normalizedObservation.setStartedAt(parsedAlert.getFromDate());
         normalizedObservation.setEndedAt(parsedAlert.getToDate());
-
+        normalizedObservation.setSourceUri(parsedAlert.getLink());
     }
 }

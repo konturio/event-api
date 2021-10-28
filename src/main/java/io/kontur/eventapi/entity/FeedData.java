@@ -22,6 +22,7 @@ public class FeedData {
     private Boolean enriched;
     private Long enrichmentAttempts;
     private Boolean enrichmentSkipped;
+    private List<String> urls = new ArrayList<>();
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;
@@ -147,6 +148,14 @@ public class FeedData {
 
     public void setEnrichmentSkipped(Boolean enrichmentSkipped) {
         this.enrichmentSkipped = enrichmentSkipped;
+    }
+
+    public List<String> getUrls() {
+        return urls;
+    }
+
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
     }
 
     @Override

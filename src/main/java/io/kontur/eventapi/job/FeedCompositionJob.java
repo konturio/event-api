@@ -20,6 +20,7 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -112,6 +113,11 @@ public class FeedCompositionJob extends AbstractJob {
         feedData.setUpdatedAt(episodes.stream()
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getUpdatedAt).orElse(null));
+
+        feedData.setUrls(episodes.stream()
+                .filter(e -> e.getUrls() != null && !e.getUrls().isEmpty())
+                .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getUrls).orElse(emptyList()));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

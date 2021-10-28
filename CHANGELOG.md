@@ -5,6 +5,7 @@
 #### Added
 
 - Added DEBUG logs to REST API
+- Added `urls` column to `feed_data` and `urls` field to `FeedEpisode`
 
 #### Changed
 
