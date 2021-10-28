@@ -33,6 +33,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
             feedEpisode.ifPresent(episode -> {
                 episode.setGeometries(geometryObservation.get().getGeometries());
                 episode.addObservation(geometryObservation.get().getObservationId());
+                episode.addUrlIfNotExists(geometryObservation.get().getSourceUri());
             });
             return feedEpisode;
         }

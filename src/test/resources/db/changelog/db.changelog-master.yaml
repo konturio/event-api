@@ -1,6 +1,0 @@
-## Database Changelog
----
-databaseChangeLog:
-  - include:
-    - relativeToChangelogFile: true
-    - file: v0/v0.yaml

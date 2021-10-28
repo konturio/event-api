@@ -19,6 +19,7 @@ public class ParsedAlert {
     private OffsetDateTime toDate;
     private String event;
     private String severity;
+    private String link;
 
     public ParsedAlert() {
     }

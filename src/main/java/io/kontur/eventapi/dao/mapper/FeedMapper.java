@@ -29,7 +29,8 @@ public interface FeedMapper {
                        @Param("updatedAt") OffsetDateTime updatedAt,
                        @Param("observations") Set<UUID> observations,
                        @Param("episodes") String episodes,
-                       @Param("enriched") Boolean enriched);
+                       @Param("enriched") Boolean enriched,
+                       @Param("urls") List<String> urls);
 
     /**
      * Mark events below specified version outdated

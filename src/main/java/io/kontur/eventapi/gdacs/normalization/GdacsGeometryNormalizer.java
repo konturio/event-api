@@ -42,6 +42,9 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         normalizedObservation.setStartedAt(parseDateTime(readString(properties, "fromdate")));
         normalizedObservation.setEndedAt(parseDateTime(readString(properties, "todate")));
 
+        Map<String, Object> urlMap = readMap(properties, "url");
+        normalizedObservation.setSourceUri(urlMap == null ? null : readString(urlMap, "report"));
+
         return normalizedObservation;
     }
 

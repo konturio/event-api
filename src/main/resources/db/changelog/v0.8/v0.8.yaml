@@ -1,0 +1,8 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: add-url-column-to-feed-data.sql
+  - include:
+      relativeToChangelogFile: true
+      file: fill-old-gdacs-source-uri.sql

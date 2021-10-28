@@ -8,6 +8,8 @@ import io.kontur.eventapi.job.Applicable;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
 
     public abstract Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);
@@ -24,6 +26,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         feedEpisode.setUpdatedAt(observation.getLoadedAt());
         feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
         feedEpisode.addObservation(observation.getObservationId());
+        feedEpisode.addUrlIfNotExists(observation.getSourceUri());
 
         if (observation.getGeometries() != null) {
             feedEpisode.setGeometries(observation.getGeometries());

@@ -19,6 +19,7 @@ public class EventDto {
     private List<FeedEpisode> episodes = new ArrayList<>();
     private Map<String, Object> eventDetails = new HashMap<>();
     private FeatureCollection geometries;
+    private List<String> urls = new ArrayList<>();
 
     public UUID getEventId() {
         return eventId;
@@ -106,5 +107,13 @@ public class EventDto {
 
     public void setGeometries(FeatureCollection geometries) {
         this.geometries = geometries;
+    }
+
+    public List<String> getUrls() {
+        return urls;
+    }
+
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
     }
 }
