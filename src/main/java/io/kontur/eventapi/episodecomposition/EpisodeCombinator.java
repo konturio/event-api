@@ -27,6 +27,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
         feedEpisode.addObservation(observation.getObservationId());
         feedEpisode.addUrlIfNotExists(observation.getSourceUri());
+        feedEpisode.setProperName(observation.getProperName());
 
         if (observation.getGeometries() != null) {
             feedEpisode.setGeometries(observation.getGeometries());

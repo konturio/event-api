@@ -22,6 +22,7 @@ public interface NormalizedObservationsMapper {
                @Param("geometries") String geometries,
                @Param("eventSeverity") Severity eventSeverity,
                @Param("name") String name,
+               @Param("properName") String properName,
                @Param("description") String description,
                @Param("episodeDescription") String episodeDescription,
                @Param("type") EventType type,

@@ -27,7 +27,7 @@ public class NormalizedObservationsDao {
         dataLakeDao.markAsNormalized(obs.getObservationId());
         String geometries = writeJson(obs.getGeometries());
         return mapper.insert(obs.getObservationId(), obs.getExternalEventId(), obs.getExternalEpisodeId(),
-                obs.getProvider(), obs.getPoint(), geometries, obs.getEventSeverity(), obs.getName(),
+                obs.getProvider(), obs.getPoint(), geometries, obs.getEventSeverity(), obs.getName(), obs.getProperName(),
                 obs.getDescription(), obs.getEpisodeDescription(), obs.getType(), obs.getActive(), obs.getCost(),
                 obs.getRegion(), obs.getLoadedAt(), obs.getStartedAt(), obs.getEndedAt(), obs.getSourceUpdatedAt(),
                 obs.getSourceUri(), obs.getRecombined());

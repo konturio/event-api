@@ -34,11 +34,13 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         Map<String, Object> properties = featureCollection.getFeatures()[0].getProperties();
 
         normalizedObservation.setGeometries(featureCollection);
+
         String eventType = readString(properties, "eventtype");
         String eventId = readString(properties, "eventid");
         normalizedObservation.setType(defineGeometryType(eventType));
         normalizedObservation.setExternalEventId(composeExternalEventId(eventType, eventId));
 
+        normalizedObservation.setProperName(readString(properties, "eventname").trim());
         normalizedObservation.setStartedAt(parseDateTime(readString(properties, "fromdate")));
         normalizedObservation.setEndedAt(parseDateTime(readString(properties, "todate")));
 

@@ -23,6 +23,7 @@ public interface FeedMapper {
                        @Param("feedId") UUID feedId,
                        @Param("version") Long version,
                        @Param("name") String name,
+                       @Param("properName") String properName,
                        @Param("description") String description,
                        @Param("startedAt") OffsetDateTime startedAt,
                        @Param("endedAt") OffsetDateTime endedAt,

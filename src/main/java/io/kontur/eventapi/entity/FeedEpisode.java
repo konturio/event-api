@@ -10,6 +10,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class FeedEpisode {
 
     private String name;
+    private String properName;
     private String description;
     private EventType type;
     private Boolean active;
@@ -124,6 +125,14 @@ public class FeedEpisode {
         if (isNotBlank(url) && !this.urls.contains(url)) {
             this.urls.add(url);
         }
+    }
+
+    public String getProperName() {
+        return properName;
+    }
+
+    public void setProperName(String properName) {
+        this.properName = properName;
     }
 
     @Override

@@ -6,3 +6,9 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: fill-old-gdacs-source-uri.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-proper-name-column.sql
+  - include:
+      relativeToChangelogFile: true
+      file: fill-old-gdacs-proper-name.sql

@@ -11,6 +11,7 @@ public class FeedData {
     private UUID feedId;
     private Long version;
     private String name;
+    private String properName;
     private String description;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
@@ -156,6 +157,14 @@ public class FeedData {
 
     public void setUrls(List<String> urls) {
         this.urls = urls;
+    }
+
+    public String getProperName() {
+        return properName;
+    }
+
+    public void setProperName(String properName) {
+        this.properName = properName;
     }
 
     @Override
