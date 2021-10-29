@@ -20,6 +20,7 @@ public class ParsedAlert {
     private String event;
     private String severity;
     private String link;
+    private String eventName;
 
     public ParsedAlert() {
     }

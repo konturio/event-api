@@ -97,6 +97,11 @@ public class FeedCompositionJob extends AbstractJob {
                 .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getName).orElse(null));
 
+        feedData.setProperName(episodes.stream()
+                .filter(e -> !isEmpty(e.getProperName()))
+                .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getProperName).orElse(null));
+
         feedData.setDescription(episodes.stream()
                 .filter(e -> !isEmpty(e.getDescription()))
                 .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))

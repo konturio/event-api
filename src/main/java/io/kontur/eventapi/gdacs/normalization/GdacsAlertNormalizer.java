@@ -56,6 +56,7 @@ public class GdacsAlertNormalizer extends GdacsNormalizer {
     private void setDataFromParsedAlert(NormalizedObservation normalizedObservation, ParsedAlert parsedAlert) {
 
         normalizedObservation.setName(parsedAlert.getHeadLine());
+        normalizedObservation.setProperName(parsedAlert.getEventName().trim());
         normalizedObservation.setDescription(parsedAlert.getDescription());
         normalizedObservation.setEpisodeDescription(parsedAlert.getDescription());
         normalizedObservation.setType(defineType(parsedAlert.getEvent()));

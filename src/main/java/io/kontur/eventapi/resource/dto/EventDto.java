@@ -11,6 +11,7 @@ public class EventDto {
     private UUID eventId;
     private Long version;
     private String name;
+    private String properName;
     private String description;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
@@ -115,5 +116,13 @@ public class EventDto {
 
     public void setUrls(List<String> urls) {
         this.urls = urls;
+    }
+
+    public String getProperName() {
+        return properName;
+    }
+
+    public void setProperName(String properName) {
+        this.properName = properName;
     }
 }

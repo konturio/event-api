@@ -16,10 +16,10 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, description, started_at, ended_at,
+        insert into feed_data (event_id, feed_id, version, name, proper_name, description, started_at, ended_at,
                                updated_at, observations, episodes, is_latest_version, enriched, geometries,
                                enrichment_attempts, urls)
-        values (#{eventId}, #{feedId}, #{version}, #{name}, #{description}, #{startedAt}, #{endedAt},
+        values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{startedAt}, #{endedAt},
                 #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 #{episodes}::jsonb, true, #{enriched}, collectEventGeometries(#{episodes}::jsonb), 0,
                 #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
@@ -35,7 +35,7 @@
     </update>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        select event_id, feed_id, version, name, description, started_at, ended_at, updated_at, observations,
+        select event_id, feed_id, version, name, proper_name, description, started_at, ended_at, updated_at, observations,
                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls,
         <choose>
             <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
@@ -169,6 +169,7 @@
         <result property="feedId" column="feed_id" />
         <result property="version" column="version" />
         <result property="name" column="name" />
+        <result property="properName" column="proper_name"/>
         <result property="description" column="description" />
         <result property="startedAt" column="started_at" />
         <result property="endedAt" column="ended_at" />

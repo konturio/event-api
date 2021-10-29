@@ -17,6 +17,7 @@
             </if>
             event_severity,
             name,
+            proper_name,
             description,
             episode_description,
             type,
@@ -42,6 +43,7 @@
             </if>
             #{eventSeverity},
             #{name},
+            #{properName},
             #{description},
             #{episodeDescription},
             #{type},
@@ -149,6 +151,7 @@
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
         <result property="eventSeverity" column="event_severity"/>
         <result property="name" column="name"/>
+        <result property="properName" column="proper_name"/>
         <result property="description" column="description"/>
         <result property="episodeDescription" column="episode_description"/>
         <result property="type" column="type"/>

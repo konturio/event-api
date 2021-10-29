@@ -39,7 +39,7 @@ public class FeedDao {
     public void insertFeedData(FeedData feedData) {
         String episodesJson = writeJson(feedData.getEpisodes());
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
-                feedData.getName(), feedData.getDescription(),
+                feedData.getName(), feedData.getProperName(), feedData.getDescription(),
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls());
 

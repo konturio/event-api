@@ -16,6 +16,7 @@ public class NormalizedObservation {
     private FeatureCollection geometries;
     private Severity eventSeverity;
     private String name;
+    private String properName;
     private String description;
     private String episodeDescription;
     private EventType type;
@@ -179,6 +180,14 @@ public class NormalizedObservation {
 
     public void setSourceUri(String sourceUri) {
         this.sourceUri = sourceUri;
+    }
+
+    public String getProperName() {
+        return properName;
+    }
+
+    public void setProperName(String properName) {
+        this.properName = properName;
     }
 
     public boolean getRecombined() {

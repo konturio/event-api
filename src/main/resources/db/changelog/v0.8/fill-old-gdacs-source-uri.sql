@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:v0.8/fill-old-gdacs-source-uri.sql runOnChange:false
+--changeset event-api-migrations:v0.8/fill-old-gdacs-source-uri.sql runOnChange:true
 
 update normalized_observations no
 set source_uri = dl.link
@@ -33,28 +33,33 @@ with event_ids_to_update as (
     from kontur_events
     where provider in ('gdacsAlert', 'gdacsAlertGeometry')
 ),
-events_to_update as (
+episodes_to_update as (
     select fd.feed_id, fd.event_id, fd.version,
-        (
-            select coalesce(array_agg(distinct source_uri), '{}'::text[])
-            from normalized_observations
-            where source_uri is not null and observation_id in (select unnest(fd.observations))
-        ) links,
-        to_jsonb((
-            select array_agg(jsonb_set(ep, '{urls}', (
-                select coalesce((
-                    select jsonb_agg(distinct source_uri)
-                    from normalized_observations
-                    where source_uri is not null and observation_id in (select unnest((
-                        select array_agg(obs_id::uuid) from jsonb_array_elements_text(ep -> 'observations') obs_id)))
-                ), '[]'::jsonb)),
-                true
-            )) from jsonb_array_elements(episodes) ep
-        )) episodes_with_urls
+           to_jsonb((
+               select array_agg(jsonb_set(ep, '{urls}', (
+                   select coalesce((
+                       select jsonb_agg(distinct source_uri)
+                       from normalized_observations
+                       where source_uri is not null and observation_id in (select unnest((
+                           select array_agg(obs_id::uuid) from jsonb_array_elements_text(ep -> 'observations') obs_id)))
+                       ), '[]'::jsonb)),
+                   true))
+               from jsonb_array_elements(episodes) ep
+           )) episodes_with_links
     from feed_data fd
     inner join event_ids_to_update eiu on fd.event_id = eiu.event_id
-    where fd.urls = '{}'::text[]
+    where feed_id = (select feed_id from feeds where alias = 'disaster-ninja-02')
+),
+events_to_update as (
+    select eu.*, (
+        select (select array_agg(last_ep_links) from jsonb_array_elements_text(ep -> 'urls') last_ep_links)
+        from jsonb_array_elements(episodes_with_links) ep
+        where ep -> 'urls' <> '[]'::jsonb
+        order by (ep ->> 'startedAt')::timestamptz, (ep ->> 'updatedAt')::timestamptz
+        limit 1
+    ) links
+    from episodes_to_update eu
 )
-update feed_data fd set urls = eu.links, episodes = eu.episodes_with_urls
+update feed_data fd set urls = eu.links, episodes = eu.episodes_with_links
 from (select * from events_to_update) eu
 where fd.event_id = eu.event_id and fd.feed_id = eu.feed_id and fd.version = eu.version;

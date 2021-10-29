@@ -11,6 +11,7 @@ import java.util.Set;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 
 /**
@@ -34,6 +35,9 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
                 episode.setGeometries(geometryObservation.get().getGeometries());
                 episode.addObservation(geometryObservation.get().getObservationId());
                 episode.addUrlIfNotExists(geometryObservation.get().getSourceUri());
+                if (isBlank(episode.getProperName())) {
+                    episode.setProperName(geometryObservation.get().getProperName());
+                }
             });
             return feedEpisode;
         }

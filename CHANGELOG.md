@@ -6,6 +6,7 @@
 
 - Added DEBUG logs to REST API
 - Added `urls` column to `feed_data` and `urls` field to `FeedEpisode`
+- Added `proper_name` column to `normalized_observations` and `feed_data` tables and `properName` field to `FeedEpisode`
 
 #### Changed
 
