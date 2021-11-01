@@ -65,5 +65,6 @@ public class GdacsAlertNormalizer extends GdacsNormalizer {
         normalizedObservation.setStartedAt(parsedAlert.getFromDate());
         normalizedObservation.setEndedAt(parsedAlert.getToDate());
         normalizedObservation.setSourceUri(parsedAlert.getLink());
+        normalizedObservation.setRegion(parsedAlert.getCountry());
     }
 }

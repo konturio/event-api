@@ -1,8 +1,13 @@
 package io.kontur.eventapi.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@Data
+@NoArgsConstructor
 public class DataLake {
 
     private UUID observationId;
@@ -13,69 +18,10 @@ public class DataLake {
     private String data;
     private boolean normalized = false;
 
-    public DataLake() {
-    }
-
     public DataLake(UUID observationId, String externalId, OffsetDateTime updatedAt, OffsetDateTime loadedAt) {
         this.observationId = observationId;
         this.externalId = externalId;
         this.updatedAt = updatedAt;
         this.loadedAt = loadedAt;
-    }
-
-    public UUID getObservationId() {
-        return observationId;
-    }
-
-    public void setObservationId(UUID observationId) {
-        this.observationId = observationId;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public OffsetDateTime getLoadedAt() {
-        return loadedAt;
-    }
-
-    public void setLoadedAt(OffsetDateTime loadedAt) {
-        this.loadedAt = loadedAt;
-    }
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public boolean isNormalized() {
-        return normalized;
-    }
-
-    public void setNormalized(boolean normalized) {
-        this.normalized = normalized;
     }
 }

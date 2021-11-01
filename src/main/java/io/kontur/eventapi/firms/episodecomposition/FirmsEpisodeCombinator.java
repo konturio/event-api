@@ -11,8 +11,6 @@ import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.firms.FirmsUtil;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
-import net.sf.geographiclib.Geodesic;
-import net.sf.geographiclib.PolygonArea;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.overlayng.OverlayNGRobust;
@@ -109,9 +107,10 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                     .get()
                     .until(episode.getEndedAt(), ChronoUnit.HOURS);
             Double area = calculateBurntAreaUpToCurrentEpisode(observation, observationsUpToCurrentEpisode);
-
+            String areaName = getBurntAreaName(episodeObservations);
+            episode.setLocation(areaName);
             episode.setSeverity(calculateSeverity(area, burningTime));
-            episode.setName(calculateName(episodeObservations, area, burningTime));
+            episode.setName(calculateName(areaName, area, burningTime));
         }
 
     }
@@ -171,9 +170,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         return Severity.EXTREME;
     }
 
-    private String calculateName(Set<NormalizedObservation> episodeObservations, Double area, long burningTime) {
+    private String calculateName(String areaName, Double area, long burningTime) {
         String burntArea = String.format(Locale.US, "%.3f", area);
-        String areaName = getBurntAreaName(episodeObservations);
         if (!StringUtils.isEmpty(areaName)) {
             areaName = "Thermal anomaly in " + areaName + ". ";
         } else {

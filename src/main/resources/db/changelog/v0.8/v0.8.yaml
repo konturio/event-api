@@ -12,3 +12,9 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: fill-old-gdacs-proper-name.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-location-column-to-feed-data.sql
+  - include:
+      relativeToChangelogFile: true
+      file: fill-old-gdacs-location.sql
