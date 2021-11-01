@@ -80,6 +80,7 @@ public class EmDatNormalizer extends Normalizer {
         obs.setEventSeverity(severityConverter.defineSeverity(csvData));
         obs.setActive(false);
         obs.setName(makeName(csvData));
+        obs.setProperName(csvData.get("Event Name"));
         obs.setRegion(csvData.get("ISO") + " " + csvData.get("Location"));
         if (!StringUtils.isEmpty(csvData.get("Total Damages ('000 US$)"))) {
             try {

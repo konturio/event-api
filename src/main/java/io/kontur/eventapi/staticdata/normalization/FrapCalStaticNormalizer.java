@@ -44,6 +44,7 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
         String state = readString(properties, "STATE");
         String unit = readString(properties, "UNIT_ID");
         normalizedObservation.setName(createName("Wildfire", unit, state, "USA"));
+        normalizedObservation.setProperName(readString(properties, "FIRE_NAME"));
 
         OffsetDateTime startedAt = parseLocalDate(readString(properties, "ALARM_DATE"));
         OffsetDateTime endedAt = parseLocalDate(readString(properties, "CONT_DATE"));

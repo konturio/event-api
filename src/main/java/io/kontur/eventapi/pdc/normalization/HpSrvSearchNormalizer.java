@@ -49,6 +49,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         normalizedDto.setEpisodeDescription(readString(props, "description"));
         normalizedDto.setType(defineType(readString(props, "type_ID")));
         normalizedDto.setSourceUpdatedAt(readDateTime(props, "update_Date"));
+        normalizedDto.setSourceUri(readString(props, "snc_url"));
 
         OffsetDateTime startedAt = readDateTime(props, "start_Date");
         OffsetDateTime endedAt = readDateTime(props, "end_Date");

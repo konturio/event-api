@@ -38,6 +38,9 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
                 if (isBlank(episode.getProperName())) {
                     episode.setProperName(geometryObservation.get().getProperName());
                 }
+                if (isBlank(episode.getLocation())) {
+                    episode.setLocation(geometryObservation.get().getRegion());
+                }
             });
             return feedEpisode;
         }
