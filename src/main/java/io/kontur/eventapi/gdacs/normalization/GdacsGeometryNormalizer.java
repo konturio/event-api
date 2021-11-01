@@ -40,6 +40,7 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         normalizedObservation.setType(defineGeometryType(eventType));
         normalizedObservation.setExternalEventId(composeExternalEventId(eventType, eventId));
 
+        normalizedObservation.setRegion(readString(properties, "country"));
         normalizedObservation.setProperName(readString(properties, "eventname").trim());
         normalizedObservation.setStartedAt(parseDateTime(readString(properties, "fromdate")));
         normalizedObservation.setEndedAt(parseDateTime(readString(properties, "todate")));

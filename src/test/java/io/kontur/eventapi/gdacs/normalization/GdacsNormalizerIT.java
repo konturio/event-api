@@ -121,7 +121,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         assertTrue(observation.getActive());
         assertNull(observation.getPoint());
         assertNull(observation.getCost());
-        assertNull(observation.getRegion());
+        assertNotNull(observation.getRegion());
 
         assertNull(observation.getGeometries());
 
@@ -152,7 +152,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         assertNull(observation.getEpisodeDescription());
         assertNull(observation.getPoint());
         assertNull(observation.getCost());
-        assertNull(observation.getRegion());
+        assertNotNull(observation.getRegion());
     }
 
     private List<DataLake> getDataLakeList() throws IOException {

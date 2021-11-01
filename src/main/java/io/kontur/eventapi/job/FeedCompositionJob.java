@@ -123,6 +123,11 @@ public class FeedCompositionJob extends AbstractJob {
                 .filter(e -> e.getUrls() != null && !e.getUrls().isEmpty())
                 .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getUrls).orElse(emptyList()));
+
+        feedData.setLocation(episodes.stream()
+                .filter(e -> !isEmpty(e.getLocation()))
+                .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getLocation).orElse(null));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

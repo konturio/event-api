@@ -21,6 +21,7 @@ public class ParsedAlert {
     private String severity;
     private String link;
     private String eventName;
+    private String country;
 
     public ParsedAlert() {
     }

@@ -18,11 +18,11 @@
     <insert id="insertFeedData" useGeneratedKeys="false">
         insert into feed_data (event_id, feed_id, version, name, proper_name, description, started_at, ended_at,
                                updated_at, observations, episodes, is_latest_version, enriched, geometries,
-                               enrichment_attempts, urls)
+                               enrichment_attempts, urls, location)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{startedAt}, #{endedAt},
                 #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 #{episodes}::jsonb, true, #{enriched}, collectEventGeometries(#{episodes}::jsonb), 0,
-                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
+                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -36,7 +36,7 @@
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
         select event_id, feed_id, version, name, proper_name, description, started_at, ended_at, updated_at, observations,
-               collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls,
+               collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
         <choose>
             <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                 jsonb_build_array((
@@ -182,5 +182,6 @@
         <result property="enrichmentAttempts" column="enrichment_attempts" />
         <result property="enrichmentSkipped" column="enrichment_skipped" />
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
+        <result property="location" column="location"/>
     </resultMap>
 </mapper>

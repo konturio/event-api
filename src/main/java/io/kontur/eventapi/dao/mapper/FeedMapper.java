@@ -31,7 +31,8 @@ public interface FeedMapper {
                        @Param("observations") Set<UUID> observations,
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,
-                       @Param("urls") List<String> urls);
+                       @Param("urls") List<String> urls,
+                       @Param("location") String location);
 
     /**
      * Mark events below specified version outdated
