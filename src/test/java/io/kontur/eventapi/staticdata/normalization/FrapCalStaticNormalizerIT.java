@@ -47,6 +47,7 @@ class FrapCalStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         assertNotNull(normalizedObservation.getPoint());
         assertNotNull(normalizedObservation.getGeometries());
         assertEquals("Wildfire - Los Angeles County, California, USA", normalizedObservation.getName());
+        assertEquals("CalFire", normalizedObservation.getProperName());
         assertEquals(Severity.UNKNOWN, normalizedObservation.getEventSeverity());
         assertEquals(OffsetDateTime.parse("2007-10-21T00:00:00Z"), normalizedObservation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2007-10-23T00:00:00Z"), normalizedObservation.getEndedAt());
@@ -60,7 +61,7 @@ class FrapCalStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setUpdatedAt(OffsetDateTime.parse("2020-07-12T10:37:00Z"));
         dataLake.setProvider("test-provider");
-        dataLake.setData("{\"type\":\"Feature\",\"properties\":{\"YEAR_\":\"2007\",\"STATE\":\"California\"," +
+        dataLake.setData("{\"type\":\"Feature\",\"properties\":{\"YEAR_\":\"2007\",\"STATE\":\"California\", \"FIRE_NAME\":\"CalFire\"," +
                 "\"UNIT_ID\":\"Los Angeles County\",\"ALARM_DATE\":\"2007-10-21\",\"CONT_DATE\":\"2007-10-23\"}," +
                 "\"geometry\":{\"type\":\"MultiPolygon\",\"coordinates\":" +
                 "[[[[-118.49,34.38],[-118.49,34.38],[-118.49,34.38],[-118.49,34.38],[-118.49,34.38]]]]}}");

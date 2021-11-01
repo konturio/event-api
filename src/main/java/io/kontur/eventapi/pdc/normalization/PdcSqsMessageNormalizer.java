@@ -81,6 +81,8 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         normalizedDto.setEventSeverity(
                 defineSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId")));
         normalizedDto.setType(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")));
+        Map<String, Object> hazardSnc = (Map<String, Object>) props.get("hazardSnc");
+        normalizedDto.setSourceUri(hazardSnc == null ? null : readString(hazardSnc, "sncUrl"));
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
         normalizedDto.setPoint(pointWkt);
 

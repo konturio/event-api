@@ -47,6 +47,7 @@ class HpSrvSearchNormalizerTest {
         assertEquals(1590675541253L, obs.getEndedAt().toInstant().toEpochMilli());
         assertEquals(1590590813468L, obs.getSourceUpdatedAt().toInstant().toEpochMilli());
         assertEquals(dataLake.getLoadedAt(), obs.getLoadedAt());
+        assertEquals("https://hazardbrief.pdc.org/TEST/ui/index.html?uuid=d26f0681-70e2-48b2-83eb-c8b9d8ef69fe", obs.getSourceUri());
 
         assertNotNull(obs.getGeometries());
         checkGeometriesValue(obs.getGeometries());
