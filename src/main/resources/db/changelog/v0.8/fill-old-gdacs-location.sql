@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:v0.8/fill-old-gdacs-location.sql runOnChange:false
+--changeset event-api-migrations:v0.8/fill-old-gdacs-location.sql runOnChange:true
 
 update normalized_observations no
 set region = dl.country
@@ -51,7 +51,7 @@ events_to_update as (
         select ep ->> 'location'
         from jsonb_array_elements(episodes_with_locations) ep
         where ep ->> 'location' is not null and ep ->> 'location' <> ''
-        order by (ep ->> 'startedAt')::timestamptz, (ep ->> 'updatedAt')::timestamptz
+        order by (ep ->> 'startedAt')::timestamptz desc, (ep ->> 'updatedAt')::timestamptz desc
         limit 1
     ) as event_location
     from episodes_to_update eu

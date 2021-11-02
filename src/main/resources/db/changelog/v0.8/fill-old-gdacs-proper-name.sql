@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:v0.8/fill-old-gdacs-proper-name.sql runOnChange:false
+--changeset event-api-migrations:v0.8/fill-old-gdacs-proper-name.sql runOnChange:true
 
 update normalized_observations no
 set proper_name = dl.event_name
@@ -51,7 +51,7 @@ events_to_update as (
         select ep ->> 'properName'
         from jsonb_array_elements(episodes_with_proper_names) ep
         where ep ->> 'properName' is not null and ep ->> 'properName' <> ''
-        order by (ep ->> 'startedAt')::timestamptz, (ep ->> 'updatedAt')::timestamptz
+        order by (ep ->> 'startedAt')::timestamptz desc, (ep ->> 'updatedAt')::timestamptz desc
         limit 1
     ) as event_proper_name
     from episodes_to_update eu

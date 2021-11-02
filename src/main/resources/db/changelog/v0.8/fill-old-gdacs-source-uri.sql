@@ -55,7 +55,7 @@ events_to_update as (
         select (select array_agg(last_ep_links) from jsonb_array_elements_text(ep -> 'urls') last_ep_links)
         from jsonb_array_elements(episodes_with_links) ep
         where ep -> 'urls' <> '[]'::jsonb
-        order by (ep ->> 'startedAt')::timestamptz, (ep ->> 'updatedAt')::timestamptz
+        order by (ep ->> 'startedAt')::timestamptz desc, (ep ->> 'updatedAt')::timestamptz desc
         limit 1
     ) links
     from episodes_to_update eu
