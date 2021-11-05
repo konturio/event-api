@@ -4,8 +4,8 @@ import io.kontur.eventapi.client.KonturAppsClient;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.enrichment.postprocessor.EnrichmentPostProcessor;
 import io.kontur.eventapi.enrichment.EventEnrichmentTask;
-import io.kontur.eventapi.enrichment.InsightsApiRequest;
-import io.kontur.eventapi.enrichment.InsightsApiResponse;
+import io.kontur.eventapi.enrichment.dto.InsightsApiRequest;
+import io.kontur.eventapi.enrichment.dto.InsightsApiResponse;
 import io.kontur.eventapi.entity.Feed;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
@@ -46,7 +46,8 @@ public class EnrichmentJobTest {
         feedWithEnrichment = new Feed();
         feedWithEnrichment.setFeedId(UUID.randomUUID());
         feedWithEnrichment.setAlias("feedWithEnrichment");
-        feedWithEnrichment.setEnrichment(List.of(POPULATION, OSM_GAPS_PERCENTAGE, PEOPLE_WITHOUT_OSM_BUILDINGS));
+        feedWithEnrichment.setEnrichment(List.of(POPULATION, OSM_GAPS_PERCENTAGE));
+        feedWithEnrichment.setEnrichmentRequest("{polygonStatistic (polygonStatisticRequest: {polygon: \"%s\"}){analytics {population {population}}}}");
     }
 
     private static final Feed feedWithoutEnrichment;
@@ -110,6 +111,7 @@ public class EnrichmentJobTest {
         feedData.setEnriched(enriched);
         feedData.addEpisode(createFeedEpisode());
         feedData.setGeometries(createGeometries());
+        feedData.setEnrichmentAttempts(1L);
         return feedData;
     }
 
@@ -126,14 +128,12 @@ public class EnrichmentJobTest {
     }
 
     private InsightsApiResponse createResponse() {
-        InsightsApiResponse.OsmQuality osmQuality = new InsightsApiResponse.OsmQuality();
-        osmQuality.setPeopleWithoutOsmBuildings(0L);
-        osmQuality.setOsmGapsPercentage(0.);
         InsightsApiResponse.Population population = new InsightsApiResponse.Population();
         population.setPopulation(0L);
+        List<InsightsApiResponse.AnalyticFunction> functions = new ArrayList<>();
         InsightsApiResponse.Analytics populationStatistic = new InsightsApiResponse.Analytics();
-        populationStatistic.setOsmQuality(osmQuality);
         populationStatistic.setPopulation(population);
+        populationStatistic.setFunctions(functions);
         InsightsApiResponse.PolygonStatistic polygonStatistic = new InsightsApiResponse.PolygonStatistic();
         polygonStatistic.setAnalytics(populationStatistic);
         InsightsApiResponse.ResponseData responseData = new InsightsApiResponse.ResponseData();

@@ -13,8 +13,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.kontur.eventapi.enrichment.InsightsApiRequestBuilder.buildParams;
-
 @Component
 public class EnrichmentJob extends AbstractJob {
 
@@ -50,11 +48,11 @@ public class EnrichmentJob extends AbstractJob {
             List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
             LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
 
-            List<String> feedEnrichment = feed.getEnrichment();
-            String feedParamsString = buildParams(feedEnrichment);
+            List<String> enrichmentFields = feed.getEnrichment();
+            String enrichmentRequest = feed.getEnrichmentRequest();
 
             var eventEnrichmentTasks = events.stream()
-                    .map(event -> eventEnrichmentTask.enrichEvent(event, feedEnrichment, feedParamsString))
+                    .map(event -> eventEnrichmentTask.enrichEvent(event, enrichmentRequest, enrichmentFields))
                     .toArray(CompletableFuture[]::new);
             CompletableFuture.allOf(eventEnrichmentTasks).join();
         } catch (Exception e) {

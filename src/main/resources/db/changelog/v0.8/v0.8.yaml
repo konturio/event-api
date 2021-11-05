@@ -18,3 +18,15 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: fill-old-gdacs-location.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-populated-area-km2-enrichment.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-enrichment-request-column-to-feeds.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-old-events-geometries.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-jsonb-null-values.sql
