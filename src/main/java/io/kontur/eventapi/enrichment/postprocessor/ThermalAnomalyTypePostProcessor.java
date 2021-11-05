@@ -10,7 +10,6 @@ import org.wololo.geojson.GeometryCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 
 import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
@@ -35,8 +34,8 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
                 .forEach(episode -> {
                     double industrialAreaKm2 = toDouble(episode.getEpisodeDetails().get(INDUSTRIAL_AREA_KM2));
                     double forestAreaKm2 = toDouble(episode.getEpisodeDetails().get(FOREST_AREA_KM2));
-                    long volcanoesCount = toLong(episode.getEpisodeDetails().get(VOLCANOES_COUNT));
-                    long hotspotDaysPerYearMax = toLong(episode.getEpisodeDetails().get(HOTSPOT_DAYS_PER_YEAR_MAX));
+                    double volcanoesCount = toDouble(episode.getEpisodeDetails().get(VOLCANOES_COUNT));
+                    double hotspotDaysPerYearMax = toDouble(episode.getEpisodeDetails().get(HOTSPOT_DAYS_PER_YEAR_MAX));
 
                     double area = getArea(episode.getGeometries());
 
@@ -81,14 +80,6 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
 
     private Double toDouble(Object value) {
         return value == null ? 0.0 : (Double) value;
-    }
-
-    private Long toLong(Object value) {
-        try {
-            return value == null ? 0L : (Long) value;
-        } catch (Exception e) {
-            return 0L;
-        }
     }
 
     private String updateName(String oldName, EventType type) {

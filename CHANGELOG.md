@@ -8,6 +8,10 @@
 - Added `urls` column to `feed_data` and `urls` field to `FeedEpisode`
 - Added `proper_name` column to `normalized_observations` and `feed_data` tables and `properName` field to `FeedEpisode`
 - Added `location` column to `feed_data` and `location` field to `FeedEpisode`
+- Added `enrichment_request` column to `feed_data`
+- Added `populatedAreaKm2` enrichment field
+- Fixed `'null'::jsonb` values from `event_details` column to be `null`
+- Added migration to fill old events' `geometries` column in `feed_data`
 
 #### Changed
 

@@ -14,4 +14,5 @@ public class Feed {
     private List<String> providers;
     private List<String> roles;
     private List<String> enrichment;
+    private String enrichmentRequest;
 }

@@ -82,7 +82,7 @@ public class StormsNoaaImportJob extends AbstractJob {
     private Optional<DataLake> processRow(String header, String row, OffsetDateTime updatedAt) {
         String externalId = parseRow(header, row).get("EVENT_ID");
         String data = header + "\n" + row;
-        if (isNewOrUpdatedEvent(externalId, data)) {
+        if (isNewOrUpdatedEvent(externalId, data) && !externalId.equals("EVENT_ID")) {
             DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
             dataLake.setProvider(STORMS_NOAA_PROVIDER);
             dataLake.setData(data);

@@ -31,6 +31,7 @@
         where event_id = #{eventId}
           and feed_id = #{feedId}
           and version < #{version}
+          and is_latest_version is true
     ]]>
     </update>
 
@@ -146,7 +147,10 @@
 
     <update id="addAnalytics">
         UPDATE feed_data
-        SET event_details = #{eventDetails}::jsonb,
+        SET
+            <if test='eventDetails != null'>
+                event_details = #{eventDetails}::jsonb,
+            </if>
             enriched = #{enriched},
             episodes = #{episodes}::jsonb,
             name = #{name},
@@ -162,6 +166,7 @@
         <result property="providers" column="providers" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="roles" column="roles" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="enrichment" column="enrichment" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+        <result property="enrichmentRequest" column="enrichment_request"/>
     </resultMap>
 
     <resultMap id="feedDataDtoMap" type="io.kontur.eventapi.entity.FeedData">

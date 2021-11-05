@@ -1,7 +1,7 @@
 package io.kontur.eventapi.client;
 
-import io.kontur.eventapi.enrichment.InsightsApiRequest;
-import io.kontur.eventapi.enrichment.InsightsApiResponse;
+import io.kontur.eventapi.enrichment.dto.InsightsApiRequest;
+import io.kontur.eventapi.enrichment.dto.InsightsApiResponse;
 import io.micrometer.core.annotation.Timed;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

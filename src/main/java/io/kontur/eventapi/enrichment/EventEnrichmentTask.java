@@ -2,6 +2,8 @@ package io.kontur.eventapi.enrichment;
 
 import io.kontur.eventapi.client.KonturAppsClient;
 import io.kontur.eventapi.dao.FeedDao;
+import io.kontur.eventapi.enrichment.dto.InsightsApiRequest;
+import io.kontur.eventapi.enrichment.dto.InsightsApiResponse;
 import io.kontur.eventapi.enrichment.postprocessor.EnrichmentPostProcessor;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
@@ -16,8 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static io.kontur.eventapi.enrichment.InsightsApiRequestBuilder.buildRequest;
 import static io.kontur.eventapi.enrichment.InsightsApiResponseHandler.processResponse;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.RegExUtils.replaceAll;
 
 @Component
 public class EventEnrichmentTask {
@@ -41,10 +44,10 @@ public class EventEnrichmentTask {
 
 
     @Async("enrichmentExecutor")
-    public CompletableFuture<FeedData> enrichEvent(FeedData event, List<String> feedEnrichment, String feedParamsString) {
+    public CompletableFuture<FeedData> enrichEvent(FeedData event, String enrichmentRequest, List<String> enrichmentFields) {
         try {
-            processEvent(event, feedEnrichment, feedParamsString);
-            processEpisodes(event, feedEnrichment, feedParamsString);
+            processEvent(event, enrichmentRequest, enrichmentFields);
+            processEpisodes(event, enrichmentRequest, enrichmentFields);
             applyPostProcessors(event);
             markEventStatus(event);
             feedDao.addAnalytics(event);
@@ -55,16 +58,16 @@ public class EventEnrichmentTask {
         return CompletableFuture.completedFuture(event);
     }
 
-    private void processEvent(FeedData event, List<String> feedEnrichment, String feedParamsString) {
+    private void processEvent(FeedData event, String enrichmentRequest, List<String> enrichmentFields) throws Exception {
         if (needsEnrichment(event.getEventDetails(), event.getGeometries())) {
-            event.setEventDetails(fetchAnalytics(event.getGeometries(), feedEnrichment, feedParamsString));
+            event.setEventDetails(fetchAnalytics(event.getGeometries(), enrichmentRequest, enrichmentFields));
         }
     }
 
-    private void processEpisodes(FeedData event, List<String> feedEnrichment, String feedParamsString) {
+    private void processEpisodes(FeedData event, String enrichmentRequest, List<String> enrichmentFields) throws Exception {
         for (FeedEpisode episode : event.getEpisodes()) {
             if (needsEnrichment(episode.getEpisodeDetails(), episode.getGeometries())) {
-                episode.setEpisodeDetails(fetchAnalytics(episode.getGeometries(), feedEnrichment, feedParamsString));
+                episode.setEpisodeDetails(fetchAnalytics(episode.getGeometries(), enrichmentRequest, enrichmentFields));
             }
         }
     }
@@ -87,22 +90,23 @@ public class EventEnrichmentTask {
     private void updateMetrics(FeedData event) {
         if (event.getEnriched() && !event.getEnrichmentSkipped()) {
             enrichmentSuccess.increment();
+            return;
         }
-        else {
-            LOG.error("Event was not enriched: " + event.getEventId());
-            enrichmentFail.increment();
-        }
+        enrichmentFail.increment();
+        LOG.warn("Event was not enriched: feed_id = '{}', event_id = '{}', version = '{}'",
+                event.getFeedId(), event.getEventId(), event.getVersion());
     }
 
-    private Map<String, Object> fetchAnalytics(FeatureCollection geometry, List<String> feedEnrichment, String feedParamsString) {
-        InsightsApiRequest request = buildRequest(geometry, feedParamsString);
+    private Map<String, Object> fetchAnalytics(FeatureCollection geometry, String enrichmentRequest, List<String> enrichmentFields) throws Exception {
+        String query = format(enrichmentRequest, replaceAll(geometry.toString(), "\"", "\\\\\\\""));
+        InsightsApiRequest request = new InsightsApiRequest(query);
         try {
             InsightsApiResponse response = konturAppsClient.graphql(request);
-            return processResponse(response, feedEnrichment);
+            return processResponse(response, enrichmentFields);
         } catch (Exception e) {
             LOG.error(e.getMessage());
-            return null;
         }
+        return null;
     }
 
     private boolean needsEnrichment(Map<String, Object> details, FeatureCollection geometries) {

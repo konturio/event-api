@@ -1,4 +1,4 @@
-package io.kontur.eventapi.enrichment;
+package io.kontur.eventapi.enrichment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
