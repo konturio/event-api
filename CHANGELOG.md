@@ -2,6 +2,15 @@
 
 ## UNRELEASED
 
+### Added
+
+### Changed
+
+### Removed
+
+
+## 0.8 - 2021-11-09
+
 #### Added
 
 - Added DEBUG logs to REST API
@@ -13,11 +22,10 @@
 - Fixed `'null'::jsonb` values from `event_details` column to be `null`
 - Added migration to fill old events' `geometries` column in `feed_data`
 
-#### Changed
-
 #### Removed
 
 - Removed `Cache-Control` header from response
+
 
 ## 0.7 - 2021-10-21
 
