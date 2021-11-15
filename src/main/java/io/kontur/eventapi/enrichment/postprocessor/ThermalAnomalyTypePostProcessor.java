@@ -3,18 +3,21 @@ package io.kontur.eventapi.enrichment.postprocessor;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.operation.overlayng.OverlayNGRobust;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
-import org.wololo.geojson.GeometryCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
 import static io.kontur.eventapi.util.GeometryUtil.calculateAreaKm2;
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toSet;
 
 @Component
 public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor {
@@ -72,10 +75,11 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
     }
 
     private Double getArea(FeatureCollection fc) {
-        GeometryCollection geometryCollection = new GeometryCollection(Arrays.stream(fc.getFeatures())
+        Set<Geometry> geometryCollection = Arrays.stream(fc.getFeatures())
                 .map(Feature::getGeometry)
-                .toArray(org.wololo.geojson.Geometry[]::new));
-        return calculateAreaKm2(geoJSONReader.read(geometryCollection));
+                .map(geoJSONReader::read)
+                .collect(toSet());
+        return calculateAreaKm2(OverlayNGRobust.union(geometryCollection));
     }
 
     private Double toDouble(Object value) {
