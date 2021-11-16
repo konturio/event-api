@@ -9,6 +9,13 @@
 ### Removed
 
 
+## 0.8.1 - 2021-11-16
+
+#### Changed
+
+- Fixed `WILDFIRE` type calculation during enrichment post-processing
+
+
 ## 0.8 - 2021-11-09
 
 #### Added
