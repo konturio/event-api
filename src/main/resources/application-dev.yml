@@ -1,9 +1,4 @@
 spring:
-  datasource:
-    platform: postgres
-    url: 'jdbc:postgresql://localhost:5433/postgres'
-    username: postgres
-    password: postgres
   security:
     oauth2:
       resourceserver:
@@ -24,41 +19,6 @@ pdc:
 staticdata:
   s3Folder: 'TEST DEV/'
 
-
-scheduler:
-  hpSrvImport:
-    enable: false
-  hpSrvMagsImport:
-    enable: false
-  pdcMapSrvSearch:
-    enable: false
-  gdacsImport:
-    enable: false
-  firmsImport:
-    enable: false
-  emDatImport:
-    enable: false
-  staticImport:
-    enable: false
-  stormsNoaaImport:
-    enable: false
-  tornadoJapanMaImport:
-    enable: false
-  historicalTornadoJapanMaImport:
-    enable: false
-  normalization:
-    enable: true
-  eventCombination:
-    enable: true
-  feedComposition:
-    enable: true
-  enrichment:
-    enable: false
-  calfireSearch:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 60000
-
 aws:
   sqs:
-    enabled: false
+    enabled: true
