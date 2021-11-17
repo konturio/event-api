@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.job.EnrichmentJob;
@@ -42,6 +43,7 @@ public class WorkerScheduler {
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob;
     private final PdcMapSrvSearchJob pdcMapSrvSearchJob;
     private final EnrichmentJob enrichmentJob;
+    private final CalFireSearchJob calFireSearchJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -71,6 +73,8 @@ public class WorkerScheduler {
     private String pdcMapSrvSearchEnabled;
     @Value("${scheduler.enrichment.enable}")
     private String enrichmentEnabled;
+    @Value("${scheduler.calfireSearch.enable}")
+    private String calfireEnabled;
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
@@ -80,7 +84,7 @@ public class WorkerScheduler {
                            TornadoJapanMaImportJob tornadoJapanMaImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
                            PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
-                           EnrichmentJob enrichmentJob) {
+                           EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -97,6 +101,7 @@ public class WorkerScheduler {
         this.pdcMapSrvSearchJob = pdcMapSrvSearchJob;
         this.firmsFeedCompositionJob = firmsFeedCompositionJob;
         this.enrichmentJob = enrichmentJob;
+        this.calFireSearchJob = calFireSearchJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -240,6 +245,15 @@ public class WorkerScheduler {
             emDatImportJob.run();
         } else {
             LOG.info("EM-DAT Import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.calfireSearch.initialDelay}", fixedDelayString = "${scheduler.calfireSearch.fixedDelay}")
+    public void startCalFireSearchJob() {
+        if (Boolean.parseBoolean(calfireEnabled)) {
+            calFireSearchJob.run();
+        } else {
+            LOG.info("Calfire job invocation is skipped");
         }
     }
 }

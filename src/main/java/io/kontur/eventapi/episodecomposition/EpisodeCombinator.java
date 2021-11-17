@@ -5,10 +5,15 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.job.Applicable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
+
+    public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
+        return episodes;
+    }
 
     public abstract Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);
 

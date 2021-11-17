@@ -60,4 +60,9 @@ public class DataLakeDao {
     public Boolean isNewPdcExposure(String externalId, String geoHash) {
         return mapper.isNewPdcExposure(externalId, geoHash);
     }
+
+    public Boolean isNewEvent(String externalId, String provider, String updatedAt) {
+        return mapper.isNewEvent(externalId, provider, updatedAt);
+    }
+
 }

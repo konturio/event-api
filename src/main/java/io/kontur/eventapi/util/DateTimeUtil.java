@@ -1,5 +1,7 @@
 package io.kontur.eventapi.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -9,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DateTimeUtil {
 
     private static final AtomicLong LAST_TIME_MS = new AtomicLong();
+    private static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
     public static OffsetDateTime uniqueOffsetDateTime() {
         long m = uniqueCurrentTimeMS();
@@ -29,5 +32,15 @@ public class DateTimeUtil {
 
     public static OffsetDateTime parseDateTimeFromString(String value){
         return OffsetDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME);
+    }
+
+    public static OffsetDateTime parseDateTimeByPattern(String value, String pattern) {
+        if (StringUtils.isNotBlank(value)) {
+            if (pattern == null) {
+                pattern = DEFAULT_DATETIME_PATTERN;
+            }
+            return OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
+        }
+        return null;
     }
 }

@@ -28,6 +28,9 @@ staticdata:
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
+calfire:
+  host: 'https://www.fire.ca.gov/'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -99,6 +102,10 @@ scheduler:
     alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
     firmsAlias: firms, gdacs-firms
   enrichment:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  calfireSearch:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
