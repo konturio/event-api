@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -150,6 +151,10 @@ public class FeedCompositionJob extends AbstractJob {
                 }
             });
         });
+        if (!CollectionUtils.isEmpty(feedData.getEpisodes())) {
+            EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observations.get(0));
+            feedData.setEpisodes(episodeCombinator.postProcessEpisodes(feedData.getEpisodes()));
+        }
     }
 
     private void addEpisode(FeedData feedData, FeedEpisode episode) {

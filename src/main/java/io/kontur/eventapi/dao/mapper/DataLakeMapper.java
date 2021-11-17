@@ -30,4 +30,8 @@ public interface DataLakeMapper {
 
     Boolean isNewPdcExposure(@Param("externalId") String externalId,
                              @Param("geoHash") String geoHash);
+
+    Boolean isNewEvent(@Param("externalId") String externalId,
+                        @Param("provider") String provider,
+                        @Param("updatedAt") String updatedAt);
 }

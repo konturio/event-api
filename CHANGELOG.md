@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+- post-processing for episodes in FeedCompositionJob
+- wildfire.calfire provider
+
 ### Added
 
 ### Changed

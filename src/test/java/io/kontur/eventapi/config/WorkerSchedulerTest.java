@@ -1,5 +1,6 @@
 package io.kontur.eventapi.config;
 
+import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
@@ -41,10 +42,11 @@ class WorkerSchedulerTest {
     private final FirmsFeedCompositionJob firmsFeedCompositionJob = mock(FirmsFeedCompositionJob.class);
     private final EnrichmentJob enrichmentJob = mock(EnrichmentJob.class);
     private final FirmsEventCombinationJob firmsEventCombinationJob = mock(FirmsEventCombinationJob.class);
+    private final CalFireSearchJob calFireSearchJob = mock(CalFireSearchJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
             firmsEventCombinationJob, feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
-            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob);
+            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob);
 
     @AfterEach
     public void resetMocks() {
@@ -60,6 +62,7 @@ class WorkerSchedulerTest {
         Mockito.reset(tornadoJapanMaImportJob);
         Mockito.reset(historicalTornadoJapanMaImportJob);
         Mockito.reset(pdcMapSrvSearchJob);
+        Mockito.reset(calFireSearchJob);
     }
 
     @Test
@@ -238,4 +241,19 @@ class WorkerSchedulerTest {
         verify(feedCompositionJob, never()).run();
     }
 
+    @Test
+    public void startCalFireSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "calfireEnabled", "true");
+        scheduler.startCalFireSearchJob();
+
+        verify(calFireSearchJob, times(1)).run();
+    }
+
+    @Test
+    public void skipCalFireSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "calfireEnabled", "false");
+        scheduler.startCalFireSearchJob();
+
+        verify(calFireSearchJob, never()).run();
+    }
 }

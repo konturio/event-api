@@ -72,6 +72,19 @@
             END
     </select>
 
+    <select id="isNewEvent" resultType="java.lang.Boolean">
+        SELECT
+            CASE WHEN EXISTS (
+                    SELECT a.*
+                    FROM (SELECT * FROM data_lake
+                          WHERE external_id =  #{externalId}
+                            AND provider = #{provider}
+                            AND updated_at at time zone 'UTC' = to_timestamp(#{updatedAt}, 'YYYY-MM-DDThh24:mi:ss')::timestamp
+                         ) a
+                ) THEN FALSE ELSE TRUE
+                END
+    </select>
+
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
         <result property="observationId" column="observation_id" />
         <result property="externalId" column="external_id" />

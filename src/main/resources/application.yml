@@ -64,6 +64,9 @@ staticdata:
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
+calfire:
+  host: 'https://www.fire.ca.gov/'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -126,18 +129,23 @@ scheduler:
       wildfire.sa-gov,
       wildfire.qld-des-gov,
       wildfire.victoria-gov,
-      wildfire.nsw-gov
+      wildfire.nsw-gov,
+      wildfire.calfire
     firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public
+    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public, calfire
     firmsAlias: firms, disaster-ninja-02
   enrichment:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
+  calfireSearch:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 3600000
 
 feign:
   client:
