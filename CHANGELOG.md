@@ -2,10 +2,11 @@
 
 ## UNRELEASED
 
-- post-processing for episodes in FeedCompositionJob
-- wildfire.calfire provider
-
 ### Added
+
+- post-processing for episodes in FeedCompositionJob
+- `wildfire.calfire` provider
+- `proper_name` and `region` for `wildfire.calfire` provider
 
 ### Changed
 
