@@ -53,8 +53,10 @@ public class CalFireNormalizer extends Normalizer {
         normalizedObservation.setType(EventType.WILDFIRE);
         normalizedObservation.setActive(Boolean.valueOf(readString(properties, "IsActive")));
         normalizedObservation.setSourceUri(readString(properties, "Url"));
-        normalizedObservation.setName(WILDFIRE + " " + readString(properties, "Name"));
-        normalizedObservation.setRegion(null);
+        String name = readString(properties, "Name");
+        normalizedObservation.setName(WILDFIRE + " " + name);
+        normalizedObservation.setProperName(name);
+        normalizedObservation.setRegion(readString(properties, "Location"));
 
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         if (StringUtils.isNotBlank(readString(properties, "Started"))) {

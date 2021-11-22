@@ -39,6 +39,8 @@ class CalFireNormalizationTest {
         assertNull(observation.getExternalEpisodeId());
         assertEquals(Severity.MINOR, observation.getEventSeverity());
         assertEquals("Wildfire Fire", observation.getName());
+        assertEquals("Fire", observation.getProperName());
+        assertEquals("Location", observation.getRegion());
         assertEquals(EventType.WILDFIRE, observation.getType());
         assertEquals(1610640000000L, observation.getStartedAt().toInstant().toEpochMilli());
         assertEquals(1610718305000L, observation.getEndedAt().toInstant().toEpochMilli());
