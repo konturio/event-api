@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -42,5 +43,9 @@ public class DateTimeUtil {
             return OffsetDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
         }
         return null;
+    }
+
+    public static OffsetDateTime getDateTimeFromMilli(long dateTimeMilli) {
+        return Instant.ofEpochMilli(dateTimeMilli).atOffset(ZoneOffset.UTC);
     }
 }

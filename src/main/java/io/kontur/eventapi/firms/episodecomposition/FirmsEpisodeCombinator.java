@@ -6,7 +6,6 @@ import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.firms.FirmsUtil;
 import io.micrometer.core.annotation.Counted;
@@ -32,6 +31,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static io.kontur.eventapi.util.GeometryUtil.calculateAreaKm2;
+import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -151,23 +151,6 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .filter(o -> o.getSourceUpdatedAt().isAfter(oneDayBeforeObservation) || o.getSourceUpdatedAt().isEqual(oneDayBeforeObservation))
                 .filter(o -> o.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt()) || o.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
                 .collect(toSet());
-    }
-
-    private Severity calculateSeverity(Double area, long burningTime) {
-        if (burningTime <= 24) {
-            return Severity.MINOR;
-        }
-        if (area == null) {
-            return Severity.UNKNOWN;
-        }
-        if (area < 10) {
-            return Severity.MINOR;
-        } else if (area < 50) {
-            return Severity.MODERATE;
-        } else if (area < 100) {
-            return Severity.SEVERE;
-        }
-        return Severity.EXTREME;
     }
 
     private String calculateName(String areaName, Double area, long burningTime) {
