@@ -21,4 +21,21 @@ public class SeverityUtil {
                 ? fujitaMapper.get(fujita.substring(fujita.length() - 1))
                 : Severity.UNKNOWN;
     }
+
+    public static Severity calculateSeverity(Double areaSqKm, long durationHours) {
+        if (durationHours <= 24) {
+            return Severity.MINOR;
+        }
+        if (areaSqKm == null) {
+            return Severity.UNKNOWN;
+        }
+        if (areaSqKm < 10) {
+            return Severity.MINOR;
+        } else if (areaSqKm < 50) {
+            return Severity.MODERATE;
+        } else if (areaSqKm < 100) {
+            return Severity.SEVERE;
+        }
+        return Severity.EXTREME;
+    }
 }

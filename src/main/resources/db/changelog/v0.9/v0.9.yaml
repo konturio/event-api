@@ -3,3 +3,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: insert-calfire-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-nifc-feed.sql

@@ -67,6 +67,9 @@ tornadoJapanMa:
 calfire:
   host: 'https://www.fire.ca.gov/'
 
+nifc:
+  host: 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -104,6 +107,14 @@ scheduler:
   historicalTornadoJapanMaImport:
     enable: false
     initialDelay: 1000
+  calfireSearch:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 3600000
+  nifcImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 300000
   normalization:
     enable: true
     initialDelay: 1000
@@ -130,22 +141,20 @@ scheduler:
       wildfire.qld-des-gov,
       wildfire.victoria-gov,
       wildfire.nsw-gov,
-      wildfire.calfire
+      wildfire.calfire,
+      wildfire.perimeters.nifc,
+      wildfire.locations.nifc
     firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public, calfire
+    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public, calfire, nifc
     firmsAlias: firms, disaster-ninja-02
   enrichment:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-  calfireSearch:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 3600000
 
 feign:
   client:
