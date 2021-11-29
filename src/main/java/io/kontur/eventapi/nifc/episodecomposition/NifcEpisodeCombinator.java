@@ -34,11 +34,13 @@ public class NifcEpisodeCombinator extends EpisodeCombinator {
             return Optional.empty();
         }
         Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(eventObservations, observation.getSourceUpdatedAt());
-        FeedEpisode episode = createDefaultEpisode(findLatestEpisodeObservation(episodeObservations)).get();
+        NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
+        FeedEpisode episode = createDefaultEpisode(latestObservation).get();
 
         episode.setStartedAt(findEpisodeStartedAt(episodeObservations));
         episode.setObservations(mapObservationsToIDs(episodeObservations));
         episode.setGeometries(computeEpisodeGeometries(episodeObservations));
+        episode.setDescription(latestObservation.getDescription());
 
         return Optional.of(episode);
     }
