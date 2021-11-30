@@ -137,14 +137,14 @@ public class FeedCompositionJob extends AbstractJob {
             Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
             feedEpisode.ifPresent(episode -> {
                 if (episode.getStartedAt().isAfter(episode.getEndedAt())) {
-                    OffsetDateTime endedAt = episode.getEndedAt();
-                    episode.setEndedAt(episode.getStartedAt());
+                    OffsetDateTime startedAt = episode.getStartedAt();
+                    episode.setStartedAt(episode.getEndedAt());
                     addEpisode(feedData, episode);
 
                     FeedEpisode newEpisode = new FeedEpisode();
                     BeanUtils.copyProperties(episode, newEpisode);
-                    newEpisode.setStartedAt(endedAt);
-                    newEpisode.setEndedAt(endedAt);
+                    newEpisode.setStartedAt(startedAt);
+                    newEpisode.setEndedAt(startedAt);
                     addEpisode(feedData, newEpisode);
                 } else {
                     addEpisode(feedData, episode);

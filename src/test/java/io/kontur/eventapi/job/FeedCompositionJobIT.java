@@ -66,11 +66,11 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         NormalizedObservation observation = getOnlyElement(observationsDao.getObservations(feedV1.getObservations()));
 
-        assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(0).getStartedAt());
-        assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(0).getEndedAt());
+        assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(0).getStartedAt());
+        assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(0).getEndedAt());
 
-        assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(1).getStartedAt());
-        assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(1).getEndedAt());
+        assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(1).getStartedAt());
+        assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(1).getEndedAt());
     }
 
     @Test
