@@ -21,6 +21,8 @@ import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCAT
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Component
 public class NifcImportJob extends AbstractJob {
@@ -46,7 +48,8 @@ public class NifcImportJob extends AbstractJob {
 
     private void processLocations() {
         try {
-            processFeatureCollection(client.getNifcLocations(), "ModifiedOnDateTime_dt", NIFC_LOCATIONS_PROVIDER);
+            processFeatureCollection(client.getNifcLocations(), NIFC_LOCATIONS_PROVIDER,
+                    "ModifiedOnDateTime_dt", "UniqueFireIdentifier");
         } catch (Exception e) {
             LOG.error("Failed to obtain NIFC locations");
         }
@@ -54,23 +57,24 @@ public class NifcImportJob extends AbstractJob {
 
     private void processPerimeters() {
         try {
-            processFeatureCollection(client.getNifcPerimeters(), "irwin_ModifiedOnDateTime_dt", NIFC_PERIMETERS_PROVIDER);
+            processFeatureCollection(client.getNifcPerimeters(), NIFC_PERIMETERS_PROVIDER,
+                    "irwin_ModifiedOnDateTime_dt", "irwin_UniqueFireIdentifier");
         } catch (Exception e) {
             LOG.error("Failed to obtain NIFC perimeters");
         }
     }
 
-    private void processFeatureCollection(String geoJson, String updatedAtProp, String provider) {
+    private void processFeatureCollection(String geoJson, String provider, String updatedAtProp, String externalIdProp) {
         try {
             FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
             for (Feature feature : fc.getFeatures()) {
                 try {
                     String data = writeJson(feature);
-                    String externalId = DigestUtils.md5Hex(data);
+                    String externalId = String.valueOf(feature.getProperties().get(externalIdProp));
                     long updatedAtMilli = Long.parseLong(String.valueOf(feature.getProperties().get(updatedAtProp)));
-                    OffsetDateTime updatedAt = getDateTimeFromMilli(updatedAtMilli);
-                    if (dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, provider).isEmpty()) {
+                    OffsetDateTime updatedAt = getDateTimeFromMilli(updatedAtMilli).truncatedTo(SECONDS);
+                    if (dataLakeDao.isNewEvent(externalId, provider, updatedAt.format(ISO_INSTANT))) {
                         dataLakes.add(dataLakeConverter.convertDataLake(externalId, updatedAt, provider, data));
                     }
                 } catch (Exception e) {

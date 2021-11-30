@@ -49,7 +49,7 @@ class PerimetersNifcNormalizerTest {
 
     private DataLake createDataLake() throws IOException {
         String data = readFile("PerimetersNifcNormalizerTest.json");
-        String externalId = DigestUtils.md5Hex(data);
+        String externalId = "2021-ALALF-210222";
         OffsetDateTime updatedAt = getDateTimeFromMilli(1637628408000L);
         DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, OffsetDateTime.now());
         dataLake.setData(data);

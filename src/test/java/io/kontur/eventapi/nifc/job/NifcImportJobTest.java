@@ -36,7 +36,7 @@ class NifcImportJobTest {
         String perimeters = readFile("NifcImportJob_Perimeters.json");
         when(nifcClient.getNifcLocations()).thenReturn(locations);
         when(nifcClient.getNifcPerimeters()).thenReturn(perimeters);
-        when(dataLakeDao.getLatestDataLakeByExternalIdAndProvider(any(), any())).thenReturn(Optional.empty());
+        when(dataLakeDao.isNewEvent(any(), any(), any())).thenReturn(true);
         when(nifcDataLakeConverter.convertDataLake(any(), any(), any(), any())).thenReturn(new DataLake());
         doNothing().when(dataLakeDao).storeDataLakes(any());
 
@@ -44,7 +44,7 @@ class NifcImportJobTest {
 
         verify(nifcClient, times(1)).getNifcLocations();
         verify(nifcClient, times(1)).getNifcPerimeters();
-        verify(dataLakeDao, times(2)).getLatestDataLakeByExternalIdAndProvider(any(), any());
+        verify(dataLakeDao, times(2)).isNewEvent(any(), any(), any());
         verify(nifcDataLakeConverter, times(2)).convertDataLake(any(), any(), any(), any());
         verify(dataLakeDao, times(2)).storeDataLakes(any());
     }
