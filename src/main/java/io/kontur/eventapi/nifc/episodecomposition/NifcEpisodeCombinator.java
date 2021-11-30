@@ -91,11 +91,17 @@ public class NifcEpisodeCombinator extends EpisodeCombinator {
 
     @Override
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
-        if (episodes.size() > 1) {
-            episodes.sort(comparing(FeedEpisode::getEndedAt));
-            for (int i = 1; i < episodes.size(); i++) {
-                episodes.get(i).setStartedAt(episodes.get(i - 1).getEndedAt());
+        if (episodes.size() < 2) return episodes;
+
+        episodes.sort(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getEndedAt));
+        OffsetDateTime lastEndedAt = null;
+        for (FeedEpisode episode : episodes) {
+            if (lastEndedAt != null
+                    && lastEndedAt.isAfter(episode.getStartedAt())
+                    && lastEndedAt.isBefore(episode.getEndedAt())) {
+                episode.setStartedAt(lastEndedAt);
             }
+            lastEndedAt = episode.getEndedAt();
         }
         return episodes;
     }

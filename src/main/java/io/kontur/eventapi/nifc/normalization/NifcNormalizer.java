@@ -16,6 +16,7 @@ public abstract class NifcNormalizer extends Normalizer {
         observation.setLoadedAt(dataLake.getLoadedAt());
         observation.setSourceUpdatedAt(dataLake.getUpdatedAt());
         observation.setEndedAt(dataLake.getUpdatedAt());
+        observation.setExternalEventId(dataLake.getExternalId());
         observation.setType(EventType.WILDFIRE);
         return observation;
     }

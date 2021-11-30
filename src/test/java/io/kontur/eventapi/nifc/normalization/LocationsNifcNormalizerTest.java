@@ -49,7 +49,7 @@ class LocationsNifcNormalizerTest {
 
     private DataLake createDataLake() throws IOException {
         String data = readFile("LocationsNifcNormalizerTest.json");
-        String externalId = DigestUtils.md5Hex(data);
+        String externalId = "2021-IDIPF-000504";
         OffsetDateTime updatedAt = getDateTimeFromMilli(1636581972000L);
         DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, OffsetDateTime.now());
         dataLake.setData(data);

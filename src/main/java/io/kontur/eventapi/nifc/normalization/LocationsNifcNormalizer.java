@@ -14,6 +14,7 @@ import static io.kontur.eventapi.util.GeometryUtil.convertFeatureToFeatureCollec
 import static io.kontur.eventapi.util.GeometryUtil.readFeature;
 import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
 import static java.time.Duration.between;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Component
 public class LocationsNifcNormalizer extends NifcNormalizer {
@@ -31,11 +32,10 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
         Map<String, Object> props = feature.getProperties();
 
         observation.setGeometries(convertFeatureToFeatureCollection(feature));
-        observation.setExternalEventId(readString(props, "UniqueFireIdentifier"));
         observation.setDescription(readString(props, "IncidentShortDescription"));
 
         long startedAtMilli = readLong(props, "CreatedOnDateTime_dt");
-        observation.setStartedAt(getDateTimeFromMilli(startedAtMilli));
+        observation.setStartedAt(getDateTimeFromMilli(startedAtMilli).truncatedTo(SECONDS));
 
         String name = readString(props, "IncidentName");
         String type = readString(props, "IncidentTypeCategory");
