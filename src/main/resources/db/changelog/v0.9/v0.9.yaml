@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-nifc-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: rename-technical-feeds.sql

@@ -117,7 +117,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        return feedDao.searchForEvents("pdc-v0", List.of(), null,
+        return feedDao.searchForEvents("test-pdc-v0", List.of(), null,
                 null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
     }
 
@@ -156,7 +156,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(), null, null, startTimeForSearchingFeed,
+        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null, startTimeForSearchingFeed,
                 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(2, feed.getEpisodes().size());
 
@@ -201,7 +201,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("pdc-v0", List.of(EventType.WILDFIRE), null, null,
+        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(EventType.WILDFIRE), null, null,
                 loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }

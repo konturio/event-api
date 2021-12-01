@@ -38,7 +38,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
 
-    private final String feedAlias = "pdc-v0";
+    private final String feedAlias = "test-pdc-v0";
     private final UUID eventUUID = UUID.randomUUID();
 
     @Autowired

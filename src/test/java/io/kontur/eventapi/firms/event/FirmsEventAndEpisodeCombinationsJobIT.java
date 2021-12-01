@@ -74,7 +74,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         eventCombinationJob.run();
 
         //THEN
-        var firmsFeed = feedMapper.getFeeds().stream().filter(feed -> feed.getAlias().equals("firms")).findFirst().orElseThrow();
+        var firmsFeed = feedMapper.getFeeds().stream().filter(feed -> feed.getAlias().equals("test-firms")).findFirst().orElseThrow();
 
         List<KonturEvent> eventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
 
@@ -212,7 +212,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
     private List<FeedData> searchFeedData() {
         List<FeedData> firms = feedMapper.searchForEvents(
-                "firms",
+                "test-firms",
                 List.of(EventType.THERMAL_ANOMALY),
                 null,
                 null,

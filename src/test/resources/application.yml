@@ -112,8 +112,8 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
-    alias: gdacs, em-dat, pdc-v0, swissre-02, kontur-public, calfire, nifc
-    firmsAlias: firms, gdacs-firms
+    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public, test-calfire, test-nifc
+    firmsAlias: test-firms, disaster-ninja-02
   enrichment:
     enable: false
     initialDelay: 999999
