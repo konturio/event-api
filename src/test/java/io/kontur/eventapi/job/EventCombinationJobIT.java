@@ -52,7 +52,7 @@ public class EventCombinationJobIT extends AbstractCleanableIntegrationTest {
 
         var pdcFeed = feedDao.getFeeds()
                 .stream()
-                .filter(feed -> feed.getAlias().equals("pdc-v0"))
+                .filter(feed -> feed.getAlias().equals("test-pdc-v0"))
                 .findFirst()
                 .orElseThrow();
 
