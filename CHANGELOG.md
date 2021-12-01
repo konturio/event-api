@@ -2,16 +2,25 @@
 
 ## UNRELEASED
 
-### Added
+#### Added
+
+#### Changed
+
+#### Removed
+
+
+## 0.9 - 2021-12-01
+
+#### Added
 
 - post-processing for episodes in FeedCompositionJob
 - `wildfire.calfire` provider
 - `proper_name` and `region` for `wildfire.calfire` provider
 - `wildfire.perimeters.nifc` and `wildfire.locations.nifc` providers
 
-### Changed
+#### Changed
 
-### Removed
+- moment episodes ascending sort
 
 
 ## 0.8.1 - 2021-11-16
