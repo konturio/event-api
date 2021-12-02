@@ -9,6 +9,14 @@
 #### Removed
 
 
+## 0.9.1 - 2021-12-02
+
+#### Changed
+
+- Rename technical feeds, add `test` prefix: `test-gdacs`, `test-firms`, `test-em-dat`, `test-calfire`,
+ `test-nifc`, `test-pdc-v0`
+
+
 ## 0.9 - 2021-12-01
 
 #### Added
