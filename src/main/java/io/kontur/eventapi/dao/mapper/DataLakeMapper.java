@@ -34,4 +34,6 @@ public interface DataLakeMapper {
     Boolean isNewEvent(@Param("externalId") String externalId,
                         @Param("provider") String provider,
                         @Param("updatedAt") String updatedAt);
+
+    Integer getNotNormalizedObservationsCount();
 }

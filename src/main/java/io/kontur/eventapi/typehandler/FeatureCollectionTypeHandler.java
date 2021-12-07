@@ -1,9 +1,9 @@
 package io.kontur.eventapi.typehandler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 

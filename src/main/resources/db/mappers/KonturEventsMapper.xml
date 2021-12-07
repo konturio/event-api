@@ -53,7 +53,7 @@
         LIMIT 30000;
     </select>
 
-    <select id="getFeedCompositionQueueSize" resultType="java.lang.Integer">
+    <select id="getNotComposedEventsCount" resultType="java.lang.Integer">
         SELECT count(*) FROM feed_event_status WHERE NOT actual;
     </select>
 

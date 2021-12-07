@@ -162,6 +162,10 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
+  metrics:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 15000
 
 feign:
   client:

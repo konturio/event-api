@@ -35,7 +35,7 @@ public class HpSrvSearchJob extends AbstractJob {
 
     @Override
     public String getName() {
-        return "hpSrvSearch";
+        return "hpSrvSearchImport";
     }
 
     private void importHazards() {

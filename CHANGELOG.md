@@ -4,7 +4,13 @@
 
 #### Added
 
+- metrics job for checking database status 
+- add metrics to jobs subroutines that process one observation / event
+
 #### Changed
+
+- migrate to Java 16, update dependencies
+- `em-dat` import job inherits from `AbstractJob` not `Runnuble`
 
 #### Removed
 

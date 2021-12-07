@@ -36,7 +36,7 @@ public class HpSrvMagsJob extends AbstractJob {
 
     @Override
     public String getName() {
-        return "hpSrvMags";
+        return "hpSrvMagImport";
     }
 
     private void importMags() {

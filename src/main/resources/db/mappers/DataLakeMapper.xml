@@ -85,6 +85,10 @@
                 END
     </select>
 
+    <select id="getNotNormalizedObservationsCount" resultType="java.lang.Integer">
+        select count(*) from data_lake where not normalized;
+    </select>
+
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
         <result property="observationId" column="observation_id" />
         <result property="externalId" column="external_id" />

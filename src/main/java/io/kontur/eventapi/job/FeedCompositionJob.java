@@ -8,6 +8,8 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
-import static org.springframework.util.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
 public class FeedCompositionJob extends AbstractJob {
@@ -65,6 +67,8 @@ public class FeedCompositionJob extends AbstractJob {
                 .forEach(event -> createFeedData(event, feed));
     }
 
+    @Timed(value = "feedComposition.event.timer")
+    @Counted(value = "feedComposition.event.counter")
     protected void createFeedData(UUID eventId, Feed feed) {
         try {
             List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);

@@ -4,9 +4,9 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.emdat.dto.EmDatPublicFile;
 import io.kontur.eventapi.emdat.service.EmDatImportService;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.text.StringEscapeUtils;
 import org.dhatim.fastexcel.reader.Cell;
 import org.dhatim.fastexcel.reader.ReadableWorkbook;
@@ -27,7 +27,7 @@ import static io.kontur.eventapi.util.CsvUtil.parseRow;
 import static java.util.Comparator.comparing;
 
 @Component
-public class EmDatImportJob implements Runnable {
+public class EmDatImportJob extends AbstractJob {
 
     public static final String EM_DAT_PROVIDER = "em-dat";
 
@@ -39,16 +39,14 @@ public class EmDatImportJob implements Runnable {
     private final EmDatImportService importService;
     private final DataLakeDao dataLakeDao;
 
-    public EmDatImportJob(EmDatImportService importService, DataLakeDao dataLakeDao) {
+    public EmDatImportJob(MeterRegistry registry, EmDatImportService importService, DataLakeDao dataLakeDao) {
+        super(registry);
         this.importService = importService;
         this.dataLakeDao = dataLakeDao;
     }
 
     @Override
-    @Counted(value = "job.emdat_import.counter")
-    @Timed(value = "job.emdat_import.in_progress_timer", longTask = true)
-    public void run() {
-        LOG.info("EM-DAT import job has started");
+    public void execute() throws Exception {
         String token = importService.obtainAuthToken();
         EmDatPublicFile emDatPublicFile = importService.obtainFileStatistic(token);
 
@@ -59,7 +57,11 @@ public class EmDatImportJob implements Runnable {
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
-        LOG.info("EM-DAT import job has finished");
+    }
+
+    @Override
+    public String getName() {
+        return "emdatImport";
     }
 
     private Sheet getDataSheet(ReadableWorkbook wb) {

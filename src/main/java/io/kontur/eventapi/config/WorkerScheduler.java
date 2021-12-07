@@ -4,6 +4,7 @@ import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.job.EnrichmentJob;
+import io.kontur.eventapi.metrics.job.MetricsJob;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
@@ -46,6 +47,7 @@ public class WorkerScheduler {
     private final EnrichmentJob enrichmentJob;
     private final CalFireSearchJob calFireSearchJob;
     private final NifcImportJob nifcImportJob;
+    private final MetricsJob metricsJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -79,6 +81,9 @@ public class WorkerScheduler {
     private String calfireEnabled;
     @Value("${scheduler.nifcImport.enable}")
     private String nifcImportEnabled;
+    @Value("${scheduler.metrics.enable}")
+    private String metricsEnabled;
+
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
@@ -88,7 +93,8 @@ public class WorkerScheduler {
                            TornadoJapanMaImportJob tornadoJapanMaImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
                            PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
-                           EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob) {
+                           EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
+                           MetricsJob metricsJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -107,6 +113,7 @@ public class WorkerScheduler {
         this.enrichmentJob = enrichmentJob;
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
+        this.metricsJob = metricsJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -151,6 +158,15 @@ public class WorkerScheduler {
             firmsImportJob.run();
         } else {
             LOG.info("Firms import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.emDatImport.initialDelay}", fixedDelayString = "${scheduler.emDatImport.fixedDelay}")
+    public void emDatImportJob() {
+        if (Boolean.parseBoolean(emDatImportEnabled)) {
+            emDatImportJob.run();
+        } else {
+            LOG.info("EM-DAT Import job invocation is skipped");
         }
     }
 
@@ -262,12 +278,12 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.emDatImport.initialDelay}", fixedDelayString = "${scheduler.emDatImport.fixedDelay}")
-    public void emDatImportJob() {
-        if (Boolean.parseBoolean(emDatImportEnabled)) {
-            emDatImportJob.run();
+    @Scheduled(initialDelayString = "${scheduler.metrics.initialDelay}", fixedDelayString = "${scheduler.metrics.fixedDelay}")
+    public void startMetricsJob() {
+        if (Boolean.parseBoolean(metricsEnabled)) {
+            metricsJob.run();
         } else {
-            LOG.info("EM-DAT Import job invocation is skipped");
+            LOG.info("Metrics job invocation is skipped");
         }
     }
 }

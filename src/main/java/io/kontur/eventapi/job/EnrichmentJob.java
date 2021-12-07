@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class EnrichmentJob extends AbstractJob {
@@ -19,20 +18,16 @@ public class EnrichmentJob extends AbstractJob {
     private final Logger LOG = LoggerFactory.getLogger(EnrichmentJob.class);
     protected final FeedDao feedDao;
     private final EventEnrichmentTask eventEnrichmentTask;
-    private final AtomicInteger enrichmentQueueSize;
 
 
-    public EnrichmentJob(MeterRegistry meterRegistry, FeedDao feedDao, EventEnrichmentTask eventEnrichmentTask,
-                         AtomicInteger enrichmentQueueSizeGauge) {
+    public EnrichmentJob(MeterRegistry meterRegistry, FeedDao feedDao, EventEnrichmentTask eventEnrichmentTask) {
         super(meterRegistry);
         this.feedDao = feedDao;
         this.eventEnrichmentTask = eventEnrichmentTask;
-        this.enrichmentQueueSize = enrichmentQueueSizeGauge;
     }
 
     @Override
     public void execute() throws Exception {
-        enrichmentQueueSize.set(feedDao.getNotEnrichedEventsCount());
         feedDao.getFeeds().stream()
                 .filter(feed -> !feed.getEnrichment().isEmpty())
                 .forEach(this::enrichFeed);

@@ -5,6 +5,8 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,8 @@ public class NormalizationJob extends AbstractJob {
         return "normalization";
     }
 
+    @Timed(value = "normalization.observation.timer")
+    @Counted(value = "normalization.observation.counter")
     private boolean normalize(DataLake denormalizedEvent) {
         try {
             Normalizer normalizer = Applicable.get(normalizers, denormalizedEvent);

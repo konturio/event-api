@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
 import static org.mockito.Mockito.*;
@@ -74,8 +73,7 @@ public class EnrichmentJobTest {
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors,
                 enrichmentSuccess, enrichmentFail);
-        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask,
-                new AtomicInteger(0));
+        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
 
         enrichmentJob.run();
 
@@ -95,8 +93,7 @@ public class EnrichmentJobTest {
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createErrorResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors,
                 enrichmentSuccess, enrichmentFail);
-        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask,
-                new AtomicInteger(0));
+        EnrichmentJob enrichmentJob = new EnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
 
         enrichmentJob.run();
 
