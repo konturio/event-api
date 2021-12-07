@@ -70,6 +70,9 @@ calfire:
 nifc:
   host: 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services'
 
+inciweb:
+  host: 'https://inciweb.nwcg.gov'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -112,6 +115,10 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 3600000
   nifcImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 300000
+  inciwebImport:
     enable: true
     initialDelay: 1000
     fixedDelay: 300000

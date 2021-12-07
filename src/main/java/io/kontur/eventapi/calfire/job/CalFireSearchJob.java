@@ -39,7 +39,7 @@ public class CalFireSearchJob extends AbstractJob {
 
     @Override
     public String getName() {
-        return null;
+        return "calfireSearch";
     }
 
     @Override

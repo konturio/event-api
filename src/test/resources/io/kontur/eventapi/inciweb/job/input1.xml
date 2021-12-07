@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" 
+		xmlns:atom="http://www.w3.org/2005/Atom"
+		xmlns:georss="http://www.georss.org/georss"
+		xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"><channel><atom:link href="http://example.com/feeds/rss/incidents/" rel="self" type="application/rss+xml" /><title>InciWeb National Incidents</title><link>http://example.com</link><description>Latest incident updates nationally</description><pubDate>Fri, 03 Dec 2021 04:00:00 -06:00</pubDate><language>en-us</language><item><title>Title 1</title><published>Fri, 03 Dec 2021 01:00:00 -06:00</published><pubDate>Fri, 03 Dec 2021 01:00:00 -06:00</pubDate><georss:point>10.111 -110.111</georss:point><geo:lat>10.111</geo:lat><geo:long>-110.111</geo:long><link>http://example.com/incident/1/</link><guid isPermaLink="true">http://example.com/incident/1/</guid><description>Description 1</description></item></channel></rss>

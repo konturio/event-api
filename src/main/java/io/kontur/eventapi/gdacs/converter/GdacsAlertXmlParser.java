@@ -1,41 +1,30 @@
 package io.kontur.eventapi.gdacs.converter;
 
 import feign.FeignException;
+import io.kontur.eventapi.converter.BaseXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
-import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 @Component
-public class GdacsAlertXmlParser {
+public class GdacsAlertXmlParser extends BaseXmlParser {
 
-    private final static Logger LOG = LoggerFactory.getLogger(GdacsSearchJob.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GdacsAlertXmlParser.class);
 
     private static final String DATE_MODIFIED = "datemodified";
     private static final String EVENT_ID = "eventid";
@@ -58,32 +47,8 @@ public class GdacsAlertXmlParser {
 
     private static final String NS = "*";
 
-    public OffsetDateTime getPubDate(String xml) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
-        var xmlDocument = getXmlDocument(xml);
-        var xPath = XPathFactory.newInstance().newXPath();
-        String pathToPubDate = "/rss/channel/pubDate/text()";
-        var pubDateString = (String) xPath.compile(pathToPubDate).evaluate(xmlDocument, XPathConstants.STRING);
-        return parseDateTimeFromString(pubDateString);
-    }
-
     public List<String> getAlerts(String xml) throws IOException, SAXException, ParserConfigurationException {
-        List<String> alerts = new ArrayList<>();
-        Document xmlDocument = getXmlDocument(xml);
-        NodeList nodeList = xmlDocument.getElementsByTagNameNS(NS, ALERT);
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            try {
-                StringWriter writer = new StringWriter();
-
-                Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.transform(new DOMSource(nodeList.item(i)), new StreamResult(writer));
-
-                alerts.add(writer.toString());
-            } catch (TransformerException e) {
-                LOG.error(e.getMessage(), e);
-            }
-        }
-        return alerts;
+        return getItems(xml, ALERT, NS);
     }
 
     public List<ParsedAlert> getParsedAlertsToGdacsSearchJob(List<String> alertsXml) throws ParserConfigurationException {
@@ -157,46 +122,8 @@ public class GdacsAlertXmlParser {
         return parsedAlert;
     }
 
-    private Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setNamespaceAware(true);
-        DocumentBuilder builder = builderFactory.newDocumentBuilder();
-        InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
-        return builder.parse(inputStream);
+    protected Map<String, String> parseParameters(NodeList parameterNodes, Set<String> parameterNames) {
+        return parseParameters(parameterNodes, parameterNames, VALUE_NAME, VALUE);
     }
 
-    private Map<String, String> parseParameters(NodeList parameterNodes, Set<String> parameterNames) {
-        Map<String, String> parameters = parameterNames.stream().map(name -> Map.entry(name, ""))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        for (int i = 0; i < parameterNodes.getLength(); i++) {
-            NodeList parameterChildNodes = parameterNodes.item(i).getChildNodes();
-            String parameterName = getNodeValueByName(parameterChildNodes, VALUE_NAME);
-            if (parameters.containsKey(parameterName)) {
-                parameters.replace(parameterName, getNodeValueByName(parameterChildNodes, VALUE));
-            }
-        }
-        return parameters;
-    }
-
-    private String getNodeValueByName(NodeList nodes, String childNodeName) {
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (StringUtils.equals(node.getLocalName(), childNodeName)) {
-                return node.getTextContent();
-            }
-        }
-        return "";
-    }
-
-    private String getValueByTagName(String xml, Document xmlDocument, String tagName) {
-        NodeList nodeList = xmlDocument.getElementsByTagNameNS(NS, tagName);
-        if (nodeList.getLength() == 0) {
-            LOG.warn("Alert does not contain tag '{}': \n" + xml, tagName);
-            return "";
-        }
-        if (nodeList.getLength() > 1) {
-            LOG.warn("Alert contains more than one tag '{}': \n" + xml, tagName);
-        }
-        return nodeList.item(0).getTextContent();
-    }
 }
