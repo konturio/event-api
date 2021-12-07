@@ -31,7 +31,11 @@ public class DateTimeUtil {
         }
     }
 
-    public static OffsetDateTime parseDateTimeFromString(String value){
+    public static OffsetDateTime parseDateTimeFromString(String value) {
+        int idx = value.lastIndexOf(":");
+        if (idx > 24) {
+            value = value.substring(0, idx) + value.substring(idx + 1);
+        }
         return OffsetDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME);
     }
 
