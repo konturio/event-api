@@ -33,7 +33,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
 
     @Override
     public String getName() {
-        return "pdcMapSrv";
+        return "pdcMapSrvImport";
     }
 
     @Override

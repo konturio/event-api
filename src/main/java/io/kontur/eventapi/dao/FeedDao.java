@@ -86,4 +86,8 @@ public class FeedDao {
     public Integer getNotEnrichedEventsCount() {
         return mapper.getNotEnrichedEventsCount();
     }
+
+    public Integer getEnrichmentSkippedEventsCount() {
+        return mapper.getEnrichmentSkippedEventsCount();
+    }
 }

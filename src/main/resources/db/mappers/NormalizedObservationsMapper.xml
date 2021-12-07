@@ -142,6 +142,10 @@
         SELECT #{timestamp}::TIMESTAMP AT TIME ZONE #{timezone};
     </select>
 
+    <select id="getNotRecombinedObservationsCount" resultType="java.lang.Integer">
+        select count(*) from normalized_observations where not recombined;
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>

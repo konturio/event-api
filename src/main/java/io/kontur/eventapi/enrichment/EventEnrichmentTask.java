@@ -7,6 +7,8 @@ import io.kontur.eventapi.enrichment.dto.InsightsApiResponse;
 import io.kontur.eventapi.enrichment.postprocessor.EnrichmentPostProcessor;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Counter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,8 @@ public class EventEnrichmentTask {
 
 
     @Async("enrichmentExecutor")
+    @Timed(value = "enrichment.event.timer")
+    @Counted(value = "enrichment.event.counter")
     public CompletableFuture<FeedData> enrichEvent(FeedData event, String enrichmentRequest, List<String> enrichmentFields) {
         try {
             processEvent(event, enrichmentRequest, enrichmentFields);

@@ -54,12 +54,12 @@
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
             and is_latest_version
             and enriched
-            <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty()" >
+            <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
                 <foreach item="eventType" collection="eventTypes" separator="," open="and episode_types &amp;&amp; array[" close="]">
                     #{eventType}::text
                 </foreach>
             </if>
-            <if test="severities!=null &amp;&amp; !severities.isEmpty()"  >
+            <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
                 <if test='"ANY".equalsIgnoreCase(episodeFilterType)'>
                     and exists(select from jsonb_array_elements(episodes) arr(episode) where
                     <foreach item="severity" collection="severities" separator="," open="episode ->> 'severity' in (" close=")">
@@ -143,6 +143,10 @@
 
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
         SELECT count(*) FROM feed_data WHERE NOT enriched;
+    </select>
+
+    <select id="getEnrichmentSkippedEventsCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM feed_data WHERE enrichment_skipped;
     </select>
 
     <update id="addAnalytics">

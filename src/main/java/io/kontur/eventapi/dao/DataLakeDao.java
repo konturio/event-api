@@ -65,4 +65,8 @@ public class DataLakeDao {
         return mapper.isNewEvent(externalId, provider, updatedAt);
     }
 
+    public Integer getNotNormalizedObservationsCount() {
+        return mapper.getNotNormalizedObservationsCount();
+    }
+
 }

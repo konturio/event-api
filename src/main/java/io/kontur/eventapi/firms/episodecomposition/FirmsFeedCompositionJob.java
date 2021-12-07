@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.CompletableFuture.allOf;
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -30,20 +29,17 @@ public class FirmsFeedCompositionJob extends FeedCompositionJob {
     private static final Logger LOG = LoggerFactory.getLogger(FirmsFeedCompositionJob.class);
     @Value("${scheduler.feedComposition.firmsAlias}")
     private String[] alias;
-    private static AtomicInteger feedCompositionQueueSize;
     private final ExecutorService executor;
 
     public FirmsFeedCompositionJob(KonturEventsDao eventsDao, FeedDao feedDao, NormalizedObservationsDao observationsDao,
                                    List<EpisodeCombinator> episodeCombinators, MeterRegistry meterRegistry,
                                    ExecutorService firmsFeedCompositionExecutor) {
         super(eventsDao, feedDao, observationsDao, episodeCombinators, meterRegistry);
-        feedCompositionQueueSize = meterRegistry.gauge("feedCompositionJob.queueSize", new AtomicInteger(0));
         this.executor = firmsFeedCompositionExecutor;
     }
 
     @Override
     public void execute() {
-        feedCompositionQueueSize.set(eventsDao.getFeedCompositionQueueSize());
         List<Feed> feeds = feedDao.getFeedsByAliases(Arrays.asList(alias));
         feeds.forEach(this::updateFeed);
     }

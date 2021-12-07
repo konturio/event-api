@@ -89,7 +89,7 @@ class HpSrvServiceTest {
         //given
         HpSrvService hpSrvService = new HpSrvService(dataLakeDao, mock(Bucket.class), hpSrvClient, pdcDataLakeConverter);
         ObjectNode node = new ObjectMapper().createObjectNode();
-        node.put("features", new ObjectMapper().createObjectNode().put("1", 1));
+        node.set("features", new ObjectMapper().createObjectNode().put("1", 1));
         DataLake dataLake = new DataLake();
         DataLake dataLake2 = new DataLake();
         when(pdcDataLakeConverter.convertHpSrvMagData(node, "exId1")).thenReturn(List.of(dataLake, dataLake2));

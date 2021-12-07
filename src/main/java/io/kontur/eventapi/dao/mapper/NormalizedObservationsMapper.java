@@ -59,4 +59,6 @@ public interface NormalizedObservationsMapper {
 
     OffsetDateTime getTimestampAtTimezone(@Param("timestamp") LocalDateTime timestamp,
                                           @Param("timezone") String timezone);
+
+    Integer getNotRecombinedObservationsCount();
 }

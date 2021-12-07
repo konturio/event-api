@@ -2,6 +2,7 @@ package io.kontur.eventapi.emdat.service;
 
 import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.emdat.dto.GeocoderDto;
+import org.apache.commons.lang3.StringUtils;
 import org.locationtech.jts.geom.CoordinateXY;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
@@ -10,7 +11,6 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 

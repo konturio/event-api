@@ -5,6 +5,8 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.KonturEvent;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.eventcombination.EventCombinator;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,8 @@ public class EventCombinationJob extends AbstractJob  {
         return "eventCombination";
     }
 
+    @Timed(value = "eventCombination.observation.timer")
+    @Counted(value = "eventCombination.observation.counter")
     private void addToEvent(NormalizedObservation observation) {
         KonturEvent event = findEvent(observation).orElseGet(() -> new KonturEvent(UUID.randomUUID()));
         event.addObservations(observation.getObservationId());

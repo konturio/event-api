@@ -6,6 +6,8 @@ import io.kontur.eventapi.entity.KonturEvent;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.eventcombination.EventCombinator;
 import io.kontur.eventapi.job.EventCombinationJob;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,8 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
      * @param observations list of observations to search events for
      * @return set of event IDs to which observations were found
      */
+    @Timed(value = "firmsEventCombination.findExistingEvents.timer")
+    @Counted(value = "firmsEventCombination.findExistingEvents.counter")
     private Set<UUID> findExistingEvents(List<NormalizedObservation> observations) {
         Set<UUID> events = new HashSet<>();
         observations.removeIf(observation -> {
@@ -84,6 +88,8 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
      *               (observations were added to them)
      * @param observations unmatched observations
      */
+    @Timed(value = "firmsEventCombination.addObservationsToExistingEvents.timer")
+    @Counted(value = "firmsEventCombination.addObservationsToExistingEvents.counter")
     private void addObservationsToExistingEvents(Set<UUID> events, List<NormalizedObservation> observations) {
         while (!events.isEmpty()) {
             Set<UUID> changedEvents = new HashSet<>();
@@ -105,6 +111,8 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
      *
      * @param observations unmatched observations
      */
+    @Timed(value = "firmsEventCombination.addObservationsToNewEvents.timer")
+    @Counted(value = "firmsEventCombination.addObservationsToNewEvents.counter")
     private void addObservationsToNewEvents(List<NormalizedObservation> observations) {
         if (observations.isEmpty()) {
             return;

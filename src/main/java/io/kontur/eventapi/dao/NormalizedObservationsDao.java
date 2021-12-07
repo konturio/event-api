@@ -68,4 +68,8 @@ public class NormalizedObservationsDao {
     public OffsetDateTime getTimestampAtTimezone(LocalDateTime timestamp, String timezone) {
         return mapper.getTimestampAtTimezone(timestamp, timezone);
     }
+
+    public Integer getNotRecombinedObservationsCount() {
+        return mapper.getNotRecombinedObservationsCount();
+    }
 }

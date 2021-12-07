@@ -75,4 +75,6 @@ public interface FeedMapper {
                       @Param("enrichmentSkipped") Boolean enrichmentSkipped);
 
     Integer getNotEnrichedEventsCount();
+
+    Integer getEnrichmentSkippedEventsCount();
 }

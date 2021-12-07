@@ -14,7 +14,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.overlayng.OverlayNGRobust;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONReader;
@@ -35,6 +34,7 @@ import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
 public class FirmsEpisodeCombinator extends EpisodeCombinator {
@@ -155,7 +155,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     private String calculateName(String areaName, Double area, long burningTime) {
         String burntArea = String.format(Locale.US, "%.3f", area);
-        if (!StringUtils.isEmpty(areaName)) {
+        if (!isEmpty(areaName)) {
             areaName = "Thermal anomaly in " + areaName + ". ";
         } else {
             areaName = "Thermal anomaly in an unknown area. ";

@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             @Override
             public Collection<GrantedAuthority> convert(Jwt jwt) {
                 Collection<GrantedAuthority> grantedAuthorities = converter.convert(jwt);
-                if (jwt.containsClaim("resource_access")) {
+                if (jwt.hasClaim("resource_access")) {
                     JSONObject resourceAccess = jwt.getClaim("resource_access");
                     if (resourceAccess.containsKey("event-api")) {
                         JSONObject konturClient = (JSONObject) resourceAccess.get("event-api");

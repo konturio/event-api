@@ -3,9 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>io.kontur.k2</groupId>
-		<artifactId>k2parent</artifactId>
-		<version>2.1</version>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.6.1</version>
+		<relativePath/>
 	</parent>
 
 	<artifactId>event-api</artifactId>
@@ -17,9 +18,21 @@
 	<properties>
 		<java.version>16</java.version>
 		<project.resource.directory>src/main/resources</project.resource.directory>
+		<spring-cloud.version>2021.0.0</spring-cloud.version>
+		<spring-cloud-aws-messaging.version>2.2.6.RELEASE</spring-cloud-aws-messaging.version>
+		<springdoc-openapi-ui.version>1.5.13</springdoc-openapi-ui.version>
+		<feign-micrometer.version>11.7</feign-micrometer.version>
+		<mybatis-spring-boot-starter.version>2.2.0</mybatis-spring-boot-starter.version>
+		<liquibase-core.version>4.6.1</liquibase-core.version>
+		<jts2geojson.version>0.16.0</jts2geojson.version>
+		<geographiclib-java.version>1.51</geographiclib-java.version>
+		<gt-geojson.version>26-SNAPSHOT</gt-geojson.version>
+		<spatial4j.version>0.8</spatial4j.version>
+		<jts-core.version>1.18.1</jts-core.version>
 	</properties>
 
 	<dependencies>
+		<!-- Web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -36,18 +49,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-logging</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-openfeign</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.github.openfeign</groupId>
-			<artifactId>feign-okhttp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
@@ -57,19 +58,61 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.github.vladimir-bukhtoyarov</groupId>
-			<artifactId>bucket4j-core</artifactId>
-			<version>4.10.0</version>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-messaging</artifactId>
+			<version>${spring-cloud-aws-messaging.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-core</artifactId>
-			<version>4.5.0</version>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-okhttp</artifactId>
+		</dependency>
+
+		<!-- Swagger UI -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${springdoc-openapi-ui.version}</version>
+		</dependency>
+
+		<!-- Authorization -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+
+		<!-- Monitoring and Logging -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-micrometer</artifactId>
+			<version>${feign-micrometer.version}</version>
+		</dependency>
+
+		<!-- Database -->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>2.2.0</version>
+			<version>${mybatis-spring-boot-starter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -77,16 +120,66 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>${liquibase-core.version}</version>
+		</dependency>
+
+		<!-- GIS -->
+		<dependency>
 			<groupId>org.wololo</groupId>
 			<artifactId>jts2geojson</artifactId>
-			<version>0.16.0</version>
+			<version>${jts2geojson.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.geographiclib</groupId>
+			<artifactId>GeographicLib-Java</artifactId>
+			<version>${geographiclib-java.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geojson</artifactId>
+			<version>${gt-geojson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.locationtech.spatial4j</groupId>
+			<artifactId>spatial4j</artifactId>
+			<version>${spatial4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.locationtech.jts</groupId>
+			<artifactId>jts-core</artifactId>
+			<version>${jts-core.version}</version>
+		</dependency>
+
+		<!-- Parsing -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-modules-java8</artifactId>
-			<version>2.11.0</version>
+			<version>2.13.0</version>
 			<type>pom</type>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dhatim</groupId>
+			<artifactId>fastexcel-reader</artifactId>
+			<version>0.12.12</version>
+		</dependency>
+		<dependency>
+			<groupId>net.minidev</groupId>
+			<artifactId>json-smart</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.14.3</version>
+		</dependency>
+
+		<!-- Tools -->
+		<dependency>
+			<groupId>com.github.vladimir-bukhtoyarov</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>6.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.uber</groupId>
@@ -99,78 +192,13 @@
 			<version>30.0-jre</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.geographiclib</groupId>
-			<artifactId>GeographicLib-Java</artifactId>
-			<version>1.51</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dhatim</groupId>
-			<artifactId>fastexcel-reader</artifactId>
-			<version>0.12.3</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.9</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.13.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-geojson</artifactId>
-			<version>26-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.locationtech.spatial4j</groupId>
-			<artifactId>spatial4j</artifactId>
-			<version>0.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.locationtech.jts</groupId>
-			<artifactId>jts-core</artifactId>
-			<version>1.18.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.20</version>
-		</dependency>
-
-		<!-- Swagger UI -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.4.4</version>
-		</dependency>
-
-		<!-- Health -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
-			<version>1.5.1</version>
-		</dependency>
-
-		<!-- AWS -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-aws-messaging</artifactId>
-		</dependency>
-
-		<!-- Authorization -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 
 		<!--Test dependencies-->
@@ -188,6 +216,7 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
+			<version>1.16.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -197,7 +226,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>Hoxton.SR6</version>
+				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -209,6 +238,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.0.0-M4</version>
 				<executions>
 					<execution>
 						<goals>
@@ -243,6 +273,7 @@
 			</plugin>
 			<!-- Copy dependencies for runnable app archive packaging -->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.1.2</version>
 				<executions>
@@ -281,6 +312,7 @@
 			</plugin>
 			<!-- Config assembly for runnable app archive packaging -->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.1.1</version>
 				<configuration>
@@ -342,4 +374,11 @@
 			<releases><enabled>false</enabled></releases>
 		</repository>
 	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>kontur</id>
+			<url>https://nexus.kontur.io/repository/common/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
