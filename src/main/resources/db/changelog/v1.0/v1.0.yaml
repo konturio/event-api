@@ -1,0 +1,5 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: add-enrichment-skipped-index-to-feed-data.sql
