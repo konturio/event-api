@@ -6,11 +6,13 @@
 
 - metrics job for checking database status 
 - add metrics to jobs subroutines that process one observation / event
+- `wildfire.inciweb` provider
 
 #### Changed
 
 - migrate to Java 16, update dependencies
 - `em-dat` import job inherits from `AbstractJob` not `Runnuble`
+- Nifc and Calfire combinators inherit from the new abstract class WildfireEpisodeCombinator  
 
 #### Removed
 
