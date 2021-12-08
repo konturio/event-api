@@ -33,7 +33,6 @@ spring:
   profiles:
     active: awsSqsDisabled, jwtAuthDisabled
 
-
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
 

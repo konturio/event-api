@@ -50,8 +50,8 @@ public class InciWebXmlParser extends BaseXmlParser {
             item.setTitle(getValueByTagName(xml, xmlDocument, TITLE));
             item.setDescription(getValueByTagName(xml, xmlDocument, DESCRIPTION));
             item.setLink(getValueByTagName(xml, xmlDocument, LINK));
-            item.setLongitude(Float.parseFloat(getValueByTagName(xml, xmlDocument, LONGITUDE)));
-            item.setLatitude(Float.parseFloat(getValueByTagName(xml, xmlDocument, LATITUDE)));
+            item.setLongitude(Double.parseDouble(getValueByTagName(xml, xmlDocument, LONGITUDE)));
+            item.setLatitude(Double.parseDouble(getValueByTagName(xml, xmlDocument, LATITUDE)));
             item.setData(xml);
             return Optional.of(item);
         } catch (ParserConfigurationException | IOException | SAXException | DateTimeParseException | NumberFormatException e) {

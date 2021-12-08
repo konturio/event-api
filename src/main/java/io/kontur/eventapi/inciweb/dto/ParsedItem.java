@@ -12,8 +12,8 @@ import lombok.Setter;
 public class ParsedItem {
     private String guid;
     private OffsetDateTime pubDate;
-    private Float longitude;
-    private Float latitude;
+    private Double longitude;
+    private Double latitude;
     private String title;
     private String description;
     private String link;
