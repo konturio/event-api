@@ -3,3 +3,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-enrichment-skipped-index-to-feed-data.sql
+  - include:
+      relativeToChangelogFile: true
+      file: insert-test-inciweb-feed.sql

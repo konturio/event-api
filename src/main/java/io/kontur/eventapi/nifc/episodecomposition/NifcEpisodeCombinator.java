@@ -3,7 +3,7 @@ package io.kontur.eventapi.nifc.episodecomposition;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.kontur.eventapi.episodecomposition.WildfireEpisodeCombinator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
@@ -21,7 +21,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
 
 @Component
-public class NifcEpisodeCombinator extends EpisodeCombinator {
+public class NifcEpisodeCombinator extends WildfireEpisodeCombinator {
 
     @Override
     public boolean isApplicable(NormalizedObservation observation) {
@@ -89,20 +89,4 @@ public class NifcEpisodeCombinator extends EpisodeCombinator {
         return new FeatureCollection(features);
     }
 
-    @Override
-    public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
-        if (episodes.size() < 2) return episodes;
-
-        episodes.sort(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getEndedAt));
-        OffsetDateTime lastEndedAt = null;
-        for (FeedEpisode episode : episodes) {
-            if (lastEndedAt != null
-                    && lastEndedAt.isAfter(episode.getStartedAt())
-                    && lastEndedAt.isBefore(episode.getEndedAt())) {
-                episode.setStartedAt(lastEndedAt);
-            }
-            lastEndedAt = episode.getEndedAt();
-        }
-        return episodes;
-    }
 }

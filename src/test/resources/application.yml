@@ -112,14 +112,16 @@ scheduler:
       wildfire.qld-des-gov,
       wildfire.victoria-gov,
       wildfire.nsw-gov,
+      wildfire.calfire,
       wildfire.perimeters.nifc,
-      wildfire.locations.nifc
+      wildfire.locations.nifc,
+      wildfire.inciweb
     firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
-    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public, test-calfire, test-nifc
+    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public, test-calfire, test-nifc, test-inciweb
     firmsAlias: test-firms, disaster-ninja-02
   enrichment:
     enable: false
