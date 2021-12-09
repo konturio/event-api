@@ -19,7 +19,11 @@
                last_analyze,
                last_autoanalyze,
                n_live_tup,
-               n_dead_tup
+               n_dead_tup,
+               analyze_count,
+               autoanalyze_count,
+               vacuum_count,
+               autovacuum_count
         FROM pg_stat_user_tables;
     </select>
 
@@ -31,6 +35,10 @@
         <result property="lastAutoAnalyze" column="last_autoanalyze"/>
         <result property="liveTupCount" column="n_live_tup"/>
         <result property="deadTupCount" column="n_dead_tup"/>
+        <result property="analyzeCount" column="analyze_count"/>
+        <result property="autoAnalyzeCount" column="autoanalyze_count"/>
+        <result property="vacuumCount" column="vacuum_count"/>
+        <result property="autoVacuumCount" column="autovacuum_count"/>
     </resultMap>
 
     <resultMap id="pgSettingMap" type="io.kontur.eventapi.entity.PgSetting">
