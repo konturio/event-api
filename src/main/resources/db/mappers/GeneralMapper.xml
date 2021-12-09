@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.GeneralMapper">
+
+    <select id="getPgSettings" resultMap="pgSettingMap">
+        select
+               name,
+               setting
+        from pg_settings where category = 'Autovacuum';
+    </select>
+
+    <select id="getPgStatTables" resultMap="pgStatTableMap">
+        SELECT
+               relname,
+               last_vacuum,
+               last_autovacuum,
+               last_analyze,
+               last_autoanalyze,
+               n_live_tup,
+               n_dead_tup
+        FROM pg_stat_user_tables;
+    </select>
+
+    <resultMap id="pgStatTableMap" type="io.kontur.eventapi.entity.PgStatTable">
+        <result property="tableName" column="relname" />
+        <result property="lastVacuum" column="last_vacuum"/>
+        <result property="lastAutoVacuum" column="last_autovacuum"/>
+        <result property="lastAnalyse" column="last_analyze"/>
+        <result property="lastAutoAnalyze" column="last_autoanalyze"/>
+        <result property="liveTupCount" column="n_live_tup"/>
+        <result property="deadTupCount" column="n_dead_tup"/>
+    </resultMap>
+
+    <resultMap id="pgSettingMap" type="io.kontur.eventapi.entity.PgSetting">
+        <result property="name" column="name" />
+        <result property="setting" column="setting"/>
+    </resultMap>
+</mapper>
