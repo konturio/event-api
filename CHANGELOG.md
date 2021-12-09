@@ -7,6 +7,8 @@
 - metrics job for checking database status 
 - add metrics to jobs subroutines that process one observation / event
 - `wildfire.inciweb` provider
+- added index `feed_data_enrichment_skipped_idx`
+- DB tables autovacuum metrics
 
 #### Changed
 
