@@ -3,6 +3,7 @@ package io.kontur.eventapi.config;
 import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
+import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.EnrichmentJob;
 import io.kontur.eventapi.metrics.job.MetricsJob;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
@@ -47,6 +48,7 @@ public class WorkerScheduler {
     private final EnrichmentJob enrichmentJob;
     private final CalFireSearchJob calFireSearchJob;
     private final NifcImportJob nifcImportJob;
+    private final InciWebImportJob inciWebImportJob;
     private final MetricsJob metricsJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
@@ -81,6 +83,8 @@ public class WorkerScheduler {
     private String calfireEnabled;
     @Value("${scheduler.nifcImport.enable}")
     private String nifcImportEnabled;
+    @Value("${scheduler.inciwebImport.enable}")
+    private String inciwebEnabled;
     @Value("${scheduler.metrics.enable}")
     private String metricsEnabled;
 
@@ -94,7 +98,7 @@ public class WorkerScheduler {
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
                            PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
-                           MetricsJob metricsJob) {
+                           InciWebImportJob inciWebImportJob, MetricsJob metricsJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -113,6 +117,7 @@ public class WorkerScheduler {
         this.enrichmentJob = enrichmentJob;
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
+        this.inciWebImportJob = inciWebImportJob;
         this.metricsJob = metricsJob;
     }
 
@@ -221,6 +226,15 @@ public class WorkerScheduler {
             nifcImportJob.run();
         } else {
             LOG.info("Nifc import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.inciwebImport.initialDelay}", fixedDelayString = "${scheduler.inciwebImport.fixedDelay}")
+    public void startInciWebImport() {
+        if (Boolean.parseBoolean(inciwebEnabled)) {
+            inciWebImportJob.run();
+        } else {
+            LOG.info("InciWeb import job invocation is skipped");
         }
     }
 

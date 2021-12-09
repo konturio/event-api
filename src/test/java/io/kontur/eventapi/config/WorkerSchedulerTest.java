@@ -4,6 +4,7 @@ import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
+import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.EnrichmentJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
@@ -46,11 +47,13 @@ class WorkerSchedulerTest {
     private final FirmsEventCombinationJob firmsEventCombinationJob = mock(FirmsEventCombinationJob.class);
     private final CalFireSearchJob calFireSearchJob = mock(CalFireSearchJob.class);
     private final NifcImportJob nifcImportJob = mock(NifcImportJob.class);
+    private final InciWebImportJob inciWebImportJob = mock(InciWebImportJob.class);
     private final MetricsJob metricsJob = mock(MetricsJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
             firmsEventCombinationJob, feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
-            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob, nifcImportJob, metricsJob);
+            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob, nifcImportJob, inciWebImportJob,
+            metricsJob);
 
     @AfterEach
     public void resetMocks() {
@@ -66,6 +69,8 @@ class WorkerSchedulerTest {
         Mockito.reset(tornadoJapanMaImportJob);
         Mockito.reset(historicalTornadoJapanMaImportJob);
         Mockito.reset(pdcMapSrvSearchJob);
+        Mockito.reset(calFireSearchJob);
+        Mockito.reset(inciWebImportJob);
     }
 
     @Test
@@ -258,5 +263,21 @@ class WorkerSchedulerTest {
         scheduler.startCalFireSearchJob();
 
         verify(calFireSearchJob, never()).run();
+    }
+
+    @Test
+    public void startInciWebImportJob() {
+        ReflectionTestUtils.setField(scheduler, "inciwebEnabled", "true");
+        scheduler.startInciWebImport();
+
+        verify(inciWebImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipInciWebImportJob() {
+        ReflectionTestUtils.setField(scheduler, "inciwebEnabled", "false");
+        scheduler.startInciWebImport();
+
+        verify(inciWebImportJob, never()).run();
     }
 }
