@@ -52,7 +52,7 @@ public class InciWebService {
             for (ParsedItem event : events) {
                 try {
                     if (dataLakeDao.isNewEvent(event.getGuid(), INCIWEB_PROVIDER,
-                            event.getPubDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))) {
+                            event.getPubDate().format(DateTimeFormatter.ISO_INSTANT))) {
                         dataLakes.add(dataLakeConverter.convertEvent(event));
                     }
                 } catch (Exception e) {
