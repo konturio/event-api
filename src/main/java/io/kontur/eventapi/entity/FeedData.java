@@ -27,6 +27,8 @@ public class FeedData {
     private Boolean enrichmentSkipped;
     private List<String> urls = new ArrayList<>();
     private String location;
+    private OffsetDateTime composedAt;
+    private OffsetDateTime enrichedAt;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;

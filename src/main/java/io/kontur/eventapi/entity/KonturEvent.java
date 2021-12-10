@@ -2,12 +2,14 @@ package io.kontur.eventapi.entity;
 
 import lombok.Data;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Data
 public class KonturEvent {
     private UUID eventId;
     private Set<UUID> observationIds = new HashSet<>();
+    private OffsetDateTime recombinedAt;
 
     public KonturEvent(UUID eventId) {
         this.eventId = eventId;

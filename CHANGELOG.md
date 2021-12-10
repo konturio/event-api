@@ -9,6 +9,8 @@
 - `wildfire.inciweb` provider
 - added index `feed_data_enrichment_skipped_idx`
 - DB tables autovacuum metrics
+- added update date columns to tables: `normalized_at` - `normalized_observations`,
+  `recombined_at` - `kontur_events`, `composed_at`, `enriched_at` - `feed_data`
 
 #### Changed
 

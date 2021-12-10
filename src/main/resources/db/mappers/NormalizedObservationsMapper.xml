@@ -168,5 +168,6 @@
         <result property="sourceUpdatedAt" column="source_updated_at"/>
         <result property="sourceUri" column="source_uri"/>
         <result property="recombined" column="recombined"/>
+        <result property="normalizedAt" column="normalized_at"/>
     </resultMap>
 </mapper>
