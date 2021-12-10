@@ -10,7 +10,7 @@
     </insert>
 
     <select id="getEventByExternalId" resultMap="konturEventDtoMap" >
-        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids
+        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids, min(recombined_at) as recombined_at
         FROM kontur_events
         WHERE observation_id IN (
             SELECT observation_id
@@ -21,7 +21,7 @@
     </select>
 
     <select id="getEventById" resultMap="konturEventDtoMap" >
-        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids
+        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids, min(recombined_at) as recombined_at
         FROM kontur_events
         WHERE event_id = #{eventId}
         GROUP BY event_id
@@ -60,5 +60,6 @@
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">
         <result property="eventId" column="event_id"/>
         <result property="observationIds" column="observation_ids" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler"/>
+        <result property="recombinedAt" column="recombined_at"/>
     </resultMap>
 </mapper>

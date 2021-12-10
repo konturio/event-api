@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: insert-test-inciweb-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-updated-at-fields.sql

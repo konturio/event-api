@@ -31,4 +31,5 @@ public class NormalizedObservation {
     private OffsetDateTime sourceUpdatedAt;
     private String sourceUri;
     private Boolean recombined = false;
+    private OffsetDateTime normalizedAt;
 }
