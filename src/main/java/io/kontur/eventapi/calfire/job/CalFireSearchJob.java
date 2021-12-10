@@ -16,6 +16,8 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,11 +53,14 @@ public class CalFireSearchJob extends AbstractJob {
             for (Feature feature : featureCollection.getFeatures()) {
                 try {
                     String externalId = String.valueOf(feature.getProperties().get("UniqueId"));
-                    String updatedAt = (String) feature.getProperties().get("Updated");
-                    if (StringUtils.isNotBlank(updatedAt)
-                            && dataLakeDao.isNewEvent(externalId, CALFIRE_PROVIDER, updatedAt)) {
-                        dataLakes.add(calFireDataLakeConverter.convertEvent(feature.toString(), externalId,
-                                DateTimeUtil.parseDateTimeByPattern(updatedAt, null)));
+                    String updatedAtValue = (String) feature.getProperties().get("Updated");
+                    if (StringUtils.isNotBlank(updatedAtValue)) {
+                        OffsetDateTime updatedAt = DateTimeUtil.parseDateTimeByPattern(updatedAtValue, null);
+                        if (updatedAt != null && dataLakeDao.isNewEvent(externalId, CALFIRE_PROVIDER,
+                                updatedAt.format(DateTimeFormatter.ISO_INSTANT))) {
+                            dataLakes.add(
+                                    calFireDataLakeConverter.convertEvent(feature.toString(), externalId, updatedAt));
+                        }
                     }
                 } catch (Exception e1) {
                     LOG.error("Error while processing calfire feature. {}", e1.getMessage());
