@@ -11,6 +11,9 @@
 - DB tables autovacuum metrics
 - added update date columns to tables: `normalized_at` - `normalized_observations`,
   `recombined_at` - `kontur_events`, `composed_at`, `enriched_at` - `feed_data`
+- indexes for update date columns: `normalized_observations_normalized_at_idx`, `kontur_events_recombined_at_idx`, 
+  `feed_data_composed_at_idx`, `feed_data_enriched_at_idx` 
+- metrics on observation / event processing duration for each stage
 
 #### Changed
 
@@ -19,6 +22,8 @@
 - Nifc and Calfire combinators inherit from the new abstract class WildfireEpisodeCombinator  
 
 #### Removed
+
+- example datetime from /v1/ endpoint in swagger 
 
 
 ## 0.9.1 - 2021-12-02

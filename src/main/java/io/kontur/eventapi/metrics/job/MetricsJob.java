@@ -7,13 +7,21 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.GeneralDao;
 import io.kontur.eventapi.entity.PgSetting;
 import io.kontur.eventapi.entity.PgStatTable;
+import io.kontur.eventapi.entity.ProcessingDuration;
+import io.kontur.eventapi.metrics.config.ProcessingDurationMetricsConfig;
 import io.kontur.eventapi.metrics.config.TableMetricsConfig;
 import io.kontur.eventapi.job.AbstractJob;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.kontur.eventapi.metrics.config.MetricsConfig.*;
 import static java.lang.Double.parseDouble;
 
 @Component
@@ -30,13 +38,16 @@ public class MetricsJob extends AbstractJob {
     private final AtomicInteger eventCombinationQueueSize;
     private final AtomicInteger normalizationQueueSize;
     private final Map<String, TableMetricsConfig> tableMetrics;
+    private final Map<String, ProcessingDurationMetricsConfig> processingDurationMetrics;
+    private Map<String, OffsetDateTime> latestProcessedAt;
 
     protected MetricsJob(MeterRegistry meterRegistry, FeedDao feedDao, KonturEventsDao konturEventsDao,
                          NormalizedObservationsDao normalizedObservationsDao, DataLakeDao dataLakeDao,
                          GeneralDao generalDao, AtomicInteger enrichmentQueueSizeGauge,
                          AtomicInteger enrichmentSkippedQueueSizeGauge, AtomicInteger feedCompositionQueueSizeGauge,
                          AtomicInteger eventCombinationQueueSizeGauge, AtomicInteger normalizationQueueSizeGauge,
-                         Map<String, TableMetricsConfig> tableMetrics) {
+                         Map<String, TableMetricsConfig> tableMetrics,
+                         Map<String, ProcessingDurationMetricsConfig> processingDurationMetrics) {
         super(meterRegistry);
         this.feedDao = feedDao;
         this.konturEventsDao = konturEventsDao;
@@ -49,6 +60,13 @@ public class MetricsJob extends AbstractJob {
         this.eventCombinationQueueSize = eventCombinationQueueSizeGauge;
         this.normalizationQueueSize = normalizationQueueSizeGauge;
         this.tableMetrics = tableMetrics;
+        this.processingDurationMetrics = processingDurationMetrics;
+        OffsetDateTime initialLatestProcessedAt = OffsetDateTime.now().minus(5, ChronoUnit.MINUTES);
+        latestProcessedAt = new HashMap<>();
+        latestProcessedAt.put(NORMALIZATION, initialLatestProcessedAt);
+        latestProcessedAt.put(RECOMBINATION, initialLatestProcessedAt);
+        latestProcessedAt.put(COMPOSITION, initialLatestProcessedAt);
+        latestProcessedAt.put(ENRICHMENT, initialLatestProcessedAt);
     }
 
     @Override
@@ -75,6 +93,17 @@ public class MetricsJob extends AbstractJob {
 
             value.getAutovacuumConditionExpectedValue()
                     .set(autovacuumThreshold + autovacuumScaleFactor * checkNotNull(pgStatTable.getLiveTupCount()));
+        });
+
+        processingDurationMetrics.forEach((stage, metric) -> {
+            Optional<ProcessingDuration> durationOpt = generalDao.getProcessingDuration(stage, latestProcessedAt.get(stage));
+            if (durationOpt.isPresent()) {
+                ProcessingDuration duration = durationOpt.get();
+                if (duration.getAvg() != null) metric.getAvg().set(duration.getAvg());
+                if (duration.getMax() != null) metric.getMax().set(duration.getMax());
+                if (duration.getMin() != null) metric.getMin().set(duration.getMin());
+                latestProcessedAt.put(stage, duration.getLatestProcessedAt());
+            }
         });
     }
 

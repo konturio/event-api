@@ -18,7 +18,13 @@ public class MetricsConfig {
     private static final String FEED_DATA = "feed_data";
     private static final String FEEDS = "feeds";
 
+    public static final String NORMALIZATION = "normalization";
+    public static final String RECOMBINATION = "recombination";
+    public static final String COMPOSITION = "composition";
+    public static final String ENRICHMENT = "enrichment";
+
     private final Map<String, TableMetricsConfig> tableMetrics;
+    private final Map<String, ProcessingDurationMetricsConfig> processingDurationMetrics;
 
     private final Counter enrichmentSuccess;
     private final Counter enrichmentFail;
@@ -37,6 +43,13 @@ public class MetricsConfig {
                 FEED_EVENT_STATUS, new TableMetricsConfig(registry, FEED_EVENT_STATUS),
                 FEED_DATA, new TableMetricsConfig(registry, FEED_DATA),
                 FEEDS, new TableMetricsConfig(registry, FEEDS)
+        );
+
+        processingDurationMetrics = Map.of(
+                NORMALIZATION, new ProcessingDurationMetricsConfig(registry, NORMALIZATION),
+                RECOMBINATION, new ProcessingDurationMetricsConfig(registry, RECOMBINATION),
+                COMPOSITION, new ProcessingDurationMetricsConfig(registry, COMPOSITION),
+                ENRICHMENT, new ProcessingDurationMetricsConfig(registry, ENRICHMENT)
         );
 
         this.enrichmentSuccess = registry.counter("enrichment.success.counter");
@@ -85,5 +98,10 @@ public class MetricsConfig {
 
     @Bean Map<String, TableMetricsConfig> tableMetrics() {
         return tableMetrics;
+    }
+
+    @Bean
+    Map<String, ProcessingDurationMetricsConfig> processingDurationMetrics() {
+        return processingDurationMetrics;
     }
 }
