@@ -27,6 +27,70 @@
         FROM pg_stat_user_tables;
     </select>
 
+    <select id="getObservationNormalizationDuration" resultMap="processingDuration">
+        with durations as (
+            select extract(epoch from (no.normalized_at - dl.loaded_at)::interval) as duration, normalized_at
+            from data_lake dl
+                inner join normalized_observations no on dl.observation_id = no.observation_id
+            where no.normalized_at > #{latestNormalizedAt}
+        )
+        select
+            avg(duration) as avg,
+            max(duration) as max,
+            min(duration) as min,
+            max(normalized_at) as latest_processed_at
+        from durations
+    </select>
+
+    <select id="getObservationsRecombinationDuration" resultMap="processingDuration">
+        with durations as (
+            select extract(epoch from (ke.recombined_at - no.normalized_at)::interval) as duration, recombined_at
+            from normalized_observations no
+                inner join kontur_events ke on no.observation_id = ke.observation_id
+            where ke.recombined_at > #{latestRecombinedAt}
+        )
+        select
+            avg(duration) as avg,
+            max(duration) as max,
+            min(duration) as min,
+            max(recombined_at) as latest_processed_at
+        from durations
+    </select>
+
+    <select id="getEventCompositionDuration" resultMap="processingDuration">
+        with events as (
+            select event_id, min(recombined_at) as recombined_at
+            from kontur_events
+            group by event_id
+        ),
+        durations as (
+            select extract(epoch from (fd.composed_at - e.recombined_at)::interval) as duration, composed_at
+            from events e
+                inner join feed_data fd on e.event_id = fd.event_id
+            where fd.composed_at > #{latestComposedAt}
+        )
+        select
+            avg(duration) as avg,
+            max(duration) as max,
+            min(duration) as min,
+            max(composed_at) as latest_processed_at
+        from durations
+    </select>
+
+    <select id="getEventEnrichmentDuration" resultMap="processingDuration">
+        with durations as (
+            select extract(epoch from (fd.enriched_at - fd.composed_at)::interval) as duration, enriched_at
+            from feed_data fd
+            where fd.enriched_at is not null and fd.enriched_at > #{latestEnrichedAt}
+        )
+        select
+            avg(duration) as avg,
+            max(duration) as max,
+            min(duration) as min,
+            max(enriched_at) as latest_processed_at
+        from durations
+    </select>
+
     <resultMap id="pgStatTableMap" type="io.kontur.eventapi.entity.PgStatTable">
         <result property="tableName" column="relname" />
         <result property="lastVacuum" column="last_vacuum"/>
@@ -44,5 +108,12 @@
     <resultMap id="pgSettingMap" type="io.kontur.eventapi.entity.PgSetting">
         <result property="name" column="name" />
         <result property="setting" column="setting"/>
+    </resultMap>
+
+    <resultMap id="processingDuration" type="io.kontur.eventapi.entity.ProcessingDuration">
+        <result property="avg" column="avg"/>
+        <result property="max" column="max"/>
+        <result property="min" column="min"/>
+        <result property="latestProcessedAt" column="latest_processed_at"/>
     </resultMap>
 </mapper>

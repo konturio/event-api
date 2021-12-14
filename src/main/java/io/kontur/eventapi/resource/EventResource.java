@@ -76,7 +76,7 @@ public class EventResource {
                             "<ul><li>A date-time: \"2018-02-12T23:20:50Z\"</li>" +
                             "<li>A closed interval: \"2020-01-01T00:00:00Z/2020-12-01T00:00:00Z\"</li>" +
                             "<li>Open intervals: \"2020-01-01T00:00:00Z/..\" or \"../2020-12-01T00:00:00Z\"</li></ul>" +
-                            "Only events that have a `startedAt` - `endedAt` interval that intersects the value of `datetime` are selected.", example = "2020-01-01T00:00:00Z/2020-12-01T00:00:00Z")
+                            "Only events that have a `startedAt` - `endedAt` interval that intersects the value of `datetime` are selected.")
             @RequestParam(value = "datetime", required = false)
                     DateTimeRange datetime,
             @Parameter(description = "Only hazards that have a geometry that intersects the bounding box are selected. The bounding box is provided as four numbers" +

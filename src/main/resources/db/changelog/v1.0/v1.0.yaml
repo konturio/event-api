@@ -9,3 +9,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-updated-at-fields.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-updated-at-fields-indexes.sql
