@@ -10,10 +10,10 @@
 - added index `feed_data_enrichment_skipped_idx`
 - DB tables autovacuum metrics
 - added update date columns to tables: `normalized_at` - `normalized_observations`,
-  `recombined_at` - `kontur_events`, `composed_at`, `enriched_at` - `feed_data`
-- indexes for update date columns: `normalized_observations_normalized_at_idx`, `kontur_events_recombined_at_idx`, 
-  `feed_data_composed_at_idx`, `feed_data_enriched_at_idx` 
-- metrics on observation / event processing duration for each stage
+  `recombined_at` - `kontur_events`, `recombined_at` - `feed_event_status`, `composed_at`, `enriched_at` - `feed_data`
+- indexes for update date columns: `normalized_observations_normalized_at_idx`, `kontur_events_recombined_at_idx`,
+  `feed_event_status_recombined_at_idx`, `feed_data_composed_at_idx`, `feed_data_enriched_at_idx` 
+- metrics on observation / event processing on each stage: avg, max, min, count
 
 #### Changed
 

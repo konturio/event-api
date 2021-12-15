@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Tag;
 import lombok.Data;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Collections.singletonList;
 
@@ -14,6 +15,7 @@ public class ProcessingDurationMetricsConfig {
     private final AtomicDouble max;
     private final AtomicDouble min;
     private final AtomicDouble avg;
+    private final AtomicInteger count;
 
     public ProcessingDurationMetricsConfig(MeterRegistry registry, String stage) {
         List<Tag> tags = singletonList(Tag.of("stage", stage));
@@ -21,5 +23,6 @@ public class ProcessingDurationMetricsConfig {
         max = registry.gauge("max.processing.duration.seconds", tags, new AtomicDouble(0));
         min = registry.gauge("min.processing.duration.seconds", tags, new AtomicDouble(0));
         avg = registry.gauge("avg.processing.duration.seconds", tags, new AtomicDouble(0));
+        count = registry.gauge("count.processing.observations", tags, new AtomicInteger(0));
     }
 }
