@@ -96,20 +96,31 @@ public class MetricsJob extends AbstractJob {
         });
 
         processingDurationMetrics.forEach((stage, metric) -> {
-            generalDao.getProcessingDuration(stage, latestProcessedAt.get(stage))
-                    .ifPresent(duration -> {
-                        metric.getAvg().set(duration.getAvg() == null ? 0 : duration.getAvg());
-                        metric.getMax().set(duration.getMax() == null ? 0 : duration.getMax());
-                        metric.getMin().set(duration.getMin() == null ? 0 : duration.getMin());
-                        metric.getCount().set(duration.getCount() == null ? 0 : duration.getCount());
-                        if (duration.getLatestProcessedAt() != null)
-                            latestProcessedAt.put(stage, duration.getLatestProcessedAt());
-                    });
+            Optional<ProcessingDuration> durationOpt = generalDao.getProcessingDuration(stage, latestProcessedAt.get(stage));
+            if (durationOpt.isPresent()) {
+                ProcessingDuration duration = durationOpt.get();
+                metric.getAvg().set(checkNotNull(duration.getAvg()));
+                metric.getMax().set(checkNotNull(duration.getMax()));
+                metric.getMin().set(checkNotNull(duration.getMin()));
+                metric.getCount().set(checkNotNull(duration.getCount()));
+                if (duration.getLatestProcessedAt() != null)
+                    latestProcessedAt.put(stage, duration.getLatestProcessedAt());
+            } else {
+                metric.resetAll();
+            }
         });
     }
 
     private Long checkNotNull(Long value) {
         return value == null ? 0L : value;
+    }
+
+    private Double checkNotNull(Double value) {
+        return value == null ? 0.0 : value;
+    }
+
+    private Integer checkNotNull(Integer value) {
+        return value == null ? 0 : value;
     }
 
     @Override
