@@ -11,19 +11,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Configuration
 public class MetricsConfig {
 
-    private static final String DATA_LAKE = "data_lake";
-    private static final String NORMALIZED_OBSERVATIONS = "normalized_observations";
-    private static final String KONTUR_EVENTS = "kontur_events";
-    private static final String FEED_EVENT_STATUS = "feed_event_status";
-    private static final String FEED_DATA = "feed_data";
-    private static final String FEEDS = "feeds";
-
     public static final String NORMALIZATION = "normalization";
     public static final String RECOMBINATION = "recombination";
     public static final String COMPOSITION = "composition";
     public static final String ENRICHMENT = "enrichment";
 
-    private final Map<String, TableMetricsConfig> tableMetrics;
     private final Map<String, ProcessingDurationMetricsConfig> processingDurationMetrics;
 
     private final Counter enrichmentSuccess;
@@ -36,15 +28,6 @@ public class MetricsConfig {
     private final AtomicInteger normalizationQueueSize;
 
     public MetricsConfig(MeterRegistry registry) {
-        tableMetrics = Map.of(
-                DATA_LAKE, new TableMetricsConfig(registry, DATA_LAKE),
-                NORMALIZED_OBSERVATIONS, new TableMetricsConfig(registry, NORMALIZED_OBSERVATIONS),
-                KONTUR_EVENTS, new TableMetricsConfig(registry, KONTUR_EVENTS),
-                FEED_EVENT_STATUS, new TableMetricsConfig(registry, FEED_EVENT_STATUS),
-                FEED_DATA, new TableMetricsConfig(registry, FEED_DATA),
-                FEEDS, new TableMetricsConfig(registry, FEEDS)
-        );
-
         processingDurationMetrics = Map.of(
                 NORMALIZATION, new ProcessingDurationMetricsConfig(registry, NORMALIZATION),
                 RECOMBINATION, new ProcessingDurationMetricsConfig(registry, RECOMBINATION),
@@ -94,10 +77,6 @@ public class MetricsConfig {
     @Bean
     public AtomicInteger normalizationQueueSizeGauge() {
         return normalizationQueueSize;
-    }
-
-    @Bean Map<String, TableMetricsConfig> tableMetrics() {
-        return tableMetrics;
     }
 
     @Bean

@@ -1,13 +1,10 @@
 package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.GeneralMapper;
-import io.kontur.eventapi.entity.PgSetting;
-import io.kontur.eventapi.entity.PgStatTable;
 import io.kontur.eventapi.entity.ProcessingDuration;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.Optional;
 
 import static io.kontur.eventapi.metrics.config.MetricsConfig.*;
@@ -18,14 +15,6 @@ public class GeneralDao {
 
     public GeneralDao(GeneralMapper mapper) {
         this.mapper = mapper;
-    }
-
-    public Map<String, PgSetting> getPgSettings() {
-        return mapper.getPgSettings();
-    }
-
-    public Map<String, PgStatTable> getPgStatTables() {
-        return mapper.getPgStatTables();
     }
 
     public Optional<ProcessingDuration> getProcessingDuration(String stage, OffsetDateTime latestProcessedAt) {

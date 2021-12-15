@@ -4,29 +4,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.kontur.eventapi.dao.mapper.GeneralMapper">
 
-    <select id="getPgSettings" resultMap="pgSettingMap">
-        select
-               name,
-               setting
-        from pg_settings where category = 'Autovacuum';
-    </select>
-
-    <select id="getPgStatTables" resultMap="pgStatTableMap">
-        SELECT
-               relname,
-               last_vacuum,
-               last_autovacuum,
-               last_analyze,
-               last_autoanalyze,
-               n_live_tup,
-               n_dead_tup,
-               analyze_count,
-               autoanalyze_count,
-               vacuum_count,
-               autovacuum_count
-        FROM pg_stat_user_tables;
-    </select>
-
     <select id="getObservationNormalizationDuration" resultMap="processingDuration">
         with durations as (
             select extract(epoch from (no.normalized_at - dl.loaded_at)::interval) as duration, normalized_at
@@ -89,25 +66,6 @@
             max(enriched_at) as latest_processed_at
         from durations
     </select>
-
-    <resultMap id="pgStatTableMap" type="io.kontur.eventapi.entity.PgStatTable">
-        <result property="tableName" column="relname" />
-        <result property="lastVacuum" column="last_vacuum"/>
-        <result property="lastAutoVacuum" column="last_autovacuum"/>
-        <result property="lastAnalyse" column="last_analyze"/>
-        <result property="lastAutoAnalyze" column="last_autoanalyze"/>
-        <result property="liveTupCount" column="n_live_tup"/>
-        <result property="deadTupCount" column="n_dead_tup"/>
-        <result property="analyzeCount" column="analyze_count"/>
-        <result property="autoAnalyzeCount" column="autoanalyze_count"/>
-        <result property="vacuumCount" column="vacuum_count"/>
-        <result property="autoVacuumCount" column="autovacuum_count"/>
-    </resultMap>
-
-    <resultMap id="pgSettingMap" type="io.kontur.eventapi.entity.PgSetting">
-        <result property="name" column="name" />
-        <result property="setting" column="setting"/>
-    </resultMap>
 
     <resultMap id="processingDuration" type="io.kontur.eventapi.entity.ProcessingDuration">
         <result property="avg" column="avg"/>
