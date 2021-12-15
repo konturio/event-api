@@ -25,4 +25,12 @@ public class ProcessingDurationMetricsConfig {
         avg = registry.gauge("avg.processing.duration.seconds", tags, new AtomicDouble(0));
         count = registry.gauge("count.processing.observations", tags, new AtomicInteger(0));
     }
+
+    public void resetAll() {
+        this.max.set(0);
+        this.min.set(0);
+        this.avg.set(0);
+        this.count.set(0);
+
+    }
 }
