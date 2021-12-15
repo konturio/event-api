@@ -96,14 +96,15 @@ public class MetricsJob extends AbstractJob {
         });
 
         processingDurationMetrics.forEach((stage, metric) -> {
-            Optional<ProcessingDuration> durationOpt = generalDao.getProcessingDuration(stage, latestProcessedAt.get(stage));
-            if (durationOpt.isPresent()) {
-                ProcessingDuration duration = durationOpt.get();
-                if (duration.getAvg() != null) metric.getAvg().set(duration.getAvg());
-                if (duration.getMax() != null) metric.getMax().set(duration.getMax());
-                if (duration.getMin() != null) metric.getMin().set(duration.getMin());
-                latestProcessedAt.put(stage, duration.getLatestProcessedAt());
-            }
+            generalDao.getProcessingDuration(stage, latestProcessedAt.get(stage))
+                    .ifPresent(duration -> {
+                        metric.getAvg().set(duration.getAvg() == null ? 0 : duration.getAvg());
+                        metric.getMax().set(duration.getMax() == null ? 0 : duration.getMax());
+                        metric.getMin().set(duration.getMin() == null ? 0 : duration.getMin());
+                        metric.getCount().set(duration.getCount() == null ? 0 : duration.getCount());
+                        if (duration.getLatestProcessedAt() != null)
+                            latestProcessedAt.put(stage, duration.getLatestProcessedAt());
+                    });
         });
     }
 

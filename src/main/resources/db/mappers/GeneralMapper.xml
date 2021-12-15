@@ -38,6 +38,7 @@
             avg(duration) as avg,
             max(duration) as max,
             min(duration) as min,
+            count(*) as count,
             max(normalized_at) as latest_processed_at
         from durations
     </select>
@@ -53,6 +54,7 @@
             avg(duration) as avg,
             max(duration) as max,
             min(duration) as min,
+            count(*) as count,
             max(recombined_at) as latest_processed_at
         from durations
     </select>
@@ -68,6 +70,7 @@
             avg(duration) as avg,
             max(duration) as max,
             min(duration) as min,
+            count(*) as count,
             max(composed_at) as latest_processed_at
         from durations
     </select>
@@ -82,6 +85,7 @@
             avg(duration) as avg,
             max(duration) as max,
             min(duration) as min,
+            count(*) as count,
             max(enriched_at) as latest_processed_at
         from durations
     </select>
@@ -109,6 +113,7 @@
         <result property="avg" column="avg"/>
         <result property="max" column="max"/>
         <result property="min" column="min"/>
+        <result property="count" column="count"/>
         <result property="latestProcessedAt" column="latest_processed_at"/>
     </resultMap>
 </mapper>
