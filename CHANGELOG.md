@@ -1,6 +1,16 @@
 # Release notes
 
+
 ## UNRELEASED
+
+#### Added
+
+#### Changed
+
+#### Removed
+
+
+## 1.0 - 2021-12-17
 
 #### Added
 
