@@ -108,14 +108,13 @@ public abstract class BaseXmlParser {
         return "";
     }
 
-    protected String getValueByTagName(String xml, Document xmlDocument, String tagName) {
-        return getValueByTagName(xml, xmlDocument, tagName, DEFAULT_NS);
+    protected String getValueByTagName(Document xmlDocument, String tagName) {
+        return getValueByTagName(xmlDocument, tagName, DEFAULT_NS);
     }
 
-    protected String getValueByTagName(String xml, Document xmlDocument, String tagName, String namespace) {
+    protected String getValueByTagName(Document xmlDocument, String tagName, String namespace) {
         NodeList nodeList = xmlDocument.getElementsByTagNameNS(namespace, tagName);
         if (nodeList.getLength() == 0) {
-            LOG.warn("Event does not contain tag '{}'", tagName);
             return "";
         }
         if (nodeList.getLength() > 1) {
