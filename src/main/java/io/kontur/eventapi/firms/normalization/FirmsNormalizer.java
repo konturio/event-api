@@ -5,6 +5,7 @@ import com.uber.h3core.util.GeoCoord;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.firms.dto.ParsedNormalizationItem;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
@@ -17,12 +18,11 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
 
-import static io.kontur.eventapi.util.CsvUtil.parseRow;
+import static io.kontur.eventapi.util.CsvUtil.parseNormalizationRow;
 
 @Component
 public class FirmsNormalizer extends Normalizer {
@@ -56,15 +56,17 @@ public class FirmsNormalizer extends Normalizer {
         normalizedObservation.setStartedAt(dataLakeDto.getUpdatedAt());
 
         String[] csvHeaderAndRow = dataLakeDto.getData().split("\n");
-        Map<String, String> csvData = parseRow(csvHeaderAndRow[0], csvHeaderAndRow[1]);
-        Double longitude = Double.valueOf(csvData.get("longitude"));
-        Double latitude = Double.valueOf(csvData.get("latitude"));
+        ParsedNormalizationItem csvData =
+                parseNormalizationRow(dataLakeDto.getProvider(), csvHeaderAndRow[0], csvHeaderAndRow[1]);
+        if (csvData != null) {
+            Double longitude = csvData.getLongitude();
+            Double latitude = csvData.getLatitude();
 
-        normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
+            normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
 
-        String wktPolygon = createWktPolygon(longitude, latitude);
-        normalizedObservation.setGeometries(createGeometry(wktPolygon));
-
+            String wktPolygon = createWktPolygon(longitude, latitude);
+            normalizedObservation.setGeometries(createGeometry(wktPolygon));
+        }
         return normalizedObservation;
     }
 
@@ -73,11 +75,10 @@ public class FirmsNormalizer extends Normalizer {
         List<GeoCoord> h3Polygon = h3.h3ToGeoBoundary(h3Index);
 
         h3Polygon.add(h3Polygon.get(0));//wkt polygon must be closed
-        String wktPolygon = h3Polygon.stream()
+
+        return h3Polygon.stream()
                 .map(geoCoord -> geoCoord.lng + " " + geoCoord.lat)
                 .collect(Collectors.joining(",", "POLYGON ((", "))"));
-
-        return wktPolygon;
     }
 
     private FeatureCollection createGeometry(String wktPolygon) {

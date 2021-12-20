@@ -87,7 +87,15 @@ scheduler:
   gdacsImport:
     enable: true
     cron: 0 1/5 * * * * # every five minutes after hh:01:00
-  firmsImport:
+  firmsModisImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 3600000
+  firmsNoaaImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 3600000
+  firmsSuomiImport:
     enable: true
     initialDelay: 1000
     fixedDelay: 3600000

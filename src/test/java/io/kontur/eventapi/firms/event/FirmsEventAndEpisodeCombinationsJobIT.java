@@ -7,8 +7,10 @@ import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
-import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
@@ -32,7 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableIntegrationTest {
-    private final FirmsImportJob firmsImportJob;
+    private final FirmsImportModisJob firmsImportModisJob;
+    private final FirmsImportNoaaJob firmsImportNoaaJob;
+    private final FirmsImportSuomiJob firmsImportSuomiJob;
     private final NormalizationJob normalizationJob;
     private final FirmsEventCombinationJob eventCombinationJob;
     private final FirmsFeedCompositionJob feedCompositionJob;
@@ -46,12 +50,15 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private KonturApiClient konturApiClient;
 
     @Autowired
-    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportJob firmsImportJob, NormalizationJob normalizationJob,
+    public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportModisJob firmsImportModisJob, FirmsImportNoaaJob firmsImportNoaaJob,
+                                                 FirmsImportSuomiJob firmsImportSuomiJob, NormalizationJob normalizationJob,
                                                  FirmsEventCombinationJob eventCombinationJob, FirmsFeedCompositionJob feedCompositionJob,
                                                  FeedMapper feedMapper, KonturEventsDao konturEventsDao,
                                                  NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
-        this.firmsImportJob = firmsImportJob;
+        this.firmsImportModisJob = firmsImportModisJob;
+        this.firmsImportNoaaJob = firmsImportNoaaJob;
+        this.firmsImportSuomiJob = firmsImportSuomiJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
@@ -69,7 +76,9 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         configureKonturApiClient();
 
         //WHEN run event job
-        firmsImportJob.run();
+        firmsImportModisJob.run();
+        firmsImportNoaaJob.run();
+        firmsImportSuomiJob.run();
         normalizationJob.run();
         eventCombinationJob.run();
 
@@ -105,7 +114,9 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
         when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
-        firmsImportJob.run();
+        firmsImportModisJob.run();
+        firmsImportNoaaJob.run();
+        firmsImportSuomiJob.run();
         normalizationJob.run();
         eventCombinationJob.run();
 
@@ -180,7 +191,9 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         //WHEN new data available for modis - 1 observations within 1 km to existing observations
         when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6-update-2.csv"));
 
-        firmsImportJob.run();
+        firmsImportModisJob.run();
+        firmsImportNoaaJob.run();
+        firmsImportSuomiJob.run();
         normalizationJob.run();
         eventCombinationJob.run();
         feedCompositionJob.run();

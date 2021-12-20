@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -35,6 +36,10 @@ public class DataLakeDao {
 
     public List<DataLake> getDataLakesByExternalId(String externalId) {
         return mapper.getDataLakesByExternalId(externalId);
+    }
+
+    public List<DataLake> getDataLakesByExternalIds(Set<String> externalIds) {
+        return mapper.getDataLakesByExternalIds(externalIds);
     }
 
     public Optional<DataLake> getLatestUpdatedHazard(String provider) {

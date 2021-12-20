@@ -44,6 +44,15 @@
         WHERE external_id = #{externalId}
     </select>
 
+    <select id="getDataLakesByExternalIds" resultMap="dataLakeMap">
+        SELECT *
+        FROM data_lake
+        WHERE
+        <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
+            #{externalId}
+        </foreach>
+    </select>
+
     <select id="getDataLakeByObservationId" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake
