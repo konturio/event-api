@@ -52,7 +52,15 @@ scheduler:
   gdacsImport:
     enable: false
     cron: 30 30 23 24 12 SUN
-  firmsImport:
+  firmsModisImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  firmsNoaaImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  firmsSuomiImport:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999

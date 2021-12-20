@@ -3,6 +3,9 @@ package io.kontur.eventapi.config;
 import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.EnrichmentJob;
 import io.kontur.eventapi.metrics.job.MetricsJob;
@@ -17,7 +20,6 @@ import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
-import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
 import org.slf4j.Logger;
@@ -33,7 +35,9 @@ public class WorkerScheduler {
     private final HpSrvSearchJob hpSrvSearchJob;
     private final HpSrvMagsJob hpSrvMagsJob;
     private final GdacsSearchJob gdacsSearchJob;
-    private final FirmsImportJob firmsImportJob;
+    private final FirmsImportModisJob firmsImportModisJob;
+    private final FirmsImportNoaaJob firmsImportNoaaJob;
+    private final FirmsImportSuomiJob firmsImportSuomiJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
     private final FirmsEventCombinationJob firmsEventCombinationJob;
@@ -57,8 +61,12 @@ public class WorkerScheduler {
     private String hpSrvMagsImportEnabled;
     @Value("${scheduler.gdacsImport.enable}")
     private String gdacsImportEnabled;
-    @Value("${scheduler.firmsImport.enable}")
-    private String firmsImportEnabled;
+    @Value("${scheduler.firmsModisImport.enable}")
+    private String firmsModisImportEnabled;
+    @Value("${scheduler.firmsNoaaImport.enable}")
+    private String firmsNoaaImportEnabled;
+    @Value("${scheduler.firmsSuomiImport.enable}")
+    private String firmsSuomiImportEnabled;
     @Value("${scheduler.normalization.enable}")
     private String normalizationEnabled;
     @Value("${scheduler.eventCombination.enable}")
@@ -92,9 +100,10 @@ public class WorkerScheduler {
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FirmsEventCombinationJob firmsEventCombinationJob,
-                           FeedCompositionJob feedCompositionJob, FirmsImportJob firmsImportJob, EmDatImportJob emDatImportJob,
-                           StaticImportJob staticImportJob, StormsNoaaImportJob stormsNoaaImportJob,
-                           TornadoJapanMaImportJob tornadoJapanMaImportJob,
+                           FeedCompositionJob feedCompositionJob, FirmsImportModisJob firmsImportModisJob,
+                           FirmsImportNoaaJob firmsImportNoaaJob, FirmsImportSuomiJob firmsImportSuomiJob,
+                           EmDatImportJob emDatImportJob, StaticImportJob staticImportJob,
+                           StormsNoaaImportJob stormsNoaaImportJob, TornadoJapanMaImportJob tornadoJapanMaImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
                            PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
@@ -106,7 +115,9 @@ public class WorkerScheduler {
         this.eventCombinationJob = eventCombinationJob;
         this.firmsEventCombinationJob = firmsEventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
-        this.firmsImportJob = firmsImportJob;
+        this.firmsImportModisJob = firmsImportModisJob;
+        this.firmsImportNoaaJob = firmsImportNoaaJob;
+        this.firmsImportSuomiJob = firmsImportSuomiJob;
         this.emDatImportJob = emDatImportJob;
         this.staticImportJob = staticImportJob;
         this.stormsNoaaImportJob = stormsNoaaImportJob;
@@ -157,12 +168,30 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(initialDelayString = "${scheduler.firmsImport.initialDelay}", fixedDelayString= "${scheduler.firmsImport.fixedDelay}")
-    public void startFirmsImport() {
-        if (Boolean.parseBoolean(firmsImportEnabled)) {
-            firmsImportJob.run();
+    @Scheduled(initialDelayString = "${scheduler.firmsModisImport.initialDelay}", fixedDelayString= "${scheduler.firmsModisImport.fixedDelay}")
+    public void startFirmsModisImport() {
+        if (Boolean.parseBoolean(firmsModisImportEnabled)) {
+            firmsImportModisJob.run();
         } else {
-            LOG.info("Firms import job invocation is skipped");
+            LOG.info("Firms Modis import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.firmsNoaaImport.initialDelay}", fixedDelayString= "${scheduler.firmsNoaaImport.fixedDelay}")
+    public void startFirmsNoaaImport() {
+        if (Boolean.parseBoolean(firmsNoaaImportEnabled)) {
+            firmsImportNoaaJob.run();
+        } else {
+            LOG.info("Firms Noaa import job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.firmsSuomiImport.initialDelay}", fixedDelayString= "${scheduler.firmsSuomiImport.fixedDelay}")
+    public void startFirmsSuomiImport() {
+        if (Boolean.parseBoolean(firmsSuomiImportEnabled)) {
+            firmsImportSuomiJob.run();
+        } else {
+            LOG.info("Firms Suomi import job invocation is skipped");
         }
     }
 

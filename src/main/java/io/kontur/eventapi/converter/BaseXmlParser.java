@@ -115,11 +115,11 @@ public abstract class BaseXmlParser {
     protected String getValueByTagName(String xml, Document xmlDocument, String tagName, String namespace) {
         NodeList nodeList = xmlDocument.getElementsByTagNameNS(namespace, tagName);
         if (nodeList.getLength() == 0) {
-            LOG.warn("Event does not contain tag '{}': \n" + xml, tagName);
+            LOG.warn("Event does not contain tag '{}'", tagName);
             return "";
         }
         if (nodeList.getLength() > 1) {
-            LOG.warn("Event contains more than one tag '{}': \n" + xml, tagName);
+            LOG.warn("Event contains more than one tag '{}'", tagName);
         }
         return nodeList.item(0).getTextContent();
     }

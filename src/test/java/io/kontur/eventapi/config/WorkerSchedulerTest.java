@@ -3,6 +3,9 @@ package io.kontur.eventapi.config;
 import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.EnrichmentJob;
@@ -16,7 +19,6 @@ import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
-import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
@@ -35,7 +37,9 @@ class WorkerSchedulerTest {
     private final EventCombinationJob eventCombinationJob = mock(EventCombinationJob.class);
     private final FeedCompositionJob feedCompositionJob = mock(FeedCompositionJob.class);
     private final GdacsSearchJob gdacsSearchJob = mock(GdacsSearchJob.class);
-    private final FirmsImportJob firmsImportJob = mock(FirmsImportJob.class);
+    private final FirmsImportModisJob firmsImportModisJob = mock(FirmsImportModisJob.class);
+    private final FirmsImportNoaaJob firmsImportNoaaJob = mock(FirmsImportNoaaJob.class);
+    private final FirmsImportSuomiJob firmsImportSuomiJob = mock(FirmsImportSuomiJob.class);
     private final EmDatImportJob emDatImportJob = mock(EmDatImportJob.class);
     private final StaticImportJob staticImportJob = mock(StaticImportJob.class);
     private final StormsNoaaImportJob stormsNoaaImportJob = mock(StormsNoaaImportJob.class);
@@ -50,17 +54,20 @@ class WorkerSchedulerTest {
     private final InciWebImportJob inciWebImportJob = mock(InciWebImportJob.class);
     private final MetricsJob metricsJob = mock(MetricsJob.class);
 
-    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob, eventCombinationJob,
-            firmsEventCombinationJob, feedCompositionJob, firmsImportJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
-            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob, nifcImportJob, inciWebImportJob,
-            metricsJob);
+    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob,
+            eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
+            firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
+            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob,
+            nifcImportJob, inciWebImportJob, metricsJob);
 
     @AfterEach
     public void resetMocks() {
         Mockito.reset(hpSrvSearchJob);
         Mockito.reset(hpSrvMagsJob);
         Mockito.reset(gdacsSearchJob);
-        Mockito.reset(firmsImportJob);
+        Mockito.reset(firmsImportModisJob);
+        Mockito.reset(firmsImportNoaaJob);
+        Mockito.reset(firmsImportSuomiJob);
         Mockito.reset(staticImportJob);
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
@@ -130,11 +137,27 @@ class WorkerSchedulerTest {
     }
 
     @Test
-    public void startFirmsSearchJob() {
-        ReflectionTestUtils.setField(scheduler, "firmsImportEnabled", "true");
-        scheduler.startFirmsImport();
+    public void startFirmsModisSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "firmsModisImportEnabled", "true");
+        scheduler.startFirmsModisImport();
 
-        verify(firmsImportJob, times(1)).run();
+        verify(firmsImportModisJob, times(1)).run();
+    }
+
+    @Test
+    public void startFirmsNoaaSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "firmsNoaaImportEnabled", "true");
+        scheduler.startFirmsNoaaImport();
+
+        verify(firmsImportNoaaJob, times(1)).run();
+    }
+
+    @Test
+    public void startFirmsSuomiSearchJob() {
+        ReflectionTestUtils.setField(scheduler, "firmsSuomiImportEnabled", "true");
+        scheduler.startFirmsSuomiImport();
+
+        verify(firmsImportSuomiJob, times(1)).run();
     }
 
     @Test

@@ -2,10 +2,11 @@ package io.kontur.eventapi.firms.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
+import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
-import io.kontur.eventapi.test.AbstractIntegrationTest;
 import io.kontur.eventapi.firms.client.FirmsClient;
-import io.kontur.eventapi.firms.jobs.FirmsImportJob;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class FirmsImportJobIT extends AbstractCleanableIntegrationTest {
-    private final FirmsImportJob firmsImportJob;
+    private final FirmsImportModisJob firmsImportModisJob;
+    private final FirmsImportNoaaJob firmsImportNoaaJob;
+    private final FirmsImportSuomiJob firmsImportSuomiJob;
     private final DataLakeDao dataLakeDao;
 
     @MockBean
     private FirmsClient firmsClient;
 
     @Autowired
-    public FirmsImportJobIT(FirmsImportJob firmsImportJob, DataLakeDao dataLakeDao, JdbcTemplate jdbcTemplate) {
+    public FirmsImportJobIT(FirmsImportModisJob firmsImportModisJob, FirmsImportNoaaJob firmsImportNoaaJob,
+                            FirmsImportSuomiJob firmsImportSuomiJob, DataLakeDao dataLakeDao, JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
-        this.firmsImportJob = firmsImportJob;
+        this.firmsImportModisJob = firmsImportModisJob;
+        this.firmsImportNoaaJob = firmsImportNoaaJob;
+        this.firmsImportSuomiJob = firmsImportSuomiJob;
         this.dataLakeDao = dataLakeDao;
     }
 
@@ -42,7 +48,9 @@ public class FirmsImportJobIT extends AbstractCleanableIntegrationTest {
         Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
         //when
-        firmsImportJob.run();
+        firmsImportModisJob.run();
+        firmsImportNoaaJob.run();
+        firmsImportSuomiJob.run();
 
         //then
         //check modis-c6
@@ -88,7 +96,9 @@ public class FirmsImportJobIT extends AbstractCleanableIntegrationTest {
         Mockito.when(firmsClient.getNoaa20VirsData()).thenReturn(readCsv("firms.suomi-npp-viirs-c2.csv"));
         Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
-        firmsImportJob.run();
+        firmsImportModisJob.run();
+        firmsImportNoaaJob.run();
+        firmsImportSuomiJob.run();
 
         Mockito.reset(firmsClient);
 
@@ -98,7 +108,9 @@ public class FirmsImportJobIT extends AbstractCleanableIntegrationTest {
         Mockito.when(firmsClient.getSuomiNppVirsData()).thenReturn(readCsv("firms.noaa-20-viirs-c2.csv"));
 
         //when import second time
-        firmsImportJob.run();
+        firmsImportModisJob.run();
+        firmsImportNoaaJob.run();
+        firmsImportSuomiJob.run();
 
         //then
         //old data still here without duplicates
