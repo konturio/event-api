@@ -63,7 +63,7 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
         try {
             Document xmlDocument = getXmlDocument(alertXml);
 
-            String externalId = getValueByTagName(alertXml, xmlDocument, IDENTIFIER);
+            String externalId = getValueByTagName(xmlDocument, IDENTIFIER);
             if (StringUtils.isEmpty(externalId)) {
                 LOG.warn("Alert does not have identifier: \n" +  alertXml);
                 return Optional.empty();
@@ -100,10 +100,10 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
         Document xmlDocument = getXmlDocument(xml);
         ParsedAlert parsedAlert = new ParsedAlert();
 
-        parsedAlert.setHeadLine(getValueByTagName(xml, xmlDocument, HEADLINE));
-        parsedAlert.setDescription(getValueByTagName(xml, xmlDocument, DESCRIPTION));
-        parsedAlert.setEvent(getValueByTagName(xml, xmlDocument, EVENT));
-        parsedAlert.setSeverity(getValueByTagName(xml, xmlDocument, SEVERITY));
+        parsedAlert.setHeadLine(getValueByTagName(xmlDocument, HEADLINE));
+        parsedAlert.setDescription(getValueByTagName(xmlDocument, DESCRIPTION));
+        parsedAlert.setEvent(getValueByTagName(xmlDocument, EVENT));
+        parsedAlert.setSeverity(getValueByTagName(xmlDocument, SEVERITY));
 
         NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(NS, PARAMETER);
         Set<String> parameterNames = Set.of(EVENT_ID, EVENT_TYPE, CURRENT_EPISODE_ID, FROM_DATE, TO_DATE, LINK,

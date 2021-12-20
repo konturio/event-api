@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import io.kontur.eventapi.converter.BaseXmlParser;
 import io.kontur.eventapi.inciweb.dto.ParsedItem;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -35,27 +36,42 @@ public class InciWebXmlParser extends BaseXmlParser {
         List<ParsedItem> parsedItems = new ArrayList<>();
         if (!CollectionUtils.isEmpty(itemsXml)) {
             for (String itemXml : itemsXml) {
-                getParsedItem(itemXml).ifPresent(parsedItems::add);
+                getParsedItemForDataLake(itemXml).ifPresent(parsedItems::add);
             }
         }
         return parsedItems;
     }
 
-    public Optional<ParsedItem> getParsedItem(String xml) {
+    public Optional<ParsedItem> getParsedItemForDataLake(String xml) {
+        ParsedItem item = new ParsedItem();
         try {
             Document xmlDocument = getXmlDocument(xml);
-            ParsedItem item = new ParsedItem();
-            item.setGuid(getValueByTagName(xml, xmlDocument, GUID));
-            item.setPubDate(parseDateTimeFromString(getValueByTagName(xml, xmlDocument, PUBDATE)));
-            item.setTitle(getValueByTagName(xml, xmlDocument, TITLE));
-            item.setDescription(getValueByTagName(xml, xmlDocument, DESCRIPTION));
-            item.setLink(getValueByTagName(xml, xmlDocument, LINK));
-            item.setLongitude(Double.parseDouble(getValueByTagName(xml, xmlDocument, LONGITUDE)));
-            item.setLatitude(Double.parseDouble(getValueByTagName(xml, xmlDocument, LATITUDE)));
+            item.setGuid(getValueByTagName(xmlDocument, GUID));
+            item.setPubDate(parseDateTimeFromString(getValueByTagName(xmlDocument, PUBDATE)));
             item.setData(xml);
             return Optional.of(item);
         } catch (ParserConfigurationException | IOException | SAXException | DateTimeParseException | NumberFormatException e) {
-            LOG.error("Error while parsing item from InciWeb events list. {}", xml);
+            LOG.error("Error while parsing item from InciWeb events list. {}",
+                    StringUtils.isNotBlank(item.getGuid()) ? item.getGuid() : "unknown");
+            return Optional.empty();
+        }
+    }
+
+    public Optional<ParsedItem> getParsedItem(String xml) {
+        ParsedItem item = new ParsedItem();
+        try {
+            Document xmlDocument = getXmlDocument(xml);
+            item.setGuid(getValueByTagName(xmlDocument, GUID));
+            item.setPubDate(parseDateTimeFromString(getValueByTagName(xmlDocument, PUBDATE)));
+            item.setTitle(getValueByTagName(xmlDocument, TITLE));
+            item.setDescription(getValueByTagName(xmlDocument, DESCRIPTION));
+            item.setLink(getValueByTagName(xmlDocument, LINK));
+            item.setLongitude(Double.parseDouble(getValueByTagName(xmlDocument, LONGITUDE)));
+            item.setLatitude(Double.parseDouble(getValueByTagName(xmlDocument, LATITUDE)));
+            return Optional.of(item);
+        } catch (ParserConfigurationException | IOException | SAXException | DateTimeParseException | NumberFormatException e) {
+            LOG.error("Error while parsing item from InciWeb events list. {}",
+                    StringUtils.isNotBlank(item.getGuid()) ? item.getGuid() : "unknown");
             return Optional.empty();
         }
     }

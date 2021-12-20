@@ -68,7 +68,7 @@ class InciWebNormalizationTest {
     private DataLake createDataLake() throws Exception {
         String data = IOUtils.toString(
                 Objects.requireNonNull(this.getClass().getResourceAsStream("data.xml")), "UTF-8");
-        Optional<ParsedItem> parsedItem = new InciWebXmlParser().getParsedItem(data);
+        Optional<ParsedItem> parsedItem = new InciWebXmlParser().getParsedItemForDataLake(data);
         assertTrue(parsedItem.isPresent());
         return new InciWebDataLakeConverter().convertEvent(parsedItem.get());
     }
