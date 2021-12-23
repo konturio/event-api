@@ -56,7 +56,7 @@ public class EventCombinationJob extends AbstractJob  {
     private void addToEvent(NormalizedObservation observation) {
         KonturEvent event = findEvent(observation).orElseGet(() -> new KonturEvent(UUID.randomUUID()));
         event.addObservations(observation.getObservationId());
-        eventsDao.appendObservationIntoEvent(event, observation);
+        eventsDao.appendObservationIntoEvent(event.getEventId(), observation);
     }
 
     protected Optional<KonturEvent> findEvent(NormalizedObservation normalizedObservation) {

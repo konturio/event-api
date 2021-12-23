@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -41,14 +40,14 @@ public class KonturEventsDao {
         }
     }
 
-    public Optional<KonturEvent> getEventWithClosestObservation(OffsetDateTime updatedAt, String geometry, List<String> providers, Set<UUID> eventIds) {
-        return mapper.getEventWithClosestObservation(updatedAt, geometry, providers, eventIds);
+    public List<KonturEvent> findClosestEventsToObservations(Set<UUID> observationIds, Set<UUID> eventIds) {
+        return mapper.findClosestEventsToObservations(observationIds, eventIds);
     }
 
     @Transactional
-    public void appendObservationIntoEvent(KonturEvent event, NormalizedObservation observation) {
-        feedEventStatusDao.markAsNonActual(observation.getProvider(), event.getEventId());
-        mapper.insert(event.getEventId(), observation.getObservationId(), observation.getProvider());
+    public void appendObservationIntoEvent(UUID eventId, NormalizedObservation observation) {
+        feedEventStatusDao.markAsNonActual(observation.getProvider(), eventId);
+        mapper.insert(eventId, observation.getObservationId(), observation.getProvider());
         observationsDao.markAsRecombined(observation.getObservationId());
     }
 

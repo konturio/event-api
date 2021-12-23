@@ -4,7 +4,6 @@ import io.kontur.eventapi.entity.KonturEvent;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,10 +20,8 @@ public interface KonturEventsMapper {
 
     Optional<KonturEvent> getEventById(@Param("eventId") UUID evenId);
 
-    Optional<KonturEvent> getEventWithClosestObservation(@Param("updatedAt") OffsetDateTime updatedAt,
-                                                         @Param("geometry") String geometry,
-                                                         @Param("providers") List<String> providers,
-                                                         @Param("eventIds") Set<UUID> eventIds);
+    List<KonturEvent> findClosestEventsToObservations(@Param("observationIds") Set<UUID> observationIds,
+                                                      @Param("eventIds") Set<UUID> eventIds);
 
     Set<UUID> getEventsForRolloutEpisodes(@Param("feedId") UUID feedId);
 

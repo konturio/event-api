@@ -27,22 +27,34 @@
         GROUP BY event_id
     </select>
 
-    <select id="getEventWithClosestObservation" resultMap="konturEventDtoMap" >
-        SELECT ev.*
-        FROM kontur_events ev inner join normalized_observations no on ev.observation_id = no.observation_id
-        WHERE
-            no.source_updated_at between #{updatedAt} - interval '24 hours' and #{updatedAt} + interval '24 hours'
-            <if test='eventIds != null'>
-                <foreach item="eventId" collection="eventIds" separator="," open="AND ev.event_id in (" close=")">
-                    #{eventId}
-                </foreach>
-            </if>
-            AND ST_DWithin(ST_GeomFromGeoJSON(#{geometry})::geography, no.collected_geography, 2000)
-            <foreach item="provider" collection="providers" separator="," open="AND no.provider in (" close=")">
-             #{provider}
+    <select id="findClosestEventsToObservations" resultMap="konturEventDtoMap">
+        with observations as (
+            select observation_id, source_updated_at, collected_geography
+            from normalized_observations
+            where observation_id in
+            <foreach item="id" collection="observationIds" separator="," open="(" close=")">
+                #{id}
             </foreach>
-        ORDER BY ST_Distance(ST_GeomFromGeoJSON(#{geometry})::geography, no.collected_geography)
-        LIMIT 1
+        ),
+        events as (
+            select ((
+                select ke.event_id
+                from kontur_events ke inner join normalized_observations no on ke.observation_id = no.observation_id
+                where ke.provider in ('firms.modis-c6', 'firms.suomi-npp-viirs-c2', 'firms.noaa-20-viirs-c2')
+                    <if test='eventIds != null'>
+                        <foreach item="eventId" collection="eventIds" open="and ke.event_id in (" separator="," close=")">
+                            #{eventId}
+                        </foreach>
+                    </if>
+                    and no.source_updated_at between obs.source_updated_at - interval '24 hours'
+                        and obs.source_updated_at + interval '24 hours'
+                    and ST_DWithin(obs.collected_geography, no.collected_geography, 2000)
+                order by st_distance(obs.collected_geography, no.collected_geography)
+                limit 1)) as event_id, array_agg(obs.observation_id)::uuid[] as observation_ids
+            from observations obs
+            group by event_id
+        )
+        select * from events where event_id is not null
     </select>
 
     <select id="getEventsForRolloutEpisodes" resultType="java.util.UUID">

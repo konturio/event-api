@@ -5,7 +5,11 @@
 
 #### Added
 
+- index `normalized_observations_source_updated_collected_geography_idx`
+
 #### Changed
+
+- search for existing firms events in batches, not one-by-one
 
 #### Removed
 

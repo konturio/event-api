@@ -6,29 +6,20 @@ import io.kontur.eventapi.entity.KonturEvent;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.eventcombination.EventCombinator;
 import io.kontur.eventapi.job.EventCombinationJob;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.function.Function;
 
-import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
-import static io.kontur.eventapi.util.JsonUtil.writeJson;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.*;
 
 @Component
 public class FirmsEventCombinationJob extends EventCombinationJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FirmsEventCombinationJob.class);
-
-    @Value("${scheduler.eventCombination.firmsProviders}")
-    private String[] sequentialProviders;
 
     public FirmsEventCombinationJob(NormalizedObservationsDao observationsDao, KonturEventsDao eventsDao,
                                     List<EventCombinator> eventCombinators, MeterRegistry meterRegistry) {
@@ -39,110 +30,71 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
      * 1. Obtain observations for 24 hours
      * 2. Search for existing events iteratively.
      * 3. Cluster remaining observations by geometry
-     *    and create events.
+     *    and create events from clusters.
      */
     @Override
     public void execute() {
         List<NormalizedObservation> observations = observationsDao
-                .getObservationsNotLinkedToEventFor24Hours(Arrays.asList(sequentialProviders));
+                .getFirmsObservationsNotLinkedToEventFor24Hours();
 
         LOG.info("Firms Combination processing: {} events", observations.size());
 
-        Set<UUID> events = findExistingEvents(observations);
-        addObservationsToExistingEvents(events, observations);
-        addObservationsToNewEvents(observations);
+        Map<UUID, NormalizedObservation> observationByIds = observations.stream()
+                .collect(toMap(NormalizedObservation::getObservationId, identity()));
+        findExistingEvents(observationByIds);
+        addObservationsToNewEvents(observationByIds);
     }
 
     /**
-     * Try to find existing event for each observation
-     * and save all the found events.
-     * We don't need to check other events, cause remaining
-     * observations can be added only to changed events
-     * after first iteration.
+     * Try to find existing events for observations iteratively.
+     * We need to check only if observations fit to changed events
+     * after the first iteration.
+     * Number of changed events will reduce with each iteration,
+     * and on the last iteration it won't find any more existing
+     * events fitting observations.
      *
-     * @param observations list of observations to search events for
-     * @return set of event IDs to which observations were found
+     * @param observationByIds observations to match with existing events
      */
-    @Timed(value = "firmsEventCombination.findExistingEvents.timer")
-    @Counted(value = "firmsEventCombination.findExistingEvents.counter")
-    private Set<UUID> findExistingEvents(List<NormalizedObservation> observations) {
-        Set<UUID> events = new HashSet<>();
-        observations.removeIf(observation -> {
-            Optional<UUID> eventIdOpt = tryFindEvent(observation, null);
-            if (eventIdOpt.isPresent()) {
-                events.add(eventIdOpt.get());
-                return true;
+    private void findExistingEvents(Map<UUID, NormalizedObservation> observationByIds) {
+        if (!observationByIds.isEmpty()) {
+            Set<UUID> eventIds = tryFindEvents(observationByIds, null);
+            while (!eventIds.isEmpty() && !observationByIds.isEmpty()) {
+                eventIds = tryFindEvents(observationByIds, eventIds);
             }
-            return false;
-        });
-        return events;
+        }
     }
 
-    /**
-     * Try to add remaining observations only to changed events.
-     * Save events that were changed on each iteration, their
-     * count will reduce in iterations. And it'll come to situation
-     * when no more observations can be added to existing events.
-     *
-     * @param events events that were changed in first iteration
-     *               (observations were added to them)
-     * @param observations unmatched observations
-     */
-    @Timed(value = "firmsEventCombination.addObservationsToExistingEvents.timer")
-    @Counted(value = "firmsEventCombination.addObservationsToExistingEvents.counter")
-    private void addObservationsToExistingEvents(Set<UUID> events, List<NormalizedObservation> observations) {
-        while (!events.isEmpty()) {
-            Set<UUID> changedEvents = new HashSet<>();
-            observations.removeIf(observation -> {
-                Optional<UUID> eventIdOpt = tryFindEvent(observation, events);
-                if (eventIdOpt.isPresent()) {
-                    changedEvents.add(eventIdOpt.get());
-                    return true;
-                }
-                return false;
+    private Set<UUID> tryFindEvents(Map<UUID, NormalizedObservation> observationByIds, Set<UUID> eventIds) {
+        List<KonturEvent> events = eventsDao.findClosestEventsToObservations(observationByIds.keySet(), eventIds);
+        Set<UUID> changedEventIds = new HashSet<>();
+        events.forEach(event -> {
+            changedEventIds.add(event.getEventId());
+            event.getObservationIds().forEach(observationId -> {
+                NormalizedObservation observation = observationByIds.remove(observationId);
+                addToEvent(event.getEventId(), observation);
             });
-            events.retainAll(changedEvents);
-        }
+        });
+        return changedEventIds;
     }
 
     /**
-     * Cluster observations by geometry to get
-     * new events.
+     * Cluster the remaining observations by geometry
+     * and create new events from those clusters.
      *
-     * @param observations unmatched observations
+     * @param observationByIds unmatched observations
      */
-    @Timed(value = "firmsEventCombination.addObservationsToNewEvents.timer")
-    @Counted(value = "firmsEventCombination.addObservationsToNewEvents.counter")
-    private void addObservationsToNewEvents(List<NormalizedObservation> observations) {
-        if (observations.isEmpty()) {
-            return;
+    private void addObservationsToNewEvents(Map<UUID, NormalizedObservation> observationByIds) {
+        if (!observationByIds.isEmpty()) {
+            List<Set<UUID>> clusters = observationsDao.clusterObservationsByGeography(observationByIds.keySet());
+            clusters.forEach(cluster -> {
+                UUID eventId = UUID.randomUUID();
+                cluster.forEach(observationId -> addToEvent(eventId, observationByIds.get(observationId)));
+            });
         }
-        Map<UUID, NormalizedObservation> observationsByIds = observations.stream()
-                .collect(toMap(NormalizedObservation::getObservationId, Function.identity()));
-        List<Set<UUID>> clusters = observationsDao.clusterObservationsByGeography(observationsByIds.keySet());
-        clusters.forEach(clusterObservationIds -> createEvent(
-                clusterObservationIds.stream().map(observationsByIds::get).collect(toList())));
     }
 
-    private Optional<UUID> tryFindEvent(NormalizedObservation observation, Set<UUID> eventIds) {
-        String geometry = writeJson(observation.getGeometries().getFeatures()[0].getGeometry());
-        Optional<KonturEvent> eventOpt = eventsDao.getEventWithClosestObservation(observation.getSourceUpdatedAt(), geometry, FIRMS_PROVIDERS, eventIds);
-        if (eventOpt.isPresent()) {
-            KonturEvent event = eventOpt.get();
-            addToEvent(observation, event);
-            return Optional.of(event.getEventId());
-        }
-        return Optional.empty();
-    }
-
-    private void createEvent(List<NormalizedObservation> observations) {
-        KonturEvent event = new KonturEvent(UUID.randomUUID());
-        observations.forEach(observation -> addToEvent(observation, event));
-    }
-
-    private void addToEvent(NormalizedObservation observation, KonturEvent event) {
-        event.addObservations(observation.getObservationId());
-        eventsDao.appendObservationIntoEvent(event, observation);
+    private void addToEvent(UUID eventId, NormalizedObservation observation) {
+        eventsDao.appendObservationIntoEvent(eventId, observation);
     }
 
     @Override
