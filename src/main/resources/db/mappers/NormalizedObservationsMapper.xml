@@ -74,20 +74,16 @@
         LIMIT 30000
     </select>
 
-    <select id="getObservationsNotLinkedToEventFor24Hours" resultMap="normalizedObservationsDtoMap">
+    <select id="getFirmsObservationsNotLinkedToEventFor24Hours" resultMap="normalizedObservationsDtoMap">
         WITH obs AS (
             SELECT min(source_updated_at) as min_sua
             FROM normalized_observations
             WHERE recombined IS FALSE
-                <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
-                    #{provider}
-                </foreach>
+                and provider in ('firms.modis-c6', 'firms.suomi-npp-viirs-c2', 'firms.noaa-20-viirs-c2')
         )
         SELECT * FROM normalized_observations
         WHERE recombined IS FALSE
-            <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
-                #{provider}
-            </foreach>
+            and provider in ('firms.modis-c6', 'firms.suomi-npp-viirs-c2', 'firms.noaa-20-viirs-c2')
             and source_updated_at between (select min_sua from obs) - interval '1s' and (select min_sua from obs) + interval '24 hours'
         ORDER BY source_updated_at
         LIMIT 30000

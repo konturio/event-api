@@ -41,8 +41,8 @@ public class NormalizedObservationsDao {
         return mapper.getObservationsNotLinkedToEvent(providers);
     }
 
-    public List<NormalizedObservation> getObservationsNotLinkedToEventFor24Hours(List<String> providers) {
-        return mapper.getObservationsNotLinkedToEventFor24Hours(providers);
+    public List<NormalizedObservation> getFirmsObservationsNotLinkedToEventFor24Hours() {
+        return mapper.getFirmsObservationsNotLinkedToEventFor24Hours();
     }
 
     public List<Set<UUID>> clusterObservationsByGeography(Set<UUID> observationIds) {

@@ -40,7 +40,7 @@ public interface NormalizedObservationsMapper {
 
     List<NormalizedObservation> getObservationsNotLinkedToEvent(@Param("providers") List<String> providers);
 
-    List<NormalizedObservation> getObservationsNotLinkedToEventFor24Hours(@Param("providers") List<String> providers);
+    List<NormalizedObservation> getFirmsObservationsNotLinkedToEventFor24Hours();
 
     List<Set<UUID>> clusterObservationsByGeography(@Param("observationIds") Set<UUID> observationIds);
 
