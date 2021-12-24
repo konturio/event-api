@@ -255,6 +255,8 @@
 				<configuration>
 					<classesDirectory>${project.build.outputDirectory}</classesDirectory>
 					<runOrder>alphabetical</runOrder>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -326,6 +328,15 @@
 						<descriptor>assembly.xml</descriptor>
 					</descriptors>
 					<tarLongFileMode>posix</tarLongFileMode>
+				</configuration>
+			</plugin>
+			<!-- Gitlab CI -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
 		</plugins>

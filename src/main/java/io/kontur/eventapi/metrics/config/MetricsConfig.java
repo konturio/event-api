@@ -35,6 +35,9 @@ public class MetricsConfig {
     private final AtomicInteger eventCombinationQueueSize;
     private final AtomicInteger normalizationQueueSize;
 
+    private final AtomicInteger sqsQueueSize;
+    private final AtomicInteger sqsDLQueueSize;
+
     public MetricsConfig(MeterRegistry registry) {
         tableMetrics = Map.of(
                 DATA_LAKE, new TableMetricsConfig(registry, DATA_LAKE),
@@ -59,6 +62,9 @@ public class MetricsConfig {
         this.feedCompositionQueueSize = registry.gauge("feedComposition.queueSize", new AtomicInteger(0));
         this.eventCombinationQueueSize = registry.gauge("eventCombination.queueSize", new AtomicInteger(0));
         this.normalizationQueueSize = registry.gauge("normalization.queueSize", new AtomicInteger(0));
+
+        this.sqsQueueSize = registry.gauge("sqs.queueSize", new AtomicInteger(0));
+        this.sqsDLQueueSize = registry.gauge("sqs.dl.queueSize", new AtomicInteger(0));
     }
 
     @Bean
@@ -103,5 +109,15 @@ public class MetricsConfig {
     @Bean
     Map<String, ProcessingDurationMetricsConfig> processingDurationMetrics() {
         return processingDurationMetrics;
+    }
+
+    @Bean
+    AtomicInteger sqsQueueSize() {
+        return sqsQueueSize;
+    }
+
+    @Bean
+    AtomicInteger sqsDLQueueSize() {
+        return sqsDLQueueSize;
     }
 }

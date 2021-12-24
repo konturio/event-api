@@ -6,6 +6,16 @@
 #### Added
 
 - index `normalized_observations_source_updated_collected_geography_idx`
+- metrics on SQS queue sizes
+- Gitlab CI test reports
+
+The following config should be added to all the stages:
+
+```yaml
+aws:
+  sqs:
+    dlqUrl: [DLQ URL]
+```
 
 #### Changed
 
