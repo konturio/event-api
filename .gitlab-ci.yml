@@ -27,13 +27,11 @@ build:
     name: event-api-$CI_COMMIT_REF_SLUG
     paths:
       - '*.zip'
-      - $CI_PROJECT_DIR/target/surefire-reports
-      - $CI_PROJECT_DIR/target/failsafe-reports
     reports:
       junit:
-        - $CI_PROJECT_DIR/target/surefire-reports/*.xml
-        - $CI_PROJECT_DIR/target/failsafe-reports/*.xml
-    when: on_failure
+        - target/surefire-reports/*.xml
+        - target/failsafe-reports/*.xml
+    when: always
 
 deploy-sonic:
   tags:
