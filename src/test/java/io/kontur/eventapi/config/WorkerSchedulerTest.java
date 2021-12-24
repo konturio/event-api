@@ -13,7 +13,7 @@ import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
-import io.kontur.eventapi.metrics.job.MetricsJob;
+import io.kontur.eventapi.job.MetricsJob;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;

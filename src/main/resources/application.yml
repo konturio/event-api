@@ -196,6 +196,7 @@ aws:
   sqs:
     enabled: false
     url: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns.fifo
+    dlqUrl: https://sqs.us-west-1.amazonaws.com/001426858141/SNS_messages_from_pdc-test-publiccloud-sns_DLQ.fifo
 
 management:
   metrics:
