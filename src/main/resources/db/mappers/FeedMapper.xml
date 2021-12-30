@@ -142,6 +142,13 @@
         LIMIT 1000
     </select>
 
+    <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
+        SELECT * FROM feed_data fd
+        WHERE feed_id = #{feedId} AND enrichment_skipped
+        ORDER BY enrichment_attempts, updated_at
+        LIMIT 100
+    </select>
+
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
         SELECT count(*) FROM feed_data WHERE NOT enriched;
     </select>

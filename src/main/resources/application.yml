@@ -170,6 +170,10 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
+  reEnrichment:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1000
   metrics:
     enable: true
     initialDelay: 1000
@@ -182,6 +186,9 @@ feign:
         connectTimeout: 60000
         readTimeout: 60000
         loggerLevel: headers
+      longKonturAppsClient:
+        connectTimeout: 600000
+        readTimeout: 600000
 
 mybatis:
   mapper-locations: classpath:db/mappers/*Mapper.xml
