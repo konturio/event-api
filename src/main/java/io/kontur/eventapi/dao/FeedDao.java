@@ -76,6 +76,10 @@ public class FeedDao {
         return mapper.getNotEnrichedEventsForFeed(feedId);
     }
 
+    public List<FeedData> getEnrichmentSkippedEventsForFeed(UUID feedId) {
+        return mapper.getEnrichmentSkippedEventsForFeed(feedId);
+    }
+
     @Transactional
     public void addAnalytics(FeedData event) {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),

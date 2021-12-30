@@ -7,17 +7,13 @@ import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
-import io.kontur.eventapi.job.EnrichmentJob;
-import io.kontur.eventapi.job.MetricsJob;
+import io.kontur.eventapi.job.*;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
-import io.kontur.eventapi.job.FeedCompositionJob;
-import io.kontur.eventapi.job.EventCombinationJob;
-import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
@@ -54,6 +50,7 @@ public class WorkerScheduler {
     private final NifcImportJob nifcImportJob;
     private final InciWebImportJob inciWebImportJob;
     private final MetricsJob metricsJob;
+    private final ReEnrichmentJob reEnrichmentJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -95,6 +92,8 @@ public class WorkerScheduler {
     private String inciwebEnabled;
     @Value("${scheduler.metrics.enable}")
     private String metricsEnabled;
+    @Value("${scheduler.reEnrichment.enable}")
+    private String reEnrichmentEnabled;
 
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
@@ -107,7 +106,7 @@ public class WorkerScheduler {
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
                            PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
-                           InciWebImportJob inciWebImportJob, MetricsJob metricsJob) {
+                           InciWebImportJob inciWebImportJob, MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -130,6 +129,7 @@ public class WorkerScheduler {
         this.nifcImportJob = nifcImportJob;
         this.inciWebImportJob = inciWebImportJob;
         this.metricsJob = metricsJob;
+        this.reEnrichmentJob = reEnrichmentJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -318,6 +318,15 @@ public class WorkerScheduler {
             enrichmentJob.run();
         } else {
             LOG.info("Enrichment job invocation is skipped");
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.reEnrichment.initialDelay}", fixedDelayString = "${scheduler.reEnrichment.fixedDelay}")
+    public void startReEnrichmentJob() {
+        if (Boolean.parseBoolean(reEnrichmentEnabled)) {
+            reEnrichmentJob.run();
+        } else {
+            LOG.info("Re-enrichment job invocation is skipped");
         }
     }
 

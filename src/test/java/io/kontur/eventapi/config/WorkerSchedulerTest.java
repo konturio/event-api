@@ -9,6 +9,7 @@ import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.EnrichmentJob;
+import io.kontur.eventapi.job.ReEnrichmentJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
@@ -53,12 +54,13 @@ class WorkerSchedulerTest {
     private final NifcImportJob nifcImportJob = mock(NifcImportJob.class);
     private final InciWebImportJob inciWebImportJob = mock(InciWebImportJob.class);
     private final MetricsJob metricsJob = mock(MetricsJob.class);
+    private final ReEnrichmentJob reEnrichmentJob = mock(ReEnrichmentJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob,
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
             historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob,
-            nifcImportJob, inciWebImportJob, metricsJob);
+            nifcImportJob, inciWebImportJob, metricsJob, reEnrichmentJob);
 
     @AfterEach
     public void resetMocks() {
@@ -78,6 +80,7 @@ class WorkerSchedulerTest {
         Mockito.reset(pdcMapSrvSearchJob);
         Mockito.reset(calFireSearchJob);
         Mockito.reset(inciWebImportJob);
+        Mockito.reset(reEnrichmentJob);
     }
 
     @Test

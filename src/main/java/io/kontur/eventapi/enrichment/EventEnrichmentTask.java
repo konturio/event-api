@@ -13,7 +13,6 @@ import io.micrometer.core.instrument.Counter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.wololo.geojson.FeatureCollection;
 
 import java.util.List;
@@ -24,7 +23,6 @@ import static io.kontur.eventapi.enrichment.InsightsApiResponseHandler.processRe
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RegExUtils.replaceAll;
 
-@Component
 public class EventEnrichmentTask {
 
     private final Logger LOG = LoggerFactory.getLogger(EventEnrichmentTask.class);

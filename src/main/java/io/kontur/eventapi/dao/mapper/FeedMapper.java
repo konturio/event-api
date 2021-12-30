@@ -64,6 +64,8 @@ public interface FeedMapper {
 
     List<FeedData> getNotEnrichedEventsForFeed(@Param("feedId") UUID feedId);
 
+    List<FeedData> getEnrichmentSkippedEventsForFeed(@Param("feedId") UUID feedId);
+
     void addAnalytics(@Param("feedId") UUID feedId,
                       @Param("eventId") UUID eventId,
                       @Param("version") Long version,
