@@ -3,3 +3,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-source-updated-at-index-to-normalized-observations.sql
+  - include:
+      relativeToChangelogFile: true
+      file: mark-enrichment-skipped-events.sql
