@@ -9,6 +9,7 @@
 - metrics on SQS queue sizes
 - Gitlab CI test reports
 - re-enrichment job
+- build and java info to `/info` endpoint
 
 The following config should be added to all the stages:
 

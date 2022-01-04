@@ -217,6 +217,11 @@ management:
       enabled: false
     refresh:
       enabled: false
+  info:
+    build:
+      enabled: true
+    java:
+      enabled: true
   endpoint:
     health:
       status:
