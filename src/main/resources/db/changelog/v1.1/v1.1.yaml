@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: mark-enrichment-skipped-events.sql
+  - include:
+      relativeToChangelogFile: true
+      file: fill-enriched-at-for-skipped-events.sql

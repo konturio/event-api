@@ -79,7 +79,7 @@
         with durations as (
             select extract(epoch from (fd.enriched_at - fd.composed_at)::interval) as duration, enriched_at
             from feed_data fd
-            where fd.enriched_at is not null and fd.enriched_at > #{latestEnrichedAt}
+            where fd.enriched_at is not null and fd.enriched_at > #{latestEnrichedAt} and not enrichment_skipped
         )
         select
             avg(duration) as avg,

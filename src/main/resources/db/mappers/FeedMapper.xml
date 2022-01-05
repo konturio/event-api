@@ -145,8 +145,9 @@
     <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
         SELECT * FROM feed_data fd
         WHERE feed_id = #{feedId} AND enrichment_skipped
+              AND (enrichment_attempts &lt; 5 or enriched_at &lt; now() - '6 hour'::interval)
         ORDER BY enrichment_attempts, updated_at
-        LIMIT 100
+        LIMIT 10
     </select>
 
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
@@ -163,9 +164,7 @@
             <if test='eventDetails != null'>
                 event_details = #{eventDetails}::jsonb,
             </if>
-            <if test="enriched &amp;&amp; !enrichmentSkipped">
-                enriched_at = current_timestamp,
-            </if>
+            enriched_at = current_timestamp,
             enriched = #{enriched},
             episodes = #{episodes}::jsonb,
             name = #{name},
