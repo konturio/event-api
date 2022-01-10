@@ -83,7 +83,15 @@ public class ThermalAnomalyTypePostProcessor implements EnrichmentPostProcessor 
     }
 
     private Double toDouble(Object value) {
-        return value == null ? 0.0 : (Double) value;
+        try {
+            return value == null ? 0.0 : (double) value;
+        } catch (Exception e) {
+            return (double) toInteger(value);
+        }
+    }
+
+    private Integer toInteger(Object value) {
+        return value == null ? 0 : (int) value;
     }
 
     private String updateName(String oldName, EventType type) {

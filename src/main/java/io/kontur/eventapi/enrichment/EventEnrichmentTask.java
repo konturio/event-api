@@ -54,7 +54,7 @@ public class EventEnrichmentTask {
             markEventStatus(event);
             feedDao.addAnalytics(event);
         } catch (Exception e) {
-            LOG.warn(e.getMessage());
+            LOG.error(e.getMessage(), e);
         }
         updateMetrics(event);
         return CompletableFuture.completedFuture(event);
