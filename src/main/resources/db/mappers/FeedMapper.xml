@@ -145,7 +145,7 @@
     <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
         SELECT * FROM feed_data fd
         WHERE feed_id = #{feedId} AND enrichment_skipped
-              AND (enrichment_attempts &lt; 5 or enriched_at &lt; now() - '6 hour'::interval)
+              AND (enrichment_attempts &lt; 5 or enriched_at &lt; now() - '24 hour'::interval)
         ORDER BY enrichment_attempts, updated_at
         LIMIT 10
     </select>
