@@ -5,6 +5,15 @@
 
 #### Added
 
+#### Changed
+
+#### Removed
+
+
+## 1.1 - 2022-01-12
+
+#### Added
+
 - index `normalized_observations_source_updated_collected_geography_idx`
 - metrics on SQS queue sizes
 - Gitlab CI test reports
