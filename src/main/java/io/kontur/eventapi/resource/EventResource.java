@@ -1,9 +1,6 @@
 package io.kontur.eventapi.resource;
 
-import io.kontur.eventapi.entity.EventType;
-import io.kontur.eventapi.entity.FeedData;
-import io.kontur.eventapi.entity.Severity;
-import io.kontur.eventapi.entity.SortOrder;
+import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.DateTimeRange;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
@@ -22,6 +19,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -31,7 +30,9 @@ import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -139,5 +140,27 @@ public class EventResource {
         return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping(path = "/user_feeds", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(tags = "Events", summary = "returns list of feeds allowed for authenticated user",
+        description = "Returns list of feeds available for user based on roles provided in JWT token.")
+    public ResponseEntity<List<FeedSummary>> getUserFeeds() {
+        List<String> userRoles = SecurityContextHolder.getContext().getAuthentication()
+            .getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .filter(Objects::nonNull)
+            .filter(it -> it.startsWith("read:feed:"))
+            .collect(Collectors.toList());
+
+        List<Feed> allowedFeeds = eventResourceService.getFeeds()
+            .stream().filter(it -> userRoles.contains("read:feed:" + it.getAlias()))
+            .collect(Collectors.toList());
+
+        List<FeedSummary> resultDtos = allowedFeeds.stream()
+            .map(it -> new FeedSummary(it.getAlias(), it.getDescription()))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(resultDtos);
     }
 }
