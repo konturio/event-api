@@ -1,4 +1,4 @@
-package io.kontur.eventapi.entity;
+package io.kontur.eventapi.resource.dto;
 
 import lombok.Data;
 

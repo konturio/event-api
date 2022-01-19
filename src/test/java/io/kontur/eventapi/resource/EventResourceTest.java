@@ -3,7 +3,7 @@ package io.kontur.eventapi.resource;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.Feed;
-import io.kontur.eventapi.entity.FeedSummary;
+import io.kontur.eventapi.resource.dto.FeedSummary;
 import io.kontur.eventapi.service.EventResourceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

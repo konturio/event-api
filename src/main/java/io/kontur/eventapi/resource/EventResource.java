@@ -5,6 +5,7 @@ import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.DateTimeRange;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.resource.dto.FeedSummary;
 import io.kontur.eventapi.resource.validation.ValidBbox;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
