@@ -53,4 +53,8 @@ public class EventResourceService {
     public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
         return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version);
     }
+
+    public List<Feed> getFeeds() {
+        return feedDao.getFeeds();
+    }
 }
