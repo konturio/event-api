@@ -53,9 +53,11 @@ public abstract class AbstractJob implements Runnable {
 
         long duration = stopTimer(regularTimer);
         longTaskTimer.stop();
-        logger.info("job has finished in {} seconds", duration);
-        if (duration > 60) {
-            logger.warn("[slow_job] {} seconds", duration);
+        if (duration > 0) {
+            logger.info("job has finished in {} seconds", duration);
+            if (duration > 60) {
+                logger.warn("[slow_job] {} seconds", duration);
+            }
         }
     }
 

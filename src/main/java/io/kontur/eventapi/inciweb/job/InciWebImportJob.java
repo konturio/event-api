@@ -1,10 +1,13 @@
 package io.kontur.eventapi.inciweb.job;
 
+import static io.kontur.eventapi.inciweb.converter.InciWebXmlParser.GUID;
+
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -51,8 +54,8 @@ public class InciWebImportJob extends AbstractJob {
             String xml = xmlOpt.get();
             try {
                 setPubDate(xml);
-                List<String> events = inciWebXmlParser.getItems(xml, "item");
-                List<ParsedItem> parsedEvents = inciWebXmlParser.getParsedItems(events);
+                Map<String, String> events = inciWebXmlParser.getItems(xml, "item", GUID);
+                Map<String, ParsedItem> parsedEvents = inciWebXmlParser.getParsedItems(events);
                 List<DataLake> dataLakes = inciWebService.createDataLake(parsedEvents);
                 inciWebService.saveEventsToDataLake(dataLakes);
             } catch (DateTimeParseException e) {

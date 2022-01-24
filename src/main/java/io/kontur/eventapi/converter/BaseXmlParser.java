@@ -8,10 +8,10 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -50,25 +51,30 @@ public abstract class BaseXmlParser {
         return parseDateTimeFromString(pubDateString);
     }
 
-    public List<String> getItems(String xml, String itemName)
+    public Map<String, String> getItems(String xml, String itemName, String idTagName)
             throws IOException, ParserConfigurationException, SAXException {
-        return getItems(xml, itemName, DEFAULT_NS);
+        return getItems(xml, itemName, DEFAULT_NS, idTagName);
     }
 
-    public List<String> getItems(String xml, String itemName, String namespace)
+    public Map<String, String> getItems(String xml, String itemName, String namespace, String idTagName)
             throws IOException, SAXException, ParserConfigurationException {
-        List<String> items = new ArrayList<>();
+        Map<String, String> items = new HashMap<>();
         Document xmlDocument = getXmlDocument(xml);
         NodeList nodeList = xmlDocument.getElementsByTagNameNS(namespace, itemName);
         for (int i = 0; i < nodeList.getLength(); i++) {
             try {
+                Element element = (Element) nodeList.item(i);
+                String id = String.valueOf(element.getElementsByTagNameNS(namespace, idTagName).item(0).getTextContent());
+                if (StringUtils.isEmpty(id)) {
+                    id = UUID.randomUUID().toString();
+                }
                 StringWriter writer = new StringWriter();
 
                 Transformer transformer = TransformerFactory.newInstance().newTransformer();
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                 transformer.transform(new DOMSource(nodeList.item(i)), new StreamResult(writer));
 
-                items.add(writer.toString());
+                items.put(id, writer.toString());
             } catch (TransformerException e) {
                 LOG.error(e.getMessage(), e);
             }

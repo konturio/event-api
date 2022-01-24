@@ -1,6 +1,7 @@
 package io.kontur.eventapi.dao.mapper;
 
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.pdc.dto.ExposureGeohash;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,10 +27,18 @@ public interface DataLakeMapper {
 
     List<DataLake> getDataLakesByExternalIds(@Param("externalIds") Set<String> externalIds);
 
+    List<DataLake> getDataLakesByExternalIdsAndProvider(@Param("externalIds") Set<String> externalIds,
+                                                        @Param("provider") String provider);
+
+    Set<String> getDataLakesIdByExternalIdsAndProvider(@Param("externalIds") Set<String> externalIds,
+                                                       @Param("provider") String provider);
+
     DataLake getDataLakeByObservationId(@Param("observationId") UUID observationId);
 
     Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(@Param("externalId") String externalId,
                                                                 @Param("provider") String provider);
+
+    List<ExposureGeohash> getPdcExposureGeohash(@Param("externalIds") Set<String> externalIds);
 
     Boolean isNewPdcExposure(@Param("externalId") String externalId,
                              @Param("geoHash") String geoHash);

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -41,21 +42,20 @@ public class GdacsService {
         return Optional.empty();
     }
 
-    public List<DataLake> createDataLakeListWithAlertsAndGeometry(List<ParsedAlert> alerts) {
+    public List<DataLake> createDataLakeListWithAlertsAndGeometry(Map<String, ParsedAlert> alerts) {
         var dataLakes = new ArrayList<DataLake>();
-        for (ParsedAlert alert : alerts) {
-            var dataLakesByExternalId = dataLakeDao.getDataLakesByExternalId(alert.getIdentifier());
-            if (dataLakesByExternalId.isEmpty()) {
-                var geometry = getGeometryToAlert(
-                        alert.getEventType(),
-                        alert.getEventId(),
-                        alert.getCurrentEpisodeId(),
-                        alert.getIdentifier());
 
-                if (geometry.isPresent()) {
-                    dataLakes.add(dataLakeConverter.convertGdacs(alert));
-                    dataLakes.add(dataLakeConverter.convertGdacsWithGeometry(alert, geometry.get()));
-                }
+        for (String key : alerts.keySet()) {
+            ParsedAlert alert = alerts.get(key);
+            var geometry = getGeometryToAlert(
+                    alert.getEventType(),
+                    alert.getEventId(),
+                    alert.getCurrentEpisodeId(),
+                    alert.getIdentifier());
+
+            if (geometry.isPresent()) {
+                dataLakes.add(dataLakeConverter.convertGdacs(alert));
+                dataLakes.add(dataLakeConverter.convertGdacsWithGeometry(alert, geometry.get()));
             }
         }
         dataLakes.sort(Comparator.comparing(DataLake::getLoadedAt));

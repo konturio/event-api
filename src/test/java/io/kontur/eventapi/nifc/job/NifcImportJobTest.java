@@ -10,9 +10,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class NifcImportJobTest {
@@ -44,12 +43,12 @@ class NifcImportJobTest {
 
         verify(nifcClient, times(1)).getNifcLocations();
         verify(nifcClient, times(1)).getNifcPerimeters();
-        verify(dataLakeDao, times(2)).isNewEvent(any(), any(), any());
+        verify(dataLakeDao, times(2)).getDataLakesByExternalIdsAndProvider(any(), any());
         verify(nifcDataLakeConverter, times(2)).convertDataLake(any(), any(), any(), any());
         verify(dataLakeDao, times(2)).storeDataLakes(any());
     }
 
     private String readFile(String fileName) throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
+        return IOUtils.toString(Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
     }
 }

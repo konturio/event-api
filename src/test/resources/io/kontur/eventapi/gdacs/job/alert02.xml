@@ -1,9 +1,9 @@
  <cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
-    <cap:identifier>GDACS_TC_1000742_1 </cap:identifier>
-    <cap:sent>2020-11-10T02:00:00-00:00 </cap:sent>
+    <cap:identifier>GDACS_TC_1000742_1</cap:identifier>
+    <cap:sent>2020-11-10T02:00:00-00:00</cap:sent>
     <cap:info>
-        <cap:event>Tropical Cyclone </cap:event>
-        <cap:severity>Moderate </cap:severity>
+        <cap:event>Tropical Cyclone</cap:event>
+        <cap:severity>Moderate</cap:severity>
         <cap:headline>Green alert for tropical cyclone THETA-20. Population affected by Category 1 (120 km/h) wind speeds or
             higher is 0.
          </cap:headline>
@@ -12,32 +12,32 @@
             affected by category 1 (120 km/h) wind speeds or higher is 0.
          </cap:description>
         <cap:parameter>
-            <cap:valueName>eventid </cap:valueName>
-            <cap:value>1000742 </cap:value>
+            <cap:valueName>eventid</cap:valueName>
+            <cap:value>1000742</cap:value>
          </cap:parameter>
         <cap:parameter>
-            <cap:valueName>currentepisodeid </cap:valueName>
-            <cap:value>1 </cap:value>
+            <cap:valueName>currentepisodeid</cap:valueName>
+            <cap:value>1</cap:value>
          </cap:parameter>
         <cap:parameter>
-            <cap:valueName>fromdate </cap:valueName>
-            <cap:value>Tue, 10 Nov 2020 03:00:00 GMT </cap:value>
+            <cap:valueName>fromdate</cap:valueName>
+            <cap:value>Tue, 10 Nov 2020 03:00:00 GMT</cap:value>
          </cap:parameter>
         <cap:parameter>
-            <cap:valueName>todate </cap:valueName>
-            <cap:value>Tue, 10 Nov 2020 03:00:00 GMT </cap:value>
+            <cap:valueName>todate</cap:valueName>
+            <cap:value>Tue, 10 Nov 2020 03:00:00 GMT</cap:value>
          </cap:parameter>
         <cap:parameter>
-            <cap:valueName>eventtype </cap:valueName>
-            <cap:value>TC </cap:value>
+            <cap:valueName>eventtype</cap:valueName>
+            <cap:value>TC</cap:value>
          </cap:parameter>
         <cap:parameter>
-            <cap:valueName>severity </cap:valueName>
-            <cap:value>Tropical Storm (maximum wind speed of 93 km/h) </cap:value>
+            <cap:valueName>severity</cap:valueName>
+            <cap:value>Tropical Storm (maximum wind speed of 93 km/h)</cap:value>
          </cap:parameter>
         <cap:parameter>
-            <cap:valueName>datemodified </cap:valueName>
-            <cap:value>Tue, 10 Nov 2020 05:03:09 GMT </cap:value>
+            <cap:valueName>datemodified</cap:valueName>
+            <cap:value>Tue, 10 Nov 2020 05:03:09 GMT</cap:value>
          </cap:parameter>
      </cap:info>
  </cap:alert>

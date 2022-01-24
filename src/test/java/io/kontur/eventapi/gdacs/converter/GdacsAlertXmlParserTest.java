@@ -6,7 +6,8 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,12 +22,12 @@ class GdacsAlertXmlParserTest {
 
     @Test
     public void testAlerts() throws IOException, ParserConfigurationException {
-        List<String> listOfAlerts = List.of(
-                readMessageFromFile("alert01_valid.xml"),
-                readMessageFromFile("alert02_without_identifier.xml"),
-                readMessageFromFile("alert02_without_parameters.xml"),
-                readMessageFromFile("alert02_invaliddate.xml"),
-                readMessageFromFile("alert02_valid.xml")
+        Map<String, String> listOfAlerts = Map.of(
+                "GDACS_EQ_1279931_1389192", readMessageFromFile("alert01_valid.xml"),
+                "", readMessageFromFile("alert02_without_identifier.xml"),
+                "GDACS_EQ_1278636_1387465", readMessageFromFile("alert02_without_parameters.xml"),
+                "GDACS_EQ_1278647_1387486", readMessageFromFile("alert02_invaliddate.xml"),
+                "GDACS_EQ_1278646_1387477", readMessageFromFile("alert02_valid.xml")
         );
 
         int alertCount = 2;
@@ -34,7 +35,7 @@ class GdacsAlertXmlParserTest {
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
+        return IOUtils.toString(Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
     }
 
 }

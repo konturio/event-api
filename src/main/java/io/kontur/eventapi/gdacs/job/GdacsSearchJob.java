@@ -1,5 +1,7 @@
 package io.kontur.eventapi.gdacs.job;
 
+import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.job.AbstractJob;
@@ -20,6 +22,8 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class GdacsSearchJob extends AbstractJob {
@@ -30,12 +34,15 @@ public class GdacsSearchJob extends AbstractJob {
 
     private final GdacsService gdacsService;
     private final GdacsAlertXmlParser gdacsAlertParser;
+    private final DataLakeDao dataLakeDao;
 
     @Autowired
-    public GdacsSearchJob(GdacsService gdacsService, GdacsAlertXmlParser gdacsAlertParser, MeterRegistry meterRegistry) {
+    public GdacsSearchJob(GdacsService gdacsService, GdacsAlertXmlParser gdacsAlertParser, DataLakeDao dataLakeDao,
+                          MeterRegistry meterRegistry) {
         super(meterRegistry);
         this.gdacsService = gdacsService;
         this.gdacsAlertParser = gdacsAlertParser;
+        this.dataLakeDao = dataLakeDao;
         Gauge.builder("gdacsFeedXML", XML_PUB_DATE, (pub) -> pub.getPubDate().until(DateTimeUtil.uniqueOffsetDateTime(), ChronoUnit.HOURS))
                 .description("Gdacs CAP feed did not update (hours)")
                 .register(meterRegistry);
@@ -49,7 +56,8 @@ public class GdacsSearchJob extends AbstractJob {
             try {
                 setPubDate(xml);
                 var alerts = gdacsAlertParser.getAlerts(xml);
-                var parsedAlerts = gdacsAlertParser.getParsedAlertsToGdacsSearchJob(alerts);
+                var filteredAlerts = filterExistsAlerts(alerts);
+                var parsedAlerts = gdacsAlertParser.getParsedAlertsToGdacsSearchJob(filteredAlerts);
                 var dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(parsedAlerts);
                 gdacsService.saveGdacs(dataLakes);
             } catch (DateTimeParseException e) {
@@ -58,6 +66,17 @@ public class GdacsSearchJob extends AbstractJob {
                 LOG.error(e.getMessage(), e);
             }
         }
+    }
+
+    public Map<String, String> filterExistsAlerts(Map<String, String> alerts) {
+        Map<String, String> filteredAlerts = new HashMap<>();
+        Map<String, DataLake> existsDataLakes = new HashMap<>();
+        dataLakeDao.getDataLakesByExternalIds(alerts.keySet())
+                .forEach(dataLake -> existsDataLakes.put(dataLake.getExternalId(), dataLake));
+        alerts.keySet().stream()
+                .filter(key -> !existsDataLakes.containsKey(key))
+                .forEach(key -> filteredAlerts.put(key, alerts.get(key)));
+        return filteredAlerts;
     }
 
     @Override

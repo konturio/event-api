@@ -12,14 +12,19 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.opengis.feature.simple.SimpleFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import java.io.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class StaticImportJob extends AbstractJob {
+    private static final Logger LOG = LoggerFactory.getLogger(StaticImportJob.class);
+
     private final AwsS3Service awsS3Service;
     private final DataLakeDao dataLakeDao;
 
@@ -56,22 +61,43 @@ public class StaticImportJob extends AbstractJob {
     private void processFile(String provider, OffsetDateTime updatedAt, InputStream content) throws IOException {
         FeatureIterator<SimpleFeature> features = featureJson.streamFeatureCollection(content);
         List<DataLake> dataLakes = new ArrayList<>();
+        Map<String, String> dataSet = new HashMap<>();
         while (features.hasNext()) {
             try (OutputStream outputStream = new ByteArrayOutputStream()) {
                 SimpleFeature feature = features.next();
                 featureJson.writeFeature(feature, outputStream);
                 String data = outputStream.toString();
                 String externalId = DigestUtils.md5Hex(data);
-                if (dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, provider).isEmpty()) {
-                    dataLakes.add(createDataLake(externalId, updatedAt, provider, data));
+                dataSet.put(externalId, data);
+                if (dataSet.size() > maxDataLakesCount) {
+                    storeDataLakes(provider, updatedAt, dataLakes, dataSet);
                 }
-            }
-            if (dataLakes.size() > maxDataLakesCount) {
-                dataLakeDao.storeDataLakes(dataLakes);
-                dataLakes.clear();
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
             }
         }
+        if (!dataSet.isEmpty()) {
+            try {
+                storeDataLakes(provider, updatedAt, dataLakes, dataSet);
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+            }
+        }
+    }
+
+    private void storeDataLakes(String provider, OffsetDateTime updatedAt, List<DataLake> dataLakes,
+                                Map<String, String> dataSet) {
+        Set<String> storedDataLakes = dataLakeDao
+                .getDataLakesIdByExternalIdsAndProvider(dataSet.keySet(), provider);
+        for (String id : dataSet.keySet()) {
+            if (!storedDataLakes.contains(id) &&
+                    !dataLakes.stream().map(DataLake::getExternalId).collect(Collectors.toSet()).contains(id)) {
+                dataLakes.add(createDataLake(id, updatedAt, provider, dataSet.get(id)));
+            }
+        }
+        dataSet.clear();
         dataLakeDao.storeDataLakes(dataLakes);
+        dataLakes.clear();
     }
 
     private DataLake createDataLake(String externalId, OffsetDateTime updatedAt, String provider, String data) {
