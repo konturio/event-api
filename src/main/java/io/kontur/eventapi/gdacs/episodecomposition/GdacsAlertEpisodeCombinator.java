@@ -6,11 +6,13 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
+import static java.lang.String.format;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 
@@ -27,31 +29,53 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        Optional<NormalizedObservation> geometryObservation = getGeometryObservationForAlert(observation, eventObservations);
-        if (geometryObservation.isPresent()) {
-            Optional<FeedEpisode> feedEpisode = createDefaultEpisode(observation);
-            feedEpisode.ifPresent(episode -> {
-                episode.setGeometries(geometryObservation.get().getGeometries());
-                episode.addObservation(geometryObservation.get().getObservationId());
-                episode.addUrlIfNotExists(geometryObservation.get().getSourceUri());
-                if (isBlank(episode.getProperName())) {
-                    episode.setProperName(geometryObservation.get().getProperName());
-                }
-                if (isBlank(episode.getLocation())) {
-                    episode.setLocation(geometryObservation.get().getRegion());
-                }
-            });
-            return feedEpisode;
-        }
-        throw new RuntimeException("Geometry observation not found for alert: " + observation.getObservationId());
+    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData event, Set<NormalizedObservation> eventObservations) {
+        if (event.getEpisodes().size() > 0) return Optional.empty();
+
+        Map.Entry<NormalizedObservation, NormalizedObservation> observations = checkObservationsAndGetLatest(eventObservations, event);
+
+        NormalizedObservation alertObservation = observations.getKey();
+        NormalizedObservation geometryObservation = observations.getValue();
+
+        Optional<FeedEpisode> episode = createDefaultEpisode(alertObservation);
+        episode.ifPresent(ep -> {
+            ep.setObservations(findObservationsForEpisode(eventObservations));
+            ep.setGeometries(geometryObservation.getGeometries());
+            ep.addUrlIfNotExists(geometryObservation.getSourceUri());
+            if (isBlank(ep.getProperName())) {
+                ep.setProperName(geometryObservation.getProperName());
+            }
+            if (isBlank(ep.getLocation())) {
+                ep.setLocation(geometryObservation.getRegion());
+            }
+        });
+        return episode;
     }
 
-    private Optional<NormalizedObservation> getGeometryObservationForAlert(NormalizedObservation alertObservation, Set<NormalizedObservation> eventObservations) {
+    private Map.Entry<NormalizedObservation, NormalizedObservation> checkObservationsAndGetLatest(Set<NormalizedObservation> eventObservations, FeedData event) {
+        return eventObservations
+                .stream()
+                .filter(obs -> obs.getProvider().equals(GDACS_ALERT_PROVIDER))
+                .map(obs -> Map.entry(obs, getGeometryObservationForAlert(obs, eventObservations)))
+                .max(comparing(obs -> obs.getKey().getLoadedAt()))
+                .orElseThrow(() -> new RuntimeException(format(
+                        "No alert observation present for event: event_id = '%s', feed_id = '%s', version = %d",
+                        event.getFeedId(), event.getEventId(), event.getVersion())));
+    }
+
+    private NormalizedObservation getGeometryObservationForAlert(NormalizedObservation alertObservation, Set<NormalizedObservation> eventObservations) {
         return eventObservations.stream()
                 .filter(obs -> obs.getProvider().equals(GDACS_ALERT_GEOMETRY_PROVIDER)
                         && obs.getExternalEpisodeId().equals(alertObservation.getExternalEpisodeId())
                         && obs.getSourceUpdatedAt().equals(alertObservation.getSourceUpdatedAt()))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Geometry observation not found for alert: " + alertObservation.getObservationId()));
+    }
+
+    private Set<UUID> findObservationsForEpisode(Set<NormalizedObservation> eventObservations) {
+        return eventObservations
+                .stream()
+                .map(NormalizedObservation::getObservationId)
+                .collect(toSet());
     }
 }

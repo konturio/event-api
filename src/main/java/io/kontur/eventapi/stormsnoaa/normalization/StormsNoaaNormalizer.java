@@ -13,8 +13,6 @@ import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
@@ -31,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
+import static io.kontur.eventapi.util.GeometryUtil.*;
 import static io.kontur.eventapi.util.SeverityUtil.convertFujitaScale;
 
 @Component
@@ -40,6 +39,9 @@ public class StormsNoaaNormalizer extends Normalizer {
     private static final GeoJSONWriter geoJsonWriter = new GeoJSONWriter();
     private static final WKTReader wktReader = new WKTReader();
     private final NormalizedObservationsDao normalizedObservationsDao;
+
+    public static final Map<String, Object> STORMS_NOAA_POSITION_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, POSITION, IS_OBSERVED_PROPERTY, true);
+    public static final Map<String, Object> STORMS_NOAA_TRACK_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, TRACK, IS_OBSERVED_PROPERTY, true);
 
     private static final Map<String, BigDecimal> COST_UNITS = Map.of(
             "H", BigDecimal.valueOf(100),
@@ -145,12 +147,15 @@ public class StormsNoaaNormalizer extends Normalizer {
         boolean startPointPresent = x1 != null && y1 != null;
         boolean endPointPresent = x2 != null && y2 != null;
         String point = startPointPresent ? makeWktPoint(x1, y1) : endPointPresent ? makeWktPoint(x2, y2) : null;
-        String geom = startPointPresent && endPointPresent ? makeWktLine(x1, y1, x2, y2) : point;
         normalizedObservation.setPoint(point);
         try {
-            Geometry geometry = geom == null ? null : geoJsonWriter.write(wktReader.read(geom));
-            Feature feature = new Feature(geometry, Collections.emptyMap());
-            normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {feature}));
+            if (startPointPresent && endPointPresent) {
+                Geometry geometry = geoJsonWriter.write(wktReader.read(makeWktLine(x1, y1, x2, y2)));
+                normalizedObservation.setGeometries(convertGeometryToFeatureCollection(geometry, STORMS_NOAA_TRACK_PROPERTIES));
+            } else if (point != null) {
+                Geometry geometry = geoJsonWriter.write(wktReader.read(point));
+                normalizedObservation.setGeometries(convertGeometryToFeatureCollection(geometry, STORMS_NOAA_POSITION_PROPERTIES));
+            }
         } catch (ParseException e) {
             LOG.error(e.getMessage(), e);
         }

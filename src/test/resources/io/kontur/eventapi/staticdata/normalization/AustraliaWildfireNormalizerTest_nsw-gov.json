@@ -1,0 +1,18 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]]
+  },
+  "properties": {
+    "FireName": "fire name",
+    "FireNo": "25134",
+    "Label": "2012-01 Wildfire",
+    "StartDate": "2012-01-01",
+    "EndDate": "2012-01-05",
+    "AreaHa": 14,
+    "PerimeterM": 1694,
+    "VerDate": "31\/3\/2021"
+  },
+  "id": "feature-8438"
+}

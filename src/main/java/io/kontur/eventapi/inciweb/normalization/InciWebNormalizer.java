@@ -1,8 +1,9 @@
 package io.kontur.eventapi.inciweb.normalization;
 
 import static io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter.INCIWEB_PROVIDER;
+import static io.kontur.eventapi.util.GeometryUtil.*;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import io.kontur.eventapi.entity.DataLake;
@@ -15,15 +16,14 @@ import io.kontur.eventapi.normalization.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
-import org.wololo.geojson.Geometry;
 import org.wololo.geojson.Point;
 
 @Component
 public class InciWebNormalizer extends Normalizer {
 
     private final static Logger LOG = LoggerFactory.getLogger(InciWebNormalizer.class);
+
+    public final static Map<String, Object> INCIWEB_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, START_POINT, IS_OBSERVED_PROPERTY, true);
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -50,7 +50,7 @@ public class InciWebNormalizer extends Normalizer {
             normalizedObservation.setSourceUri(parsedItem.get().getLink());
 
             Point point = new Point(new double[] {parsedItem.get().getLongitude(), parsedItem.get().getLatitude()});
-            normalizedObservation.setGeometries(convertGeometries(point));
+            normalizedObservation.setGeometries(convertGeometryToFeatureCollection(point, INCIWEB_PROPERTIES));
             normalizedObservation.setPoint(
                     makeWktPoint(parsedItem.get().getLongitude(), parsedItem.get().getLatitude()));
 
@@ -60,9 +60,4 @@ public class InciWebNormalizer extends Normalizer {
         }
         return null;
     }
-
-    private FeatureCollection convertGeometries(Geometry geometry) {
-        return new FeatureCollection(new Feature[]{new Feature(geometry, new HashMap<>())});
-    }
-
 }

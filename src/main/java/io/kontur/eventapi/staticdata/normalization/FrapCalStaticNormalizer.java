@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.jts2geojson.GeoJSONReader;
 
@@ -16,9 +15,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureCollection;
 
 @Component
 public class FrapCalStaticNormalizer extends StaticNormalizer {
@@ -38,8 +38,7 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
         MultiPolygon multiPolygon = (MultiPolygon) reader.read(feature.getGeometry());
         Point point = multiPolygon.getCentroid();
         normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
-        Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}));
+        normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), WILDFIRE_PROPERTIES));
 
         String state = readString(properties, "STATE");
         String unit = readString(properties, "UNIT_ID");

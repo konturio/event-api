@@ -14,6 +14,7 @@ import org.wololo.geojson.Point;
 import java.io.IOException;
 import java.util.UUID;
 
+import static io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer.HAZARD_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HpSrvSearchNormalizerTest {
@@ -61,7 +62,7 @@ class HpSrvSearchNormalizerTest {
         assertEquals(-98.1841, point.getCoordinates()[0]);
         assertEquals(44.4186, point.getCoordinates()[1]);
 
-        assertEquals("centerPoint", feature.getProperties().get("areaType"));
+        assertEquals(HAZARD_PROPERTIES, feature.getProperties());
     }
 
     private DataLake createDataLakeObject() throws IOException {

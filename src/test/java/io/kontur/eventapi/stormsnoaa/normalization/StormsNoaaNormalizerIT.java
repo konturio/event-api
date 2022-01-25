@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static io.kontur.eventapi.stormsnoaa.normalization.StormsNoaaNormalizer.STORMS_NOAA_TRACK_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StormsNoaaNormalizerIT extends AbstractCleanableIntegrationTest {
@@ -55,6 +56,8 @@ class StormsNoaaNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals("Tornado - WASHITA, OKLAHOMA, USA", normalizedObservation.getName());
         assertNotNull(normalizedObservation.getPoint());
         assertNotNull(normalizedObservation.getGeometries());
+        assertEquals(1, normalizedObservation.getGeometries().getFeatures().length);
+        assertEquals(STORMS_NOAA_TRACK_PROPERTIES, normalizedObservation.getGeometries().getFeatures()[0].getProperties());
     }
 
     private DataLake createTestDataLake() {

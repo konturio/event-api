@@ -1,0 +1,18 @@
+{
+  "EventSource": "aws:sns",
+  "EventVersion": "1.0",
+  "EventSubscriptionArn": "EventSubscriptionArn",
+  "Sns": {
+    "Type": "Notification",
+    "MessageId": "1",
+    "TopicArn": "topic",
+    "Subject": null,
+    "Message": "{\"event\":\"{\\\"syncDa\\\":{\\\"masterSyncEvents\\\":{\\\"type\\\":\\\"HAZARD\\\",\\\"uuid\\\":\\\"1\\\"}},\\\"json\\\":\\\"{\\\\\\\"hazardName\\\\\\\":\\\\\\\"hazard name\\\\\\\",\\\\\\\"startDate\\\\\\\":1577836800000,\\\\\\\"endDate\\\\\\\":1577840400000,\\\\\\\"latitude\\\\\\\":10,\\\\\\\"longitude\\\\\\\":10,\\\\\\\"updateDate\\\\\\\":1577840400000,\\\\\\\"uuid\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"wkt\\\\\\\":{\\\\\\\"text\\\\\\\":\\\\\\\"POINT (-109.303795018 28.839495961)\\\\\\\"},\\\\\\\"hazardType\\\\\\\":{\\\\\\\"typeId\\\\\\\":\\\\\\\"CYCLONE\\\\\\\"},\\\\\\\"hazardSeverity\\\\\\\":{\\\\\\\"severityId\\\\\\\":\\\\\\\"INFORMATION\\\\\\\"},\\\\\\\"hazardDescription\\\\\\\":{\\\\\\\"description\\\\\\\":\\\\\\\"hazard description\\\\\\\"},\\\\\\\"hazardSnc\\\\\\\":null}\\\"}\"}",
+    "Timestamp": "2020-01-01T00:00:00.000Z",
+    "SignatureVersion": "1",
+    "Signature": "signature",
+    "SigningCertUrl": "SigningCertUrl",
+    "UnsubscribeUrl": "UnsubscribeUrl",
+    "MessageAttributes": {}
+  }
+}

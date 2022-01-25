@@ -14,6 +14,7 @@ import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Point;
 import java.util.Objects;
 
+import static io.kontur.eventapi.calfire.normalization.CalFireNormalizer.CALFIRE_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CalFireNormalizationTest {
@@ -59,6 +60,7 @@ class CalFireNormalizationTest {
         Point point = (Point) feature.getGeometry();
         assertEquals(-100.12345, point.getCoordinates()[0]);
         assertEquals(30.12345, point.getCoordinates()[1]);
+        assertEquals(CALFIRE_PROPERTIES, feature.getProperties());
     }
 
     private DataLake createDataLake() throws Exception {

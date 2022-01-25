@@ -62,6 +62,7 @@ class GdacsAlertEpisodeCombinatorTest {
         observation.setProvider(provider);
         observation.setExternalEpisodeId("test_episode_id");
         observation.setSourceUpdatedAt(OffsetDateTime.parse("2021-05-20T00:00:00Z"));
+        observation.setLoadedAt(OffsetDateTime.now());
         observation.setGeometries(geometries);
         return observation;
     }

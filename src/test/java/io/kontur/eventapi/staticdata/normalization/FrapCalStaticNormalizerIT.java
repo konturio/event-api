@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static io.kontur.eventapi.staticdata.normalization.StaticNormalizer.WILDFIRE_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FrapCalStaticNormalizerIT extends AbstractCleanableIntegrationTest {
@@ -46,6 +47,7 @@ class FrapCalStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(EventType.WILDFIRE, normalizedObservation.getType());
         assertNotNull(normalizedObservation.getPoint());
         assertNotNull(normalizedObservation.getGeometries());
+        assertEquals(WILDFIRE_PROPERTIES, normalizedObservation.getGeometries().getFeatures()[0].getProperties());
         assertEquals("Wildfire - Los Angeles County, California, USA", normalizedObservation.getName());
         assertEquals("CalFire", normalizedObservation.getProperName());
         assertEquals(Severity.UNKNOWN, normalizedObservation.getEventSeverity());

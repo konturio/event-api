@@ -2,18 +2,27 @@ package io.kontur.eventapi.gdacs.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.gdacs.converter.GdacsPropertiesConverter;
+import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Map;
+import java.util.*;
+
 import org.springframework.stereotype.Component;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 
 @Component
 public class GdacsGeometryNormalizer extends GdacsNormalizer {
+
+    private final GdacsPropertiesConverter propertiesConverter;
+
+    public GdacsGeometryNormalizer(GdacsPropertiesConverter propertiesConverter) {
+        this.propertiesConverter = propertiesConverter;
+    }
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -33,7 +42,7 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(dataLakeDto.getData());
         Map<String, Object> properties = featureCollection.getFeatures()[0].getProperties();
 
-        normalizedObservation.setGeometries(featureCollection);
+        normalizedObservation.setGeometries(computeGeometry(featureCollection));
 
         String eventType = readString(properties, "eventtype");
         String eventId = readString(properties, "eventid");
@@ -52,6 +61,24 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
     }
 
     private OffsetDateTime parseDateTime(String dateTimeString) {
-        return OffsetDateTime.of(LocalDateTime.parse(dateTimeString), ZoneOffset.UTC);
+        return dateTimeString == null ? null : OffsetDateTime.of(LocalDateTime.parse(dateTimeString), ZoneOffset.UTC);
+    }
+
+    private FeatureCollection computeGeometry(FeatureCollection fc) {
+        Feature[] features = new Feature[fc.getFeatures().length];
+        for (int i = 0; i < features.length; i++) {
+            Feature feature = fc.getFeatures()[i];
+
+            String eventClass = readString(feature.getProperties(), "Class");
+            OffsetDateTime polygonDate = parseDateTime(readString(feature.getProperties(), "polygondate"));
+            String polygonLabel = readString(feature.getProperties(), "polygonlabel");
+            Boolean forecast = readBoolean(feature.getProperties(), "forecast");
+
+            Map<String, Object> props = propertiesConverter.convertProperties(eventClass, polygonDate, polygonLabel, forecast);
+            propertiesConverter.migrateProperties(feature.getProperties(), props);
+
+            features[i] = new Feature(feature.getGeometry(), props);
+        }
+        return new FeatureCollection(features);
     }
 }

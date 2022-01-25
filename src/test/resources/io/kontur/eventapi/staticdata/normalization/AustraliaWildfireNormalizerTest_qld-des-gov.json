@@ -1,0 +1,26 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [[[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]]
+  },
+  "properties": {
+    "OBJECTID": 8311107,
+    "LABEL": "label",
+    "TYPE_": "WF",
+    "BURNSTATUS": "OUT",
+    "GENERAL_LO": null,
+    "OWNING_AGE": "QPWS",
+    "IGNITIONDA": "2012-01-01",
+    "OUTDATE": "2012-01-05",
+    "OUTYEAR": 2012,
+    "MONTH_": 1,
+    "COMPLETEDD": null,
+    "COMPLETEDY": 0,
+    "PCT_BURN": 75.0,
+    "AREA_HA": 1624,
+    "Shape__Are": 0,
+    "Shape__Len": 0
+  },
+  "id": "feature-1146"
+}

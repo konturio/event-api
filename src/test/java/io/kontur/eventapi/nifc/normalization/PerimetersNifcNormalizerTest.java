@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static io.kontur.eventapi.TestUtil.readFile;
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
+import static io.kontur.eventapi.nifc.normalization.NifcNormalizer.PERIMETERS_PROPERTIES;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,20 +47,18 @@ class PerimetersNifcNormalizerTest {
         assertNull(observation.getRegion());
         assertNull(observation.getSourceUri());
         assertNull(observation.getExternalEpisodeId());
+
+        assertEquals(PERIMETERS_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
     }
 
     private DataLake createDataLake() throws IOException {
-        String data = readFile("PerimetersNifcNormalizerTest.json");
+        String data = readFile(this, "PerimetersNifcNormalizerTest.json");
         String externalId = "2021-ALALF-210222";
         OffsetDateTime updatedAt = getDateTimeFromMilli(1637628408000L);
         DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, OffsetDateTime.now());
         dataLake.setData(data);
         dataLake.setProvider(NIFC_PERIMETERS_PROVIDER);
         return dataLake;
-    }
-
-    private String readFile(String fileName) throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
     }
 
 }

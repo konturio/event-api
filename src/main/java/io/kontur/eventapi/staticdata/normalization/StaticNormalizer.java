@@ -12,9 +12,15 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.kontur.eventapi.util.GeometryUtil.*;
+
 public abstract class StaticNormalizer extends Normalizer {
+
+    protected final static Map<String, Object> WILDFIRE_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, EXPOSURE, IS_OBSERVED_PROPERTY, true);
+    protected final static Map<String, Object> TORNADO_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, POSITION, IS_OBSERVED_PROPERTY, true);
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
