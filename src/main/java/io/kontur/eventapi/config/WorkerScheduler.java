@@ -18,8 +18,6 @@ import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -27,7 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkerScheduler {
 
-    private final Logger LOG = LoggerFactory.getLogger(WorkerScheduler.class);
     private final HpSrvSearchJob hpSrvSearchJob;
     private final HpSrvMagsJob hpSrvMagsJob;
     private final GdacsSearchJob gdacsSearchJob;
@@ -136,8 +133,6 @@ public class WorkerScheduler {
     public void startPdcHazardImport() {
         if (Boolean.parseBoolean(hpSrvImportEnabled)) {
             hpSrvSearchJob.run();
-        } else {
-            LOG.info("HpSrv import job invocation is skipped");
         }
     }
 
@@ -145,8 +140,6 @@ public class WorkerScheduler {
     public void startPdcMagsImport() {
         if (Boolean.parseBoolean(hpSrvMagsImportEnabled)) {
             hpSrvMagsJob.run();
-        } else {
-            LOG.info("HpSrv mags import job invocation is skipped");
         }
     }
 
@@ -154,8 +147,6 @@ public class WorkerScheduler {
     public void startPdcMapSrvSearch() {
         if (Boolean.parseBoolean(pdcMapSrvSearchEnabled)) {
             pdcMapSrvSearchJob.run();
-        } else {
-            LOG.info("PdcMapSrv import job invocation is skipped");
         }
     }
 
@@ -163,8 +154,6 @@ public class WorkerScheduler {
     public void startGdacsImport() {
         if (Boolean.parseBoolean(gdacsImportEnabled)) {
             gdacsSearchJob.run();
-        } else {
-            LOG.info("Gdacs import job invocation is skipped");
         }
     }
 
@@ -172,8 +161,6 @@ public class WorkerScheduler {
     public void startFirmsModisImport() {
         if (Boolean.parseBoolean(firmsModisImportEnabled)) {
             firmsImportModisJob.run();
-        } else {
-            LOG.info("Firms Modis import job invocation is skipped");
         }
     }
 
@@ -181,8 +168,6 @@ public class WorkerScheduler {
     public void startFirmsNoaaImport() {
         if (Boolean.parseBoolean(firmsNoaaImportEnabled)) {
             firmsImportNoaaJob.run();
-        } else {
-            LOG.info("Firms Noaa import job invocation is skipped");
         }
     }
 
@@ -190,8 +175,6 @@ public class WorkerScheduler {
     public void startFirmsSuomiImport() {
         if (Boolean.parseBoolean(firmsSuomiImportEnabled)) {
             firmsImportSuomiJob.run();
-        } else {
-            LOG.info("Firms Suomi import job invocation is skipped");
         }
     }
 
@@ -199,8 +182,6 @@ public class WorkerScheduler {
     public void emDatImportJob() {
         if (Boolean.parseBoolean(emDatImportEnabled)) {
             emDatImportJob.run();
-        } else {
-            LOG.info("EM-DAT Import job invocation is skipped");
         }
     }
 
@@ -208,8 +189,6 @@ public class WorkerScheduler {
     public void startStaticImport() {
         if (Boolean.parseBoolean(staticImportEnabled)) {
             staticImportJob.run();
-        } else {
-            LOG.info("Static import job invocation is skipped");
         }
     }
 
@@ -217,8 +196,6 @@ public class WorkerScheduler {
     public void startStormNoaaImport() {
         if (Boolean.parseBoolean(stormsNoaaImportEnabled)) {
             stormsNoaaImportJob.run();
-        } else {
-            LOG.info("StormsNoaa import job invocation is skipped");
         }
     }
 
@@ -226,8 +203,6 @@ public class WorkerScheduler {
     public void startTornadoJapanMaImport() {
         if (Boolean.parseBoolean(tornadoJapanMaImportEnabled)) {
             tornadoJapanMaImportJob.run();
-        } else {
-            LOG.info("TornadoJapanMa import job invocation is skipped");
         }
     }
 
@@ -235,8 +210,6 @@ public class WorkerScheduler {
     public void startHistoricalTornadoJapanMaImport() {
         if (Boolean.parseBoolean(historicalTornadoJapanMaImportEnabled)) {
             historicalTornadoJapanMaImportJob.run();
-        } else {
-            LOG.info("HistoricalTornadoJapanMa import job invocation is skipped");
         }
     }
 
@@ -244,8 +217,6 @@ public class WorkerScheduler {
     public void startCalFireSearchJob() {
         if (Boolean.parseBoolean(calfireEnabled)) {
             calFireSearchJob.run();
-        } else {
-            LOG.info("Calfire job invocation is skipped");
         }
     }
 
@@ -253,8 +224,6 @@ public class WorkerScheduler {
     public void startNifcImport() {
         if (Boolean.parseBoolean(nifcImportEnabled)) {
             nifcImportJob.run();
-        } else {
-            LOG.info("Nifc import job invocation is skipped");
         }
     }
 
@@ -262,8 +231,6 @@ public class WorkerScheduler {
     public void startInciWebImport() {
         if (Boolean.parseBoolean(inciwebEnabled)) {
             inciWebImportJob.run();
-        } else {
-            LOG.info("InciWeb import job invocation is skipped");
         }
     }
 
@@ -271,8 +238,6 @@ public class WorkerScheduler {
     public void startNormalization() {
         if (Boolean.parseBoolean(normalizationEnabled)) {
             normalizationJob.run();
-        } else {
-            LOG.info("Normalization job invocation is skipped");
         }
     }
 
@@ -280,8 +245,6 @@ public class WorkerScheduler {
     public void startCombinationJob() {
         if (Boolean.parseBoolean(eventCombinationEnabled)) {
             eventCombinationJob.run();
-        } else {
-            LOG.info("Combination job invocation is skipped");
         }
     }
 
@@ -289,8 +252,6 @@ public class WorkerScheduler {
     public void startFirmsCombinationJob() {
         if (Boolean.parseBoolean(eventCombinationEnabled)) {
             firmsEventCombinationJob.run();
-        } else {
-            LOG.info("Firms Combination job invocation is skipped");
         }
     }
 
@@ -298,8 +259,6 @@ public class WorkerScheduler {
     public void startFeedCompositionJob() {
         if (Boolean.parseBoolean(feedCompositionEnabled)) {
             feedCompositionJob.run();
-        } else {
-            LOG.info("Feed Compose job invocation is skipped");
         }
     }
 
@@ -307,8 +266,6 @@ public class WorkerScheduler {
     public void startFirmsFeedCompositionJob() {
         if (Boolean.parseBoolean(feedCompositionEnabled)) {
             firmsFeedCompositionJob.run();
-        } else {
-            LOG.info("Firms Feed Compose job invocation is skipped");
         }
     }
 
@@ -316,8 +273,6 @@ public class WorkerScheduler {
     public void startEnrichmentJob() {
         if (Boolean.parseBoolean(enrichmentEnabled)) {
             enrichmentJob.run();
-        } else {
-            LOG.info("Enrichment job invocation is skipped");
         }
     }
 
@@ -325,8 +280,6 @@ public class WorkerScheduler {
     public void startReEnrichmentJob() {
         if (Boolean.parseBoolean(reEnrichmentEnabled)) {
             reEnrichmentJob.run();
-        } else {
-            LOG.info("Re-enrichment job invocation is skipped");
         }
     }
 
@@ -334,8 +287,6 @@ public class WorkerScheduler {
     public void startMetricsJob() {
         if (Boolean.parseBoolean(metricsEnabled)) {
             metricsJob.run();
-        } else {
-            LOG.info("Metrics job invocation is skipped");
         }
     }
 }

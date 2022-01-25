@@ -70,7 +70,8 @@ class GdacsServiceTest {
         when(gdacsDataLakeConverter.convertGdacsWithGeometry(alert, geometry))
                 .thenReturn(createDataLake(alert, geometry, GDACS_ALERT_GEOMETRY_PROVIDER));
 
-        List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(List.of(alert));
+        List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(
+                Map.of("GDACS_EQ_1243255_1342589", alert));
 
         assertEquals(2, dataLakes.size());
         assertEquals(GDACS_ALERT_PROVIDER, dataLakes.get(0).getProvider());
@@ -84,24 +85,12 @@ class GdacsServiceTest {
         when(gdacsClient.getGeometryByLink(alert.getEventType(), alert.getEventId(), alert.getCurrentEpisodeId()))
                 .thenThrow(FeignException.class);
 
-        List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(List.of(alert));
+        List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(
+                Map.of("GDACS_EQ_1243255_1342589", alert));
 
         assertEquals(0, dataLakes.size());
         verify(gdacsDataLakeConverter, times(0)).convertGdacs(any());
         verify(gdacsDataLakeConverter, times(0)).convertGdacsWithGeometry(any(), anyString());
-    }
-
-    @Test
-    public void testCreateDataLakeListWithAlertsAndGeometryWhenExists() throws IOException {
-        ParsedAlert alert = getParsedAlert();
-        when(dataLakeDao.getDataLakesByExternalId(alert.getIdentifier())).thenReturn(Collections.singletonList(new DataLake()));
-
-        List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(List.of(alert));
-
-        assertEquals(0, dataLakes.size());
-        verify(gdacsDataLakeConverter, times(0)).convertGdacs(any());
-        verify(gdacsDataLakeConverter, times(0)).convertGdacsWithGeometry(any(), anyString());
-        verify(gdacsClient, times(0)).getGeometryByLink(alert.getEventType(), alert.getEventId(), alert.getCurrentEpisodeId());
     }
 
     private ParsedAlert getParsedAlert() throws IOException {
@@ -123,6 +112,6 @@ class GdacsServiceTest {
     }
 
     private String readFile(String fileName) throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream(fileName), "UTF-8");
+        return IOUtils.toString(Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
     }
 }

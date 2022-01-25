@@ -6,7 +6,7 @@ import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.nifc.client.NifcClient;
 import io.kontur.eventapi.nifc.converter.NifcDataLakeConverter;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,13 +16,15 @@ import org.wololo.geojson.GeoJSONFactory;
 
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCATIONS_PROVIDER;
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.time.temporal.ChronoUnit.SECONDS;
+
+import javax.validation.constraints.NotNull;
 
 @Component
 public class NifcImportJob extends AbstractJob {
@@ -68,13 +70,22 @@ public class NifcImportJob extends AbstractJob {
         try {
             FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
+            Set<String> ids = Arrays.stream(fc.getFeatures())
+                    .map(feature -> String.valueOf(feature.getProperties().get(externalIdProp)))
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.toSet());
+            Map<String, DataLake> existsDataLakes = new HashMap<>();
+            dataLakeDao.getDataLakesByExternalIdsAndProvider(ids, provider)
+                    .stream().filter(item -> StringUtils.isNotBlank(item.getExternalId()))
+                    .forEach(dataLake -> existsDataLakes.put(dataLake.getExternalId(), dataLake));
             for (Feature feature : fc.getFeatures()) {
                 try {
                     String data = writeJson(feature);
                     String externalId = String.valueOf(feature.getProperties().get(externalIdProp));
                     long updatedAtMilli = Long.parseLong(String.valueOf(feature.getProperties().get(updatedAtProp)));
                     OffsetDateTime updatedAt = getDateTimeFromMilli(updatedAtMilli).truncatedTo(SECONDS);
-                    if (dataLakeDao.isNewEvent(externalId, provider, updatedAt.format(ISO_INSTANT))) {
+                    if (!existsDataLakes.containsKey(externalId)
+                            || !existsDataLakes.get(externalId).getUpdatedAt().isEqual(updatedAt)) {
                         dataLakes.add(dataLakeConverter.convertDataLake(externalId, updatedAt, provider, data));
                     }
                 } catch (Exception e) {

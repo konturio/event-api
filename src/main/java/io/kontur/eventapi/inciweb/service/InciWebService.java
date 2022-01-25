@@ -2,10 +2,11 @@ package io.kontur.eventapi.inciweb.service;
 
 import static io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter.INCIWEB_PROVIDER;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import feign.FeignException;
@@ -46,14 +47,17 @@ public class InciWebService {
         return Optional.empty();
     }
 
-    public List<DataLake> createDataLake(List<ParsedItem> events) {
+    public List<DataLake> createDataLake(Map<String, ParsedItem> events) {
         List<DataLake> dataLakes = new ArrayList<>();
         if (!CollectionUtils.isEmpty(events)) {
-            for (ParsedItem event : events) {
+            Map<String, DataLake> existsDataLakes = new HashMap<>();
+            dataLakeDao.getDataLakesByExternalIdsAndProvider(events.keySet(), INCIWEB_PROVIDER)
+                    .forEach(dataLake -> existsDataLakes.put(dataLake.getExternalId(), dataLake));
+            for (String key : events.keySet()) {
                 try {
-                    if (dataLakeDao.isNewEvent(event.getGuid(), INCIWEB_PROVIDER,
-                            event.getPubDate().format(DateTimeFormatter.ISO_INSTANT))) {
-                        dataLakes.add(dataLakeConverter.convertEvent(event));
+                    if (!existsDataLakes.containsKey(key)
+                            || !existsDataLakes.get(key).getUpdatedAt().isEqual(events.get(key).getPubDate())) {
+                        dataLakes.add(dataLakeConverter.convertEvent(events.get(key)));
                     }
                 } catch (Exception e) {
                     LOG.error("Error while processing InciWeb wildfire event. {}", e.getMessage());

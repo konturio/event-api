@@ -5,10 +5,13 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.client.PdcMapSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
+import io.kontur.eventapi.entity.ExposureGeohash;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -42,14 +45,29 @@ public class PdcMapSrvSearchJob extends AbstractJob {
             String geoJson = pdcMapSrvClient.getExposures();
             FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
+            Map<String, String> ids = new HashMap<>();
+            Map<String, String> features = new HashMap<>();
             for (Feature feature : featureCollection.getFeatures()) {
                 String externalId = String.valueOf(feature.getProperties().get("hazard_uuid"));
                 String geoHash = (String) feature.getProperties().get("geohash");
-                if (geoHash != null && dataLakeDao.isNewPdcExposure(externalId, geoHash)) {
-                    dataLakes.add(pdcDataLakeConverter.convertExposure(feature.toString(), externalId));
+                ids.put(externalId, geoHash);
+                features.put(externalId, feature.toString());
+            }
+            if (!ids.isEmpty()) {
+                List<ExposureGeohash> exposureGeohashes = dataLakeDao.getPdcExposureGeohashes(ids.keySet());
+                Map<String, ExposureGeohash> storedValues = new HashMap<>();
+                exposureGeohashes.forEach(value -> storedValues.put(value.getExternalId(), value));
+                for (String id : ids.keySet()) {
+                    if ((!storedValues.containsKey(id) || StringUtils.isBlank(storedValues.get(id).getGeohash())
+                            || !storedValues.get(id).getGeohash().equals(ids.get(id)))
+                            && dataLakes.stream().noneMatch(i -> i.getExternalId().equals(id))) {
+                        dataLakes.add(pdcDataLakeConverter.convertExposure(features.get(id), id));
+                    }
+                }
+                if (!CollectionUtils.isEmpty(dataLakes)) {
+                    dataLakeDao.storeDataLakes(dataLakes);
                 }
             }
-            dataLakeDao.storeDataLakes(dataLakes);
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }

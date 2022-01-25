@@ -26,6 +26,8 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsAlertXmlParser.class);
 
+    public static final String IDENTIFIER = "identifier";
+
     private static final String DATE_MODIFIED = "datemodified";
     private static final String EVENT_ID = "eventid";
     private static final String EVENT_TYPE = "eventtype";
@@ -40,21 +42,21 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
     private static final String SEVERITY = "severity";
     private static final String DESCRIPTION = "description";
     private static final String PARAMETER = "parameter";
-    private static final String IDENTIFIER = "identifier";
     private static final String ALERT = "alert";
     private static final String VALUE = "value";
     private static final String VALUE_NAME = "valueName";
 
     private static final String NS = "*";
 
-    public List<String> getAlerts(String xml) throws IOException, SAXException, ParserConfigurationException {
-        return getItems(xml, ALERT, NS);
+    public Map<String, String> getAlerts(String xml) throws IOException, SAXException, ParserConfigurationException {
+        return getItems(xml, ALERT, NS, IDENTIFIER);
     }
 
-    public List<ParsedAlert> getParsedAlertsToGdacsSearchJob(List<String> alertsXml) throws ParserConfigurationException {
-        List<ParsedAlert> parsedAlerts = new ArrayList<>();
-        for (String alertXml : alertsXml) {
-            parseAlert(alertXml).ifPresent(parsedAlerts::add);
+    public Map<String, ParsedAlert> getParsedAlertsToGdacsSearchJob(Map<String, String> alertsXml)
+            throws ParserConfigurationException {
+        Map<String, ParsedAlert> parsedAlerts = new HashMap<>();
+        for (String key : alertsXml.keySet()) {
+            parseAlert(alertsXml.get(key)).ifPresent(alert -> parsedAlerts.put(key, alert));
         }
         return parsedAlerts;
     }

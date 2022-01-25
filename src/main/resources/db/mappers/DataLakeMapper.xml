@@ -53,6 +53,26 @@
         </foreach>
     </select>
 
+    <select id="getDataLakesByExternalIdsAndProvider" resultMap="dataLakeMap">
+        SELECT *
+        FROM data_lake
+        WHERE
+        provider = #{provider} AND
+        <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
+            #{externalId}
+        </foreach>
+    </select>
+
+    <select id="getDataLakesIdByExternalIdsAndProvider" resultType="java.lang.String">
+        SELECT external_id
+        FROM data_lake
+        WHERE
+        provider = #{provider} AND
+        <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
+            #{externalId}
+        </foreach>
+    </select>
+
     <select id="getDataLakeByObservationId" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake
@@ -66,6 +86,15 @@
           AND provider = #{provider}
         ORDER BY updated_at DESC
         LIMIT 1
+    </select>
+
+    <select id="getPdcExposureGeohashes" resultMap="exposureGeohash">
+        SELECT external_id, jsonb_object_field_text((data::jsonb)->'properties', 'geohash') as geohash
+        FROM data_lake
+        WHERE provider = 'pdcMapSrv' AND
+        <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
+            #{externalId}
+        </foreach>
     </select>
 
     <select id="isNewPdcExposure" resultType="java.lang.Boolean">
@@ -106,6 +135,11 @@
         <result property="provider" column="provider" />
         <result property="data" column="data" />
         <result property="normalized" column="normalized" />
+    </resultMap>
+
+    <resultMap id="exposureGeohash" type="io.kontur.eventapi.entity.ExposureGeohash">
+        <result property="externalId" column="external_id" />
+        <result property="geohash" column="geohash"/>
     </resultMap>
 
 </mapper>

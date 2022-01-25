@@ -35,7 +35,7 @@ class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
     public GdacsSearchJobIT(JdbcTemplate jdbcTemplate, DataLakeDao dataLakeDao) {
         super(jdbcTemplate);
         GdacsService gdacsService = new GdacsService(dataLakeDao, new GdacsDataLakeConverter(), gdacsClient);
-        this.gdacsSearchJob = new GdacsSearchJob(gdacsService, new GdacsAlertXmlParser(), new SimpleMeterRegistry());
+        this.gdacsSearchJob = new GdacsSearchJob(gdacsService, new GdacsAlertXmlParser(), dataLakeDao, new SimpleMeterRegistry());
         this.dataLakeDao = dataLakeDao;
     }
 

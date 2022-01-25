@@ -4,8 +4,8 @@ import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -24,7 +24,8 @@ public class InciWebXmlParser extends BaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(InciWebXmlParser.class);
 
-    private static final String GUID = "guid";
+    public static final String GUID = "guid";
+
     private static final String PUBDATE = "pubDate";
     private static final String LONGITUDE = "long";
     private static final String LATITUDE = "lat";
@@ -32,11 +33,12 @@ public class InciWebXmlParser extends BaseXmlParser {
     private static final String DESCRIPTION = "description";
     private static final String LINK = "link";
 
-    public List<ParsedItem> getParsedItems(List<String> itemsXml) {
-        List<ParsedItem> parsedItems = new ArrayList<>();
+    public Map<String, ParsedItem> getParsedItems(Map<String, String> itemsXml) {
+        Map<String, ParsedItem> parsedItems = new HashMap<>();
         if (!CollectionUtils.isEmpty(itemsXml)) {
-            for (String itemXml : itemsXml) {
-                getParsedItemForDataLake(itemXml).ifPresent(parsedItems::add);
+            for (String itemXml : itemsXml.keySet()) {
+                getParsedItemForDataLake(itemsXml.get(itemXml))
+                        .ifPresent(parsedItem -> parsedItems.put(itemXml, parsedItem));
             }
         }
         return parsedItems;

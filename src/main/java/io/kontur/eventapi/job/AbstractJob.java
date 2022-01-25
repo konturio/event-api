@@ -34,7 +34,7 @@ public abstract class AbstractJob implements Runnable {
             throw new IllegalStateException("Parallel execution of same job is not supported, job" + jobName);
         }
 
-        logger.info("job has started");
+        logger.debug("job has started");
         Timer.Sample regularTimer = Timer.start(meterRegistry);
         LongTaskTimer.Sample longTaskTimer = LongTaskTimer.builder("job." + getName() + ".current")
                 .register(meterRegistry).start();
@@ -53,7 +53,7 @@ public abstract class AbstractJob implements Runnable {
 
         long duration = stopTimer(regularTimer);
         longTaskTimer.stop();
-        logger.info("job has finished in {} seconds", duration);
+        logger.debug("job has finished in {} seconds", duration);
         if (duration > 60) {
             logger.warn("[slow_job] {} seconds", duration);
         }

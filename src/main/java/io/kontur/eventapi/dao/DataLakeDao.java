@@ -2,6 +2,7 @@ package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.DataLakeMapper;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.entity.ExposureGeohash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,14 @@ public class DataLakeDao {
         return mapper.getDataLakesByExternalIds(externalIds);
     }
 
+    public List<DataLake> getDataLakesByExternalIdsAndProvider(Set<String> externalIds, String provider) {
+        return mapper.getDataLakesByExternalIdsAndProvider(externalIds, provider);
+    }
+
+    public Set<String> getDataLakesIdByExternalIdsAndProvider(Set<String> externalIds, String provider) {
+        return mapper.getDataLakesIdByExternalIdsAndProvider(externalIds, provider);
+    }
+
     public Optional<DataLake> getLatestUpdatedHazard(String provider) {
         return mapper.getLatestUpdatedEventForProvider(provider);
     }
@@ -60,6 +69,10 @@ public class DataLakeDao {
 
     public Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(String externalId, String provider) {
         return mapper.getLatestDataLakeByExternalIdAndProvider(externalId, provider);
+    }
+
+    public List<ExposureGeohash> getPdcExposureGeohashes(Set<String> externalIds) {
+        return mapper.getPdcExposureGeohashes(externalIds);
     }
 
     public Boolean isNewPdcExposure(String externalId, String geoHash) {
