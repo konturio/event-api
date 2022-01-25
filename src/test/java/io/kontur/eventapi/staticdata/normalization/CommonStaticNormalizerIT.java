@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static io.kontur.eventapi.staticdata.normalization.StaticNormalizer.TORNADO_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CommonStaticNormalizerIT extends AbstractCleanableIntegrationTest {
@@ -56,6 +57,9 @@ class CommonStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         OffsetDateTime date = OffsetDateTime.parse("1980-05-06T00:00:00Z");
         assertEquals(date, normalizedObservation.getStartedAt());
         assertEquals(date, normalizedObservation.getEndedAt());
+
+        assertEquals(1, normalizedObservation.getGeometries().getFeatures().length);
+        assertEquals(TORNADO_PROPERTIES, normalizedObservation.getGeometries().getFeatures()[0].getProperties());
     }
 
     private DataLake createDataLakeWithProvider(String provider) {

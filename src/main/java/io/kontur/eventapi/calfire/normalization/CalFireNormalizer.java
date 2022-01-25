@@ -12,18 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import static io.kontur.eventapi.calfire.converter.CalFireDataLakeConverter.CALFIRE_PROVIDER;
+import static io.kontur.eventapi.util.GeometryUtil.*;
 
 @Component
 public class CalFireNormalizer extends Normalizer {
@@ -32,6 +31,8 @@ public class CalFireNormalizer extends Normalizer {
     private final static GeoJSONReader reader = new GeoJSONReader();
     private final static String WILDFIRE = "Wildfire";
     private final static double ACRES_IN_SQ_KM = 247.105d;
+
+    public final static Map<String, Object> CALFIRE_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, START_POINT, IS_OBSERVED_PROPERTY, true);
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -43,7 +44,7 @@ public class CalFireNormalizer extends Normalizer {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
         Geometry geometry = feature.getGeometry();
-        normalizedObservation.setGeometries(convertGeometries(geometry));
+        normalizedObservation.setGeometries(convertGeometryToFeatureCollection(geometry, CALFIRE_PROPERTIES));
         normalizedObservation.setPoint(getCentroid(geometry, normalizedObservation.getObservationId()));
 
         Map<String, Object> properties = feature.getProperties();
@@ -96,10 +97,6 @@ public class CalFireNormalizer extends Normalizer {
             }
         }
         return normalizedObservation;
-    }
-
-    private FeatureCollection convertGeometries(Geometry geometry) {
-        return new FeatureCollection(new Feature[]{new Feature(geometry, new HashMap<>())});
     }
 
     private String getCentroid(Geometry geometry, UUID observationID) {

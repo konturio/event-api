@@ -8,7 +8,7 @@ import java.util.Map;
 
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
-import static io.kontur.eventapi.util.GeometryUtil.convertFeatureToFeatureCollection;
+import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureCollection;
 import static io.kontur.eventapi.util.GeometryUtil.readFeature;
 import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
 import static java.time.Duration.between;
@@ -29,7 +29,7 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         Feature feature = readFeature(dataLakeDto.getData());
         Map<String, Object> props = feature.getProperties();
 
-        observation.setGeometries(convertFeatureToFeatureCollection(feature));
+        observation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), PERIMETERS_PROPERTIES));
         observation.setDescription(readString(props, "irwin_IncidentShortDescription"));
 
         long startedAtMilli = readLong(props, "irwin_CreatedOnDateTime_dt");

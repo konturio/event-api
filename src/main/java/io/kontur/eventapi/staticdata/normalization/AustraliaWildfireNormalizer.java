@@ -7,15 +7,15 @@ import io.kontur.eventapi.entity.Severity;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureCollection;
 
 @Component
 public class AustraliaWildfireNormalizer extends StaticNormalizer {
@@ -41,8 +41,7 @@ public class AustraliaWildfireNormalizer extends StaticNormalizer {
         Point point = reader.read(feature.getGeometry()).getCentroid();
         normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
 
-        Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}));
+        normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), WILDFIRE_PROPERTIES));
 
         normalizedObservation.setEventSeverity(Severity.UNKNOWN);
         normalizedObservation.setType(EventType.WILDFIRE);

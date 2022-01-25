@@ -6,13 +6,12 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureCollection;
 import static io.kontur.eventapi.util.SeverityUtil.convertFujitaScale;
 
 @Component
@@ -31,8 +30,7 @@ public class CommonStaticNormalizer extends StaticNormalizer {
         Double lon = readDouble(properties, "longitude");
         Double lat = readDouble(properties, "latitude");
         normalizedObservation.setPoint(makeWktPoint(lon, lat));
-        Feature geomFeature = new Feature(feature.getGeometry(), Collections.emptyMap());
-        normalizedObservation.setGeometries(new FeatureCollection(new Feature[] {geomFeature}));
+        normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), TORNADO_PROPERTIES));
 
         String name = readString(properties, "name");
         String admin0 = readString(properties, "admin0");

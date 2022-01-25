@@ -13,6 +13,7 @@ import org.wololo.geojson.FeatureCollection;
 import java.io.IOException;
 import java.util.UUID;
 
+import static io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer.MAG_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HpSrvMagsNormalizerTest {
@@ -46,7 +47,7 @@ class HpSrvMagsNormalizerTest {
         assertEquals(1595458283232L, obs.getSourceUpdatedAt().toInstant().toEpochMilli());
         FeatureCollection fc = obs.getGeometries();
         assertEquals(1, fc.getFeatures().length);
-        assertEquals("alertArea", fc.getFeatures()[0].getProperties().get("areaType"));
+        assertEquals(MAG_PROPERTIES, fc.getFeatures()[0].getProperties());
     }
 
     private DataLake createDataLakeObject() throws IOException {

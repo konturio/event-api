@@ -1,5 +1,6 @@
 package io.kontur.eventapi.inciweb.normalization;
 
+import static io.kontur.eventapi.inciweb.normalization.InciWebNormalizer.INCIWEB_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -63,6 +64,7 @@ class InciWebNormalizationTest {
         Point point = (Point) feature.getGeometry();
         assertEquals(-110.111, point.getCoordinates()[0]);
         assertEquals(10.111, point.getCoordinates()[1]);
+        assertEquals(INCIWEB_PROPERTIES, feature.getProperties());
     }
 
     private DataLake createDataLake() throws Exception {

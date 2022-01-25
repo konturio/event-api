@@ -3,6 +3,7 @@ package io.kontur.eventapi.pdc.normalization;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.kontur.eventapi.entity.DataLake;
+import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.util.JsonUtil;
 import org.locationtech.jts.geom.Geometry;
@@ -16,6 +17,7 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
 import java.util.Map;
 
+import static io.kontur.eventapi.entity.EventType.CYCLONE;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 
@@ -66,7 +68,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         normalizedDto.setExternalEpisodeId(uniqueExternalId);
         convertHazardTypeProperties(normalizedDto, (Map<String, Object>) props.get("hazard"));
         normalizedDto.setActive(readBoolean(props, "isActive"));
-        normalizedDto.setGeometries(convertGeometries(props));
+        normalizedDto.setGeometries(convertMagGeometry(props));
     }
 
     @SuppressWarnings("unchecked")
@@ -91,14 +93,14 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         }
 
         try {
-            normalizedDto.setGeometries(convertGeometry(pointWkt, props));
+            normalizedDto.setGeometries(convertHazardGeometry(pointWkt, normalizedDto.getType()));
         } catch (ParseException e) {
             LOG.warn(e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private FeatureCollection convertGeometries(Map<String, Object> props) {
+    private FeatureCollection convertMagGeometry(Map<String, Object> props) {
         try {
             Geometry wktGeometry = wktReader.read((String) ((Map<String, Object>) props.get("wkt")).get("text"));
             org.wololo.geojson.Geometry geoJsonGeometry = geoJSONWriter.write(wktGeometry);
@@ -108,15 +110,9 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         }
     }
 
-    private FeatureCollection convertGeometry(String point, Map<String, Object> props) throws ParseException {
+    private FeatureCollection convertHazardGeometry(String point, EventType type) throws ParseException {
         org.wololo.geojson.Geometry geometry = geoJSONWriter.write(wktReader.read(point));
-        Feature feature = new Feature(geometry, HAZARD_PROPERTIES);
+        Feature feature = new Feature(geometry, type == CYCLONE ? SQS_CYCLONE_PROPERTIES : HAZARD_PROPERTIES);
         return new FeatureCollection(new Feature[] {feature});
-    }
-
-    @SuppressWarnings("unchecked")
-    private String convertDescription(Map<String, Object> props) {
-        Map<String, Object> hazardProperties = (Map<String, Object>) props.get("hazard");
-        return readString((Map<String, Object>) hazardProperties.get("hazardDescription"), "description");
     }
 }

@@ -15,6 +15,7 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static io.kontur.eventapi.TestUtil.readFile;
+import static io.kontur.eventapi.firms.normalization.FirmsNormalizer.FIRMS_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -58,7 +59,8 @@ public class FirmsNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(FirmsUtil.MODIS_PROVIDER, observation.getProvider());
         assertEquals(EventType.THERMAL_ANOMALY, observation.getType());
         assertEquals("POINT(133.141 -2.443)", observation.getPoint());
-        assertEquals(readFile(this, "firms.geometries.json"), observation.getGeometries().toString());
+        assertEquals(readFile(this, "firms.geometries.json"), observation.getGeometries().getFeatures()[0].getGeometry().toString());
+        assertEquals(FIRMS_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
 
         assertNull(observation.getEventSeverity());
         assertNull(observation.getName());

@@ -10,25 +10,27 @@ import io.kontur.eventapi.normalization.Normalizer;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Component;
-import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
 
 import static io.kontur.eventapi.util.CsvUtil.parseNormalizationRow;
+import static io.kontur.eventapi.util.GeometryUtil.*;
 
 @Component
 public class FirmsNormalizer extends Normalizer {
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
     private final H3Core h3;
+
+    public static final Map<String, Object> FIRMS_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, EXPOSURE, IS_OBSERVED_PROPERTY, true);
 
     public FirmsNormalizer() {
         try {
@@ -89,9 +91,7 @@ public class FirmsNormalizer extends Normalizer {
             throw new RuntimeException("can not create Geometry", e);
         }
 
-        Feature feature = new Feature(geometry, Collections.emptyMap());
-
-        return new FeatureCollection(new Feature[]{feature});
+        return convertGeometryToFeatureCollection(geometry, FIRMS_PROPERTIES);
     }
 
 }

@@ -5,9 +5,16 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
 
+import java.util.Map;
+
+import static io.kontur.eventapi.util.GeometryUtil.*;
+
 public abstract class NifcNormalizer extends Normalizer {
 
     private static final double acresInSqKm = 247.105;
+
+    protected static final Map<String, Object> LOCATIONS_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, START_POINT, IS_OBSERVED_PROPERTY, true);
+    protected static final Map<String, Object> PERIMETERS_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, EXPOSURE, IS_OBSERVED_PROPERTY, true);
 
     protected NormalizedObservation createObservationFromDataLake(DataLake dataLake) {
         NormalizedObservation observation = new NormalizedObservation();

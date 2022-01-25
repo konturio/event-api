@@ -7,6 +7,14 @@
 
 #### Changed
 
+- Unify geometry properties structure for all providers:
+  - areaType 
+  - severityData: windSpeedKmph, magnitude 
+  - isObserved 
+  - forecastHours 
+  - timestamp
+- Compose GDACS events to have one episode 
+
 #### Removed
 
 

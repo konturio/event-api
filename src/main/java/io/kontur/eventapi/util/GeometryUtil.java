@@ -8,9 +8,28 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Map;
 
 public class GeometryUtil {
+
+    public static final String IS_OBSERVED_PROPERTY = "isObserved";
+    public static final String FORECAST_HRS_PROPERTY = "forecastHrs";
+    public static final String TIMESTAMP_PROPERTY = "timestamp";
+    public static final String AREA_TYPE_PROPERTY = "areaType";
+    public static final String SEVERITY_DATA_PROPERTY = "severityData";
+
+    public static final String CENTER_POINT = "centerPoint";
+    public static final String START_POINT = "startPoint";
+    public static final String POSITION = "position";
+    public static final String GLOBAL_POINT = "globalPoint";
+    public static final String TRACK = "track";
+    public static final String ALERT_AREA = "alertArea";
+    public static final String EXPOSURE = "exposure";
+    public static final String GLOBAL_AREA = "globalArea";
+    public static final String UNKNOWN = "unknown";
+
+    public static final String WIND_SPEED_KPH = "windSpeedKph";
+    public static final String MAGNITUDE = "magnitude";
 
     public static Double calculateAreaKm2(Geometry geometry) {
         double areaInMeters = 0;
@@ -23,9 +42,9 @@ public class GeometryUtil {
         return areaInKm;
     }
 
-    public static FeatureCollection convertFeatureToFeatureCollection(Feature feature) {
-        Feature featureWithoutProperties = new Feature(feature.getGeometry(), Collections.emptyMap());
-        return new FeatureCollection(new Feature[] {featureWithoutProperties});
+    public static FeatureCollection convertGeometryToFeatureCollection(org.wololo.geojson.Geometry geometry, Map<String, Object> properties) {
+        Feature feature = new Feature(geometry, properties);
+        return new FeatureCollection(new Feature[] {feature});
     }
 
     public static Feature readFeature(String featureString) {

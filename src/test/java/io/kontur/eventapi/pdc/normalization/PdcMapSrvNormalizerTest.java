@@ -12,6 +12,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
+import static io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer.EXPOSURE_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PdcMapSrvNormalizerTest {
@@ -33,7 +34,8 @@ class PdcMapSrvNormalizerTest {
         assertEquals(dataLake.getExternalId(), observation.getExternalEventId());
         assertEquals(dataLake.getProvider(), observation.getProvider());
         assertNotNull(observation.getPoint());
-        assertEquals(getGeometries(), observation.getGeometries().toString());
+        assertEquals(getGeometries(), observation.getGeometries().getFeatures()[0].getGeometry().toString());
+        assertEquals(EXPOSURE_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
         assertEquals(Severity.UNKNOWN, observation.getEventSeverity());
         assertNull(observation.getName());
         assertNull(observation.getDescription());

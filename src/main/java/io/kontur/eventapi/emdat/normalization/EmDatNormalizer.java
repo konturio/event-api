@@ -1,6 +1,7 @@
 package io.kontur.eventapi.emdat.normalization;
 
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
+import io.kontur.eventapi.emdat.normalization.converter.EmDatGeometryConverter;
 import io.kontur.eventapi.emdat.normalization.converter.EmDatSeverityConverter;
 import io.kontur.eventapi.emdat.service.EmDatNormalizationService;
 import io.kontur.eventapi.entity.DataLake;
@@ -14,9 +15,8 @@ import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Geometry;
+import org.wololo.geojson.Point;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
+import static java.lang.Double.parseDouble;
 
 @Component
 public class EmDatNormalizer extends Normalizer {
@@ -48,13 +49,15 @@ public class EmDatNormalizer extends Normalizer {
     );
 
     private final List<EmDatSeverityConverter> severityConverters;
+    private final EmDatGeometryConverter geometryConverter;
     private final EmDatNormalizationService normalizationService;
     private final WKTReader wktReader = new WKTReader();
 
     public EmDatNormalizer(
             List<EmDatSeverityConverter> severityConverters,
-            EmDatNormalizationService normalizationService) {
+            EmDatGeometryConverter geometryConverter, EmDatNormalizationService normalizationService) {
         this.severityConverters = severityConverters;
+        this.geometryConverter = geometryConverter;
         this.normalizationService = normalizationService;
     }
 
@@ -90,12 +93,15 @@ public class EmDatNormalizer extends Normalizer {
             }
         }
 
+        Point point = null;
         if (!StringUtils.isEmpty(csvData.get("Latitude")) && !StringUtils.isEmpty(csvData.get("Longitude"))) {
             try {
-                String point = makeWktPoint(Double.parseDouble(csvData.get("Longitude")),
-                        Double.parseDouble(csvData.get("Latitude")));
-                wktReader.read(point); //validate coordinates
-                obs.setPoint(point);
+                Double lon = parseDouble(csvData.get("Longitude"));
+                Double lat = parseDouble(csvData.get("Latitude"));
+                String wktPoint = makeWktPoint(lon, lat);
+                wktReader.read(wktPoint); //validate coordinates
+                obs.setPoint(wktPoint);
+                point = new Point(new double[]{lon, lat});
             } catch (NumberFormatException | ParseException e) {
                 LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
             }
@@ -105,18 +111,9 @@ public class EmDatNormalizer extends Normalizer {
                 .obtainGeometries(csvData.get("Country"), csvData.get("Location"))
                 .or(() -> normalizationService.convertWktPointIntoGeometry(obs.getPoint()))
                 .orElse(null);
-        obs.setGeometries(createFeatureCollection(geom, csvData));
+        obs.setGeometries(geometryConverter.convertGeometry(geom, point, csvData.get("Dis Mag Scale"), csvData.get("Dis Mag Value")));
 
         return obs;
-    }
-
-    private FeatureCollection createFeatureCollection(Geometry geom, Map<String, String> csvData) {
-        Map<String, Object> severityData = Map.of(
-                "unit", csvData.get("Dis Mag Scale"),
-                "value", csvData.get("Dis Mag Value"));
-        Map<String, Object> properties = Map.of("severitydata", severityData);
-        Feature feature = new Feature(geom, properties);
-        return new FeatureCollection(new Feature[]{feature});
     }
 
     private Map<String, String> getCsvDataMap(DataLake dataLake) {

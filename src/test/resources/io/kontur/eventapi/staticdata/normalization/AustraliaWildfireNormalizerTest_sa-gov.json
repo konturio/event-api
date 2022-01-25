@@ -1,0 +1,26 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]]
+  },
+  "properties": {
+    "INCIDENTNU": 0,
+    "INCIDENTNA": "name",
+    "INCIDENTTY": "Bushfire",
+    "FIREDATE": "2012-01-01",
+    "FINANCIALY": "2012\/2013",
+    "FIREYEAR": 2012,
+    "SEASON": "SUMMER",
+    "DATERELIAB": 6,
+    "IMAGEINFOR": "Landsat 7 5\/3\/2013",
+    "FEATURESOU": 27,
+    "CAPTUREMET": 1,
+    "CAPTURESOU": 4,
+    "COMMENTS": "comments",
+    "HECTARES": 100,
+    "SHAPE_Leng": 0.1,
+    "SHAPE_Area": 0.001
+  },
+  "id": "feature-1705"
+}

@@ -4,13 +4,12 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
-import org.wololo.geojson.Point;
 
 import java.util.Map;
 
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCATIONS_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
-import static io.kontur.eventapi.util.GeometryUtil.convertFeatureToFeatureCollection;
+import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureCollection;
 import static io.kontur.eventapi.util.GeometryUtil.readFeature;
 import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
 import static java.time.Duration.between;
@@ -31,7 +30,7 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
         Feature feature = readFeature(dataLakeDto.getData());
         Map<String, Object> props = feature.getProperties();
 
-        observation.setGeometries(convertFeatureToFeatureCollection(feature));
+        observation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), LOCATIONS_PROPERTIES));
         observation.setDescription(readString(props, "IncidentShortDescription"));
 
         long startedAtMilli = readLong(props, "CreatedOnDateTime_dt");

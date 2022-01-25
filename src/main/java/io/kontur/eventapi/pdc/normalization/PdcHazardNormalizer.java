@@ -6,11 +6,14 @@ import io.kontur.eventapi.normalization.Normalizer;
 
 import java.util.Map;
 
+import static io.kontur.eventapi.util.GeometryUtil.*;
+
 public abstract class PdcHazardNormalizer extends Normalizer {
 
-    protected static final Map<String, Object> EXPOSURE_PROPERTIES = Map.of("areaType", "exposure");
-    protected final static Map<String, Object> HAZARD_PROPERTIES = Map.of("areaType", "centerPoint");
-    protected final static Map<String, Object> MAG_PROPERTIES = Map.of("areaType", "alertArea");
+    protected static final Map<String, Object> EXPOSURE_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, EXPOSURE, IS_OBSERVED_PROPERTY, true);
+    protected final static Map<String, Object> HAZARD_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, CENTER_POINT);
+    protected final static Map<String, Object> MAG_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, ALERT_AREA, IS_OBSERVED_PROPERTY, true);
+    protected final static Map<String, Object> SQS_CYCLONE_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, POSITION, IS_OBSERVED_PROPERTY, true);
 
     private static final Map<String, EventType> typeMap = Map.of(
             "FLOOD", EventType.FLOOD,

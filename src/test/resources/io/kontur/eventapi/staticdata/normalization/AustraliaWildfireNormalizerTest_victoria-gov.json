@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]]
+  },
+  "properties": {
+    "FIRETYPE": "BUSHFIRE",
+    "SEASON": 2012,
+    "FIRE_NO": "O01",
+    "NAME": "name",
+    "START_DATE": null,
+    "STRTDATIT": 20120101,
+    "TREAT_TYPE": "FIRE",
+    "FIREKEY": "W201211O01",
+    "DSE_ID": 0,
+    "CFA_ID": 0,
+    "AREA_HA": 4
+  },
+  "id": "feature-1268"
+}
