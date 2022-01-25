@@ -41,7 +41,7 @@ class PdcMapSrvSearchJobTest {
 
         verify(pdcMapSrvClient, times(1)).getExposures();
         verify(pdcDataLakeConverter, times(10)).convertExposure(isA(String.class), isA(String.class));
-        verify(dataLakeDao, times(1)).getPdcExposureGeohash(anySet());
+        verify(dataLakeDao, times(1)).getPdcExposureGeohashes(anySet());
         verify(dataLakeDao, times(1)).storeDataLakes(anyList());
     }
 
@@ -53,7 +53,7 @@ class PdcMapSrvSearchJobTest {
 
         verify(pdcMapSrvClient, times(1)).getExposures();
         verify(pdcDataLakeConverter, times(0)).convertExposure(isA(String.class), isA(String.class));
-        verify(dataLakeDao, times(0)).getPdcExposureGeohash(anySet());
+        verify(dataLakeDao, times(0)).getPdcExposureGeohashes(anySet());
         verify(dataLakeDao, times(0)).storeDataLakes(anyList());
     }
 

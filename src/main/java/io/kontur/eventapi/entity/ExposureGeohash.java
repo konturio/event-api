@@ -1,4 +1,4 @@
-package io.kontur.eventapi.pdc.dto;
+package io.kontur.eventapi.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -19,7 +19,6 @@ import java.io.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class StaticImportJob extends AbstractJob {
@@ -60,7 +59,6 @@ public class StaticImportJob extends AbstractJob {
 
     private void processFile(String provider, OffsetDateTime updatedAt, InputStream content) throws IOException {
         FeatureIterator<SimpleFeature> features = featureJson.streamFeatureCollection(content);
-        List<DataLake> dataLakes = new ArrayList<>();
         Map<String, String> dataSet = new HashMap<>();
         while (features.hasNext()) {
             try (OutputStream outputStream = new ByteArrayOutputStream()) {
@@ -70,7 +68,7 @@ public class StaticImportJob extends AbstractJob {
                 String externalId = DigestUtils.md5Hex(data);
                 dataSet.put(externalId, data);
                 if (dataSet.size() > maxDataLakesCount) {
-                    storeDataLakes(provider, updatedAt, dataLakes, dataSet);
+                    storeDataLakes(provider, updatedAt, dataSet);
                 }
             } catch (Exception e) {
                 LOG.error(e.getMessage());
@@ -78,26 +76,24 @@ public class StaticImportJob extends AbstractJob {
         }
         if (!dataSet.isEmpty()) {
             try {
-                storeDataLakes(provider, updatedAt, dataLakes, dataSet);
+                storeDataLakes(provider, updatedAt, dataSet);
             } catch (Exception e) {
                 LOG.error(e.getMessage());
             }
         }
     }
 
-    private void storeDataLakes(String provider, OffsetDateTime updatedAt, List<DataLake> dataLakes,
-                                Map<String, String> dataSet) {
+    private void storeDataLakes(String provider, OffsetDateTime updatedAt, Map<String, String> dataSet) {
+        Map<String, DataLake> dataLakes = new HashMap<>();
         Set<String> storedDataLakes = dataLakeDao
                 .getDataLakesIdByExternalIdsAndProvider(dataSet.keySet(), provider);
         for (String id : dataSet.keySet()) {
-            if (!storedDataLakes.contains(id) &&
-                    !dataLakes.stream().map(DataLake::getExternalId).collect(Collectors.toSet()).contains(id)) {
-                dataLakes.add(createDataLake(id, updatedAt, provider, dataSet.get(id)));
+            if (!storedDataLakes.contains(id) && !dataLakes.containsKey(id)) {
+                dataLakes.put(id, createDataLake(id, updatedAt, provider, dataSet.get(id)));
             }
         }
         dataSet.clear();
-        dataLakeDao.storeDataLakes(dataLakes);
-        dataLakes.clear();
+        dataLakeDao.storeDataLakes(dataLakes.values().stream().toList());
     }
 
     private DataLake createDataLake(String externalId, OffsetDateTime updatedAt, String provider, String data) {

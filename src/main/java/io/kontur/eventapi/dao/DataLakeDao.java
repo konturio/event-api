@@ -2,8 +2,7 @@ package io.kontur.eventapi.dao;
 
 import io.kontur.eventapi.dao.mapper.DataLakeMapper;
 import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.pdc.dto.ExposureGeohash;
-import org.apache.ibatis.annotations.Param;
+import io.kontur.eventapi.entity.ExposureGeohash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,7 @@ import java.util.UUID;
 @Component
 public class DataLakeDao {
 
-    public final DataLakeMapper mapper;
+    private final DataLakeMapper mapper;
 
     @Autowired
     public DataLakeDao(DataLakeMapper mapper) {
@@ -72,8 +71,8 @@ public class DataLakeDao {
         return mapper.getLatestDataLakeByExternalIdAndProvider(externalId, provider);
     }
 
-    public List<ExposureGeohash> getPdcExposureGeohash(Set<String> externalIds) {
-        return mapper.getPdcExposureGeohash(externalIds);
+    public List<ExposureGeohash> getPdcExposureGeohashes(Set<String> externalIds) {
+        return mapper.getPdcExposureGeohashes(externalIds);
     }
 
     public Boolean isNewPdcExposure(String externalId, String geoHash) {

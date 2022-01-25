@@ -88,7 +88,7 @@
         LIMIT 1
     </select>
 
-    <select id="getPdcExposureGeohash" resultMap="exposureGeohash">
+    <select id="getPdcExposureGeohashes" resultMap="exposureGeohash">
         SELECT external_id, jsonb_object_field_text((data::jsonb)->'properties', 'geohash') as geohash
         FROM data_lake
         WHERE provider = 'pdcMapSrv' AND
@@ -137,7 +137,7 @@
         <result property="normalized" column="normalized" />
     </resultMap>
 
-    <resultMap id="exposureGeohash" type="io.kontur.eventapi.pdc.dto.ExposureGeohash">
+    <resultMap id="exposureGeohash" type="io.kontur.eventapi.entity.ExposureGeohash">
         <result property="externalId" column="external_id" />
         <result property="geohash" column="geohash"/>
     </resultMap>

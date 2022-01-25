@@ -5,7 +5,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.client.PdcMapSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
-import io.kontur.eventapi.pdc.dto.ExposureGeohash;
+import io.kontur.eventapi.entity.ExposureGeohash;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                 features.put(externalId, feature.toString());
             }
             if (!ids.isEmpty()) {
-                List<ExposureGeohash> exposureGeohashes = dataLakeDao.getPdcExposureGeohash(ids.keySet());
+                List<ExposureGeohash> exposureGeohashes = dataLakeDao.getPdcExposureGeohashes(ids.keySet());
                 Map<String, ExposureGeohash> storedValues = new HashMap<>();
                 exposureGeohashes.forEach(value -> storedValues.put(value.getExternalId(), value));
                 for (String id : ids.keySet()) {

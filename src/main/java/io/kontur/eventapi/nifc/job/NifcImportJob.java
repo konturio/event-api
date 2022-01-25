@@ -24,6 +24,8 @@ import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
+import javax.validation.constraints.NotNull;
+
 @Component
 public class NifcImportJob extends AbstractJob {
 
@@ -73,12 +75,9 @@ public class NifcImportJob extends AbstractJob {
                     .filter(StringUtils::isNotBlank)
                     .collect(Collectors.toSet());
             Map<String, DataLake> existsDataLakes = new HashMap<>();
-            try {
-                dataLakeDao.getDataLakesByExternalIdsAndProvider(ids, provider)
-                        .forEach(dataLake -> existsDataLakes.put(dataLake.getExternalId(), dataLake));
-            } catch (Exception e) {
-                LOG.error("Failed to get exists DataLakes for " + provider, e);
-            }
+            dataLakeDao.getDataLakesByExternalIdsAndProvider(ids, provider)
+                    .stream().filter(item -> StringUtils.isNotBlank(item.getExternalId()))
+                    .forEach(dataLake -> existsDataLakes.put(dataLake.getExternalId(), dataLake));
             for (Feature feature : fc.getFeatures()) {
                 try {
                     String data = writeJson(feature);
