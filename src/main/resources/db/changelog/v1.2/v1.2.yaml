@@ -3,3 +3,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: create-collect-event-geometry-function.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-feeds-description.sql

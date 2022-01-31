@@ -5,15 +5,18 @@
 
 #### Added
 
+- Add `/user_feeds` endpoint
+
 #### Changed
 
 - Unify geometry properties structure for all providers:
   - areaType 
-  - severityData: windSpeedKmph, magnitude 
+  - severityData: windSpeedKph, magnitude 
   - isObserved 
   - forecastHours 
   - timestamp
 - Compose GDACS events to have one episode 
+- Update feeds description
 
 #### Removed
 
