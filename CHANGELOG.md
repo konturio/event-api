@@ -5,6 +5,15 @@
 
 #### Added
 
+#### Changed
+
+#### Removed
+
+
+## 1.2 - 2022-02-07
+
+#### Added
+
 - Add `/user_feeds` endpoint
 
 #### Changed
@@ -17,8 +26,6 @@
   - timestamp
 - Compose GDACS events to have one episode 
 - Update feeds description
-
-#### Removed
 
 
 ## 1.1 - 2022-01-12
