@@ -6,6 +6,15 @@
 #### Added
 
 #### Changed
+
+#### Removed
+
+
+## 1.3 - 2022-02-16
+
+#### Added
+
+#### Changed
 - feed `kontur-public` is renamed to `kontur-public-v1`
 - feed `disaster-ninja-02` is renamed to `kontur-public`
 
