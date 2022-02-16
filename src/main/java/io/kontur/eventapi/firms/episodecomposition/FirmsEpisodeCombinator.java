@@ -76,7 +76,8 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     private void populateMissedFields(FeedEpisode episode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Set<NormalizedObservation> episodeObservations;
         if (episode.getObservations().isEmpty()) {
-            episodeObservations = findObservationsForEpisode(observation, eventObservations);
+            episodeObservations = findObservationsForEpisode(eventObservations, observation.getSourceUpdatedAt(),
+                    24L, 0L, ChronoUnit.HOURS);
             episode.getObservations().addAll(episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
         } else {
             episodeObservations = readObservations(episode.getObservations(), eventObservations);
@@ -142,15 +143,6 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     private FeatureCollection createEpisodeGeometryFeatureCollection(NormalizedObservation observation, Geometry geometry) {
         return createFeatureCollection(geometry, getFirmFeature(observation.getGeometries()).getProperties());
-    }
-
-    private Set<NormalizedObservation> findObservationsForEpisode(NormalizedObservation observation, Set<NormalizedObservation> observations) {
-        OffsetDateTime oneDayBeforeObservation = observation.getSourceUpdatedAt().minus(24, ChronoUnit.HOURS);
-
-        return observations.stream()
-                .filter(o -> o.getSourceUpdatedAt().isAfter(oneDayBeforeObservation) || o.getSourceUpdatedAt().isEqual(oneDayBeforeObservation))
-                .filter(o -> o.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt()) || o.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
-                .collect(toSet());
     }
 
     private String calculateName(String areaName, Double area, long burningTime) {

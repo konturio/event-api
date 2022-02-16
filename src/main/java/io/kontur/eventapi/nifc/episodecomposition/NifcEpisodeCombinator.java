@@ -10,6 +10,7 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +34,8 @@ public class NifcEpisodeCombinator extends WildfireEpisodeCombinator {
         if (episodeExistsForObservation(feedData.getEpisodes(), observation)) {
             return Optional.empty();
         }
-        Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(eventObservations, observation.getSourceUpdatedAt());
+        Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(
+                eventObservations, observation.getSourceUpdatedAt(),0L, 0L);
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
         FeedEpisode episode = createDefaultEpisode(latestObservation).get();
 
@@ -43,41 +45,6 @@ public class NifcEpisodeCombinator extends WildfireEpisodeCombinator {
         episode.setDescription(latestObservation.getDescription());
 
         return Optional.of(episode);
-    }
-
-    private boolean episodeExistsForObservation(List<FeedEpisode> eventEpisodes, NormalizedObservation observation) {
-        return eventEpisodes
-                .stream()
-                .anyMatch(episode -> episode.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt()));
-    }
-
-    private Set<NormalizedObservation> findObservationsForEpisode(Set<NormalizedObservation> eventObservations, OffsetDateTime sourceUpdateAt) {
-        return eventObservations
-                .stream()
-                .filter(observation -> observation.getSourceUpdatedAt().equals(sourceUpdateAt))
-                .collect(toSet());
-    }
-
-    private NormalizedObservation findLatestEpisodeObservation(Set<NormalizedObservation> episodeObservations) {
-        return episodeObservations
-                .stream()
-                .max(comparing(NormalizedObservation::getEndedAt))
-                .orElse(null);
-    }
-
-    private OffsetDateTime findEpisodeStartedAt(Set<NormalizedObservation> episodeObservations) {
-        return episodeObservations
-                .stream()
-                .map(NormalizedObservation::getStartedAt)
-                .min(OffsetDateTime::compareTo)
-                .orElse(null);
-    }
-
-    private Set<UUID> mapObservationsToIDs(Set<NormalizedObservation> observations) {
-        return observations
-                .stream()
-                .map(NormalizedObservation::getObservationId)
-                .collect(toSet());
     }
 
     private FeatureCollection computeEpisodeGeometries(Set<NormalizedObservation> episodeObservations) {

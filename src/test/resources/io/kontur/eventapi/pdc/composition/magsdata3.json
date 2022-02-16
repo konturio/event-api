@@ -50,17 +50,17 @@
         "hazard.creator": "DisasterAWARE (Automated)",
         "hazard.startDate": "2020-07-14T20:56:00.000+0000",
         "hazard.endDate": "2020-07-15T00:00:00.000+0000",
-        "hazard.lastUpdate": "2020-07-15T00:00:21.530+0000",
+        "hazard.lastUpdate": "2020-07-15T00:00:31.530+0000",
         "hazard.latitude": 43.0008,
         "hazard.longitude": -71.1717,
         "hazard.orgId": -1,
         "hazard.autoexpire": "Y",
-        "hazard.updateDate": "2020-07-14T21:04:38.798+0000",
+        "hazard.updateDate": "2020-07-14T21:06:38.798+0000",
         "hazard.messageId": "1028.1594760425505",
         "hazard.masterIncidentId": "1052.257100.647665.1",
         "hazard.status": "E",
         "hazard.uuid": "0457178b-45c1-492f-bbc1-61ca14389a31",
-        "updateDate": "2020-07-14T21:07:26.591+0000"
+        "updateDate": "2020-07-14T21:07:00.591+0000"
       },
       "id": "fid.0"
     }
