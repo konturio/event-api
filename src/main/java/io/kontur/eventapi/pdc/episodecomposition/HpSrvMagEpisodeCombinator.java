@@ -4,7 +4,6 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -15,7 +14,7 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_P
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 
 @Component
-public class HpSrvMagEpisodeCombinator extends EpisodeCombinator {
+public class HpSrvMagEpisodeCombinator extends BasePdcEpisodeCombinator {
     private final NormalizedObservationsDao observationsDao;
 
     public HpSrvMagEpisodeCombinator(NormalizedObservationsDao observationsDao) {
@@ -34,7 +33,7 @@ public class HpSrvMagEpisodeCombinator extends EpisodeCombinator {
             addObservationIdIfDuplicate(observation, feedData, savedDuplicateObservationId.get());
             return Optional.empty();
         }
-        return createDefaultEpisode(observation);
+        return super.processObservation(observation, feedData, eventObservations);
     }
 
     private Optional<UUID> getSavedDuplicateSqsObservationId(NormalizedObservation observation) {

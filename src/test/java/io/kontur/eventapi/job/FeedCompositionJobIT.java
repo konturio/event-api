@@ -108,7 +108,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         assertEquals(Instant.ofEpochMilli(1594760678798L),
                 feedV2.getEpisodes().get(0).getSourceUpdatedAt().toInstant());
         assertEquals(OffsetDateTime
-                        .parse("2020-07-14T21:05:26.591+0000", DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")),
+                        .parse("2020-07-14T21:07:26.591+0000", DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")),
                 feedV2.getEpisodes().get(1).getSourceUpdatedAt());
     }
 
