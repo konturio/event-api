@@ -19,4 +19,7 @@ databaseChangeLog:
   - include:
     - relativeToChangelogFile: true
     - file: v1.2/v1.2.yaml
+  - include:
+      - relativeToChangelogFile: true
+      - file: v1.3/v1.3.yaml
 

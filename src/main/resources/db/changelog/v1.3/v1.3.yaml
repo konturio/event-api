@@ -1,0 +1,5 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: rename-feeds.sql
