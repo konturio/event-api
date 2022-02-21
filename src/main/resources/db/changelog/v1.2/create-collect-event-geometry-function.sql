@@ -9,7 +9,7 @@ AS $$
     with features as (
         select
             f.feature -> 'properties' as props,
-            st_makevalid(st_geomfromgeojson(NULLIF(f.feature -> 'geometry', 'null'::jsonb))) as geom
+            st_setsrid(st_makevalid(st_geomfromgeojson(NULLIF(f.feature -> 'geometry', 'null'::jsonb))), 4326) as geom
         from (
             select jsonb_array_elements(e -> 'geometries' -> 'features') as feature
             from jsonb_array_elements($1) e
@@ -18,7 +18,7 @@ AS $$
         where f.feature -> 'geometry' != 'null'::jsonb
     ),
     areas as (
-        select f.props as props, st_union(f.geom) as geom
+        select f.props as props, st_setsrid(st_union(f.geom), 4326) as geom
         from features f
         where f.props ->> 'areaType' in ('exposure', 'alertArea', 'globalArea')
         group by f.props
@@ -35,7 +35,7 @@ AS $$
         where f.props ->> 'areaType' not in ('exposure', 'alertArea', 'globalArea', 'startPoint', 'centerPoint')
     ),
     centerPoint as (
-        select jsonb_build_object('areaType', 'centerPoint') as props, st_centroid(st_collect(f.geom)) as geom
+        select jsonb_build_object('areaType', 'centerPoint') as props, st_setsrid(st_centroid(st_collect(f.geom)), 4326) as geom
         from (
             select * from areas
             union select * from startPoint
