@@ -18,7 +18,7 @@ AS $$
         where f.feature -> 'geometry' != 'null'::jsonb
     ),
     areas as (
-        select f.props as props, st_union(f.geom) as geom
+        select f.props as props, st_setsrid(st_union(f.geom), 4326) as geom
         from features f
         where f.props ->> 'areaType' in ('exposure', 'alertArea', 'globalArea')
         group by f.props
