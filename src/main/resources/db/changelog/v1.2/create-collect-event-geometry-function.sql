@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:v1.2/create-collect-event-geometry-function.sql runOnChange:false
+--changeset event-api-migrations:v1.2/create-collect-event-geometry-function.sql runOnChange:true
 
 drop function if exists collectEventGeometries;
 
