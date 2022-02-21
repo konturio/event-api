@@ -9,6 +9,14 @@
 
 #### Removed
 
+## 1.3.1 - 2022-02-21
+
+#### Added
+
+#### Changed
+Fixed mixed SRID geometry in collectEventGeometries function
+
+#### Removed
 
 ## 1.3 - 2022-02-17
 
