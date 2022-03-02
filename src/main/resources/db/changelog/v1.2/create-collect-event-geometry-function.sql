@@ -35,12 +35,23 @@ AS $$
         where f.props ->> 'areaType' not in ('exposure', 'alertArea', 'globalArea', 'startPoint', 'centerPoint')
     ),
     centerPoint as (
-        select jsonb_build_object('areaType', 'centerPoint') as props, st_centroid(st_collect(f.geom)) as geom
-        from (
-            select * from areas
-            union select * from startPoint
-            union select * from other
-        ) f
+        select jsonb_build_object('areaType', 'centerPoint') as props, (
+            case
+                when exists(select * from areas) or exists(select * from startPoint) or exists(select * from other) then (
+                    select st_centroid(st_collect(f.geom)) as geom
+                    from (
+                        select * from areas
+                        union select * from startPoint
+                        union select * from other
+                    ) f
+                )
+                else (
+                    select f.geom as geom
+                    from features f
+                    where f.props ->> 'areaType' = 'centerPoint'
+                    limit 1
+                )
+                end) as geom
     )
     select jsonb_build_object(
         'type', 'FeatureCollection',
