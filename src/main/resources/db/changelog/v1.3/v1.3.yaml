@@ -3,3 +3,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: rename-feeds.sql
+  - include:
+      relativeToChangelogFile: true
+      file: fix-center-point-in-event-geometries.sql

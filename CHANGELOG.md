@@ -7,26 +7,23 @@
 
 #### Changed
 
+- Fixed center point computing in event geometries
+
 #### Removed
+
 
 ## 1.3.1 - 2022-02-21
 
-#### Added
-
 #### Changed
-Fixed mixed SRID geometry in collectEventGeometries function
 
-#### Removed
+- Fixed mixed SRID geometry in collectEventGeometries function
+
 
 ## 1.3 - 2022-02-17
-
-#### Added
 
 #### Changed
 - feed `kontur-public` is renamed to `kontur-public-v1`
 - feed `disaster-ninja-02` is renamed to `kontur-public`
-
-#### Removed
 
 
 ## 1.2 - 2022-02-07
