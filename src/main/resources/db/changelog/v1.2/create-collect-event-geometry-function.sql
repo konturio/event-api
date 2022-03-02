@@ -32,7 +32,7 @@ AS $$
     other as (
         select f.props as props, f.geom as geom
         from features f
-        where f.props ->> 'areaType' not in ('exposure', 'alertArea', 'globalArea', 'startPoint', 'centerPoint')
+        where (f.props ->> 'areaType') is null or f.props ->> 'areaType' not in ('exposure', 'alertArea', 'globalArea', 'startPoint', 'centerPoint')
     ),
     centerPoint as (
         select jsonb_build_object('areaType', 'centerPoint') as props, (
