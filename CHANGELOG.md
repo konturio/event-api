@@ -7,9 +7,14 @@
 
 #### Changed
 
-- Fixed center point computing in event geometries
-
 #### Removed
+
+
+## 1.3.2 - 2022-03-04
+
+#### Changed
+
+- Fixed center point computing in event geometries
 
 
 ## 1.3.1 - 2022-02-21
