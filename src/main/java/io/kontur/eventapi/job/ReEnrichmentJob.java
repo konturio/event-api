@@ -8,6 +8,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
 import java.util.List;
 
 import static java.lang.String.format;
@@ -34,18 +36,20 @@ public class ReEnrichmentJob extends AbstractJob {
 
     private void reEnrichFeed(Feed feed) {
         List<FeedData> events = feedDao.getEnrichmentSkippedEventsForFeed(feed.getFeedId());
-        LOG.info(format("%s feed. %s events to re-enrich", feed.getAlias(), events.size()));
+        if (!CollectionUtils.isEmpty(events)) {
+            LOG.info(format("%s feed. %s events to re-enrich", feed.getAlias(), events.size()));
 
-        List<String> enrichmentFields = feed.getEnrichment();
-        String enrichmentRequest = feed.getEnrichmentRequest();
+            List<String> enrichmentFields = feed.getEnrichment();
+            String enrichmentRequest = feed.getEnrichmentRequest();
 
-        events.forEach(event -> {
-            try {
-                longEventEnrichmentTask.enrichEvent(event, enrichmentRequest, enrichmentFields).get();
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-            }
-        });
+            events.forEach(event -> {
+                try {
+                    longEventEnrichmentTask.enrichEvent(event, enrichmentRequest, enrichmentFields).get();
+                } catch (Exception e) {
+                    LOG.error(e.getMessage(), e);
+                }
+            });
+        }
     }
 
     @Override

@@ -11,6 +11,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -36,13 +37,15 @@ public class NormalizationJob extends AbstractJob {
     @Override
     public void execute() {
         List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
-        LOG.info("Normalization processing: {} data lakes", dataLakes.size());
+        if (!CollectionUtils.isEmpty(dataLakes)) {
+            LOG.info("Normalization processing: {} data lakes", dataLakes.size());
 
-        for (DataLake dataLake : dataLakes) {
-            boolean isNormalized = normalize(dataLake);
-            if (!isNormalized) {
-                LOG.info("Event wasn't normalized. Provider: {}, observation: {}", dataLake.getProvider(),
-                        dataLake.getObservationId());
+            for (DataLake dataLake : dataLakes) {
+                boolean isNormalized = normalize(dataLake);
+                if (!isNormalized) {
+                    LOG.info("Event wasn't normalized. Provider: {}, observation: {}", dataLake.getProvider(),
+                            dataLake.getObservationId());
+                }
             }
         }
     }

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,9 +42,11 @@ public class EventCombinationJob extends AbstractJob  {
         List<NormalizedObservation> observations = observationsDao
                 .getObservationsNotLinkedToEvent(Arrays.asList(sequentialProviders));
 
-        LOG.info("Combination processing: {} events", observations.size());
+        if (!CollectionUtils.isEmpty(observations)) {
+            LOG.info("Combination processing: {} events", observations.size());
 
-        observations.forEach(this::addToEvent);
+            observations.forEach(this::addToEvent);
+        }
     }
 
     @Override

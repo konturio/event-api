@@ -10,6 +10,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -37,12 +38,14 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
         List<NormalizedObservation> observations = observationsDao
                 .getFirmsObservationsNotLinkedToEventFor24Hours();
 
-        LOG.info("Firms Combination processing: {} events", observations.size());
+        if (!CollectionUtils.isEmpty(observations)) {
+            LOG.info("Firms Combination processing: {} events", observations.size());
 
-        Map<UUID, NormalizedObservation> observationByIds = observations.stream()
-                .collect(toMap(NormalizedObservation::getObservationId, identity()));
-        findExistingEvents(observationByIds);
-        addObservationsToNewEvents(observationByIds);
+            Map<UUID, NormalizedObservation> observationByIds = observations.stream()
+                    .collect(toMap(NormalizedObservation::getObservationId, identity()));
+            findExistingEvents(observationByIds);
+            addObservationsToNewEvents(observationByIds);
+        }
     }
 
     /**

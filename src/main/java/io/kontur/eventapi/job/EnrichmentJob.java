@@ -8,6 +8,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -41,15 +42,17 @@ public class EnrichmentJob extends AbstractJob {
     protected void enrichFeed(Feed feed) {
         try {
             List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
-            LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
+            if (!CollectionUtils.isEmpty(events)) {
+                LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
 
-            List<String> enrichmentFields = feed.getEnrichment();
-            String enrichmentRequest = feed.getEnrichmentRequest();
+                List<String> enrichmentFields = feed.getEnrichment();
+                String enrichmentRequest = feed.getEnrichmentRequest();
 
-            var eventEnrichmentTasks = events.stream()
-                    .map(event -> eventEnrichmentTask.enrichEvent(event, enrichmentRequest, enrichmentFields))
-                    .toArray(CompletableFuture[]::new);
-            CompletableFuture.allOf(eventEnrichmentTasks).join();
+                var eventEnrichmentTasks = events.stream()
+                        .map(event -> eventEnrichmentTask.enrichEvent(event, enrichmentRequest, enrichmentFields))
+                        .toArray(CompletableFuture[]::new);
+                CompletableFuture.allOf(eventEnrichmentTasks).join();
+            }
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
