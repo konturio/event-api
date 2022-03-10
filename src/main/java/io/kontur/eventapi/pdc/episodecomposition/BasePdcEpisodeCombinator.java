@@ -44,7 +44,11 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
             episode.get().setUpdatedAt(findEpisodeUpdatedAt(episodeObservations));
             episode.get().setObservations(mapObservationsToIDs(episodeObservations));
             episode.get().setGeometries(computeEpisodeGeometries(episodeObservations));
-            episode.get().setDescription(latestObservation.getDescription());
+            episode.get().setName(
+                    findLatestEpisodeObservationWithName(episodeObservations).orElse(latestObservation).getName());
+            episode.get().setDescription(
+                    findLatestEpisodeObservationWithDescription(episodeObservations).orElse(latestObservation)
+                            .getDescription());
         }
         return episode;
     }
