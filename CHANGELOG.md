@@ -7,6 +7,8 @@
 
 #### Changed
 
+- Updated episodes timeline
+
 #### Removed
 
 

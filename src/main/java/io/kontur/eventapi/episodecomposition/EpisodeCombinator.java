@@ -7,6 +7,10 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.job.Applicable;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -17,7 +21,31 @@ import java.util.UUID;
 
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
 
+    private final static Logger LOG = LoggerFactory.getLogger(EpisodeCombinator.class);
+
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
+        if (CollectionUtils.isEmpty(episodes) || episodes.size() == 1) {
+            return episodes;
+        }
+        episodes.sort(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getSourceUpdatedAt));
+        for (int i = 0; i < episodes.size() - 1; i++) {
+            FeedEpisode currentEpisode = episodes.get(i);
+            FeedEpisode nextEpisode = episodes.get(i + 1);
+            if (!currentEpisode.getSourceUpdatedAt().isAfter(currentEpisode.getEndedAt())) {
+                if (currentEpisode.getSourceUpdatedAt().isAfter(currentEpisode.getStartedAt())) {
+                    currentEpisode.setEndedAt(currentEpisode.getSourceUpdatedAt());
+                } else {
+                    LOG.info("SourceUpdatedAt is before StartedAt for observations: {}",
+                            String.join(",", currentEpisode.getObservations().stream().map(UUID::toString).toList()));
+                }
+            }
+            if (nextEpisode.getSourceUpdatedAt().isBefore(currentEpisode.getEndedAt())) {
+                currentEpisode.setEndedAt(nextEpisode.getSourceUpdatedAt());
+                nextEpisode.setStartedAt(nextEpisode.getSourceUpdatedAt());
+            } else {
+                nextEpisode.setStartedAt(currentEpisode.getEndedAt());
+            }
+        }
         return episodes;
     }
 
@@ -84,6 +112,20 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .stream()
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt))
                 .orElse(null);
+    }
+
+    protected Optional<NormalizedObservation> findLatestEpisodeObservationWithName(Set<NormalizedObservation> episodeObservations) {
+        return episodeObservations
+                .stream()
+                .filter(obs -> StringUtils.isNotBlank(obs.getName()))
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt));
+    }
+
+    protected Optional<NormalizedObservation> findLatestEpisodeObservationWithDescription(Set<NormalizedObservation> episodeObservations) {
+        return episodeObservations
+                .stream()
+                .filter(obs -> StringUtils.isNotBlank(obs.getDescription()))
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt));
     }
 
     protected OffsetDateTime findEpisodeStartedAt(Set<NormalizedObservation> episodeObservations) {

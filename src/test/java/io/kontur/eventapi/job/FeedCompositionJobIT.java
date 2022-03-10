@@ -29,6 +29,7 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARC
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.testcontainers.shaded.com.google.common.collect.Iterables.getOnlyElement;
 
@@ -69,7 +70,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(0).getStartedAt());
         assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(0).getEndedAt());
 
-        assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(1).getStartedAt());
+        assertEquals(observation.getEndedAt(), feedV1.getEpisodes().get(1).getStartedAt());
         assertEquals(observation.getStartedAt(), feedV1.getEpisodes().get(1).getEndedAt());
     }
 
@@ -204,6 +205,43 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(EventType.WILDFIRE), null, null,
                 loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
+    }
+
+    @Test
+    public void testEpisodesTimeline() throws IOException {
+        String externalId = "0457178b-45c1-492f-bbc1-61ca14389a31";
+
+        var loadTime1 = OffsetDateTime.of(
+                LocalDateTime.of(2020, 1, 1, 1, 1), ZoneOffset.UTC);
+        var loadTime2 = OffsetDateTime.of(
+                LocalDateTime.of(2020, 1, 2, 1, 1), ZoneOffset.UTC);
+        var loadTime3 = OffsetDateTime.of(
+                LocalDateTime.of(2020, 1, 3, 1, 1), ZoneOffset.UTC);
+
+        var updateTime1 = OffsetDateTime.parse("2020-07-14T20:00:00.000+0000",
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+        var updateTime2 = OffsetDateTime.parse("2020-07-15T20:00:00.000+0000",
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+
+        createNormalizations(externalId, loadTime1, HP_SRV_MAG_PROVIDER,
+                readMessageFromFile("timeline01.json"));
+        createNormalizations(externalId, loadTime2, HP_SRV_MAG_PROVIDER,
+                readMessageFromFile("timeline02.json"));
+        createNormalizations(externalId, loadTime3, HP_SRV_MAG_PROVIDER,
+                readMessageFromFile("timeline03.json"));
+
+        eventCombinationJob.run();
+        feedCompositionJob.run();
+
+        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null,
+                null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
+        assertNotNull(feed.getEpisodes());
+        assertEquals(3, feed.getEpisodes().size());
+        assertEquals(updateTime1, feed.getEpisodes().get(0).getSourceUpdatedAt());
+        assertEquals(updateTime1, feed.getEpisodes().get(0).getEndedAt());
+        assertEquals(updateTime1, feed.getEpisodes().get(1).getStartedAt());
+        assertEquals(updateTime2, feed.getEpisodes().get(1).getEndedAt());
+        assertEquals(updateTime2, feed.getEpisodes().get(2).getStartedAt());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
