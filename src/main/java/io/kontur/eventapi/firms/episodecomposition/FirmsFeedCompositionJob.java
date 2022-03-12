@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,11 +49,13 @@ public class FirmsFeedCompositionJob extends FeedCompositionJob {
     protected void updateFeed(Feed feed) {
         try {
             Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
-            LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
-            CompletableFuture<?>[] tasks = eventsIds.stream()
-                    .map(event -> runAsync(() -> createFeedData(event, feed), executor))
-                    .toArray(CompletableFuture[]::new);
-            allOf(tasks).join();
+            if (!CollectionUtils.isEmpty(eventsIds)) {
+                LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
+                CompletableFuture<?>[] tasks = eventsIds.stream()
+                        .map(event -> runAsync(() -> createFeedData(event, feed), executor))
+                        .toArray(CompletableFuture[]::new);
+                allOf(tasks).join();
+            }
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
