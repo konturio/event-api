@@ -8,6 +8,7 @@
 #### Changed
 
 - Updated episodes timeline
+- Switched off logging to stdout
 
 #### Removed
 

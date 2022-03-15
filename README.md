@@ -125,3 +125,20 @@ AWS S3 bucket `event-api-locker01` is used for storing static data files.
 - `TEST QA/` - for testing
 - `TEST DEV/` - for development
 - `EXP/` - for experiments 
+
+#### Logging configuration
+
+Logging to STDOUT should be switched off (level = OFF) for all tiers except local use.
+For debugging could be used levels ERROR, WARN, INFO, TRACE
+```xml
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>OFF</level>
+        </filter>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+        </encoder>
+    </appender>
+```
+
+
