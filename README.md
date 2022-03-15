@@ -129,7 +129,7 @@ AWS S3 bucket `event-api-locker01` is used for storing static data files.
 #### Logging configuration
 
 Logging to STDOUT should be switched off (level = OFF) for all tiers except local use.
-For debugging could be used levels ERROR, WARN, INFO, TRACE
+For debugging could be used levels ERROR, WARN, INFO, DEBUG, TRACE
 ```xml
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
