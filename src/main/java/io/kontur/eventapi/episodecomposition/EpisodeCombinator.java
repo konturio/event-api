@@ -35,7 +35,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 if (currentEpisode.getSourceUpdatedAt().isAfter(currentEpisode.getStartedAt())) {
                     currentEpisode.setEndedAt(currentEpisode.getSourceUpdatedAt());
                 } else {
-                    LOG.info("SourceUpdatedAt is before StartedAt for observations: {}",
+                    LOG.debug("SourceUpdatedAt is before StartedAt for observations: {}",
                             String.join(",", currentEpisode.getObservations().stream().map(UUID::toString).toList()));
                 }
             }
