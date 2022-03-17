@@ -7,7 +7,7 @@
 
 #### Changed
 
-- Updated episodes timeline
+- Reworked PDC's episodes
 - Switched off logging to stdout
 
 #### Removed
