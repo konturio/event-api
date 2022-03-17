@@ -93,25 +93,26 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                                                                     OffsetDateTime sourceUpdatedAt) {
         Set<NormalizedObservation> foundEvents = new HashSet<>();
         Duration timeRange = Duration.ofSeconds(TIME_RANGE_IN_SEC);
-        AtomicReference<OffsetDateTime> currentTime = new AtomicReference<>(sourceUpdatedAt);
+        AtomicReference<OffsetDateTime> currentTimeUp = new AtomicReference<>(sourceUpdatedAt);
 
         foundEvents.addAll(eventObservations.stream()
                 .sorted(Collections.reverseOrder(comparing(NormalizedObservation::getSourceUpdatedAt)))
                 .dropWhile(obs -> obs.getSourceUpdatedAt().isAfter(sourceUpdatedAt)
                         || obs.getSourceUpdatedAt().isEqual(sourceUpdatedAt))
                 .filter(obs -> {
-                    if (Duration.between(obs.getSourceUpdatedAt(), currentTime.get()).minus(timeRange).isNegative()) {
-                        currentTime.set(obs.getSourceUpdatedAt());
+                    if (Duration.between(obs.getSourceUpdatedAt(), currentTimeUp.get()).minus(timeRange).isNegative()) {
+                        currentTimeUp.set(obs.getSourceUpdatedAt());
                         return true;
                     }
                     return false;
                 }).collect(Collectors.toSet()));
+        AtomicReference<OffsetDateTime> currentTimeDown = new AtomicReference<>(sourceUpdatedAt);
         foundEvents.addAll(eventObservations.stream()
                 .sorted(comparing(NormalizedObservation::getSourceUpdatedAt))
                 .dropWhile(obs -> obs.getSourceUpdatedAt().isBefore(sourceUpdatedAt))
                 .filter(obs -> {
-                    if (Duration.between(currentTime.get(), obs.getSourceUpdatedAt()).minus(timeRange).isNegative()) {
-                        currentTime.set(obs.getSourceUpdatedAt());
+                    if (Duration.between(currentTimeDown.get(), obs.getSourceUpdatedAt()).minus(timeRange).isNegative()) {
+                        currentTimeDown.set(obs.getSourceUpdatedAt());
                         return true;
                     }
                     return false;
