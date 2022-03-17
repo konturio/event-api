@@ -11,8 +11,6 @@
 
 ## 1.4 - 2022-03-17
 
-#### Added
-
 #### Changed
 
 - Reworked PDC's episodes
