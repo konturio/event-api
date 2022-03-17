@@ -2,6 +2,7 @@ package io.kontur.eventapi.inciweb.service;
 
 import static io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter.INCIWEB_PROVIDER;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -50,13 +51,18 @@ public class InciWebService {
     public List<DataLake> createDataLake(Map<String, ParsedItem> events) {
         List<DataLake> dataLakes = new ArrayList<>();
         if (!CollectionUtils.isEmpty(events)) {
-            Map<String, DataLake> existsDataLakes = new HashMap<>();
+            Map<String, List<OffsetDateTime>> existsDataLakes = new HashMap<>();
             dataLakeDao.getDataLakesByExternalIdsAndProvider(events.keySet(), INCIWEB_PROVIDER)
-                    .forEach(dataLake -> existsDataLakes.put(dataLake.getExternalId(), dataLake));
+                    .forEach(dataLake -> {
+                        if (!existsDataLakes.containsKey(dataLake.getExternalId())) {
+                            existsDataLakes.put(dataLake.getExternalId(), new ArrayList<>());
+                        }
+                        existsDataLakes.get(dataLake.getExternalId()).add(dataLake.getUpdatedAt());
+                    });
             for (String key : events.keySet()) {
                 try {
                     if (!existsDataLakes.containsKey(key)
-                            || !existsDataLakes.get(key).getUpdatedAt().isEqual(events.get(key).getPubDate())) {
+                            || existsDataLakes.get(key).stream().noneMatch(time -> time.isEqual(events.get(key).getPubDate()))) {
                         dataLakes.add(dataLakeConverter.convertEvent(events.get(key)));
                     }
                 } catch (Exception e) {
