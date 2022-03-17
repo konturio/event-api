@@ -1,9 +1,15 @@
 # Release notes
 
-
 ## UNRELEASED
 
 #### Added
+
+#### Changed
+
+#### Removed
+
+
+## 1.4 - 2022-03-17
 
 #### Changed
 
