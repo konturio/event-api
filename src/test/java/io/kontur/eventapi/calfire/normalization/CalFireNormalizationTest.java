@@ -12,6 +12,8 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Point;
+
+import java.util.List;
 import java.util.Objects;
 
 import static io.kontur.eventapi.calfire.normalization.CalFireNormalizer.CALFIRE_PROPERTIES;
@@ -47,7 +49,7 @@ class CalFireNormalizationTest {
         assertEquals(1610718305000L, observation.getEndedAt().toInstant().toEpochMilli());
         assertEquals(1611582312000L, observation.getSourceUpdatedAt().toInstant().toEpochMilli());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
-        assertEquals("https://www.fire.ca.gov", observation.getSourceUri());
+        assertEquals(List.of("https://www.fire.ca.gov"), observation.getSourceUri());
         assertEquals("POINT(-100.12345 30.12345)", observation.getPoint());
         checkGeometriesValue(observation.getGeometries());
     }

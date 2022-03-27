@@ -25,6 +25,10 @@ staticdata:
   s3Bucket: 'event-api-locker01'
   s3Folder: 'EXP/'
 
+humanitarianCrisis:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'kontur_events/EXP/'
+
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
@@ -94,6 +98,9 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
+  humanitarianCrisisImport:
+    enable: false
+    cron: 30 30 23 24 12 SUN
   normalization:
     enable: false
     initialDelay: 999999
@@ -123,14 +130,15 @@ scheduler:
       wildfire.calfire,
       wildfire.perimeters.nifc,
       wildfire.locations.nifc,
-      wildfire.inciweb
+      wildfire.inciweb,
+      kontur.events
     firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
-    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public, test-calfire, test-nifc, test-inciweb
-    firmsAlias: test-firms, disaster-ninja-02
+    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public-v1, test-calfire, test-nifc, test-inciweb
+    firmsAlias: test-firms, kontur-public
   enrichment:
     enable: false
     initialDelay: 999999

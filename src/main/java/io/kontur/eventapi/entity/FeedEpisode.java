@@ -1,12 +1,11 @@
 package io.kontur.eventapi.entity;
 
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 import org.wololo.geojson.FeatureCollection;
 
 import java.time.OffsetDateTime;
 import java.util.*;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Data
 public class FeedEpisode {
@@ -27,9 +26,9 @@ public class FeedEpisode {
     private String location;
     private FeatureCollection geometries;
 
-    public void addUrlIfNotExists(String url) {
-        if (isNotBlank(url) && !this.urls.contains(url)) {
-            this.urls.add(url);
+    public void addUrlIfNotExists(List<String> urls) {
+        if (!CollectionUtils.isEmpty(urls)) {
+            urls.stream().filter(url -> !this.urls.contains(url)).forEach(url -> this.urls.add(url));
         }
     }
 

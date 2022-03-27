@@ -67,7 +67,7 @@ public class FirmsNormalizerIT extends AbstractCleanableIntegrationTest {
         assertNull(observation.getDescription());
         assertNull(observation.getEpisodeDescription());
         assertNull(observation.getEndedAt());
-        assertNull(observation.getSourceUri());
+        assertTrue(observation.getSourceUri().isEmpty());
         assertNull(observation.getActive());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());

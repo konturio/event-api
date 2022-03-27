@@ -4,7 +4,11 @@
 
 #### Added
 
+- added new provider `kontur.events` for Humanitarian Crisis to feed `kontur-public-v1`
+
 #### Changed
+
+- Type of the field source_uri in normalized_observations was changed from String to List
 
 #### Removed
 

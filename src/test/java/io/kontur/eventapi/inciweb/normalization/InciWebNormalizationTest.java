@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ class InciWebNormalizationTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getEndedAt());
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
-        assertEquals("http://example.com/incident/1/", observation.getSourceUri());
+        assertEquals(List.of("http://example.com/incident/1/"), observation.getSourceUri());
         assertEquals("POINT(-110.111 10.111)", observation.getPoint());
         checkGeometriesValue(observation.getGeometries());
     }

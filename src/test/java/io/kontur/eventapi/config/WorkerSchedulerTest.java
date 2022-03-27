@@ -23,6 +23,7 @@ import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
+import io.kontur.eventapi.uhc.job.HumanitarianCrisisImportJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -53,6 +54,7 @@ class WorkerSchedulerTest {
     private final CalFireSearchJob calFireSearchJob = mock(CalFireSearchJob.class);
     private final NifcImportJob nifcImportJob = mock(NifcImportJob.class);
     private final InciWebImportJob inciWebImportJob = mock(InciWebImportJob.class);
+    private final HumanitarianCrisisImportJob humanitarianCrisisImportJob = mock(HumanitarianCrisisImportJob.class);
     private final MetricsJob metricsJob = mock(MetricsJob.class);
     private final ReEnrichmentJob reEnrichmentJob = mock(ReEnrichmentJob.class);
 
@@ -60,7 +62,7 @@ class WorkerSchedulerTest {
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
             historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob,
-            nifcImportJob, inciWebImportJob, metricsJob, reEnrichmentJob);
+            nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, metricsJob, reEnrichmentJob);
 
     @AfterEach
     public void resetMocks() {

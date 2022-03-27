@@ -11,6 +11,7 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static io.kontur.eventapi.entity.EventType.*;
@@ -56,7 +57,7 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
 
         assertNull(observation.getActive());
-        assertNull(observation.getSourceUri());
+        assertTrue(observation.getSourceUri().isEmpty());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
         assertNull(observation.getProperName());
@@ -94,7 +95,7 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
 
         assertNull(observation.getActive());
-        assertNull(observation.getSourceUri());
+        assertTrue(observation.getSourceUri().isEmpty());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
         assertNull(observation.getProperName());
@@ -130,7 +131,7 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getEndedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
-        assertEquals(observation.getSourceUri(), "snc url");
+        assertEquals(observation.getSourceUri(), List.of("snc url"));
         assertTrue(observation.getActive());
 
         assertNull(observation.getCost());

@@ -3,14 +3,23 @@ package io.kontur.eventapi.util;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
+import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 
 public class GeometryUtil {
+
+    private final static Logger LOG = LoggerFactory.getLogger(GeometryUtil.class);
+
+    private final static GeoJSONReader reader = new GeoJSONReader();
 
     public static final String IS_OBSERVED_PROPERTY = "isObserved";
     public static final String FORECAST_HRS_PROPERTY = "forecastHrs";
@@ -38,8 +47,7 @@ public class GeometryUtil {
             Arrays.stream(geometry.getGeometryN(i).getCoordinates()).forEach(c -> polygonArea.AddPoint(c.getY(), c.getX()));
             areaInMeters += Math.abs(polygonArea.Compute().area);
         }
-        double areaInKm = areaInMeters / 1_000_000;
-        return areaInKm;
+        return areaInMeters / 1_000_000;
     }
 
     public static FeatureCollection convertGeometryToFeatureCollection(org.wololo.geojson.Geometry geometry, Map<String, Object> properties) {
@@ -49,5 +57,19 @@ public class GeometryUtil {
 
     public static Feature readFeature(String featureString) {
         return (Feature) GeoJSONFactory.create(featureString);
+    }
+
+    public static String getCentroid(org.wololo.geojson.Geometry geometry, UUID observationID) {
+        try {
+            Point centroid = reader.read(geometry).getCentroid();
+            return makeWktPoint(centroid.getX(), centroid.getY());
+        } catch (Exception e) {
+            LOG.debug("Can't find center point for observation. Observation ID: {}", observationID);
+        }
+        return null;
+    }
+
+    protected static String makeWktPoint(Double lon, Double lat) {
+        return lon == null || lat == null ? null : String.format("POINT(%s %s)", lon, lat);
     }
 }
