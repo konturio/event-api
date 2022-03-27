@@ -3,6 +3,7 @@ package io.kontur.eventapi.inciweb.normalization;
 import static io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter.INCIWEB_PROVIDER;
 import static io.kontur.eventapi.util.GeometryUtil.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.inciweb.converter.InciWebXmlParser;
 import io.kontur.eventapi.inciweb.dto.ParsedItem;
 import io.kontur.eventapi.normalization.Normalizer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,7 +49,9 @@ public class InciWebNormalizer extends Normalizer {
             normalizedObservation.setStartedAt(dataLakeDto.getUpdatedAt());
             normalizedObservation.setEndedAt(dataLakeDto.getUpdatedAt());
             normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
-            normalizedObservation.setSourceUri(parsedItem.get().getLink());
+            if (StringUtils.isNotBlank(parsedItem.get().getLink())) {
+                normalizedObservation.setSourceUri(List.of(parsedItem.get().getLink()));
+            }
 
             Point point = new Point(new double[] {parsedItem.get().getLongitude(), parsedItem.get().getLatitude()});
             normalizedObservation.setGeometries(convertGeometryToFeatureCollection(point, INCIWEB_PROPERTIES));

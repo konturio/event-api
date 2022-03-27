@@ -3,6 +3,7 @@ package io.kontur.eventapi.gdacs.normalization;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.gdacs.converter.GdacsPropertiesConverter;
+import org.apache.commons.lang3.StringUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -55,7 +56,10 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         normalizedObservation.setEndedAt(parseDateTime(readString(properties, "todate")));
 
         Map<String, Object> urlMap = readMap(properties, "url");
-        normalizedObservation.setSourceUri(urlMap == null ? null : readString(urlMap, "report"));
+        String url = urlMap == null ? null : readString(urlMap, "report");
+        if (StringUtils.isNotBlank(url)) {
+            normalizedObservation.setSourceUri(List.of(url));
+        }
 
         return normalizedObservation;
     }

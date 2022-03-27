@@ -13,5 +13,6 @@ public enum EventType {
     CYCLONE,
     DROUGHT,
     VOLCANO,
+    SITUATION,
     OTHER
 }

@@ -14,6 +14,8 @@ public class DateTimeUtil {
     private static final AtomicLong LAST_TIME_MS = new AtomicLong();
     private static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
+    public static final String UHC_DATETIME_PATTERN = "dd-MM-yyyy'T'HH:mm:ssXXX";
+
     public static OffsetDateTime uniqueOffsetDateTime() {
         long m = uniqueCurrentTimeMS();
         Instant instant = Instant.ofEpochMilli(m);

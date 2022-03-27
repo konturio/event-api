@@ -33,7 +33,7 @@ public interface NormalizedObservationsMapper {
                @Param("startedAt") OffsetDateTime startedAt,
                @Param("endedAt") OffsetDateTime endedAt,
                @Param("sourceUpdatedAt") OffsetDateTime sourceUpdatedAt,
-               @Param("sourceUri") String sourceUri,
+               @Param("sourceUri") List<String> sourceUri,
                @Param("recombined") boolean recombined);
 
     void markAsRecombined(@Param("observationId") UUID observationId);

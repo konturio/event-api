@@ -3,6 +3,7 @@ package io.kontur.eventapi.pdc.normalization;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import org.apache.commons.lang3.StringUtils;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
@@ -49,7 +51,10 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         normalizedDto.setEpisodeDescription(readString(props, "description"));
         normalizedDto.setType(defineType(readString(props, "type_ID")));
         normalizedDto.setSourceUpdatedAt(readDateTime(props, "update_Date"));
-        normalizedDto.setSourceUri(readString(props, "snc_url"));
+        String url = readString(props, "snc_url");
+        if (StringUtils.isNotBlank(url)) {
+            normalizedDto.setSourceUri(List.of(url));
+        }
 
         OffsetDateTime startedAt = readDateTime(props, "start_Date");
         OffsetDateTime endedAt = readDateTime(props, "end_Date");

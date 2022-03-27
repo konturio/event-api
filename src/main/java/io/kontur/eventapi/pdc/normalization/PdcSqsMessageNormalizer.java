@@ -6,6 +6,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.util.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
+
+import java.util.List;
 import java.util.Map;
 
 import static io.kontur.eventapi.entity.EventType.CYCLONE;
@@ -84,7 +87,10 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
                 defineSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId")));
         normalizedDto.setType(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")));
         Map<String, Object> hazardSnc = (Map<String, Object>) props.get("hazardSnc");
-        normalizedDto.setSourceUri(hazardSnc == null ? null : readString(hazardSnc, "sncUrl"));
+        String url = hazardSnc == null ? null : readString(hazardSnc, "sncUrl");
+        if (StringUtils.isNotBlank(url)) {
+            normalizedDto.setSourceUri(List.of(url));
+        }
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
         normalizedDto.setPoint(pointWkt);
 

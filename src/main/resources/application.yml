@@ -60,6 +60,10 @@ staticdata:
   s3Bucket: 'event-api-locker01'
   s3Folder: 'EXP/'
 
+humanitarianCrisis:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'kontur_events/EXP/'
+
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
@@ -129,6 +133,9 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 300000
+  humanitarianCrisisImport:
+    enable: true
+    cron: 0 0 9 * * * # every day at 9 AM
   normalization:
     enable: true
     initialDelay: 1000
@@ -158,7 +165,8 @@ scheduler:
       wildfire.calfire,
       wildfire.perimeters.nifc,
       wildfire.locations.nifc,
-      wildfire.inciweb
+      wildfire.inciweb,
+      kontur.events
     firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   feedComposition:
     enable: true

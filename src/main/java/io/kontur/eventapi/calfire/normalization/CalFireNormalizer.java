@@ -6,20 +6,19 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.kontur.eventapi.util.GeometryUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
-import org.wololo.jts2geojson.GeoJSONReader;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static io.kontur.eventapi.calfire.converter.CalFireDataLakeConverter.CALFIRE_PROVIDER;
 import static io.kontur.eventapi.util.GeometryUtil.*;
@@ -28,7 +27,6 @@ import static io.kontur.eventapi.util.GeometryUtil.*;
 public class CalFireNormalizer extends Normalizer {
 
     private final static Logger LOG = LoggerFactory.getLogger(CalFireNormalizer.class);
-    private final static GeoJSONReader reader = new GeoJSONReader();
     private final static String WILDFIRE = "Wildfire";
     private final static double ACRES_IN_SQ_KM = 247.105d;
 
@@ -45,7 +43,7 @@ public class CalFireNormalizer extends Normalizer {
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
         Geometry geometry = feature.getGeometry();
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(geometry, CALFIRE_PROPERTIES));
-        normalizedObservation.setPoint(getCentroid(geometry, normalizedObservation.getObservationId()));
+        normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
 
         Map<String, Object> properties = feature.getProperties();
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
@@ -53,7 +51,10 @@ public class CalFireNormalizer extends Normalizer {
         normalizedObservation.setProvider(dataLakeDto.getProvider());
         normalizedObservation.setType(EventType.WILDFIRE);
         normalizedObservation.setActive(Boolean.valueOf(readString(properties, "IsActive")));
-        normalizedObservation.setSourceUri(readString(properties, "Url"));
+        String url = readString(properties, "Url");
+        if (StringUtils.isNotBlank(url)) {
+            normalizedObservation.setSourceUri(List.of(url));
+        }
         String name = readString(properties, "Name");
         normalizedObservation.setName(WILDFIRE + " " + name);
         normalizedObservation.setProperName(name);
@@ -97,15 +98,5 @@ public class CalFireNormalizer extends Normalizer {
             }
         }
         return normalizedObservation;
-    }
-
-    private String getCentroid(Geometry geometry, UUID observationID) {
-        try {
-            Point centroid = reader.read(geometry).getCentroid();
-            return makeWktPoint(centroid.getX(), centroid.getY());
-        } catch (Exception e) {
-            LOG.warn("Can't find center point for observation. Observation ID: {}", observationID);
-        }
-        return null;
     }
 }

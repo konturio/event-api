@@ -5,6 +5,8 @@ import org.wololo.geojson.FeatureCollection;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -29,7 +31,7 @@ public class NormalizedObservation {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime sourceUpdatedAt;
-    private String sourceUri;
+    private List<String> sourceUri = new ArrayList<>();
     private Boolean recombined = false;
     private OffsetDateTime normalizedAt;
 }

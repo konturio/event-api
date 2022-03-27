@@ -54,7 +54,7 @@
             #{startedAt},
             #{endedAt},
             #{sourceUpdatedAt},
-            #{sourceUri},
+            #{sourceUri, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
             #{recombined}
         )
     </insert>
@@ -162,7 +162,7 @@
         <result property="startedAt" column="started_at"/>
         <result property="endedAt" column="ended_at"/>
         <result property="sourceUpdatedAt" column="source_updated_at"/>
-        <result property="sourceUri" column="source_uri"/>
+        <result property="sourceUri" column="source_uri" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="recombined" column="recombined"/>
         <result property="normalizedAt" column="normalized_at"/>
     </resultMap>

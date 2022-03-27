@@ -4,6 +4,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -11,6 +12,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.util.List;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
 import static java.lang.String.format;
@@ -64,7 +66,9 @@ public class GdacsAlertNormalizer extends GdacsNormalizer {
         normalizedObservation.setExternalEventId(composeExternalEventId(parsedAlert.getEventType(), parsedAlert.getEventId()));
         normalizedObservation.setStartedAt(parsedAlert.getFromDate());
         normalizedObservation.setEndedAt(parsedAlert.getToDate());
-        normalizedObservation.setSourceUri(parsedAlert.getLink());
+        if (StringUtils.isNotBlank(parsedAlert.getLink())) {
+            normalizedObservation.setSourceUri(List.of(parsedAlert.getLink()));
+        }
         normalizedObservation.setRegion(parsedAlert.getCountry());
     }
 }
