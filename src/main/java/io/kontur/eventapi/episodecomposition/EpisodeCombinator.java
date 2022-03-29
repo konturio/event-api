@@ -8,6 +8,7 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.job.Applicable;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -36,7 +37,11 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         feedEpisode.setUpdatedAt(observation.getLoadedAt());
         feedEpisode.setSourceUpdatedAt(observation.getSourceUpdatedAt());
         feedEpisode.addObservation(observation.getObservationId());
-        feedEpisode.addUrlIfNotExists(observation.getSourceUri());
+        if (!CollectionUtils.isEmpty(observation.getUrls())) {
+            feedEpisode.addUrlIfNotExists(observation.getUrls());
+        } else {
+            feedEpisode.addUrlIfNotExists(observation.getSourceUri());
+        }
         feedEpisode.setProperName(observation.getProperName());
         feedEpisode.setLocation(observation.getRegion());
 

@@ -83,7 +83,7 @@ class AustraliaWildfireNormalizerTest {
         assertNull(observation.getEpisodeDescription());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
-        assertNull(observation.getSourceUri());
+        assertNull(observation.getUrls());
         assertNull(observation.getExternalEpisodeId());
         assertNull(observation.getProperName());
     }

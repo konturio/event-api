@@ -50,7 +50,7 @@ public class InciWebNormalizer extends Normalizer {
             normalizedObservation.setEndedAt(dataLakeDto.getUpdatedAt());
             normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
             if (StringUtils.isNotBlank(parsedItem.get().getLink())) {
-                normalizedObservation.setSourceUri(List.of(parsedItem.get().getLink()));
+                normalizedObservation.setUrls(List.of(parsedItem.get().getLink()));
             }
 
             Point point = new Point(new double[] {parsedItem.get().getLongitude(), parsedItem.get().getLatitude()});

@@ -53,7 +53,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         normalizedDto.setSourceUpdatedAt(readDateTime(props, "update_Date"));
         String url = readString(props, "snc_url");
         if (StringUtils.isNotBlank(url)) {
-            normalizedDto.setSourceUri(List.of(url));
+            normalizedDto.setUrls(List.of(url));
         }
 
         OffsetDateTime startedAt = readDateTime(props, "start_Date");

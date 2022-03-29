@@ -53,7 +53,7 @@ public class CalFireNormalizer extends Normalizer {
         normalizedObservation.setActive(Boolean.valueOf(readString(properties, "IsActive")));
         String url = readString(properties, "Url");
         if (StringUtils.isNotBlank(url)) {
-            normalizedObservation.setSourceUri(List.of(url));
+            normalizedObservation.setUrls(List.of(url));
         }
         String name = readString(properties, "Name");
         normalizedObservation.setName(WILDFIRE + " " + name);

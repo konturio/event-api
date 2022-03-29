@@ -45,7 +45,7 @@ class PerimetersNifcNormalizerTest {
         assertNull(observation.getActive());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
-        assertTrue(observation.getSourceUri().isEmpty());
+        assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());
 
         assertEquals(PERIMETERS_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());

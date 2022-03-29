@@ -89,7 +89,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         Map<String, Object> hazardSnc = (Map<String, Object>) props.get("hazardSnc");
         String url = hazardSnc == null ? null : readString(hazardSnc, "sncUrl");
         if (StringUtils.isNotBlank(url)) {
-            normalizedDto.setSourceUri(List.of(url));
+            normalizedDto.setUrls(List.of(url));
         }
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
         normalizedDto.setPoint(pointWkt);

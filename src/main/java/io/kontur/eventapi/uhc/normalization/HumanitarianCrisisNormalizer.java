@@ -90,9 +90,9 @@ public class HumanitarianCrisisNormalizer extends Normalizer {
         normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
         Object urls = properties.get("urls");
         if (urls instanceof List) {
-            normalizedObservation.setSourceUri((List<String>) urls);
+            normalizedObservation.setUrls((List<String>) urls);
         } else if (urls instanceof String) {
-            normalizedObservation.setSourceUri(List.of(String.valueOf(urls)));
+            normalizedObservation.setUrls(List.of(String.valueOf(urls)));
         }
         normalizedObservation.setExternalEpisodeId(null);
         normalizedObservation.setProperName(readString(properties, "name"));

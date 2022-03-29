@@ -58,7 +58,7 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         Map<String, Object> urlMap = readMap(properties, "url");
         String url = urlMap == null ? null : readString(urlMap, "report");
         if (StringUtils.isNotBlank(url)) {
-            normalizedObservation.setSourceUri(List.of(url));
+            normalizedObservation.setUrls(List.of(url));
         }
 
         return normalizedObservation;

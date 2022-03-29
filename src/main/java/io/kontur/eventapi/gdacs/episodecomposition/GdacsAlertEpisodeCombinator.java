@@ -5,6 +5,7 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -41,7 +42,11 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
         episode.ifPresent(ep -> {
             ep.setObservations(findObservationsForEpisode(eventObservations));
             ep.setGeometries(geometryObservation.getGeometries());
-            ep.addUrlIfNotExists(geometryObservation.getSourceUri());
+            if (!CollectionUtils.isEmpty(geometryObservation.getUrls())) {
+                ep.addUrlIfNotExists(geometryObservation.getUrls());
+            } else {
+                ep.addUrlIfNotExists(geometryObservation.getSourceUri());
+            }
             if (isBlank(ep.getProperName())) {
                 ep.setProperName(geometryObservation.getProperName());
             }

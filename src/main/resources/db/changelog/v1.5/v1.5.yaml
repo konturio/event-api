@@ -5,4 +5,4 @@ databaseChangeLog:
       file: update-provides-list-for-kontur-public-v1-feed.sql
   - include:
       relativeToChangelogFile: true
-      file: alter-observations-change-urls-type-to-array.sql
+      file: alter-observations-add-urls-as-array.sql

@@ -57,7 +57,7 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
 
         assertNull(observation.getActive());
-        assertTrue(observation.getSourceUri().isEmpty());
+        assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
         assertNull(observation.getProperName());
@@ -95,7 +95,7 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
 
         assertNull(observation.getActive());
-        assertTrue(observation.getSourceUri().isEmpty());
+        assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
         assertNull(observation.getProperName());
@@ -131,7 +131,7 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getEndedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
-        assertEquals(observation.getSourceUri(), List.of("snc url"));
+        assertEquals(observation.getUrls(), List.of("snc url"));
         assertTrue(observation.getActive());
 
         assertNull(observation.getCost());

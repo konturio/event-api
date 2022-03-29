@@ -45,7 +45,7 @@ class LocationsNifcNormalizerTest {
         assertNull(observation.getActive());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
-        assertTrue(observation.getSourceUri().isEmpty());
+        assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());
 
         assertEquals(LOCATIONS_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
