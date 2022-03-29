@@ -100,7 +100,8 @@ scheduler:
     fixedDelay: 999999
   humanitarianCrisisImport:
     enable: false
-    cron: 30 30 23 24 12 SUN
+    initialDelay: 999999
+    fixedDelay: 999999
   normalization:
     enable: false
     initialDelay: 999999

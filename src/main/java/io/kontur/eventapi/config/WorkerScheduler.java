@@ -240,7 +240,8 @@ public class WorkerScheduler {
         }
     }
 
-    @Scheduled(cron = "${scheduler.humanitarianCrisisImport.cron}")
+    @Scheduled(initialDelayString = "${scheduler.humanitarianCrisisImport.initialDelay}",
+            fixedDelayString = "${scheduler.humanitarianCrisisImport.fixedDelay}")
     public void startHumanitarianCrisisImport() {
         if (Boolean.parseBoolean(humanitarianCrisisEnabled)) {
             humanitarianCrisisImportJob.run();

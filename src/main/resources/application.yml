@@ -135,7 +135,8 @@ scheduler:
     fixedDelay: 300000
   humanitarianCrisisImport:
     enable: true
-    cron: 0 0 9 * * * # every day at 9 AM
+    initialDelay: 1000
+    fixedDelay: PT12H # every 12 hours
   normalization:
     enable: true
     initialDelay: 1000
