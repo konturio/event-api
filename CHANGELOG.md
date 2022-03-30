@@ -1,15 +1,20 @@
 # Release notes
 
-## UNRELEASED  1.5.0
+## UNRELEASED
 
 #### Added
-
-- added new provider `kontur.events` for Humanitarian Crisis to feed `kontur-public-v1`
-- added new field `urls` type array to normalized_observations
 
 #### Changed
 
 #### Removed
+
+
+## 1.5 - 2022-03-30
+
+#### Added
+
+- added new provider `kontur.events` for Humanitarian Crisis to feed `kontur-public`
+- added new field `urls` type array to normalized_observations
 
 
 ## 1.4.1 - 2022-03-23
