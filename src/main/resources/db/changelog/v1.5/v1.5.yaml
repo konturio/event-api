@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: alter-observations-add-urls-as-array.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-providers-list-for-kontur-public-feed.sql
