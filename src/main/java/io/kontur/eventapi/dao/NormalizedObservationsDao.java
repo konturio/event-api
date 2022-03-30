@@ -30,7 +30,7 @@ public class NormalizedObservationsDao {
                 obs.getProvider(), obs.getPoint(), geometries, obs.getEventSeverity(), obs.getName(), obs.getProperName(),
                 obs.getDescription(), obs.getEpisodeDescription(), obs.getType(), obs.getActive(), obs.getCost(),
                 obs.getRegion(), obs.getLoadedAt(), obs.getStartedAt(), obs.getEndedAt(), obs.getSourceUpdatedAt(),
-                obs.getSourceUri(), obs.getUrls(), obs.getRecombined());
+                obs.getUrls(), obs.getRecombined());
     }
 
     public void markAsRecombined(UUID observationId) {
