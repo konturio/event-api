@@ -33,7 +33,6 @@ public interface NormalizedObservationsMapper {
                @Param("startedAt") OffsetDateTime startedAt,
                @Param("endedAt") OffsetDateTime endedAt,
                @Param("sourceUpdatedAt") OffsetDateTime sourceUpdatedAt,
-               @Param("sourceUri") String sourceUri,
                @Param("urls") List<String> urls,
                @Param("recombined") boolean recombined);
 

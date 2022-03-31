@@ -1,0 +1,8 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: filling-urls-from-source-uri-fot-normalized-observations.sql
+  - include:
+      relativeToChangelogFile: true
+      file: remove-unused-source-uri-field-from-normalized-observations.sql

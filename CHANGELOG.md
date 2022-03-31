@@ -9,6 +9,13 @@
 #### Removed
 
 
+## UNRELEASED 1.5.1 - 2022-03-31
+
+#### Removed
+
+- removed unused field `source_uri` from normalized_observations
+
+
 ## 1.5 - 2022-03-30
 
 #### Added

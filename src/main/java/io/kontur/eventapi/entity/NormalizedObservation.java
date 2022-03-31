@@ -31,7 +31,6 @@ public class NormalizedObservation {
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime sourceUpdatedAt;
-    private String sourceUri;
     private List<String> urls = new ArrayList<>();
     private Boolean recombined = false;
     private OffsetDateTime normalizedAt;

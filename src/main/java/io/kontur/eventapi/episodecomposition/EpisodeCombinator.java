@@ -39,8 +39,6 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         feedEpisode.addObservation(observation.getObservationId());
         if (!CollectionUtils.isEmpty(observation.getUrls())) {
             feedEpisode.addUrlIfNotExists(observation.getUrls());
-        } else {
-            feedEpisode.addUrlIfNotExists(observation.getSourceUri());
         }
         feedEpisode.setProperName(observation.getProperName());
         feedEpisode.setLocation(observation.getRegion());
