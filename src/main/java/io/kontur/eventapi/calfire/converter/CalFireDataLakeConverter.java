@@ -2,6 +2,7 @@ package io.kontur.eventapi.calfire.converter;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.annotation.Counted;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
@@ -11,6 +12,7 @@ import java.util.UUID;
 public class CalFireDataLakeConverter {
     public final static String CALFIRE_PROVIDER = "wildfire.calfire";
 
+    @Counted(value = "import.calfire.counter")
     public DataLake convertEvent(String event, String externalId, OffsetDateTime updatedAt) throws Exception {
         if (updatedAt == null) {
             throw new Exception("Empty datetime field updated_at for " + externalId);

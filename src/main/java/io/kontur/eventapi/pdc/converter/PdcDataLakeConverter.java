@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.kontur.eventapi.util.JsonUtil;
+import io.micrometer.core.annotation.Counted;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -25,6 +26,7 @@ public class PdcDataLakeConverter {
     public final static String PDC_MAP_SRV_PROVIDER = "pdcMapSrv";
     public final static DateTimeFormatter magsDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
+    @Counted(value = "import.pdc.hazard.counter")
     public DataLake convertHpSrvHazardData(JsonNode node) {
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
@@ -36,6 +38,7 @@ public class PdcDataLakeConverter {
         return dataLake;
     }
 
+    @Counted(value = "import.pdc.mag.counter")
     public List<DataLake> convertHpSrvMagData(JsonNode jsonNode, String eventId) {
         FeatureCollection fc = JsonUtil.readJson(jsonNode.toString(), FeatureCollection.class);
         List<DataLake> result = new ArrayList<>(fc.getFeatures().length);
@@ -53,6 +56,7 @@ public class PdcDataLakeConverter {
         return result;
     }
 
+    @Counted(value = "import.pdc.sqs.counter")
     public DataLake convertSQSMessage(String messageJson, String type, String messageId) {
         if (!"HAZARD".equals(type) && !"MAG".equals(type)) {
             throw new IllegalStateException("Unexpected SQS message type: " + type + "\n" + messageJson);
@@ -68,6 +72,7 @@ public class PdcDataLakeConverter {
         return dataLake;
     }
 
+    @Counted(value = "import.pdc.exposure.counter")
     public DataLake convertExposure(String data, String externalId) {
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
