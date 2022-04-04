@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractJob implements Runnable {
     private final static Map<String, Lock> locks = new ConcurrentHashMap<>();
-    private final MeterRegistry meterRegistry;
+    protected final MeterRegistry meterRegistry;
 
     protected AbstractJob(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;

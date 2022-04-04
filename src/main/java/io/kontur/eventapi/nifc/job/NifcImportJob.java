@@ -5,6 +5,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.nifc.client.NifcClient;
 import io.kontur.eventapi.nifc.converter.NifcDataLakeConverter;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,8 +24,6 @@ import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIM
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
 import static java.time.temporal.ChronoUnit.SECONDS;
-
-import javax.validation.constraints.NotNull;
 
 @Component
 public class NifcImportJob extends AbstractJob {
@@ -50,8 +49,9 @@ public class NifcImportJob extends AbstractJob {
 
     private void processLocations() {
         try {
+            Counter counterLocation = meterRegistry.counter("import.nifc.locations.counter");
             processFeatureCollection(client.getNifcLocations(), NIFC_LOCATIONS_PROVIDER,
-                    "ModifiedOnDateTime_dt", "UniqueFireIdentifier");
+                    "ModifiedOnDateTime_dt", "UniqueFireIdentifier", counterLocation);
         } catch (Exception e) {
             LOG.error("Failed to obtain NIFC locations");
         }
@@ -59,14 +59,16 @@ public class NifcImportJob extends AbstractJob {
 
     private void processPerimeters() {
         try {
+            Counter counterPerimeters = meterRegistry.counter("import.nifc.perimeters.counter");
             processFeatureCollection(client.getNifcPerimeters(), NIFC_PERIMETERS_PROVIDER,
-                    "irwin_ModifiedOnDateTime_dt", "irwin_UniqueFireIdentifier");
+                    "irwin_ModifiedOnDateTime_dt", "irwin_UniqueFireIdentifier", counterPerimeters);
         } catch (Exception e) {
             LOG.error("Failed to obtain NIFC perimeters");
         }
     }
 
-    private void processFeatureCollection(String geoJson, String provider, String updatedAtProp, String externalIdProp) {
+    private void processFeatureCollection(String geoJson, String provider, String updatedAtProp, String externalIdProp,
+                                          Counter counter) {
         try {
             FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
@@ -86,6 +88,7 @@ public class NifcImportJob extends AbstractJob {
                     OffsetDateTime updatedAt = getDateTimeFromMilli(updatedAtMilli).truncatedTo(SECONDS);
                     if (!existsDataLakes.containsKey(externalId)
                             || !existsDataLakes.get(externalId).getUpdatedAt().isEqual(updatedAt)) {
+                        counter.increment();
                         dataLakes.add(dataLakeConverter.convertDataLake(externalId, updatedAt, provider, data));
                     }
                 } catch (Exception e) {
