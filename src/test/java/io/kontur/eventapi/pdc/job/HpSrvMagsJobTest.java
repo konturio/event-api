@@ -50,7 +50,7 @@ class HpSrvMagsJobTest {
 
         //then
         verify(hpSrvService, times(2)).obtainMagsFeatureCollection(hazardIdCaptor.capture());
-        verify(hpSrvService, times(2)).saveMag(externalIdCaptor.capture(), eq(node));
+        verify(hpSrvService, times(2)).saveMag(externalIdCaptor.capture(), eq(node), any());
 
         List<String> hazardIdValues = hazardIdCaptor.getAllValues();
         assertEquals(Arrays.asList("hazardId1", "hazardId2"), hazardIdValues);
@@ -73,7 +73,7 @@ class HpSrvMagsJobTest {
 
         //then
         verify(hpSrvService, never()).obtainMagsFeatureCollection(any());
-        verify(hpSrvService, never()).saveMag(any(), any());
+        verify(hpSrvService, never()).saveMag(any(), any(), any());
     }
 
     private DataLake generateHazardDataLake(String id) {

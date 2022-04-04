@@ -8,6 +8,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.client.HpSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
+import io.micrometer.core.instrument.Counter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -65,10 +66,13 @@ public class HpSrvService {
         dataLakeDao.storeEventData(dataLake);
     }
 
-    public void saveMag(String externalId, JsonNode json) {
+    public void saveMag(String externalId, JsonNode json, Counter counter) {
         if (json != null && !json.isEmpty() && !json.get("features").isEmpty()) {
             pdcDataLakeConverter.convertHpSrvMagData(json, externalId)
                     .forEach(dataLakeDao::storeEventData);
+            if (counter != null) {
+                counter.increment();
+            }
         }
     }
 

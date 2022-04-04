@@ -16,6 +16,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.inciweb.client.InciWebClient;
 import io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter;
 import io.kontur.eventapi.inciweb.dto.ParsedItem;
+import io.micrometer.core.instrument.Counter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class InciWebService {
         return Optional.empty();
     }
 
-    public List<DataLake> createDataLake(Map<String, ParsedItem> events) {
+    public List<DataLake> createDataLake(Map<String, ParsedItem> events, Counter counter) {
         List<DataLake> dataLakes = new ArrayList<>();
         if (!CollectionUtils.isEmpty(events)) {
             Map<String, List<OffsetDateTime>> existsDataLakes = new HashMap<>();
@@ -64,6 +65,9 @@ public class InciWebService {
                     if (!existsDataLakes.containsKey(key)
                             || existsDataLakes.get(key).stream().noneMatch(time -> time.isEqual(events.get(key).getPubDate()))) {
                         dataLakes.add(dataLakeConverter.convertEvent(events.get(key)));
+                        if (counter != null) {
+                            counter.increment();
+                        }
                     }
                 } catch (Exception e) {
                     LOG.error("Error while processing InciWeb wildfire event. {}", e.getMessage());

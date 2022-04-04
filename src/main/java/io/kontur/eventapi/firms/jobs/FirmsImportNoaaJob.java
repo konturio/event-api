@@ -7,6 +7,7 @@ import java.util.List;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.firms.client.FirmsClient;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,8 @@ public class FirmsImportNoaaJob extends FirmsImportJob {
     @Override
     protected List<DataLake> loadData() {
         String noaaData = firmsClient.getNoaa20VirsData();
-        return createDataLakes(NOAA_PROVIDER, noaaData);
+        Counter counter = meterRegistry.counter("import.firms.noaa.counter");
+        return createDataLakes(NOAA_PROVIDER, noaaData, counter);
     }
 
     @Override

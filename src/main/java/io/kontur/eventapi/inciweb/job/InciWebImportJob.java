@@ -18,6 +18,7 @@ import io.kontur.eventapi.inciweb.dto.ParsedItem;
 import io.kontur.eventapi.inciweb.service.InciWebService;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
@@ -51,12 +52,13 @@ public class InciWebImportJob extends AbstractJob {
     public void execute() throws Exception {
         Optional<String> xmlOpt = inciWebService.fetchXml();
         if (xmlOpt.isPresent()) {
+            Counter counter = meterRegistry.counter("import.inciweb.counter");
             String xml = xmlOpt.get();
             try {
                 setPubDate(xml);
                 Map<String, String> events = inciWebXmlParser.getItems(xml, "item", GUID);
                 Map<String, ParsedItem> parsedEvents = inciWebXmlParser.getParsedItems(events);
-                List<DataLake> dataLakes = inciWebService.createDataLake(parsedEvents);
+                List<DataLake> dataLakes = inciWebService.createDataLake(parsedEvents, counter);
                 inciWebService.saveEventsToDataLake(dataLakes);
             } catch (DateTimeParseException e) {
                 LOG.error("Error while parsing pubDate from InciWeb");

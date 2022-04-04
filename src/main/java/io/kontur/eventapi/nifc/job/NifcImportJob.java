@@ -88,8 +88,10 @@ public class NifcImportJob extends AbstractJob {
                     OffsetDateTime updatedAt = getDateTimeFromMilli(updatedAtMilli).truncatedTo(SECONDS);
                     if (!existsDataLakes.containsKey(externalId)
                             || !existsDataLakes.get(externalId).getUpdatedAt().isEqual(updatedAt)) {
-                        counter.increment();
                         dataLakes.add(dataLakeConverter.convertDataLake(externalId, updatedAt, provider, data));
+                        if (counter != null) {
+                            counter.increment();
+                        }
                     }
                 } catch (Exception e) {
                     LOG.error("Failed to process feature from " + provider, e);

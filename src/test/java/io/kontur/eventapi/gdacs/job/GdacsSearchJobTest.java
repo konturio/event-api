@@ -47,7 +47,7 @@ public class GdacsSearchJobTest {
         when(gdacsAlertXmlParser.getPubDate(isA(String.class))).thenReturn(getPubDate());
         when(gdacsAlertXmlParser.getAlerts(isA(String.class))).thenReturn(getAlerts());
         when(gdacsAlertXmlParser.getParsedAlertsToGdacsSearchJob(anyMap())).thenReturn(parsedAlerts);
-        when(gdacsService.createDataLakeListWithAlertsAndGeometry(anyMap())).thenReturn(dataLakes);
+        when(gdacsService.createDataLakeListWithAlertsAndGeometry(anyMap(), any())).thenReturn(dataLakes);
         doNothing().when(gdacsService).saveGdacs(anyList());
 
         GdacsSearchJob gdacsSearchJob = new GdacsSearchJob(gdacsService, gdacsAlertXmlParser, dataLakeDao,
@@ -58,7 +58,7 @@ public class GdacsSearchJobTest {
         verify(gdacsAlertXmlParser, times(1)).getPubDate(isA(String.class));
         verify(gdacsAlertXmlParser, times(1)).getAlerts(isA(String.class));
         verify(gdacsAlertXmlParser, times(1)).getParsedAlertsToGdacsSearchJob(anyMap());
-        verify(gdacsService, times(1)).createDataLakeListWithAlertsAndGeometry(anyMap());
+        verify(gdacsService, times(1)).createDataLakeListWithAlertsAndGeometry(anyMap(), any());
         verify(gdacsService, times(1)).saveGdacs(anyList());
 
     }

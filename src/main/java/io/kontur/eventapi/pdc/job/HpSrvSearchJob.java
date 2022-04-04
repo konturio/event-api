@@ -6,6 +6,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
 import io.kontur.eventapi.pdc.service.HpSrvService;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,12 +40,16 @@ public class HpSrvSearchJob extends AbstractJob {
     }
 
     private void importHazards() {
+        Counter counter = meterRegistry.counter("import.pdc.hazard.counter");
         HpSrvSearchBody searchBody = generateHazardSearchBody();
 
         JsonNode pdcHazardDtos = hpSrvService.obtainHazards(searchBody);
 
         while (!pdcHazardDtos.isEmpty()) {
-            pdcHazardDtos.forEach(hpSrvService::saveHazard);
+            pdcHazardDtos.forEach(hazard -> {
+                hpSrvService.saveHazard(hazard);
+                counter.increment();
+            });
 
             searchBody.getPagination().setOffset(searchBody.getPagination().getOffset() + pdcHazardDtos.size());
             pdcHazardDtos = hpSrvService.obtainHazards(searchBody);

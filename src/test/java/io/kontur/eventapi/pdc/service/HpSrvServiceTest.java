@@ -95,7 +95,7 @@ class HpSrvServiceTest {
         when(pdcDataLakeConverter.convertHpSrvMagData(node, "exId1")).thenReturn(List.of(dataLake, dataLake2));
 
         //when
-        hpSrvService.saveMag("exId1", node);
+        hpSrvService.saveMag("exId1", node, null);
 
         //then
         verify(pdcDataLakeConverter, times(1)).convertHpSrvMagData(node, "exId1");
@@ -109,7 +109,7 @@ class HpSrvServiceTest {
         ObjectNode node = new ObjectMapper().createObjectNode();
 
         //when
-        hpSrvService.saveMag("exId1", node);
+        hpSrvService.saveMag("exId1", node, null);
 
         //then
         verify(pdcDataLakeConverter, never()).convertHpSrvMagData(any(), anyString());

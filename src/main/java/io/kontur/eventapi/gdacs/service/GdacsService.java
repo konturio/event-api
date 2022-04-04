@@ -6,6 +6,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
+import io.micrometer.core.instrument.Counter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class GdacsService {
         return Optional.empty();
     }
 
-    public List<DataLake> createDataLakeListWithAlertsAndGeometry(Map<String, ParsedAlert> alerts) {
+    public List<DataLake> createDataLakeListWithAlertsAndGeometry(Map<String, ParsedAlert> alerts, Counter counter) {
         var dataLakes = new ArrayList<DataLake>();
 
         for (String key : alerts.keySet()) {
@@ -56,6 +57,9 @@ public class GdacsService {
             if (geometry.isPresent()) {
                 dataLakes.add(dataLakeConverter.convertGdacs(alert));
                 dataLakes.add(dataLakeConverter.convertGdacsWithGeometry(alert, geometry.get()));
+                if (counter != null) {
+                    counter.increment();
+                }
             }
         }
         dataLakes.sort(Comparator.comparing(DataLake::getLoadedAt));

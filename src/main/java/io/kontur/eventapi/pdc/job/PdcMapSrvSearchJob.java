@@ -6,6 +6,7 @@ import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.client.PdcMapSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.entity.ExposureGeohash;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
     @Override
     public void execute() throws Exception {
         try {
+            Counter counter = meterRegistry.counter("import.pdc.exposure.counter");
             String geoJson = pdcMapSrvClient.getExposures();
             FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
@@ -62,6 +64,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                             || !storedValues.get(id).getGeohash().equals(ids.get(id)))
                             && dataLakes.stream().noneMatch(i -> i.getExternalId().equals(id))) {
                         dataLakes.add(pdcDataLakeConverter.convertExposure(features.get(id), id));
+                        counter.increment();
                     }
                 }
                 if (!CollectionUtils.isEmpty(dataLakes)) {

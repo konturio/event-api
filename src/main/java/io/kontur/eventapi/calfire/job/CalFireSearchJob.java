@@ -6,6 +6,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ public class CalFireSearchJob extends AbstractJob {
     @Override
     public void execute() throws Exception {
         try {
+            Counter counter = meterRegistry.counter("import.calfire.counter");
             String geoJson = calFireClient.getEvents();
             FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
@@ -60,6 +62,7 @@ public class CalFireSearchJob extends AbstractJob {
                                 updatedAt.format(DateTimeFormatter.ISO_INSTANT))) {
                             dataLakes.add(
                                     calFireDataLakeConverter.convertEvent(feature.toString(), externalId, updatedAt));
+                            counter.increment();
                         }
                     }
                 } catch (Exception e1) {

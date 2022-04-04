@@ -7,6 +7,7 @@ import java.util.List;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.firms.client.FirmsClient;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,8 @@ public class FirmsImportSuomiJob extends FirmsImportJob {
     @Override
     protected List<DataLake> loadData() {
         String suomiData = firmsClient.getSuomiNppVirsData();
-        return createDataLakes(SUOMI_PROVIDER, suomiData);
+        Counter counter = meterRegistry.counter("import.firms.suomi.counter");
+        return createDataLakes(SUOMI_PROVIDER, suomiData, counter);
     }
 
     @Override

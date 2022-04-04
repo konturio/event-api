@@ -6,6 +6,7 @@ import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.dto.ParsedDataLakeItem;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +68,7 @@ public abstract class FirmsImportJob extends AbstractJob {
         return "firmsImport";
     }
 
-    protected List<DataLake> createDataLakes(String provider, String data) {
+    protected List<DataLake> createDataLakes(String provider, String data, Counter counter) {
         List<DataLake> dataLakes = new ArrayList<>();
         String[] csvRows = data.split("\r?\n");
         String csvHeader = csvRows[0];
@@ -100,6 +101,9 @@ public abstract class FirmsImportJob extends AbstractJob {
                         dataLake.setUpdatedAt(extractUpdatedAtValue(csvData));
 
                         dataLakes.add(dataLake);
+                        if (counter != null) {
+                            counter.increment();
+                        }
                     }
                 }
             }

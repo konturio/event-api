@@ -6,6 +6,7 @@ import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.service.GdacsService;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
@@ -52,13 +53,14 @@ public class GdacsSearchJob extends AbstractJob {
     public void execute() {
         var xmlOpt = gdacsService.fetchGdacsXml();
         if (xmlOpt.isPresent()) {
+            Counter counter = meterRegistry.counter("import.gdacs.counter");
             String xml = xmlOpt.get();
             try {
                 setPubDate(xml);
                 var alerts = gdacsAlertParser.getAlerts(xml);
                 var filteredAlerts = filterExistsAlerts(alerts);
                 var parsedAlerts = gdacsAlertParser.getParsedAlertsToGdacsSearchJob(filteredAlerts);
-                var dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(parsedAlerts);
+                var dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(parsedAlerts, counter);
                 gdacsService.saveGdacs(dataLakes);
             } catch (DateTimeParseException e) {
                 LOG.error("Parsing pubDate from Gdacs was failed");

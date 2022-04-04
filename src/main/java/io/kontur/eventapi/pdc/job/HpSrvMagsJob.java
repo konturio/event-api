@@ -6,6 +6,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.service.HpSrvService;
 import io.kontur.eventapi.util.JsonUtil;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class HpSrvMagsJob extends AbstractJob {
     }
 
     private void importMags() {
+        Counter counter = meterRegistry.counter("import.pdc.mags.counter");
         List<DataLake> eventsWithoutAreas = dataLakeDao.getPdcHpSrvHazardsWithoutAreas();
         LOG.info("{} hazards to process", eventsWithoutAreas.size());
 
@@ -53,7 +55,7 @@ public class HpSrvMagsJob extends AbstractJob {
             String hazardId = getHazardId(dataLake);
             try {
                 JsonNode json = hpSrvService.obtainMagsFeatureCollection(hazardId);
-                hpSrvService.saveMag(externalId, json);
+                hpSrvService.saveMag(externalId, json, counter);
             } catch (Exception e) {
                 LOG.warn("Exception during hazard mag processing. Hazard UUID = '{}'", externalId, e);
             }

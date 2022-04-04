@@ -71,7 +71,7 @@ class GdacsServiceTest {
                 .thenReturn(createDataLake(alert, geometry, GDACS_ALERT_GEOMETRY_PROVIDER));
 
         List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(
-                Map.of("GDACS_EQ_1243255_1342589", alert));
+                Map.of("GDACS_EQ_1243255_1342589", alert), null);
 
         assertEquals(2, dataLakes.size());
         assertEquals(GDACS_ALERT_PROVIDER, dataLakes.get(0).getProvider());
@@ -86,7 +86,7 @@ class GdacsServiceTest {
                 .thenThrow(FeignException.class);
 
         List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(
-                Map.of("GDACS_EQ_1243255_1342589", alert));
+                Map.of("GDACS_EQ_1243255_1342589", alert), null);
 
         assertEquals(0, dataLakes.size());
         verify(gdacsDataLakeConverter, times(0)).convertGdacs(any());
