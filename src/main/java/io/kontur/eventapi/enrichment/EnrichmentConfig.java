@@ -11,15 +11,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Configuration
 public class EnrichmentConfig {
-
-    private final Path lossModelPath =
-            Paths.get(getClass().getClassLoader().getResource("model").getPath(), "linreg-loss.pmml");
 
     public static final String WILDFIRE_TYPE_POSTPROCESSOR = "wildfire_type";
     public static final String LOSS_POSTPROCESSOR = "loss";
@@ -57,7 +52,7 @@ public class EnrichmentConfig {
     @Bean
     public Evaluator lossEvaluator() throws Exception {
         Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                .load(lossModelPath.toFile())
+                .load(getClass().getClassLoader().getResourceAsStream("model/linreg-loss.pmml"))
                 .build();
         evaluator.verify();
         return evaluator;
