@@ -4,7 +4,11 @@
 
 #### Added
 
+- Disaster loss estimation on enrichment stage
+
 #### Changed
+
+- Fix EM-DAT cost setup
 
 #### Removed
  

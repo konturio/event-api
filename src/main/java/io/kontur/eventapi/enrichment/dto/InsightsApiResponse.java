@@ -34,6 +34,7 @@ public class InsightsApiResponse {
     @Data
     public static class Population {
         private Long population;
+        private Double gdp;
     }
 
     @Data

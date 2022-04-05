@@ -87,7 +87,7 @@ public class EmDatNormalizer extends Normalizer {
         obs.setRegion(csvData.get("ISO") + " " + csvData.get("Location"));
         if (!StringUtils.isEmpty(csvData.get("Total Damages ('000 US$)"))) {
             try {
-                obs.setCost(new BigDecimal(csvData.get("Total Damages ('000 US$)")));
+                obs.setCost(new BigDecimal(csvData.get("Total Damages ('000 US$)")).multiply(BigDecimal.valueOf(1000)));
             } catch (NumberFormatException e) {
                 LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
             }

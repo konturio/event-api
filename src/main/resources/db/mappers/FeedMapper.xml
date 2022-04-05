@@ -181,6 +181,7 @@
         <result property="roles" column="roles" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="enrichment" column="enrichment" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="enrichmentRequest" column="enrichment_request"/>
+        <result property="enrichmentPostProcessors" column="enrichment_postprocessors" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
     </resultMap>
 
     <resultMap id="feedDataDtoMap" type="io.kontur.eventapi.entity.FeedData">
