@@ -45,11 +45,9 @@ public class EnrichmentJob extends AbstractJob {
             if (!CollectionUtils.isEmpty(events)) {
                 LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
 
-                List<String> enrichmentFields = feed.getEnrichment();
-                String enrichmentRequest = feed.getEnrichmentRequest();
-
-                var eventEnrichmentTasks = events.stream()
-                        .map(event -> eventEnrichmentTask.enrichEvent(event, enrichmentRequest, enrichmentFields))
+                var eventEnrichmentTasks = events
+                        .stream()
+                        .map(event -> eventEnrichmentTask.enrichEvent(event, feed))
                         .toArray(CompletableFuture[]::new);
                 CompletableFuture.allOf(eventEnrichmentTasks).join();
             }

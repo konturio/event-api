@@ -38,13 +38,10 @@ public class ReEnrichmentJob extends AbstractJob {
         List<FeedData> events = feedDao.getEnrichmentSkippedEventsForFeed(feed.getFeedId());
         if (!CollectionUtils.isEmpty(events)) {
             LOG.info(format("%s feed. %s events to re-enrich", feed.getAlias(), events.size()));
-
-            List<String> enrichmentFields = feed.getEnrichment();
-            String enrichmentRequest = feed.getEnrichmentRequest();
-
+;
             events.forEach(event -> {
                 try {
-                    longEventEnrichmentTask.enrichEvent(event, enrichmentRequest, enrichmentFields).get();
+                    longEventEnrichmentTask.enrichEvent(event, feed).get();
                 } catch (Exception e) {
                     LOG.error(e.getMessage(), e);
                 }

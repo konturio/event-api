@@ -1,0 +1,8 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: add-enrichment-postprocessors-to-feeds.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-loss-feed.sql

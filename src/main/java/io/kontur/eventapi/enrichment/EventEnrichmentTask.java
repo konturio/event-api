@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.enrichment.dto.InsightsApiRequest;
 import io.kontur.eventapi.enrichment.dto.InsightsApiResponse;
 import io.kontur.eventapi.enrichment.postprocessor.EnrichmentPostProcessor;
+import io.kontur.eventapi.entity.Feed;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.micrometer.core.annotation.Counted;
@@ -46,38 +47,40 @@ public class EventEnrichmentTask {
     @Async("enrichmentExecutor")
     @Timed(value = "enrichment.event.timer")
     @Counted(value = "enrichment.event.counter")
-    public CompletableFuture<FeedData> enrichEvent(FeedData event, String enrichmentRequest, List<String> enrichmentFields) {
+    public CompletableFuture<FeedData> enrichEvent(FeedData event, Feed feed) {
         try {
-            processEvent(event, enrichmentRequest, enrichmentFields);
-            processEpisodes(event, enrichmentRequest, enrichmentFields);
-            applyPostProcessors(event);
+            processEvent(event, feed);
+            processEpisodes(event, feed);
+            applyPostProcessors(event, feed);
             markEventStatus(event);
             feedDao.addAnalytics(event);
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
         }
         updateMetrics(event);
         return CompletableFuture.completedFuture(event);
     }
 
-    private void processEvent(FeedData event, String enrichmentRequest, List<String> enrichmentFields) throws Exception {
+    private void processEvent(FeedData event, Feed feed) throws Exception {
         if (needsEnrichment(event.getEventDetails(), event.getGeometries())) {
-            event.setEventDetails(fetchAnalytics(event.getGeometries(), enrichmentRequest, enrichmentFields));
+            event.setEventDetails(fetchAnalytics(
+                    event.getGeometries(), feed.getEnrichmentRequest(), feed.getEnrichment()));
         }
     }
 
-    private void processEpisodes(FeedData event, String enrichmentRequest, List<String> enrichmentFields) throws Exception {
+    private void processEpisodes(FeedData event, Feed feed) throws Exception {
         for (FeedEpisode episode : event.getEpisodes()) {
             if (needsEnrichment(episode.getEpisodeDetails(), episode.getGeometries())) {
-                episode.setEpisodeDetails(fetchAnalytics(episode.getGeometries(), enrichmentRequest, enrichmentFields));
+                episode.setEpisodeDetails(fetchAnalytics(
+                        episode.getGeometries(), feed.getEnrichmentRequest(), feed.getEnrichment()));
             }
         }
     }
 
-    private void applyPostProcessors(FeedData event) {
+    private void applyPostProcessors(FeedData event, Feed feed) {
         postProcessors
                 .stream()
-                .filter(postProcessor -> postProcessor.isApplicable(event))
+                .filter(postProcessor -> postProcessor.isApplicable(feed))
                 .forEach(postProcessor -> postProcessor.process(event));
     }
 
