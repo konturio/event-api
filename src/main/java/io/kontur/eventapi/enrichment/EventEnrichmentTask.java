@@ -61,18 +61,30 @@ public class EventEnrichmentTask {
         return CompletableFuture.completedFuture(event);
     }
 
-    private void processEvent(FeedData event, Feed feed) throws Exception {
+    private void processEvent(FeedData event, Feed feed) {
         if (needsEnrichment(event.getEventDetails(), event.getGeometries())) {
-            event.setEventDetails(fetchAnalytics(
-                    event.getGeometries(), feed.getEnrichmentRequest(), feed.getEnrichment()));
+            try {
+                event.setEventDetails(fetchAnalytics(
+                        event.getGeometries(), feed.getEnrichmentRequest(), feed.getEnrichment()));
+            } catch (Exception e) {
+                LOG.warn(format(
+                        "Error while enriching the event: event_id = '%s', feed_id = '%s', version = %d - %s",
+                        event.getEventId(), event.getFeedId(), event.getVersion(), e.getMessage()));
+            }
         }
     }
 
-    private void processEpisodes(FeedData event, Feed feed) throws Exception {
+    private void processEpisodes(FeedData event, Feed feed) {
         for (FeedEpisode episode : event.getEpisodes()) {
             if (needsEnrichment(episode.getEpisodeDetails(), episode.getGeometries())) {
-                episode.setEpisodeDetails(fetchAnalytics(
-                        episode.getGeometries(), feed.getEnrichmentRequest(), feed.getEnrichment()));
+                try {
+                    episode.setEpisodeDetails(fetchAnalytics(
+                            episode.getGeometries(), feed.getEnrichmentRequest(), feed.getEnrichment()));
+                } catch (Exception e) {
+                    LOG.warn(format(
+                            "Error while enriching the episode of event: event_id = '%s', feed_id = '%s', version = %d - %s",
+                            event.getEventId(), event.getFeedId(), event.getVersion(), e.getMessage()));
+                }
             }
         }
     }
@@ -105,13 +117,8 @@ public class EventEnrichmentTask {
     private Map<String, Object> fetchAnalytics(FeatureCollection geometry, String enrichmentRequest, List<String> enrichmentFields) throws Exception {
         String query = format(enrichmentRequest, replaceAll(geometry.toString(), "\"", "\\\\\\\""));
         InsightsApiRequest request = new InsightsApiRequest(query);
-        try {
-            InsightsApiResponse response = konturAppsClient.graphql(request);
-            return processResponse(response, enrichmentFields);
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-        }
-        return null;
+        InsightsApiResponse response = konturAppsClient.graphql(request);
+        return processResponse(response, enrichmentFields);
     }
 
     private boolean needsEnrichment(Map<String, Object> details, FeatureCollection geometries) {
