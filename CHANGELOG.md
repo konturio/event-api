@@ -4,13 +4,20 @@
 
 #### Added
 
+#### Changed
+
+#### Removed
+
+
+## 1.6 - 2022-04-07
+
+#### Added
+
 - Disaster loss estimation on enrichment stage
 
 #### Changed
 
 - Fix EM-DAT cost setup
-
-#### Removed
  
 
 ## 1.5.1 - 2022-03-31
