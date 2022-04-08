@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
-import static java.util.stream.Collectors.toList;
 
 public class InsightsApiResponseHandler {
 
@@ -39,20 +38,21 @@ public class InsightsApiResponseHandler {
         }
     }
 
-    private static Object getFieldFromResponse(String param, InsightsApiResponse.Analytics data) throws Exception {
-        if (param.equals(POPULATION)) {
-            return data.getPopulation().getPopulation();
-        }
-        return findFunctionResult(data.getFunctions(), param);
+    private static Object getFieldFromResponse(String field, InsightsApiResponse.Analytics data) throws Exception {
+        return switch (field) {
+            case POPULATION -> data.getPopulation().getPopulation();
+            case GDP -> data.getPopulation().getGdp();
+            default -> findFunctionResult(data.getFunctions(), field);
+        };
     }
 
     private static Object findFunctionResult(List<InsightsApiResponse.AnalyticFunction> functions, String id) throws Exception {
         List<Object> results = functions.stream()
                 .filter(function -> function.getId().equals(id))
                 .map(InsightsApiResponse.AnalyticFunction::getResult)
-                .collect(toList());
+                .toList();
         if (results.isEmpty()) {
-            throw new Exception("Unknown enrichment field is requested: id = " + id);
+            throw new Exception("Enrichment field is not present: id = " + id);
         }
         return results.get(0);
     }

@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>event-api</artifactId>
-	<version>1.5.1-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 
 	<name>event-api</name>
 	<description>Kontur Event API</description>
@@ -179,6 +179,21 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.14.3</version>
 		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.activation</groupId>
+			<artifactId>jakarta.activation-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
 
 		<!-- Tools -->
 		<dependency>
@@ -205,6 +220,12 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-evaluator</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+
 
 		<!--Test dependencies-->
 		<dependency>

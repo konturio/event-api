@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_4" xmlns:data="http://jpmml.org/jpmml-model/InlineTable" version="4.4">
+	<Header>
+		<Application name="JPMML-SkLearn" version="1.6.35"/>
+		<Timestamp>2022-03-31T20:00:55Z</Timestamp>
+	</Header>
+	<MiningBuildTask>
+		<Extension name="repr">PMMLPipeline(steps=[('mapper', DataFrameMapper(drop_cols=[],
+                features=[(['buildingCount'],
+                           [ContinuousDomain(invalid_value_replacement=0,
+                                             invalid_value_treatment='as_value'),
+                            FunctionTransformer(func=&lt;ufunc 'square'&gt;)]),
+                          (['highwayLength'],
+                           [ContinuousDomain(invalid_value_replacement=0,
+                                             invalid_value_treatment='as_value')]),
+                          (['gdp'],
+                           [ContinuousDomain(invalid_value_replacement=0,
+                                             invalid_val...
+                                             invalid_value_treatment='as_value')]),
+                          (['FLOOD'], [CategoricalDomain()]),
+                          (['WILDFIRE'], [CategoricalDomain()]),
+                          (['TORNADO'], [CategoricalDomain()]),
+                          (['EARTHQUAKE'], [CategoricalDomain()]),
+                          (['CYCLONE'], [CategoricalDomain()]),
+                          (['DROUGHT'], [CategoricalDomain()]),
+                          (['STORM'], [CategoricalDomain()]),
+                          (['VOLCANO'], [CategoricalDomain()]),
+                          (['WINTER_STORM'], [CategoricalDomain()])])),
+       ('regression', LinearRegression())])</Extension>
+	</MiningBuildTask>
+	<DataDictionary>
+		<DataField name="cost" optype="continuous" dataType="double"/>
+		<DataField name="buildingCount" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="0" rightMargin="50883010"/>
+		</DataField>
+		<DataField name="highwayLength" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="60.03859378755274" rightMargin="1.0711961079869486E7"/>
+		</DataField>
+		<DataField name="gdp" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="6487445.72458306" rightMargin="1.669016495477646E13"/>
+		</DataField>
+		<DataField name="population" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="108" rightMargin="1364959934"/>
+		</DataField>
+		<DataField name="industrialAreaKm2" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="0.0" rightMargin="10700.179389424178"/>
+		</DataField>
+		<DataField name="area" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="5.42453256875144" rightMargin="2.0386801928527903E7"/>
+		</DataField>
+		<DataField name="FLOOD" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="WILDFIRE" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="TORNADO" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="EARTHQUAKE" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="CYCLONE" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="DROUGHT" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="STORM" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="VOLCANO" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="WINTER_STORM" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+	</DataDictionary>
+	<RegressionModel functionName="regression" algorithmName="sklearn.linear_model._base.LinearRegression">
+		<MiningSchema>
+			<MiningField name="cost" usageType="target"/>
+			<MiningField name="highwayLength" missingValueTreatment="asIs" invalidValueTreatment="asValue" invalidValueReplacement="0"/>
+			<MiningField name="gdp" missingValueTreatment="asIs" invalidValueTreatment="asValue" invalidValueReplacement="0"/>
+			<MiningField name="industrialAreaKm2" missingValueTreatment="asIs" invalidValueTreatment="asValue" invalidValueReplacement="0"/>
+			<MiningField name="area" missingValueTreatment="asIs" invalidValueTreatment="asValue" invalidValueReplacement="0"/>
+			<MiningField name="FLOOD" missingValueTreatment="asIs"/>
+			<MiningField name="WILDFIRE" missingValueTreatment="asIs"/>
+			<MiningField name="TORNADO" missingValueTreatment="asIs"/>
+			<MiningField name="EARTHQUAKE" missingValueTreatment="asIs"/>
+			<MiningField name="CYCLONE" missingValueTreatment="asIs"/>
+			<MiningField name="DROUGHT" missingValueTreatment="asIs"/>
+			<MiningField name="STORM" missingValueTreatment="asIs"/>
+			<MiningField name="VOLCANO" missingValueTreatment="asIs"/>
+			<MiningField name="WINTER_STORM" missingValueTreatment="asIs"/>
+			<MiningField name="buildingCount" missingValueTreatment="asIs" invalidValueTreatment="asValue" invalidValueReplacement="0"/>
+			<MiningField name="population" missingValueTreatment="asIs" invalidValueTreatment="asValue" invalidValueReplacement="0"/>
+		</MiningSchema>
+		<ModelStats>
+			<UnivariateStats field="highwayLength">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<NumericInfo minimum="60.03859378755274" maximum="1.0711961079869486E7" mean="366907.8937900059" standardDeviation="1057125.8578060872" median="130140.10259082797" interQuartileRange="263753.96350207255"/>
+			</UnivariateStats>
+			<UnivariateStats field="gdp">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<NumericInfo minimum="6487445.72458306" maximum="1.669016495477646E13" mean="5.2117520674588116E11" standardDeviation="1.648066016778463E12" median="1.3586684479016809E11" interQuartileRange="3.544312158866285E11"/>
+			</UnivariateStats>
+			<UnivariateStats field="industrialAreaKm2">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<NumericInfo minimum="0.0" maximum="10700.179389424178" mean="413.77887724748797" standardDeviation="1265.8575642717888" median="98.9293587182795" interQuartileRange="250.64222779496487"/>
+			</UnivariateStats>
+			<UnivariateStats field="area">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<NumericInfo minimum="5.42453256875144" maximum="2.0386801928527903E7" mean="429043.62162153685" standardDeviation="1617986.6088485667" median="78432.96867987319" interQuartileRange="165360.6958099065"/>
+			</UnivariateStats>
+			<UnivariateStats field="FLOOD">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">595 337</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="WILDFIRE">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">903 29</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="TORNADO">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">465 467</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="EARTHQUAKE">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">916 16</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="CYCLONE">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">881 51</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="DROUGHT">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">928 4</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="STORM">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">925 7</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="VOLCANO">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">930 2</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="WINTER_STORM">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<DiscrStats>
+					<Array type="string">0 1</Array>
+					<Array type="int">913 19</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="buildingCount">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<NumericInfo minimum="0" maximum="50883010" mean="1723450.5708154507" standardDeviation="5858394.894789288" median="235295.0" interQuartileRange="785981.75"/>
+			</UnivariateStats>
+			<UnivariateStats field="population">
+				<Counts totalFreq="932" missingFreq="0" invalidFreq="0"/>
+				<NumericInfo minimum="108" maximum="1364959934" mean="2.827035328755365E7" standardDeviation="1.0704764043657263E8" median="2565453.0" interQuartileRange="7180902.5"/>
+			</UnivariateStats>
+		</ModelStats>
+		<LocalTransformations>
+			<DerivedField name="square(buildingCount)" optype="continuous" dataType="double">
+				<Apply function="pow">
+					<FieldRef field="buildingCount"/>
+					<Constant dataType="integer">2</Constant>
+				</Apply>
+			</DerivedField>
+			<DerivedField name="sqrt(population)" optype="continuous" dataType="double">
+				<Apply function="sqrt">
+					<FieldRef field="population"/>
+				</Apply>
+			</DerivedField>
+		</LocalTransformations>
+		<RegressionTable intercept="2.938397373950121E9">
+			<NumericPredictor name="square(buildingCount)" coefficient="2.281640839984698E-6"/>
+			<NumericPredictor name="highwayLength" coefficient="-195.72735750516267"/>
+			<NumericPredictor name="gdp" coefficient="1.733711564278408E-4"/>
+			<NumericPredictor name="sqrt(population)" coefficient="50973.62399881293"/>
+			<NumericPredictor name="industrialAreaKm2" coefficient="-203940.93375934334"/>
+			<NumericPredictor name="area" coefficient="-34.93906311425952"/>
+			<NumericPredictor name="FLOOD" coefficient="-2.093459150725787E9"/>
+			<NumericPredictor name="WILDFIRE" coefficient="-1.8976859724596658E9"/>
+			<NumericPredictor name="TORNADO" coefficient="-1.1552481219543955E9"/>
+			<NumericPredictor name="EARTHQUAKE" coefficient="-2.164326685371369E9"/>
+			<NumericPredictor name="CYCLONE" coefficient="-2.6365318515600452E9"/>
+			<NumericPredictor name="DROUGHT" coefficient="-2.216234659354709E9"/>
+			<NumericPredictor name="STORM" coefficient="-2.5336081044066477E9"/>
+			<NumericPredictor name="VOLCANO" coefficient="1.0983294455094178E8"/>
+			<NumericPredictor name="WINTER_STORM" coefficient="1.4587261601281685E10"/>
+		</RegressionTable>
+		<ModelVerification recordCount="10">
+			<VerificationFields>
+				<VerificationField field="CYCLONE" column="data:CYCLONE"/>
+				<VerificationField field="DROUGHT" column="data:DROUGHT"/>
+				<VerificationField field="EARTHQUAKE" column="data:EARTHQUAKE"/>
+				<VerificationField field="FLOOD" column="data:FLOOD"/>
+				<VerificationField field="STORM" column="data:STORM"/>
+				<VerificationField field="TORNADO" column="data:TORNADO"/>
+				<VerificationField field="VOLCANO" column="data:VOLCANO"/>
+				<VerificationField field="WILDFIRE" column="data:WILDFIRE"/>
+				<VerificationField field="WINTER_STORM" column="data:WINTER_STORM"/>
+				<VerificationField field="area" column="data:area"/>
+				<VerificationField field="buildingCount" column="data:buildingCount"/>
+				<VerificationField field="gdp" column="data:gdp"/>
+				<VerificationField field="industrialAreaKm2" column="data:industrialAreaKm2"/>
+				<VerificationField field="population" column="data:population"/>
+				<VerificationField field="highwayLength" column="data:highwayLength"/>
+				<VerificationField field="cost" column="data:cost" precision="1.0E-13" zeroThreshold="1.0E-13"/>
+			</VerificationFields>
+			<InlineTable>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>1</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>2305.994101401474</data:area>
+					<data:buildingCount>1766</data:buildingCount>
+					<data:gdp>5.218249051298658E9</data:gdp>
+					<data:industrialAreaKm2>10.681409706941023</data:industrialAreaKm2>
+					<data:population>86871</data:population>
+					<data:highwayLength>3564.1813394902506</data:highwayLength>
+					<data:cost>8.57910278683038E8</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>1</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>3426.2205897633467</data:area>
+					<data:buildingCount>100193</data:buildingCount>
+					<data:gdp>2.8153952652201275E10</data:gdp>
+					<data:industrialAreaKm2>59.95259691047705</data:industrialAreaKm2>
+					<data:population>468694</data:population>
+					<data:highwayLength>16961.22977509655</data:highwayLength>
+					<data:cost>8.690731068181648E8</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>0</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>1</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>235365.7131079176</data:area>
+					<data:buildingCount>2056519</data:buildingCount>
+					<data:gdp>8.359041603734406E11</data:gdp>
+					<data:industrialAreaKm2>662.7723430472633</data:industrialAreaKm2>
+					<data:population>13917606</data:population>
+					<data:highwayLength>493755.1068810066</data:highwayLength>
+					<data:cost>1.8878531192079747E9</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>1</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>107715.05755202512</data:area>
+					<data:buildingCount>5587273</data:buildingCount>
+					<data:gdp>2.3446525225926724E12</data:gdp>
+					<data:industrialAreaKm2>896.2951763012817</data:industrialAreaKm2>
+					<data:population>39714400</data:population>
+					<data:highwayLength>1249024.8672770944</data:highwayLength>
+					<data:cost>1.2128701899908E9</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>1</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>38093.670346169725</data:area>
+					<data:buildingCount>65472</data:buildingCount>
+					<data:gdp>1.2594967186346504E10</data:gdp>
+					<data:industrialAreaKm2>4.863534790876332</data:industrialAreaKm2>
+					<data:population>220632</data:population>
+					<data:highwayLength>8054.442106651165</data:highwayLength>
+					<data:cost>8.671753680074339E8</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>1</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>21275.23761946908</data:area>
+					<data:buildingCount>163807</data:buildingCount>
+					<data:gdp>8.406310672427006E9</data:gdp>
+					<data:industrialAreaKm2>1.6354995090969016</data:industrialAreaKm2>
+					<data:population>2387555</data:population>
+					<data:highwayLength>15986.883152322656</data:highwayLength>
+					<data:cost>9.210138967674637E8</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>0</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>1</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>13934.646814081048</data:area>
+					<data:buildingCount>91</data:buildingCount>
+					<data:gdp>1.873010088643647E8</data:gdp>
+					<data:industrialAreaKm2>0.4601075026708476</data:industrialAreaKm2>
+					<data:population>4310</data:population>
+					<data:highwayLength>4308.400246519482</data:highwayLength>
+					<data:cost>1.0426663525509305E9</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>1</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>3464.785940636545</data:area>
+					<data:buildingCount>4421</data:buildingCount>
+					<data:gdp>1.21770557629262E10</data:gdp>
+					<data:industrialAreaKm2>3.410265912027797</data:industrialAreaKm2>
+					<data:population>202718</data:population>
+					<data:highwayLength>6565.129192620597</data:highwayLength>
+					<data:cost>8.678983679041116E8</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>1</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>0</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>1870557.529046108</data:area>
+					<data:buildingCount>921972</data:buildingCount>
+					<data:gdp>9.549248213566886E11</data:gdp>
+					<data:industrialAreaKm2>856.2341122303108</data:industrialAreaKm2>
+					<data:population>101907594</data:population>
+					<data:highwayLength>1223401.940661547</data:highwayLength>
+					<data:cost>5.045065920093651E8</data:cost>
+				</row>
+				<row>
+					<data:CYCLONE>0</data:CYCLONE>
+					<data:DROUGHT>0</data:DROUGHT>
+					<data:EARTHQUAKE>0</data:EARTHQUAKE>
+					<data:FLOOD>1</data:FLOOD>
+					<data:STORM>0</data:STORM>
+					<data:TORNADO>0</data:TORNADO>
+					<data:VOLCANO>0</data:VOLCANO>
+					<data:WILDFIRE>0</data:WILDFIRE>
+					<data:WINTER_STORM>0</data:WINTER_STORM>
+					<data:area>4522.148305681095</data:area>
+					<data:buildingCount>2893</data:buildingCount>
+					<data:gdp>5.709252582342561E9</data:gdp>
+					<data:industrialAreaKm2>4.047401231413039</data:industrialAreaKm2>
+					<data:population>95045</data:population>
+					<data:highwayLength>5223.709878471323</data:highwayLength>
+					<data:cost>8.596370553942132E8</data:cost>
+				</row>
+			</InlineTable>
+		</ModelVerification>
+	</RegressionModel>
+</PMML>
