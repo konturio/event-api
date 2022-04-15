@@ -19,6 +19,9 @@ pdc:
 staticdata:
   s3Folder: 'PROD/'
 
+humanitarianCrisis:
+  s3Folder: 'kontur_events/PROD/'
+
 aws:
   sqs:
     enabled: true
