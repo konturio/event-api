@@ -9,6 +9,13 @@
 #### Removed
 
 
+## UNRELEASED 1.6.1 - 2022-04-14
+
+#### Added
+
+- Added S3 Folders for all stages
+
+
 ## 1.6 - 2022-04-07
 
 #### Added

@@ -16,6 +16,9 @@ pdc:
   host: 'https://testemops.pdc.org'
   mapSrvHost: 'https://testapps.pdc.org'
 
+humanitarianCrisis:
+  s3Folder: 'kontur_events/TEST DEV/'
+
 staticdata:
   s3Folder: 'TEST DEV/'
 
