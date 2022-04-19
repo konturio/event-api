@@ -4,6 +4,8 @@
 
 #### Added
 
+- GeoJson endpoint `/v1/geojson/events`
+
 #### Changed
 
 #### Removed
