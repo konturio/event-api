@@ -12,12 +12,4 @@ public class DataPaginationDTO {
         this.data = data;
         this.pageMetadata = new PageMetadata(nextAfterValue);
     }
-
-    public static class PageMetadata {
-        public final OffsetDateTime nextAfterValue;
-
-        public PageMetadata(OffsetDateTime nextAfterValue) {
-            this.nextAfterValue = nextAfterValue;
-        }
-    }
 }

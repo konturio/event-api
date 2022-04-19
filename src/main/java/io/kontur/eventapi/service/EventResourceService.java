@@ -6,9 +6,12 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.resource.dto.GeoJsonPaginationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.wololo.geojson.Feature;
+import org.wololo.geojson.FeatureCollection;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -40,6 +43,25 @@ public class EventResourceService {
         return feedData.stream()
                 .map(EventDtoConverter::convert)
                 .collect(Collectors.toList());
+    }
+
+    public Optional<GeoJsonPaginationDTO> searchEventsGeoJson(String feedAlias, List<EventType> eventTypes,
+                                                              OffsetDateTime from, OffsetDateTime to,
+                                                              OffsetDateTime updatedAfter, int limit,
+                                                              List<Severity> severities, SortOrder sortOrder,
+                                                              List<BigDecimal> bbox, EpisodeFilterType episodeFilterType) {
+        List<FeedData> events = feedDao.searchForEvents(feedAlias, eventTypes, from, to,
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+        if (events.isEmpty()) {
+            return Optional.empty();
+        }
+        Feature[] features = events.stream()
+                .map(EventDtoConverter::convertGeoJson)
+                .flatMap(List::stream)
+                .toArray(Feature[]::new);
+        FeatureCollection fc = new FeatureCollection(features);
+        GeoJsonPaginationDTO paginationDTO = new GeoJsonPaginationDTO(fc, events.get(events.size() - 1).getUpdatedAt());
+        return Optional.of(paginationDTO);
     }
 
     public String getRawData(UUID observationId) {
