@@ -129,6 +129,9 @@ public class EventResource {
     @ApiResponse(responseCode = "204", description = "No content. Try to check filters values.", content = @Content())
     @PreAuthorize("hasAuthority('read:feed:'+#feed)")
     public ResponseEntity<GeoJsonPaginationDTO> searchEventsGeoJson(
+            @Parameter(description = "Authentication token")
+            @RequestParam(value = "access_token", required = false)
+            String accessToken,
             @Parameter(description = "Feed name")
             @RequestParam(value = "feed")
             String feed,
