@@ -2,4 +2,10 @@
 databaseChangeLog:
   - include:
       relativeToChangelogFile: true
-      file: create-table-episodes.sql
+      file: add-index-to-feed-data-by-updated-at.sql
+  - include:
+      relativeToChangelogFile: true
+      file: create-table-feed-episode.sql
+  - include:
+      relativeToChangelogFile: true
+      file: transfer-episodes-column-to-a-new-table.sql
