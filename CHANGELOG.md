@@ -4,11 +4,16 @@
 
 #### Added
 
-- GeoJson endpoint `/v1/geojson/events`
-
 #### Changed
 
 #### Removed
+
+
+## 1.7 - 2022-04-28
+
+#### Added
+
+- GeoJson endpoint `/v1/geojson/events`
 
 
 ## 1.6.1 - 2022-04-15
