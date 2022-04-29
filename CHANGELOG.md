@@ -5,7 +5,7 @@
 #### Added
 
 #### Changed
-- Speed Up `/v1` endpoint by removing the event DTO converter
+
 #### Removed
 
 
