@@ -35,7 +35,7 @@
     ]]>
     </update>
 
-    <select id="searchForEvents" resultMap="feedDataDtoMap">
+    <select id="searchForEvents" resultMap="openFeedDataDtoMap">
         select event_id, feed_id, version, name, proper_name, description, started_at, ended_at, updated_at, observations,
                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
                composed_at, enriched_at,
@@ -205,5 +205,21 @@
         <result property="location" column="location"/>
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>
+    </resultMap>
+    <resultMap id="openFeedDataDtoMap" type="io.kontur.eventapi.entity.OpenFeedData">
+        <result property="eventId" column="event_id" />
+        <result property="version" column="version" />
+        <result property="name" column="name" />
+        <result property="properName" column="proper_name"/>
+        <result property="description" column="description" />
+        <result property="startedAt" column="started_at" />
+        <result property="endedAt" column="ended_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
+        <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
+        <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
+        <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
+        <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
+        <result property="location" column="location"/>
     </resultMap>
 </mapper>

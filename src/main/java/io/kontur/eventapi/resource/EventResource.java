@@ -5,7 +5,7 @@ import io.kontur.eventapi.resource.dto.DataPaginationDTO;
 import io.kontur.eventapi.resource.dto.GeoJsonPaginationDTO;
 import io.kontur.eventapi.resource.dto.DateTimeRange;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
-import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.entity.OpenFeedData;
 import io.kontur.eventapi.resource.dto.FeedSummary;
 import io.kontur.eventapi.resource.validation.ValidBbox;
 import io.kontur.eventapi.service.EventResourceService;
@@ -107,7 +107,7 @@ public class EventResource {
                     EpisodeFilterType episodeFilterType) {
         String currentRequestURL = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
         LOG.debug("Received request: " + currentRequestURL);
-        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes,
+        List<OpenFeedData> events = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);

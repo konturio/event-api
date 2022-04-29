@@ -5,7 +5,7 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
-import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.entity.OpenFeedData;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
@@ -154,7 +154,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         feedDao.insertFeedData(latestEvent);
 
         //when page 1 ASC
-        List<EventDto> page1Asc = eventResourceService
+        List<OpenFeedData> page1Asc = eventResourceService
                 .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.ASC, null, EpisodeFilterType.ANY);
 
         //then
@@ -163,7 +163,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertEquals(middleEvent.getEventId(), page1Asc.get(1).getEventId());
 
         //when page 2 ASC
-        List<EventDto> page2Asc = eventResourceService
+        List<OpenFeedData> page2Asc = eventResourceService
                 .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.ASC, null, EpisodeFilterType.ANY);
 
         //then
@@ -171,7 +171,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertEquals(latestEvent.getEventId(), page2Asc.get(0).getEventId());
 
         //when page 1 DESC
-        List<EventDto> page1Desc = eventResourceService
+        List<OpenFeedData> page1Desc = eventResourceService
                 .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.DESC, null, EpisodeFilterType.ANY);
 
         //then
@@ -180,7 +180,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertEquals(middleEvent.getEventId(), page1Desc.get(1).getEventId());
 
         //when page 2 DESC
-        List<EventDto> page2Desc = eventResourceService
+        List<OpenFeedData> page2Desc = eventResourceService
                 .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.DESC, null, EpisodeFilterType.ANY);
 
         //then
@@ -192,12 +192,12 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         return OffsetDateTime.of(LocalDateTime.of(year, month, day, 0, 0), ZoneOffset.UTC);
     }
 
-    private Optional<EventDto> findEvent(OffsetDateTime after, OffsetDateTime before) {
-        List<EventDto> iterable = fetchEvent(after, before);
+    private Optional<OpenFeedData> findEvent(OffsetDateTime after, OffsetDateTime before) {
+        List<OpenFeedData> iterable = fetchEvent(after, before);
         return iterable.isEmpty() ? Optional.empty() : Optional.of(Iterables.getOnlyElement(iterable));
     }
 
-    private List<EventDto> fetchEvent(OffsetDateTime from, OffsetDateTime to) {
+    private List<OpenFeedData> fetchEvent(OffsetDateTime from, OffsetDateTime to) {
         return eventResourceService.searchEvents(
                 feedAlias,
                 List.of(),
@@ -212,7 +212,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         );
     }
 
-    private List<EventDto> fetchEvent(List<BigDecimal> bbox) {
+    private List<OpenFeedData> fetchEvent(List<BigDecimal> bbox) {
         return eventResourceService.searchEvents(
                 feedAlias,
                 List.of(),

@@ -5,7 +5,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
-import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.entity.OpenFeedData;
 import io.kontur.eventapi.resource.dto.GeoJsonPaginationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class EventResourceService {
@@ -32,17 +31,15 @@ public class EventResourceService {
         this.dataLakeDao = dataLakeDao;
     }
 
-    public List<EventDto> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime to,
-                                       OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
-                                       List<BigDecimal> bbox, EpisodeFilterType episodeFilterType) {
+    public List<OpenFeedData> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime to,
+                                           OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
+                                           List<BigDecimal> bbox, EpisodeFilterType episodeFilterType) {
         LOG.debug("Start searchEvents DB call");
-        List<FeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities,
+        List<OpenFeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities,
                 sortOrder, bbox, episodeFilterType);
         LOG.debug("Finished searchEvents DB call");
         LOG.debug("Process result");
-        return feedData.stream()
-                .map(EventDtoConverter::convert)
-                .collect(Collectors.toList());
+        return feedData;
     }
 
     public Optional<GeoJsonPaginationDTO> searchEventsGeoJson(String feedAlias, List<EventType> eventTypes,
@@ -50,7 +47,7 @@ public class EventResourceService {
                                                               OffsetDateTime updatedAfter, int limit,
                                                               List<Severity> severities, SortOrder sortOrder,
                                                               List<BigDecimal> bbox, EpisodeFilterType episodeFilterType) {
-        List<FeedData> events = feedDao.searchForEvents(feedAlias, eventTypes, from, to,
+        List<OpenFeedData> events = feedDao.searchForEvents(feedAlias, eventTypes, from, to,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         if (events.isEmpty()) {
             return Optional.empty();

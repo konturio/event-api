@@ -1,6 +1,5 @@
-package io.kontur.eventapi.resource.dto;
+package io.kontur.eventapi.entity;
 
-import io.kontur.eventapi.entity.FeedEpisode;
 import lombok.Data;
 import org.wololo.geojson.FeatureCollection;
 
@@ -8,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 @Data
-public class EventDto {
+public class OpenFeedData {
 
     private UUID eventId;
     private Long version;

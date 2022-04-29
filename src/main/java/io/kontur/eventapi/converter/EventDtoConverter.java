@@ -1,25 +1,16 @@
 package io.kontur.eventapi.converter;
 
-import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
-import io.kontur.eventapi.resource.dto.EventDto;
-import org.springframework.beans.BeanUtils;
+import io.kontur.eventapi.entity.OpenFeedData;
 import org.wololo.geojson.Feature;
 
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toList;
 
 public class EventDtoConverter {
 
-    public static EventDto convert(FeedData dataDto) {
-        EventDto eventDto = new EventDto();
-        BeanUtils.copyProperties(dataDto, eventDto);
-        return eventDto;
-    }
-
-    public static List<Feature> convertGeoJson(FeedData event) {
+    public static List<Feature> convertGeoJson(OpenFeedData event) {
         List<Feature> features = new ArrayList<>();
         for (FeedEpisode episode : event.getEpisodes()) {
             if (episode.getGeometries() != null && episode.getGeometries().getFeatures() != null) {
@@ -32,7 +23,7 @@ public class EventDtoConverter {
         return features;
     }
 
-    private static Feature createFeature(FeedData event, FeedEpisode episode, Feature episodeFeature) {
+    private static Feature createFeature(OpenFeedData event, FeedEpisode episode, Feature episodeFeature) {
         Map<String, Object> properties = new HashMap<>();
         for (var episodeFeatureProperty : episodeFeature.getProperties().entrySet()) {
             properties.put("feature_" + episodeFeatureProperty.getKey(), episodeFeatureProperty.getValue());

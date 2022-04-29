@@ -5,10 +5,10 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
-import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.entity.OpenFeedData;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
     public void testEpisodesWhenStartDateLaterThenEndedDate() throws IOException {
         //given data_lake with started_at > ended_at
         //when episodes crated
-        FeedData feedV1 = createFeed(UUID.randomUUID().toString(), OffsetDateTime.of(
+        OpenFeedData feedV1 = createFeed(UUID.randomUUID().toString(), OffsetDateTime.of(
                 LocalDateTime.of(2020, 1, 1, 1, 1), ZoneOffset.UTC),
                 HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard_with_start_later_then_end.json"));
 
@@ -81,7 +81,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
                 LocalDateTime.of(2020, 1, 1, 1, 1), ZoneOffset.UTC);
 
         //when
-        FeedData feedV1 = createFeed(eventUUID, hazardsLoadTime, HP_SRV_SEARCH_PROVIDER,
+        OpenFeedData feedV1 = createFeed(eventUUID, hazardsLoadTime, HP_SRV_SEARCH_PROVIDER,
                 readMessageFromFile("hpsrvhazard01.json"));
 
         //then
@@ -98,7 +98,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
                 LocalDateTime.of(2020, 2, 2, 2, 2), ZoneOffset.UTC);
 
         //when
-        FeedData feedV2 = createFeed(eventUUID, magsLoadTime, HP_SRV_MAG_PROVIDER,
+        OpenFeedData feedV2 = createFeed(eventUUID, magsLoadTime, HP_SRV_MAG_PROVIDER,
                 readMessageFromFile("magsdata01.json"));
 
         //then
@@ -112,7 +112,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
                 feedV2.getEpisodes().get(1).getSourceUpdatedAt());
     }
 
-    private FeedData createFeed(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {
+    private OpenFeedData createFeed(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {
         createNormalizations(externalEventUUId, loadedTime, provider, data);
         eventCombinationJob.run();
         feedCompositionJob.run();
@@ -156,7 +156,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null, startTimeForSearchingFeed,
+        OpenFeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null, startTimeForSearchingFeed,
                 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(2, feed.getEpisodes().size());
 
@@ -201,7 +201,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(EventType.WILDFIRE), null, null,
+        OpenFeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(EventType.WILDFIRE), null, null,
                 loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }
