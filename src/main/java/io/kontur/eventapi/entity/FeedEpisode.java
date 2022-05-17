@@ -12,6 +12,10 @@ import java.util.*;
 @Data
 public class FeedEpisode {
 
+    private UUID eventId;
+    private UUID feedId;
+    private Long version;
+    private Long episodeNumber;
     private String name;
     private String properName;
     private String description;
@@ -27,6 +31,7 @@ public class FeedEpisode {
     private List<String> urls = new ArrayList<>();
     private String location;
     private FeatureCollection geometries;
+    private Boolean enriched;
 
     public void addUrlIfNotExists(String url) {
         if (isNotBlank(url) && !this.urls.contains(url)) {

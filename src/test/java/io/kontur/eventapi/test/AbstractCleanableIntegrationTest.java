@@ -14,7 +14,7 @@ public abstract class AbstractCleanableIntegrationTest extends AbstractIntegrati
     @BeforeEach
     public void cleanDB() {
         JdbcTestUtils
-                .deleteFromTables(jdbcTemplate, "feed_data", "kontur_events", "normalized_observations", "data_lake",
+                .deleteFromTables(jdbcTemplate, "feed_episode", "feed_data", "kontur_events", "normalized_observations", "data_lake",
                         "feed_event_status");
     }
 }

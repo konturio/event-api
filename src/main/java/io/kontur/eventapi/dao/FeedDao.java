@@ -6,6 +6,7 @@ import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -43,7 +44,11 @@ public class FeedDao {
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls(),
                 feedData.getLocation());
-
+//        if (!CollectionUtils.isEmpty(feedData.getEpisodes())) {
+//            for (FeedEpisode episode : feedData.getEpisodes()) {
+//                mapper.insertFeedEpisode(episode);
+//            }
+//        }
         mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
     }

@@ -34,6 +34,8 @@ public interface FeedMapper {
                        @Param("urls") List<String> urls,
                        @Param("location") String location);
 
+    int insertFeedEpisode(FeedEpisode episode);
+
     /**
      * Mark events below specified version outdated
      */

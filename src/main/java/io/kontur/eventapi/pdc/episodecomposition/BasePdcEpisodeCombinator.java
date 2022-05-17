@@ -37,7 +37,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(eventObservations,
                 observation.getSourceUpdatedAt());
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
-        Optional<FeedEpisode> episode = createDefaultEpisode(latestObservation);
+        Optional<FeedEpisode> episode = createDefaultEpisode(latestObservation, feedData);
         if (episode.isPresent()) {
             episode.get().setStartedAt(findEpisodeStartedAt(episodeObservations));
             episode.get().setEndedAt(findEpisodeEndedAt(episodeObservations));

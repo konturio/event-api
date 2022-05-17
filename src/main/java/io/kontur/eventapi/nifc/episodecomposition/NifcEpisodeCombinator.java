@@ -37,7 +37,7 @@ public class NifcEpisodeCombinator extends WildfireEpisodeCombinator {
         Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(
                 eventObservations, observation.getSourceUpdatedAt(),0L, 0L);
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
-        FeedEpisode episode = createDefaultEpisode(latestObservation).get();
+        FeedEpisode episode = createDefaultEpisode(latestObservation, feedData).get();
 
         episode.setStartedAt(findEpisodeStartedAt(episodeObservations));
         episode.setObservations(mapObservationsToIDs(episodeObservations));

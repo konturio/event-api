@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -138,10 +139,12 @@ public class FeedCompositionJob extends AbstractJob {
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
+        AtomicLong idx = new AtomicLong(1);
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
             Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
             feedEpisode.ifPresent(episode -> {
+                feedEpisode.get().setEpisodeNumber(idx.getAndIncrement());
                 if (episode.getStartedAt().isAfter(episode.getEndedAt())) {
                     OffsetDateTime startedAt = episode.getStartedAt();
                     episode.setStartedAt(episode.getEndedAt());
