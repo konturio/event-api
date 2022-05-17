@@ -44,11 +44,11 @@ public class FeedDao {
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls(),
                 feedData.getLocation());
-        if (!CollectionUtils.isEmpty(feedData.getEpisodes())) {
-            for (FeedEpisode episode : feedData.getEpisodes()) {
-                mapper.insertFeedEpisode(episode);
-            }
-        }
+//        if (!CollectionUtils.isEmpty(feedData.getEpisodes())) {
+//            for (FeedEpisode episode : feedData.getEpisodes()) {
+//                mapper.insertFeedEpisode(episode);
+//            }
+//        }
         mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
     }

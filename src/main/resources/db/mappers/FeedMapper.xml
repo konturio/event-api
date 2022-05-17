@@ -48,43 +48,132 @@
     </update>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
+        select event_id, feed_id, version, name, proper_name, description, started_at, ended_at, updated_at, observations,
+        collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
+        composed_at, enriched_at,
+        <choose>
+            <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                jsonb_build_array((
+                select episode from jsonb_array_elements(episodes) episode
+                order by (episode ->> 'updatedAt')::timestamptz desc
+                limit 1
+                )) as episodes
+            </when>
+            <otherwise>
+                episodes
+            </otherwise>
+        </choose>
+        from feed_data fd
+        where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+        and is_latest_version
+        and enriched
+        <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
+            <foreach item="eventType" collection="eventTypes" separator="," open="and episode_types &amp;&amp; array[" close="]">
+                #{eventType}::text
+            </foreach>
+        </if>
+        <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
+            <if test='"ANY".equalsIgnoreCase(episodeFilterType)'>
+                and exists(select from jsonb_array_elements(episodes) arr(episode) where
+                <foreach item="severity" collection="severities" separator="," open="episode ->> 'severity' in (" close=")">
+                    #{severity}
+                </foreach>
+                )
+            </if>
+            <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                and exists (
+                with latest_episode as (
+                select episode as ep from jsonb_array_elements(episodes) episode
+                order by (episode ->> 'updatedAt')::timestamptz desc
+                limit 1
+                )
+                select * from latest_episode where
+                <foreach item="severity" collection="severities" separator="," open="ep ->> 'severity' in (" close=")">
+                    #{severity}
+                </foreach>
+                )
+            </if>
+        </if>
+        <if test='from != null'>
+            <![CDATA[
+                and (fd.ended_at >= #{from})
+                ]]>
+        </if>
+        <if test='to != null'>
+            <![CDATA[
+                and (fd.started_at <= #{to})
+                ]]>
+        </if>
+        <if test='updatedAfter != null'>
+            <if test='"ASC".equalsIgnoreCase(sortOrder)'>
+                and fd.updated_at > #{updatedAfter}
+            </if>
+            <if test='"DESC".equalsIgnoreCase(sortOrder)'>
+                and fd.updated_at &lt; #{updatedAfter}
+            </if>
+        </if>
+        <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
+            and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
+        </if>
+        order by fd.updated_at ${sortOrder}
+        limit #{limit};
+    </select>
+
+<!--
+    <select id="searchForEvents" resultMap="feedDataDtoMap">
         select fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.started_at, fd.ended_at,
                fd.updated_at, fd.observations, fd.collected_geometry, fd.episode_types, fd.is_latest_version, fd.geometries,
                fd.event_details, fd.enriched, fd.urls, fd.location, fd.composed_at, fd.enriched_at,
                jsonb_agg(to_jsonb(fe.*)) as episodes
         from feed_data fd
-            left join feed_episode fe on fe.event_id = fd.event_id and fe.feed_id = fd.feed_id and fe.version = fd.version
+            left join feed_episode fe on fe.feed_id = fd.feed_id and fe.event_id = fd.event_id and fe.version = fd.version
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
-            and is_latest_version
-            and enriched
+            <if test='updatedAfter != null'>
+                <if test='"ASC".equalsIgnoreCase(sortOrder)'>
+                    <![CDATA[
+                    and fd.updated_at > #{updatedAfter}
+                    ]]>
+                </if>
+                <if test='"DESC".equalsIgnoreCase(sortOrder)'>
+                <![CDATA[
+                    and fd.updated_at &lt; #{updatedAfter}
+                ]]>
+                </if>
+            </if>
+            and fd.is_latest_version
+            and fd.enriched
             <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
-                <foreach item="eventType" collection="eventTypes" separator="," open="and episode_types &amp;&amp; array[" close="]">
+                <foreach item="eventType" collection="eventTypes" separator="," open="and fd.episode_types &amp;&amp; array[" close="]">
                     #{eventType}::text
                 </foreach>
             </if>
-            <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                <if test='"ANY".equalsIgnoreCase(episodeFilterType)'>
-                    and exists(select from jsonb_array_elements(episodes) arr(episode) where
-                    <foreach item="severity" collection="severities" separator="," open="episode ->> 'severity' in (" close=")">
-                        #{severity}
-                    </foreach>
-                    )
-                </if>
-                <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                    and exists (
-                        with latest_episode as (
-                            select episode as ep from jsonb_array_elements(episodes) episode
-                            order by (episode ->> 'updatedAt')::timestamptz desc
-                            limit 1
-                        )
-                        select * from latest_episode where
-                        <foreach item="severity" collection="severities" separator="," open="ep ->> 'severity' in (" close=")">
-                            #{severity}
-                        </foreach>
-                    )
-                </if>
+            <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                and fe.episode_number =
+                            (select fes.episode_number
+                                from feed_episode fes
+                                where fes.feed_id = fd.feed_id
+                                    and fes.event_id = fd.event_id
+                                    and fes.version = fd.version
+                                    <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
+                                        <foreach item="severity" collection="severities" separator="," open="and fes.severity in (" close=")">
+                                            #{severity}
+                                        </foreach>
+                                    </if>
+                            order by fes.updated_at limit 1)
             </if>
-            <if test='from != null'>
+            <if test='"ANY".equalsIgnoreCase(episodeFilterType)'>
+                and exists (select from feed_episode fes
+                                    where fes.feed_id = fd.feed_id
+                                        and fes.event_id = fd.event_id
+                                        and fes.version = fd.version
+                                        <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
+                                            <foreach item="severity" collection="severities" separator="," open="and fes.severity in (" close=")">
+                                                #{severity}
+                                            </foreach>
+                                        </if>
+                )
+            </if>
+           <if test='from != null'>
                 <![CDATA[
                 and (fd.ended_at >= #{from})
                 ]]>
@@ -94,20 +183,17 @@
                 and (fd.started_at <= #{to})
                 ]]>
             </if>
-            <if test='updatedAfter != null'>
-                <if test='"ASC".equalsIgnoreCase(sortOrder)'>
-                    and fd.updated_at > #{updatedAfter}
-                </if>
-                <if test='"DESC".equalsIgnoreCase(sortOrder)'>
-                    and fd.updated_at &lt; #{updatedAfter}
-                </if>
-            </if>
             <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                 and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
             </if>
+        group by fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description,
+        fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.collected_geometry,
+        fd.episode_types, fd.is_latest_version, fd.geometries, fd.event_details,
+        fd.enriched, fd.urls, fd.location, fd.composed_at, fd.enriched_at
         order by fd.updated_at ${sortOrder}
         limit #{limit};
     </select>
+-->
 
     <select id="getEventByEventIdAndByVersionOrLast" resultMap="feedDataDtoMap">
         WITH feed as (SELECT feed_id
