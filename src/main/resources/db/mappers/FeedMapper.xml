@@ -25,6 +25,18 @@
                 #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
     </insert>
 
+    <insert id="insertFeedEpisode" useGeneratedKeys="false">
+        insert into feed_episode (event_id, feed_id, version, episode_number, name, proper_name, description, type,
+                                  active, severity, started_at, ended_at, updated_at, source_updated_at,
+                                  observations, episode_details, urls, location, enriched, geometries)
+        values (#{eventId}, #{feedId}, #{version}, #{episodeNumber}, #{name}, #{properName}, #{description},
+                #{type}, #{active}, #{severity}, #{startedAt}, #{endedAt}, #{updatedAt}, #{sourceUpdatedAt},
+                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
+                #{episodeDetails, typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler},
+                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location},
+                #{enriched}, #{geometries}::jsonb)
+    </insert>
+
     <update id="markOutdatedEventsVersions">
     <![CDATA[
         update feed_data set is_latest_version = false
@@ -36,22 +48,12 @@
     </update>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        select event_id, feed_id, version, name, proper_name, description, started_at, ended_at, updated_at, observations,
-               collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
-               composed_at, enriched_at,
-        <choose>
-            <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                jsonb_build_array((
-                    select episode from jsonb_array_elements(episodes) episode
-                    order by (episode ->> 'updatedAt')::timestamptz desc
-                    limit 1
-                )) as episodes
-            </when>
-            <otherwise>
-                episodes
-            </otherwise>
-        </choose>
+        select fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.started_at, fd.ended_at,
+               fd.updated_at, fd.observations, fd.collected_geometry, fd.episode_types, fd.is_latest_version, fd.geometries,
+               fd.event_details, fd.enriched, fd.urls, fd.location, fd.composed_at, fd.enriched_at,
+               jsonb_agg(to_jsonb(fe.*)) as episodes
         from feed_data fd
+            left join feed_episode fe on fe.event_id = fd.event_id and fe.feed_id = fd.feed_id and fe.version = fd.version
         where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
             and is_latest_version
             and enriched
@@ -205,5 +207,28 @@
         <result property="location" column="location"/>
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>
+    </resultMap>
+
+    <resultMap id="feedEpisodeDtoMap" type="io.kontur.eventapi.entity.FeedEpisode">
+        <result property="eventId" column="event_id" />
+        <result property="feedId" column="feed_id" />
+        <result property="version" column="version" />
+        <result property="episodeNumber" column="episode_number" />
+        <result property="name" column="name" />
+        <result property="properName" column="proper_name"/>
+        <result property="description" column="description" />
+        <result property="type" column="type" />
+        <result property="active" column="active" />
+        <result property="severity" column="severity" />
+        <result property="startedAt" column="started_at" />
+        <result property="endedAt" column="ended_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="sourceUpdatedAt" column="source_updated_at" />
+        <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
+        <result property="episodeDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
+        <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
+        <result property="location" column="location" />
+        <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
+        <result property="enriched" column="enriched"/>
     </resultMap>
 </mapper>

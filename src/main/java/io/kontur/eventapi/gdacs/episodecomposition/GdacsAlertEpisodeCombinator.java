@@ -38,7 +38,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
         NormalizedObservation alertObservation = observations.getKey();
         NormalizedObservation geometryObservation = observations.getValue();
 
-        Optional<FeedEpisode> episode = createDefaultEpisode(alertObservation);
+        Optional<FeedEpisode> episode = createDefaultEpisode(alertObservation, event);
         episode.ifPresent(ep -> {
             ep.setObservations(findObservationsForEpisode(eventObservations));
             ep.setGeometries(geometryObservation.getGeometries());

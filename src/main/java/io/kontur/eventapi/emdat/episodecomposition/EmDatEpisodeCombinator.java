@@ -26,7 +26,7 @@ public class EmDatEpisodeCombinator extends EpisodeCombinator {
                 .map(NormalizedObservation::getLoadedAt)
                 .max(OffsetDateTime::compareTo)
                 .get();
-        return observation.getLoadedAt().equals(latestLoadedAt) ? createDefaultEpisode(observation) : Optional.empty();
+        return observation.getLoadedAt().equals(latestLoadedAt) ? createDefaultEpisode(observation, feedData) : Optional.empty();
     }
 
     @Override

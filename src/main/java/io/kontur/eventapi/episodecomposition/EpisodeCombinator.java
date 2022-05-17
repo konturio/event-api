@@ -25,8 +25,11 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
 
     public abstract Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);
 
-    protected Optional<FeedEpisode> createDefaultEpisode(NormalizedObservation observation) {
+    protected Optional<FeedEpisode> createDefaultEpisode(NormalizedObservation observation, FeedData feedData) {
         FeedEpisode feedEpisode = new FeedEpisode();
+        feedEpisode.setEventId(feedData.getEventId());
+        feedEpisode.setFeedId(feedData.getFeedId());
+        feedEpisode.setVersion(feedData.getVersion());
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
         feedEpisode.setType(observation.getType());

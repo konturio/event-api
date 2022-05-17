@@ -88,6 +88,9 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
             episode.setGeometries(createEpisodeGeometryFeatureCollection(observation, episodeGeometry));
         }
 
+        episode.setEventId(feedData.getEventId());
+        episode.setFeedId(feedData.getFeedId());
+        episode.setVersion(feedData.getVersion());
         episode.setDescription(firstNonNull(episode.getDescription(), observation.getEpisodeDescription()));
         episode.setType(firstNonNull(episode.getType(), observation.getType()));
         episode.setActive(firstNonNull(episode.getActive(), observation.getActive()));

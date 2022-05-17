@@ -18,6 +18,6 @@ public class DefaultEpisodeCombinator extends EpisodeCombinator {
 
     @Override
     public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        return createDefaultEpisode(observation);
+        return createDefaultEpisode(observation, feedData);
     }
 }
