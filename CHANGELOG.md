@@ -8,6 +8,8 @@
 
 #### Removed
 
+- Remove unnecessary logs in Enrichment Job
+
 
 ## 1.7 - 2022-04-28
 
