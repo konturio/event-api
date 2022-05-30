@@ -14,8 +14,10 @@ import io.micrometer.core.instrument.Counter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -105,7 +107,13 @@ public class EventEnrichmentTask {
 
     private Optional<Map<String, Object>> fetchAnalytics(FeatureCollection geometry, String enrichmentRequest, List<String> enrichmentFields) {
         try {
-            String query = format(enrichmentRequest, replaceAll(geometry.toString(), "\"", "\\\\\\\""));
+            Feature[] features = new Feature[geometry.getFeatures().length];
+            for (int i = 0; i < geometry.getFeatures().length; i++) {
+                Feature feature = new Feature(geometry.getFeatures()[i].getGeometry(), new HashMap<>());
+                features[i] = feature;
+            }
+            FeatureCollection geom = new FeatureCollection(features);
+            String query = format(enrichmentRequest, replaceAll(geom.toString(), "\"", "\\\\\\\""));
             InsightsApiRequest request = new InsightsApiRequest(query);
             InsightsApiResponse response = konturAppsClient.graphql(request);
             return Optional.of(processResponse(response, enrichmentFields));
