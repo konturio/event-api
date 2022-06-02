@@ -6,6 +6,8 @@
 
 #### Changed
 
+- Increased application heap memory size
+
 #### Removed
 
 - Remove unnecessary logs in Enrichment Job
