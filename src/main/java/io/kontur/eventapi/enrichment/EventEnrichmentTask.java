@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import static io.kontur.eventapi.enrichment.InsightsApiResponseHandler.processResponse;
@@ -122,9 +123,10 @@ public class EventEnrichmentTask {
         }
     }
 
-    private boolean needsEnrichment(Map<String, Object> details, FeatureCollection geometries) {
+    private boolean needsEnrichment(Map<String, Object> details, FeatureCollection fc) {
         return (details == null || details.isEmpty()) &&
-                geometries != null && geometries.getFeatures() != null && geometries.getFeatures().length > 0;
+                fc != null && fc.getFeatures() != null && fc.getFeatures().length > 0 &&
+                Arrays.stream(fc.getFeatures()).anyMatch(feature -> feature.getGeometry() != null);
     }
 
     private boolean enriched(FeedData event) {
