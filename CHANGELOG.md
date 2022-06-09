@@ -6,6 +6,13 @@
 
 #### Changed
 
+#### Removed
+
+
+## 1.8 - 2022-06-09
+
+#### Changed
+
 - Increased application heap memory size
 - Remove properties from geometry before sending to Insights API
 - Don't send feature collection with `null` geometry to Insights API
