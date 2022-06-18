@@ -1,6 +1,6 @@
 package io.kontur.eventapi.inciweb.episodecomposition;
 
-import static io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter.INCIWEB_PROVIDER;
+import static io.kontur.eventapi.inciweb.job.InciWebImportJob.INCIWEB_PROVIDER;
 
 import java.util.Optional;
 import java.util.Set;

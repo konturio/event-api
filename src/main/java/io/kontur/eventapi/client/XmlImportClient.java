@@ -1,16 +1,16 @@
-package io.kontur.eventapi.gdacs.client;
+package io.kontur.eventapi.client;
 
-import io.kontur.eventapi.client.XmlImportClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(value = "gdacsFeignClient", url = "${gdacs.host}")
-public interface GdacsClient extends XmlImportClient {
+@FeignClient(value = "xmlFeignClient", url = "www.example.com")
+public interface XmlImportClient {
 
-    @GetMapping("/xml/gdacs_cap.xml")
+    @GetMapping("/cap.xml")
     String getXml();
 
-    @GetMapping("/gdacsapi/api/polygons/getgeometry")
+    @GetMapping("/geom")
     String getGeometryByLink(@RequestParam("eventtype") String eventtype, @RequestParam("eventid") String eventid, @RequestParam("episodeid") String episodeid);
+
 }

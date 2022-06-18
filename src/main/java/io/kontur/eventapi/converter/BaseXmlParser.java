@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,21 +27,22 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import io.kontur.eventapi.dto.ParsedEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-@Component
 public abstract class BaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(BaseXmlParser.class);
-    private static final String DEFAULT_NS = "*";
+    protected static final String DEFAULT_NS = "*";
+    protected static final String PUBDATE = "pubDate";
 
     public OffsetDateTime getPubDate(String xml)
             throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
@@ -51,9 +53,8 @@ public abstract class BaseXmlParser {
         return parseDateTimeFromString(pubDateString);
     }
 
-    public Map<String, String> getItems(String xml, String itemName, String idTagName)
-            throws IOException, ParserConfigurationException, SAXException {
-        return getItems(xml, itemName, DEFAULT_NS, idTagName);
+    public Map<String, String> getItems(String xml) throws IOException, SAXException, ParserConfigurationException {
+        return getItems(xml, getItemName(), getNamespace(), getIdTagName());
     }
 
     public Map<String, String> getItems(String xml, String itemName, String namespace, String idTagName)
@@ -82,7 +83,20 @@ public abstract class BaseXmlParser {
         return items;
     }
 
-    protected Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
+    public Map<String, ParsedEvent> getParsedItems(Map<String, String> itemsXml) {
+        Map<String, ParsedEvent> parsedItems = new HashMap<>();
+        if (!CollectionUtils.isEmpty(itemsXml)) {
+            for (String itemXml : itemsXml.keySet()) {
+                getParsedItemForDataLake(itemsXml.get(itemXml))
+                        .ifPresent(parsedItem -> parsedItems.put(itemXml, parsedItem));
+            }
+        }
+        return parsedItems;
+    }
+
+    public abstract Optional<ParsedEvent> getParsedItemForDataLake(String xml);
+
+        protected Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setNamespaceAware(true);
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
@@ -127,5 +141,17 @@ public abstract class BaseXmlParser {
             LOG.warn("Event contains more than one tag '{}'", tagName);
         }
         return nodeList.item(0).getTextContent();
+    }
+
+    protected String getItemName() {
+        return "item";
+    }
+
+    protected String getNamespace() {
+        return DEFAULT_NS;
+    }
+
+    protected String getIdTagName() {
+        return "guid";
     }
 }

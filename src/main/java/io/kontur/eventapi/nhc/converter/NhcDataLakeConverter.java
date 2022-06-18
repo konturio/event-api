@@ -1,4 +1,4 @@
-package io.kontur.eventapi.inciweb.converter;
+package io.kontur.eventapi.nhc.converter;
 
 import java.util.UUID;
 
@@ -9,7 +9,7 @@ import io.kontur.eventapi.util.DateTimeUtil;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InciWebDataLakeConverter implements DataLakeConverter {
+public class NhcDataLakeConverter implements DataLakeConverter {
 
     public DataLake convertEvent(ParsedItem event, String provider) {
         DataLake dataLake = new DataLake(UUID.randomUUID(), event.getGuid(), event.getPubDate(),

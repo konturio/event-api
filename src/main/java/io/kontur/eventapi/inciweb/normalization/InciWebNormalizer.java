@@ -1,18 +1,18 @@
 package io.kontur.eventapi.inciweb.normalization;
 
-import static io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter.INCIWEB_PROVIDER;
+import static io.kontur.eventapi.inciweb.job.InciWebImportJob.INCIWEB_PROVIDER;
 import static io.kontur.eventapi.util.GeometryUtil.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import io.kontur.eventapi.dto.ParsedItem;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.inciweb.converter.InciWebXmlParser;
-import io.kontur.eventapi.inciweb.dto.ParsedItem;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

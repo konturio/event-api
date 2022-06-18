@@ -70,8 +70,8 @@ class GdacsServiceTest {
         when(gdacsDataLakeConverter.convertGdacsWithGeometry(alert, geometry))
                 .thenReturn(createDataLake(alert, geometry, GDACS_ALERT_GEOMETRY_PROVIDER));
 
-        List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(
-                Map.of("GDACS_EQ_1243255_1342589", alert));
+        List<DataLake> dataLakes = gdacsService.createDataLakes(
+                Map.of("GDACS_EQ_1243255_1342589", alert), null);
 
         assertEquals(2, dataLakes.size());
         assertEquals(GDACS_ALERT_PROVIDER, dataLakes.get(0).getProvider());
@@ -85,8 +85,8 @@ class GdacsServiceTest {
         when(gdacsClient.getGeometryByLink(alert.getEventType(), alert.getEventId(), alert.getCurrentEpisodeId()))
                 .thenThrow(FeignException.class);
 
-        List<DataLake> dataLakes = gdacsService.createDataLakeListWithAlertsAndGeometry(
-                Map.of("GDACS_EQ_1243255_1342589", alert));
+        List<DataLake> dataLakes = gdacsService.createDataLakes(
+                Map.of("GDACS_EQ_1243255_1342589", alert), null);
 
         assertEquals(0, dataLakes.size());
         verify(gdacsDataLakeConverter, times(0)).convertGdacs(any());

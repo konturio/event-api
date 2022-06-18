@@ -1,6 +1,6 @@
 package io.kontur.eventapi.inciweb.job;
 
-import static io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter.INCIWEB_PROVIDER;
+import static io.kontur.eventapi.inciweb.job.InciWebImportJob.INCIWEB_PROVIDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyList;

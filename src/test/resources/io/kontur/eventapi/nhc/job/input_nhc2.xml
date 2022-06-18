@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:nhc="https://www.nhc.noaa.gov" version="2.0">
+    <channel>
+        <pubDate>Mon, 06 Jun 2022 07:06:01 GMT</pubDate>
+        <title>NHC Atlantic</title>
+        <description>Active tropical cyclones in the Atlantic, Caribbean, and the Gulf of Mexico</description>
+        <link>https://www.nhc.noaa.gov/</link>
+        <copyright>none</copyright>
+        <managingEditor>nhcwebmaster@noaa.gov (NHC Webmaster)</managingEditor>
+        <language>en-us</language>
+        <webMaster>nhcwebmaster@noaa.gov (NHC Webmaster)</webMaster>
+        <image>
+            <url>https://www.nhc.noaa.gov/gifs/xml_logo_nhc.gif</url>
+            <link>https://www.nhc.noaa.gov/</link>
+            <title>NHC Atlantic</title>
+            <description>NOAA logo</description>
+            <width>95</width>
+            <height>45</height>
+        </image>
+        <item>
+            <title>Atlantic Tropical Weather Outlook</title>
+            <description>description</description>
+            <pubDate>Mon, 06 Jun 2022 05:50:06 GMT</pubDate>
+            <link>https://www.nhc.noaa.gov/gtwo.php?basin=atlc</link>
+            <guid>https://www.nhc.noaa.gov/gtwo.php?basin=atlc&amp;202206060550</guid>
+            <author>nhcwebmaster@noaa.gov (NHC Webmaster)</author>
+        </item>
+        <item>
+            <title>Summary for Tropical Storm Alex (AT1/AL012022)</title>
+            <guid isPermaLink="false">summary-al012022-202206060549</guid>
+            <pubDate>Mon, 06 Jun 2022 05:49:36 GMT</pubDate>
+            <author>nhcwebmaster@noaa.gov (NHC Webmaster)</author>
+            <link>https://www.nhc.noaa.gov/text/refresh/MIATCPAT1+shtml/060549.shtml</link>
+            <description>description</description>
+            <nhc:Cyclone>
+                <nhc:center>32.9, -68.1</nhc:center>
+                <nhc:type>Tropical Storm</nhc:type>
+                <nhc:name>Alex</nhc:name>
+                <nhc:wallet>AT1</nhc:wallet>
+                <nhc:atcf>AL012022</nhc:atcf>
+                <nhc:datetime>2:00 AM AST Mon Jun 6</nhc:datetime>
+                <nhc:movement>ENE at 28 mph</nhc:movement>
+                <nhc:pressure>986 mb</nhc:pressure>
+                <nhc:wind>70 mph</nhc:wind>
+                <nhc:headline> ...TROPICAL STORM CONDITIONS HAVE BEGUN ON BERMUDA...</nhc:headline>
+            </nhc:Cyclone>
+        </item>
+        <item>
+            <title>Tropical Storm Alex Public Advisory Number 14A</title>
+            <description>description</description>
+            <pubDate>Mon, 06 Jun 2022 05:49:36 GMT</pubDate>
+            <link>https://www.nhc.noaa.gov/text/refresh/MIATCPAT1+shtml/060549.shtml</link>
+            <guid>https://www.nhc.noaa.gov/text/refresh/MIATCPAT1+shtml/060549.shtml</guid>
+            <author>nhcwebmaster@noaa.gov (NHC Webmaster)</author>
+        </item>
+        <item>
+            <title>Tropical Storm Alex Forecast Adv Number 14</title>
+            <description>description1</description>
+            <pubDate>Mon, 06 Jun 2022 02:45:34 GMT</pubDate>
+            <link>https://www.nhc.noaa.gov/text/refresh/MIATCMAT1+shtml/060245.shtml</link>
+            <guid>https://www.nhc.noaa.gov/text/refresh/MIATCMAT1+shtml/060245.shtml</guid>
+            <author>nhcwebmaster@noaa.gov (NHC Webmaster)</author>
+        </item>
+        <item>
+            <title>Tropical Storm Alex Forecast Discussion Number 14</title>
+            <description>description</description>
+            <pubDate>Mon, 06 Jun 2022 02:46:36 GMT</pubDate>
+            <link>https://www.nhc.noaa.gov/text/refresh/MIATCDAT1+shtml/060246.shtml</link>
+            <guid>https://www.nhc.noaa.gov/text/refresh/MIATCDAT1+shtml/060246.shtml</guid>
+            <author>nhcwebmaster@noaa.gov (NHC Webmaster)</author>
+        </item>
+        <item>
+            <title>Tropical Storm Alex Wind Speed Probabilities Number 14</title>
+            <description>description</description>
+            <pubDate>Mon, 06 Jun 2022 02:46:05 GMT</pubDate>
+            <link>https://www.nhc.noaa.gov/text/refresh/MIAPWSAT1+shtml/060245.shtml</link>
+            <guid>https://www.nhc.noaa.gov/text/refresh/MIAPWSAT1+shtml/060245.shtml</guid>
+            <author>nhcwebmaster@noaa.gov (NHC Webmaster)</author>
+        </item>
+        <item>
+            <title>Tropical Storm Alex Graphics</title>
+            <description>description</description>
+            <pubDate>Mon, 06 Jun 2022 05:49:11 GMT</pubDate>
+            <link>https://www.nhc.noaa.gov/refresh/graphics_at1+shtml/054911.shtml?cone</link>
+            <guid>https://www.nhc.noaa.gov/refresh/graphics_at1+shtml/054911.shtml?cone</guid>
+            <author>nhcwebmaster@noaa.gov (NHC Webmaster)</author>
+        </item>
+    </channel>
+</rss>
