@@ -2,12 +2,12 @@ package io.kontur.eventapi.gdacs.service;
 
 import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
-import io.kontur.eventapi.dto.ParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
-import io.kontur.eventapi.service.XmlImportService;
+import io.kontur.eventapi.cap.service.CapImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class GdacsService extends XmlImportService {
+public class GdacsService extends CapImportService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsService.class);
 
@@ -39,7 +39,7 @@ public class GdacsService extends XmlImportService {
     }
 
     @Override
-    public List<DataLake> createDataLakes(Map<String, ParsedEvent> events, String provider) {
+    public List<DataLake> createDataLakes(Map<String, CapParsedEvent> events, String provider) {
         var dataLakes = new ArrayList<DataLake>();
 
         for (String key : events.keySet()) {

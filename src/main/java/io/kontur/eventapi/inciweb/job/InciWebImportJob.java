@@ -2,13 +2,13 @@ package io.kontur.eventapi.inciweb.job;
 
 import io.kontur.eventapi.inciweb.converter.InciWebXmlParser;
 import io.kontur.eventapi.inciweb.service.InciWebService;
-import io.kontur.eventapi.job.XmlImportJob;
+import io.kontur.eventapi.cap.job.CapImportJob;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InciWebImportJob extends XmlImportJob {
+public class InciWebImportJob extends CapImportJob {
 
     public final static String INCIWEB_PROVIDER = "wildfire.inciweb";
 

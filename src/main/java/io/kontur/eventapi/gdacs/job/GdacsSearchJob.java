@@ -4,7 +4,7 @@ import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.service.GdacsService;
-import io.kontur.eventapi.job.XmlImportJob;
+import io.kontur.eventapi.cap.job.CapImportJob;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class GdacsSearchJob extends XmlImportJob {
+public class GdacsSearchJob extends CapImportJob {
 
     @Autowired
     public GdacsSearchJob(GdacsService gdacsService, GdacsAlertXmlParser gdacsAlertParser, DataLakeDao dataLakeDao,

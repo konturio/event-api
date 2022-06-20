@@ -1,4 +1,4 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.cap.dto;
 
 import java.time.OffsetDateTime;
 
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ParsedItem extends ParsedEvent {
+public class CapParsedItem extends CapParsedEvent {
     private String guid;
     private OffsetDateTime pubDate;
     private Double longitude;

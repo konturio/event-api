@@ -1,8 +1,8 @@
 package io.kontur.eventapi.gdacs.converter;
 
 import feign.FeignException;
-import io.kontur.eventapi.converter.BaseXmlParser;
-import io.kontur.eventapi.dto.ParsedEvent;
+import io.kontur.eventapi.cap.converter.CapBaseXmlParser;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ import java.util.*;
 import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 @Component
-public class GdacsAlertXmlParser extends BaseXmlParser {
+public class GdacsAlertXmlParser extends CapBaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsAlertXmlParser.class);
 
@@ -49,7 +49,7 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
 
 
     @Override
-    public Optional<ParsedEvent> getParsedItemForDataLake(String xml) {
+    public Optional<CapParsedEvent> getParsedItemForDataLake(String xml, String provider) {
         String externalId = "";
         try {
             Document xmlDocument = getXmlDocument(xml);

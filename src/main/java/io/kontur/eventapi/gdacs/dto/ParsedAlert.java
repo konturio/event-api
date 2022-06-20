@@ -1,13 +1,13 @@
 package io.kontur.eventapi.gdacs.dto;
 
-import io.kontur.eventapi.dto.ParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import lombok.*;
 import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class ParsedAlert extends ParsedEvent {
+public class ParsedAlert extends CapParsedEvent {
     private OffsetDateTime dateModified;
     private OffsetDateTime sent;
     private String identifier;

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.kontur.eventapi.dto.ParsedEvent;
-import io.kontur.eventapi.dto.ParsedItem;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedItem;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -73,9 +73,9 @@ class InciWebNormalizationTest {
     private DataLake createDataLake() throws Exception {
         String data = IOUtils.toString(
                 Objects.requireNonNull(this.getClass().getResourceAsStream("data.xml")), "UTF-8");
-        Optional<ParsedEvent> parsedItem = new InciWebXmlParser().getParsedItemForDataLake(data);
+        Optional<CapParsedEvent> parsedItem = new InciWebXmlParser().getParsedItemForDataLake(data, "provider");
         assertTrue(parsedItem.isPresent());
-        return new InciWebDataLakeConverter().convertEvent((ParsedItem) parsedItem.get(),
+        return new InciWebDataLakeConverter().convertEvent((CapParsedItem) parsedItem.get(),
                 InciWebImportJob.INCIWEB_PROVIDER);
     }
 }

@@ -31,7 +31,7 @@ class GdacsAlertXmlParserTest {
         );
 
         int alertCount = 2;
-        assertEquals(alertCount, new GdacsAlertXmlParser().getParsedItems(listOfAlerts).size());
+        assertEquals(alertCount, new GdacsAlertXmlParser().getParsedItems(listOfAlerts, "provider").size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

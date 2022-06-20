@@ -7,9 +7,9 @@ import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
-import io.kontur.eventapi.converter.BaseXmlParser;
-import io.kontur.eventapi.dto.ParsedEvent;
-import io.kontur.eventapi.dto.ParsedItem;
+import io.kontur.eventapi.cap.converter.CapBaseXmlParser;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedItem;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 @Component
-public class InciWebXmlParser extends BaseXmlParser {
+public class InciWebXmlParser extends CapBaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(InciWebXmlParser.class);
 
@@ -36,8 +36,8 @@ public class InciWebXmlParser extends BaseXmlParser {
         return super.getXmlDocument(xml);
     }
 
-    public Optional<ParsedEvent> getParsedItemForDataLake(String xml) {
-        ParsedItem item = new ParsedItem();
+    public Optional<CapParsedEvent> getParsedItemForDataLake(String xml, String provider) {
+        CapParsedItem item = new CapParsedItem();
         try {
             Document xmlDocument = getXmlDocument(xml);
             item.setGuid(getValueByTagName(xmlDocument, getIdTagName()));
@@ -52,8 +52,8 @@ public class InciWebXmlParser extends BaseXmlParser {
 
     }
 
-    public Optional<ParsedItem> getParsedItem(String xml) {
-        ParsedItem item = new ParsedItem();
+    public Optional<CapParsedItem> getParsedItem(String xml) {
+        CapParsedItem item = new CapParsedItem();
         try {
             Document xmlDocument = getXmlDocument(xml);
             item.setGuid(getValueByTagName(xmlDocument, GUID));

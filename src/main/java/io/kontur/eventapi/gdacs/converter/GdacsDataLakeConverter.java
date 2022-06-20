@@ -1,7 +1,7 @@
 package io.kontur.eventapi.gdacs.converter;
 
-import io.kontur.eventapi.converter.DataLakeConverter;
-import io.kontur.eventapi.dto.ParsedItem;
+import io.kontur.eventapi.cap.converter.CapDataLakeConverter;
+import io.kontur.eventapi.cap.dto.CapParsedItem;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import io.kontur.eventapi.util.DateTimeUtil;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class GdacsDataLakeConverter implements DataLakeConverter {
+public class GdacsDataLakeConverter implements CapDataLakeConverter {
 
     public final static String GDACS_ALERT_PROVIDER = "gdacsAlert";
     public final static String GDACS_ALERT_GEOMETRY_PROVIDER = "gdacsAlertGeometry";
@@ -39,7 +39,7 @@ public class GdacsDataLakeConverter implements DataLakeConverter {
     }
 
     @Override
-    public DataLake convertEvent(ParsedItem event, String provider) {
+    public DataLake convertEvent(CapParsedItem event, String provider) {
         return null;
     }
 }

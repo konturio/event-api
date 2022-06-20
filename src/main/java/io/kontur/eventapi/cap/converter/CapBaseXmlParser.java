@@ -1,4 +1,4 @@
-package io.kontur.eventapi.converter;
+package io.kontur.eventapi.cap.converter;
 
 import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
@@ -27,7 +27,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import io.kontur.eventapi.dto.ParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +38,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class BaseXmlParser {
+public abstract class CapBaseXmlParser {
 
-    private final static Logger LOG = LoggerFactory.getLogger(BaseXmlParser.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CapBaseXmlParser.class);
     protected static final String DEFAULT_NS = "*";
     protected static final String PUBDATE = "pubDate";
 
@@ -83,20 +83,20 @@ public abstract class BaseXmlParser {
         return items;
     }
 
-    public Map<String, ParsedEvent> getParsedItems(Map<String, String> itemsXml) {
-        Map<String, ParsedEvent> parsedItems = new HashMap<>();
+    public Map<String, CapParsedEvent> getParsedItems(Map<String, String> itemsXml, String provider) {
+        Map<String, CapParsedEvent> parsedItems = new HashMap<>();
         if (!CollectionUtils.isEmpty(itemsXml)) {
             for (String itemXml : itemsXml.keySet()) {
-                getParsedItemForDataLake(itemsXml.get(itemXml))
+                getParsedItemForDataLake(itemsXml.get(itemXml), provider)
                         .ifPresent(parsedItem -> parsedItems.put(itemXml, parsedItem));
             }
         }
         return parsedItems;
     }
 
-    public abstract Optional<ParsedEvent> getParsedItemForDataLake(String xml);
+    public abstract Optional<CapParsedEvent> getParsedItemForDataLake(String xml, String provider);
 
-        protected Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
+    protected Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setNamespaceAware(true);
         DocumentBuilder builder = builderFactory.newDocumentBuilder();

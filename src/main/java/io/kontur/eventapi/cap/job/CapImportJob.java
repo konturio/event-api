@@ -1,4 +1,4 @@
-package io.kontur.eventapi.job;
+package io.kontur.eventapi.cap.job;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -10,11 +10,12 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
-import io.kontur.eventapi.converter.BaseXmlParser;
+import io.kontur.eventapi.cap.converter.CapBaseXmlParser;
 import io.kontur.eventapi.dao.DataLakeDao;
-import io.kontur.eventapi.dto.ParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.service.XmlImportService;
+import io.kontur.eventapi.job.AbstractJob;
+import io.kontur.eventapi.cap.service.CapImportService;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -24,17 +25,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-public abstract class XmlImportJob extends AbstractJob {
+public abstract class CapImportJob extends AbstractJob {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XmlImportJob.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CapImportJob.class);
 
     public static PubDate XML_PUB_DATE = new PubDate(DateTimeUtil.uniqueOffsetDateTime());
 
-    private final XmlImportService service;
-    private final BaseXmlParser xmlParser;
+    private final CapImportService service;
+    private final CapBaseXmlParser xmlParser;
     private final DataLakeDao dataLakeDao;
 
-    public XmlImportJob(XmlImportService service, BaseXmlParser xmlParser, DataLakeDao dataLakeDao,
+    public CapImportJob(CapImportService service, CapBaseXmlParser xmlParser, DataLakeDao dataLakeDao,
                         MeterRegistry meterRegistry, String meterName, String meterDesc) {
         super(meterRegistry);
         this.service = service;
@@ -54,8 +55,8 @@ public abstract class XmlImportJob extends AbstractJob {
                 setPubDate(preparedXml);
                 Map<String, String> events = xmlParser.getItems(preparedXml);
                 Map<String, String> filteredEvents = filterItems(events);
-                Map<String, ParsedEvent> parsedEvents = xmlParser.getParsedItems(filteredEvents);
-                Map<String, ParsedEvent> filteredParsedEvents = filterParsedItems(parsedEvents);
+                Map<String, CapParsedEvent> parsedEvents = xmlParser.getParsedItems(filteredEvents, getProvider());
+                Map<String, CapParsedEvent> filteredParsedEvents = filterParsedItems(parsedEvents);
                 List<DataLake> dataLakes = service.createDataLakes(filteredParsedEvents, getProvider());
                 service.saveDataLakes(dataLakes);
             } catch (DateTimeParseException e) {
@@ -72,7 +73,7 @@ public abstract class XmlImportJob extends AbstractJob {
 
     @Override
     public String getName() {
-        return "xmlImportJob";
+        return "capImportJob";
     }
 
     protected abstract String getProvider();
@@ -80,7 +81,7 @@ public abstract class XmlImportJob extends AbstractJob {
         return events;
     }
 
-    protected Map<String, ParsedEvent> filterParsedItems(Map<String, ParsedEvent> parsedEvents) {
+    protected Map<String, CapParsedEvent> filterParsedItems(Map<String, CapParsedEvent> parsedEvents) {
         return parsedEvents;
     }
 

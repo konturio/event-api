@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import io.kontur.eventapi.dto.ParsedItem;
+import io.kontur.eventapi.cap.dto.CapParsedItem;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -34,7 +34,7 @@ public class InciWebNormalizer extends Normalizer {
 
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
-        Optional<ParsedItem> parsedItem = new InciWebXmlParser().getParsedItem(dataLakeDto.getData());
+        Optional<CapParsedItem> parsedItem = new InciWebXmlParser().getParsedItem(dataLakeDto.getData());
         if (parsedItem.isPresent()) {
             NormalizedObservation normalizedObservation = new NormalizedObservation();
 

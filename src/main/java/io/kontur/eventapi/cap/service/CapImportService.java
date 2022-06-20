@@ -1,4 +1,4 @@
-package io.kontur.eventapi.service;
+package io.kontur.eventapi.cap.service;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -9,26 +9,26 @@ import java.util.Map;
 import java.util.Optional;
 
 import feign.FeignException;
-import io.kontur.eventapi.client.XmlImportClient;
-import io.kontur.eventapi.converter.DataLakeConverter;
+import io.kontur.eventapi.cap.client.CapImportClient;
+import io.kontur.eventapi.cap.converter.CapDataLakeConverter;
 import io.kontur.eventapi.dao.DataLakeDao;
-import io.kontur.eventapi.dto.ParsedEvent;
-import io.kontur.eventapi.dto.ParsedItem;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedItem;
 import io.kontur.eventapi.entity.DataLake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-public abstract class XmlImportService {
+public abstract class CapImportService {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XmlImportService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CapImportService.class);
 
     private final DataLakeDao dataLakeDao;
-    private final XmlImportClient client;
+    private final CapImportClient client;
 
-    private final DataLakeConverter dataLakeConverter;
+    private final CapDataLakeConverter dataLakeConverter;
 
-    public XmlImportService(DataLakeDao dataLakeDao, XmlImportClient client, DataLakeConverter dataLakeConverter) {
+    public CapImportService(DataLakeDao dataLakeDao, CapImportClient client, CapDataLakeConverter dataLakeConverter) {
         this.dataLakeDao = dataLakeDao;
         this.client = client;
         this.dataLakeConverter = dataLakeConverter;
@@ -43,7 +43,7 @@ public abstract class XmlImportService {
         return Optional.empty();
     }
 
-    public List<DataLake> createDataLakes(Map<String, ParsedEvent> events, String provider) {
+    public List<DataLake> createDataLakes(Map<String, CapParsedEvent> events, String provider) {
         List<DataLake> dataLakes = new ArrayList<>();
         if (!CollectionUtils.isEmpty(events)) {
             Map<String, List<OffsetDateTime>> existsDataLakes = new HashMap<>();
@@ -60,13 +60,13 @@ public abstract class XmlImportService {
         return dataLakes;
     }
 
-    protected List<DataLake> createDataLakeList(Map<String, ParsedEvent> events,
+    protected List<DataLake> createDataLakeList(Map<String, CapParsedEvent> events,
                                                 Map<String, List<OffsetDateTime>> existsDataLakes,
                                                 String provider) {
         List<DataLake> dataLakes = new ArrayList<>();
         for (String key : events.keySet()) {
             try {
-                ParsedItem item = (ParsedItem) events.get(key);
+                CapParsedItem item = (CapParsedItem) events.get(key);
                 if (!existsDataLakes.containsKey(key)
                         || existsDataLakes.get(key).stream().noneMatch(time -> time.isEqual(item.getPubDate()))) {
                     dataLakes.add(getDataLakeConverter().convertEvent(item, provider));
@@ -84,7 +84,7 @@ public abstract class XmlImportService {
         }
     }
 
-    protected XmlImportClient getClient() {
+    protected CapImportClient getClient() {
         return client;
     }
 
@@ -92,7 +92,7 @@ public abstract class XmlImportService {
         return dataLakeDao;
     }
 
-    protected DataLakeConverter getDataLakeConverter() {
+    protected CapDataLakeConverter getDataLakeConverter() {
         return dataLakeConverter;
     }
 }

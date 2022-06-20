@@ -1,4 +1,4 @@
-package io.kontur.eventapi.dto;
+package io.kontur.eventapi.cap.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ParsedEvent {
+public class CapParsedEvent {
     private String data;
 
-    public ParsedEvent(String data) {
+    public CapParsedEvent(String data) {
         this.data = data;
     }
 }

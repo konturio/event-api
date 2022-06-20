@@ -83,6 +83,24 @@ public class NhcImportJobTest {
         assertEquals(0, dataLakesInv.size());
     }
 
+
+    @Test
+    public void testEmptyFeed() throws IOException {
+        //given
+        prepareMocks("input_nhc_empty_feed.xml");
+        NhcAtService service = new NhcAtService(dataLakeDao, new NhcDataLakeConverter(), client);
+        NhcAtImportJob importJob = new NhcAtImportJob(service, new NhcXmlParser(), new SimpleMeterRegistry());
+
+        //when
+        importJob.run();
+
+        //then
+        verify(dataLakeDao, times(0)).storeDataLakes(dataLakesCaptor.capture());
+        List<ArrayList<DataLake>> dataLakesInv = dataLakesCaptor.getAllValues();
+        assertNotNull(dataLakesInv);
+        assertEquals(0, dataLakesInv.size());
+    }
+
     private String readMessageFromFile(String fileName) throws IOException {
         return IOUtils.toString(Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
     }
