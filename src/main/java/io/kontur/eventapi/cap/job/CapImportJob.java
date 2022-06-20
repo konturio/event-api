@@ -21,6 +21,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -41,9 +42,11 @@ public abstract class CapImportJob extends AbstractJob {
         this.service = service;
         this.xmlParser = xmlParser;
         this.dataLakeDao = dataLakeDao;
-        Gauge.builder(meterName, XML_PUB_DATE, (pub) -> pub.getPubDate().until(DateTimeUtil.uniqueOffsetDateTime(), ChronoUnit.HOURS))
-                .description(meterDesc)
-                .register(meterRegistry);
+        if (StringUtils.isNotBlank(meterName)) {
+            Gauge.builder(meterName, XML_PUB_DATE, (pub) -> pub.getPubDate().until(DateTimeUtil.uniqueOffsetDateTime(), ChronoUnit.HOURS))
+                    .description(meterDesc)
+                    .register(meterRegistry);
+        }
     }
 
     public void execute() {

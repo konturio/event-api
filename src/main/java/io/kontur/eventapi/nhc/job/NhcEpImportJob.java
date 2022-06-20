@@ -12,8 +12,7 @@ public class NhcEpImportJob extends NhcImportJob {
 
     @Autowired
     protected NhcEpImportJob(NhcEpService nhcService, NhcXmlParser nhcXmlParser, MeterRegistry meterRegistry) {
-        super(nhcService, nhcXmlParser, null, meterRegistry,
-                "nhcEpFeedXML", "NHC Eastern Pacific Cyclones feed did not update (hours)");
+        super(nhcService, nhcXmlParser, null, meterRegistry, null, null);
     }
 
     @Override
