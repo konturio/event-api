@@ -40,7 +40,7 @@ konturApps:
   host: 'https://test-apps02.konturlabs.com/'
 
 pdc:
-  host: 'https://testemops.pdc.org'
+  host: 'https://testdisasteraware.pdc.org'
   mapSrvHost: 'https://testapps.pdc.org'
   user: 'eventapi'
   password: 'zvgusf48D'
@@ -75,6 +75,9 @@ nifc:
 
 inciweb:
   host: 'https://inciweb.nwcg.gov'
+
+nhc:
+  host: 'https://www.nhc.noaa.gov'
 
 scheduler:
   hpSrvImport:
@@ -137,6 +140,18 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: PT12H # every 12 hours
+  nhcAtImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1800000
+  nhcCpImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1800000
+  nhcEpImport:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 1800000
   normalization:
     enable: true
     initialDelay: 1000

@@ -15,6 +15,9 @@ import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.job.MetricsJob;
+import io.kontur.eventapi.nhc.job.NhcAtImportJob;
+import io.kontur.eventapi.nhc.job.NhcCpImportJob;
+import io.kontur.eventapi.nhc.job.NhcEpImportJob;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
@@ -55,6 +58,9 @@ class WorkerSchedulerTest {
     private final NifcImportJob nifcImportJob = mock(NifcImportJob.class);
     private final InciWebImportJob inciWebImportJob = mock(InciWebImportJob.class);
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob = mock(HumanitarianCrisisImportJob.class);
+    private final NhcAtImportJob nhcAtImportJob = mock(NhcAtImportJob.class);
+    private final NhcCpImportJob nhcCpImportJob = mock(NhcCpImportJob.class);
+    private final NhcEpImportJob nhcEpImportJob = mock(NhcEpImportJob.class);
     private final MetricsJob metricsJob = mock(MetricsJob.class);
     private final ReEnrichmentJob reEnrichmentJob = mock(ReEnrichmentJob.class);
 
@@ -62,7 +68,8 @@ class WorkerSchedulerTest {
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
             historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob,
-            nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, metricsJob, reEnrichmentJob);
+            nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, nhcAtImportJob, nhcCpImportJob, nhcEpImportJob,
+            metricsJob, reEnrichmentJob);
 
     @AfterEach
     public void resetMocks() {

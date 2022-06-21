@@ -41,6 +41,9 @@ nifc:
 inciweb:
   host: 'https://inciweb.nwcg.gov'
 
+nhc:
+  host: 'https://www.nhc.noaa.gov'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -99,6 +102,18 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
   humanitarianCrisisImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  nhcAtImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  nhcCpImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  nhcEpImport:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999

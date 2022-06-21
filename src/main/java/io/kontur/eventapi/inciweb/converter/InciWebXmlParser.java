@@ -4,23 +4,21 @@ import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
-import io.kontur.eventapi.converter.BaseXmlParser;
-import io.kontur.eventapi.inciweb.dto.ParsedItem;
+import io.kontur.eventapi.cap.converter.CapBaseXmlParser;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedItem;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 @Component
-public class InciWebXmlParser extends BaseXmlParser {
+public class InciWebXmlParser extends CapBaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(InciWebXmlParser.class);
 
@@ -33,22 +31,16 @@ public class InciWebXmlParser extends BaseXmlParser {
     private static final String DESCRIPTION = "description";
     private static final String LINK = "link";
 
-    public Map<String, ParsedItem> getParsedItems(Map<String, String> itemsXml) {
-        Map<String, ParsedItem> parsedItems = new HashMap<>();
-        if (!CollectionUtils.isEmpty(itemsXml)) {
-            for (String itemXml : itemsXml.keySet()) {
-                getParsedItemForDataLake(itemsXml.get(itemXml))
-                        .ifPresent(parsedItem -> parsedItems.put(itemXml, parsedItem));
-            }
-        }
-        return parsedItems;
+    @Override
+    protected Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
+        return super.getXmlDocument(xml);
     }
 
-    public Optional<ParsedItem> getParsedItemForDataLake(String xml) {
-        ParsedItem item = new ParsedItem();
+    public Optional<CapParsedEvent> getParsedItemForDataLake(String xml, String provider) {
+        CapParsedItem item = new CapParsedItem();
         try {
             Document xmlDocument = getXmlDocument(xml);
-            item.setGuid(getValueByTagName(xmlDocument, GUID));
+            item.setGuid(getValueByTagName(xmlDocument, getIdTagName()));
             item.setPubDate(parseDateTimeFromString(getValueByTagName(xmlDocument, PUBDATE)));
             item.setData(xml);
             return Optional.of(item);
@@ -57,10 +49,11 @@ public class InciWebXmlParser extends BaseXmlParser {
                     StringUtils.isNotBlank(item.getGuid()) ? item.getGuid() : "unknown");
             return Optional.empty();
         }
+
     }
 
-    public Optional<ParsedItem> getParsedItem(String xml) {
-        ParsedItem item = new ParsedItem();
+    public Optional<CapParsedItem> getParsedItem(String xml) {
+        CapParsedItem item = new CapParsedItem();
         try {
             Document xmlDocument = getXmlDocument(xml);
             item.setGuid(getValueByTagName(xmlDocument, GUID));

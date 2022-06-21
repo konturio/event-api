@@ -1,6 +1,7 @@
 package io.kontur.eventapi.gdacs.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
@@ -40,26 +41,26 @@ public class GdacsSearchJobTest {
     public void testJob() throws IOException, XPathExpressionException, SAXException, ParserConfigurationException {
         String xml = readMessageFromFile("gdacs_cap.xml");
         Map<String, String> alerts = getAlerts();
-        Map<String, ParsedAlert> parsedAlerts = getParsedAlerts(alerts);
+        Map<String, CapParsedEvent> parsedAlerts = getParsedAlerts(alerts);
         List<DataLake> dataLakes = parsedAlerts.values().stream().map(this::getDataLake).collect(Collectors.toList());
 
-        when(gdacsService.fetchGdacsXml()).thenReturn(Optional.of(xml));
+        when(gdacsService.fetchXml("gdacsSearch")).thenReturn(Optional.of(xml));
         when(gdacsAlertXmlParser.getPubDate(isA(String.class))).thenReturn(getPubDate());
-        when(gdacsAlertXmlParser.getAlerts(isA(String.class))).thenReturn(getAlerts());
-        when(gdacsAlertXmlParser.getParsedAlertsToGdacsSearchJob(anyMap())).thenReturn(parsedAlerts);
-        when(gdacsService.createDataLakeListWithAlertsAndGeometry(anyMap())).thenReturn(dataLakes);
-        doNothing().when(gdacsService).saveGdacs(anyList());
+        when(gdacsAlertXmlParser.getItems(isA(String.class))).thenReturn(getAlerts());
+        when(gdacsAlertXmlParser.getParsedItems(anyMap(), anyString())).thenReturn(parsedAlerts);
+        when(gdacsService.createDataLakes(anyMap(), anyString())).thenReturn(dataLakes);
+        doNothing().when(gdacsService).saveDataLakes(anyList());
 
         GdacsSearchJob gdacsSearchJob = new GdacsSearchJob(gdacsService, gdacsAlertXmlParser, dataLakeDao,
                 new SimpleMeterRegistry());
         assertDoesNotThrow(gdacsSearchJob::run);
 
-        verify(gdacsService, times(1)).fetchGdacsXml();
+        verify(gdacsService, times(1)).fetchXml("gdacsSearch");
         verify(gdacsAlertXmlParser, times(1)).getPubDate(isA(String.class));
-        verify(gdacsAlertXmlParser, times(1)).getAlerts(isA(String.class));
-        verify(gdacsAlertXmlParser, times(1)).getParsedAlertsToGdacsSearchJob(anyMap());
-        verify(gdacsService, times(1)).createDataLakeListWithAlertsAndGeometry(anyMap());
-        verify(gdacsService, times(1)).saveGdacs(anyList());
+        verify(gdacsAlertXmlParser, times(1)).getItems(isA(String.class));
+        verify(gdacsAlertXmlParser, times(1)).getParsedItems(anyMap(), anyString());
+        verify(gdacsService, times(1)).createDataLakes(anyMap(), anyString());
+        verify(gdacsService, times(1)).saveDataLakes(anyList());
 
     }
 
@@ -90,7 +91,7 @@ public class GdacsSearchJobTest {
         );
     }
 
-    private Map<String, ParsedAlert> getParsedAlerts(Map<String, String> alerts) {
+    private Map<String, CapParsedEvent> getParsedAlerts(Map<String, String> alerts) {
         return Map.of(
                 "GDACS_EQ_1243255_1342589", new ParsedAlert(OffsetDateTime.parse("Tue, 10 Nov 2020 06:07:49 GMT",
                         DateTimeFormatter.RFC_1123_DATE_TIME), "GDACS_EQ_1243255_1342589", "1243255",
@@ -103,7 +104,8 @@ public class GdacsSearchJobTest {
                         "EQ", "1342580", alerts.get("GDACS_EQ_1243234_1342580")));
     }
 
-    private DataLake getDataLake(ParsedAlert parsedAlert) {
+    private DataLake getDataLake(CapParsedEvent parsedEvent) {
+        ParsedAlert parsedAlert = (ParsedAlert) parsedEvent;
         DataLake dataLake = new DataLake(UUID.randomUUID(), parsedAlert.getIdentifier(),
                 parsedAlert.getDateModified(), DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setData(parsedAlert.getData());

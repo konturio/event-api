@@ -10,13 +10,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
+import io.kontur.eventapi.cap.dto.CapParsedItem;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.inciweb.converter.InciWebDataLakeConverter;
 import io.kontur.eventapi.inciweb.converter.InciWebXmlParser;
-import io.kontur.eventapi.inciweb.dto.ParsedItem;
+import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.wololo.geojson.Feature;
@@ -41,7 +43,7 @@ class InciWebNormalizationTest {
 
         //then
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
-        assertEquals(InciWebDataLakeConverter.INCIWEB_PROVIDER, observation.getProvider());
+        assertEquals(InciWebImportJob.INCIWEB_PROVIDER, observation.getProvider());
         assertEquals("http://example.com/incident/1/", observation.getExternalEventId());
         assertNull(observation.getExternalEpisodeId());
         assertEquals(Severity.UNKNOWN, observation.getEventSeverity());
@@ -71,8 +73,9 @@ class InciWebNormalizationTest {
     private DataLake createDataLake() throws Exception {
         String data = IOUtils.toString(
                 Objects.requireNonNull(this.getClass().getResourceAsStream("data.xml")), "UTF-8");
-        Optional<ParsedItem> parsedItem = new InciWebXmlParser().getParsedItemForDataLake(data);
+        Optional<CapParsedEvent> parsedItem = new InciWebXmlParser().getParsedItemForDataLake(data, "provider");
         assertTrue(parsedItem.isPresent());
-        return new InciWebDataLakeConverter().convertEvent(parsedItem.get());
+        return new InciWebDataLakeConverter().convertEvent((CapParsedItem) parsedItem.get(),
+                InciWebImportJob.INCIWEB_PROVIDER);
     }
 }

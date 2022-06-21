@@ -17,11 +17,11 @@ class GdacsAlertXmlParserTest {
     public void testNumberOfItems() throws ParserConfigurationException, SAXException, IOException {
         String xml = readMessageFromFile("gdacs.xml");
         int itemsCount = 64;
-        assertEquals(itemsCount, new GdacsAlertXmlParser().getAlerts(xml).size());
+        assertEquals(itemsCount, new GdacsAlertXmlParser().getItems(xml).size());
     }
 
     @Test
-    public void testAlerts() throws IOException, ParserConfigurationException {
+    public void testAlerts() throws IOException {
         Map<String, String> listOfAlerts = Map.of(
                 "GDACS_EQ_1279931_1389192", readMessageFromFile("alert01_valid.xml"),
                 "", readMessageFromFile("alert02_without_identifier.xml"),
@@ -31,7 +31,7 @@ class GdacsAlertXmlParserTest {
         );
 
         int alertCount = 2;
-        assertEquals(alertCount, new GdacsAlertXmlParser().getParsedAlertsToGdacsSearchJob(listOfAlerts).size());
+        assertEquals(alertCount, new GdacsAlertXmlParser().getParsedItems(listOfAlerts, "provider").size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

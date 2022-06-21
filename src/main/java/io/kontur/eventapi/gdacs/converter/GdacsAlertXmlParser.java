@@ -1,7 +1,8 @@
 package io.kontur.eventapi.gdacs.converter;
 
 import feign.FeignException;
-import io.kontur.eventapi.converter.BaseXmlParser;
+import io.kontur.eventapi.cap.converter.CapBaseXmlParser;
+import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import java.util.*;
 import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 @Component
-public class GdacsAlertXmlParser extends BaseXmlParser {
+public class GdacsAlertXmlParser extends CapBaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsAlertXmlParser.class);
 
@@ -46,37 +47,25 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
     private static final String VALUE = "value";
     private static final String VALUE_NAME = "valueName";
 
-    private static final String NS = "*";
 
-    public Map<String, String> getAlerts(String xml) throws IOException, SAXException, ParserConfigurationException {
-        return getItems(xml, ALERT, NS, IDENTIFIER);
-    }
-
-    public Map<String, ParsedAlert> getParsedAlertsToGdacsSearchJob(Map<String, String> alertsXml)
-            throws ParserConfigurationException {
-        Map<String, ParsedAlert> parsedAlerts = new HashMap<>();
-        for (String key : alertsXml.keySet()) {
-            parseAlert(alertsXml.get(key)).ifPresent(alert -> parsedAlerts.put(key, alert));
-        }
-        return parsedAlerts;
-    }
-
-    private Optional<ParsedAlert> parseAlert(String alertXml) throws ParserConfigurationException {
+    @Override
+    public Optional<CapParsedEvent> getParsedItemForDataLake(String xml, String provider) {
+        String externalId = "";
         try {
-            Document xmlDocument = getXmlDocument(alertXml);
+            Document xmlDocument = getXmlDocument(xml);
 
-            String externalId = getValueByTagName(xmlDocument, IDENTIFIER);
+            externalId = getValueByTagName(xmlDocument, IDENTIFIER);
             if (StringUtils.isEmpty(externalId)) {
-                LOG.warn("Alert does not have identifier: \n" +  alertXml);
+                LOG.warn("Alert does not have identifier: \n" +  xml);
                 return Optional.empty();
             }
 
-            NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(NS, PARAMETER);
+            NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(getNamespace(), PARAMETER);
             Set<String> parameterNames = Set.of(DATE_MODIFIED, EVENT_ID, EVENT_TYPE, CURRENT_EPISODE_ID);
             Map<String, String> parameters = parseParameters(parameterNodeList, parameterNames);
 
             if (parameters.values().stream().anyMatch(StringUtils::isEmpty)) {
-                LOG.warn("Alert does not have parameter: \n" +  alertXml);
+                LOG.warn("Alert with id {} does not have parameters", externalId);
                 return Optional.empty();
             }
 
@@ -86,12 +75,14 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
                     parameters.get(EVENT_ID),
                     parameters.get(EVENT_TYPE),
                     parameters.get(CURRENT_EPISODE_ID),
-                    alertXml));
+                    xml));
 
         } catch (IOException | SAXException e) {
-            LOG.warn("Alert is not valid and can not be parsed: \n" + alertXml, e);
+            LOG.warn("Alert is not valid and can not be parsed: id {}", externalId, e);
         } catch (DateTimeParseException e) {
-            LOG.warn("Alert value of parameter 'datemodified' can not be parsed: \n" + alertXml, e);
+            LOG.warn("Alert value of parameter 'datemodified' can not be parsed: id {}", externalId, e);
+        } catch (ParserConfigurationException e) {
+            LOG.warn("Parser configuration error while parse gdacs alert: id {}", externalId, e);
         }
         return Optional.empty();
     }
@@ -107,7 +98,7 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
         parsedAlert.setEvent(getValueByTagName(xmlDocument, EVENT));
         parsedAlert.setSeverity(getValueByTagName(xmlDocument, SEVERITY));
 
-        NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(NS, PARAMETER);
+        NodeList parameterNodeList = xmlDocument.getElementsByTagNameNS(getNamespace(), PARAMETER);
         Set<String> parameterNames = Set.of(EVENT_ID, EVENT_TYPE, CURRENT_EPISODE_ID, FROM_DATE, TO_DATE, LINK,
                 EVENT_NAME, COUNTRY);
         Map<String, String> parameters = parseParameters(parameterNodeList, parameterNames);
@@ -126,6 +117,14 @@ public class GdacsAlertXmlParser extends BaseXmlParser {
 
     protected Map<String, String> parseParameters(NodeList parameterNodes, Set<String> parameterNames) {
         return parseParameters(parameterNodes, parameterNames, VALUE_NAME, VALUE);
+    }
+
+    protected String getItemName() {
+        return ALERT;
+    }
+
+    protected String getIdTagName() {
+        return IDENTIFIER;
     }
 
 }

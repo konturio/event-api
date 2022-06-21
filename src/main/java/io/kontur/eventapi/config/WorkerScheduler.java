@@ -8,6 +8,9 @@ import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.*;
+import io.kontur.eventapi.nhc.job.NhcAtImportJob;
+import io.kontur.eventapi.nhc.job.NhcCpImportJob;
+import io.kontur.eventapi.nhc.job.NhcEpImportJob;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
@@ -50,6 +53,9 @@ public class WorkerScheduler {
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob;
     private final MetricsJob metricsJob;
     private final ReEnrichmentJob reEnrichmentJob;
+    private final NhcAtImportJob nhcAtImportJob;
+    private final NhcCpImportJob nhcCpImportJob;
+    private final NhcEpImportJob nhcEpImportJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -91,6 +97,12 @@ public class WorkerScheduler {
     private String inciwebEnabled;
     @Value("${scheduler.humanitarianCrisisImport.enable}")
     private String humanitarianCrisisEnabled;
+    @Value("${scheduler.nhcAtImport.enable}")
+    private String nhcAtEnabled;
+    @Value("${scheduler.nhcCpImport.enable}")
+    private String nhcCpEnabled;
+    @Value("${scheduler.nhcEpImport.enable}")
+    private String nhcEpEnabled;
     @Value("${scheduler.metrics.enable}")
     private String metricsEnabled;
     @Value("${scheduler.reEnrichment.enable}")
@@ -108,6 +120,7 @@ public class WorkerScheduler {
                            PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
+                           NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
                            MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
@@ -130,6 +143,9 @@ public class WorkerScheduler {
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
         this.inciWebImportJob = inciWebImportJob;
+        this.nhcAtImportJob = nhcAtImportJob;
+        this.nhcCpImportJob = nhcCpImportJob;
+        this.nhcEpImportJob = nhcEpImportJob;
         this.metricsJob = metricsJob;
         this.reEnrichmentJob = reEnrichmentJob;
         this.humanitarianCrisisImportJob = humanitarianCrisisImportJob;
@@ -245,6 +261,27 @@ public class WorkerScheduler {
     public void startHumanitarianCrisisImport() {
         if (Boolean.parseBoolean(humanitarianCrisisEnabled)) {
             humanitarianCrisisImportJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.nhcAtImport.initialDelay}", fixedDelayString = "${scheduler.nhcAtImport.fixedDelay}")
+    public void startNhcAtImport() {
+        if (Boolean.parseBoolean(nhcAtEnabled)) {
+            nhcAtImportJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.nhcCpImport.initialDelay}", fixedDelayString = "${scheduler.nhcCpImport.fixedDelay}")
+    public void startNhcCpImport() {
+        if (Boolean.parseBoolean(nhcCpEnabled)) {
+            nhcCpImportJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.nhcEpImport.initialDelay}", fixedDelayString = "${scheduler.nhcEpImport.fixedDelay}")
+    public void startNhcEpImport() {
+        if (Boolean.parseBoolean(nhcEpEnabled)) {
+            nhcEpImportJob.run();
         }
     }
 
