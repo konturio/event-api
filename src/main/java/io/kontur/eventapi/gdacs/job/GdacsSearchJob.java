@@ -40,7 +40,7 @@ public class GdacsSearchJob extends CapImportJob {
 
     @Override
     protected String getProvider() {
-        return "";
+        return "GDACS";
     }
 }
 

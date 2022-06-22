@@ -3,12 +3,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/test
-          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/test/protocol/openid-connect/certs
-  datasource:
-    url: 'jdbc:postgresql://localhost:5433/postgres'
-  liquibase:
-    change-log: /db/changelog/db.changelog-master.yaml
+          issuer-uri: https://keycloak01.konturlabs.com/auth/realms/dev
+          jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/dev/protocol/openid-connect/certs
 
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
@@ -17,7 +13,7 @@ konturApps:
   host: 'https://test-apps02.konturlabs.com/'
 
 pdc:
-  host: 'https://testdisasteraware.pdc.org'
+  host: 'https://testemops.pdc.org'
   mapSrvHost: 'https://testapps.pdc.org'
 
 humanitarianCrisis:
@@ -26,70 +22,6 @@ humanitarianCrisis:
 staticdata:
   s3Folder: 'TEST DEV/'
 
-emdat:
-  user: 'azapasnik@kontur.io'
-  password: 'AQ9C@7c^'
-
-scheduler:
-  hpSrvImport:
-    enable: false
-  hpSrvMagsImport:
-    enable: false
-  pdcMapSrvSearch:
-    enable: false
-  gdacsImport:
-    enable: false
-    cron: 0 1/2 * * * * # every five minutes after hh:01:00
-  firmsModisImport:
-    enable: false
-  firmsNoaaImport:
-    enable: false
-  firmsSuomiImport:
-    enable: false
-  emDatImport:
-    enable: false
-  staticImport:
-    enable: false
-  stormsNoaaImport:
-    enable: false
-  calfireSearch:
-    enable: false
-    initialDelay: 1000
-  nifcImport:
-    enable: false
-    initialDelay: 1000
-  inciwebImport:
-    enable: false
-    initialDelay: 1000
-  humanitarianCrisisImport:
-    enable: false
-    initialDelay: 1000
-    fixedDelay: 120000
-  nhcAtImport:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 1800000
-  nhcCpImport:
-    enable: true
-    initialDelay: 61000
-    fixedDelay: 1800000
-  nhcEpImport:
-    enable: true
-    initialDelay: 121000
-    fixedDelay: 1800000
-  normalization:
-    enable: false
-  eventCombination:
-    enable: false
-  feedComposition:
-    enable: false
-  enrichment:
-    enable: false
-  reEnrichment:
-    enable: false
-  metrics:
-    enable: false
-
 aws:
   sqs:
-    enabled: false
+    enabled: true
