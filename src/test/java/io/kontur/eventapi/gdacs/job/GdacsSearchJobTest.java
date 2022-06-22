@@ -73,7 +73,7 @@ public class GdacsSearchJobTest {
 
         GdacsSearchJob gdacsSearchJob = new GdacsSearchJob(gdacsService, gdacsAlertXmlParser, dataLakeDao,
                 new SimpleMeterRegistry());
-        Map<String, String> filteredAlerts = gdacsSearchJob.filterExistsAlerts(alerts);
+        Map<String, String> filteredAlerts = gdacsSearchJob.filterItems(alerts);
 
         assertEquals(2, filteredAlerts.size());
     }
