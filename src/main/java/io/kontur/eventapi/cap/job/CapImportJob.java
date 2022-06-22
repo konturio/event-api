@@ -50,7 +50,7 @@ public abstract class CapImportJob extends AbstractJob {
     }
 
     public void execute() {
-        Optional<String> xmlOpt = service.fetchXml(getName());
+        Optional<String> xmlOpt = service.fetchXml(getProvider());
         if (xmlOpt.isPresent()) {
             String xml = xmlOpt.get();
             try {

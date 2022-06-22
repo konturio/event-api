@@ -44,7 +44,7 @@ public class GdacsSearchJobTest {
         Map<String, CapParsedEvent> parsedAlerts = getParsedAlerts(alerts);
         List<DataLake> dataLakes = parsedAlerts.values().stream().map(this::getDataLake).collect(Collectors.toList());
 
-        when(gdacsService.fetchXml("gdacsSearch")).thenReturn(Optional.of(xml));
+        when(gdacsService.fetchXml(anyString())).thenReturn(Optional.of(xml));
         when(gdacsAlertXmlParser.getPubDate(isA(String.class))).thenReturn(getPubDate());
         when(gdacsAlertXmlParser.getItems(isA(String.class))).thenReturn(getAlerts());
         when(gdacsAlertXmlParser.getParsedItems(anyMap(), anyString())).thenReturn(parsedAlerts);
@@ -55,7 +55,7 @@ public class GdacsSearchJobTest {
                 new SimpleMeterRegistry());
         assertDoesNotThrow(gdacsSearchJob::run);
 
-        verify(gdacsService, times(1)).fetchXml("gdacsSearch");
+        verify(gdacsService, times(1)).fetchXml(anyString());
         verify(gdacsAlertXmlParser, times(1)).getPubDate(isA(String.class));
         verify(gdacsAlertXmlParser, times(1)).getItems(isA(String.class));
         verify(gdacsAlertXmlParser, times(1)).getParsedItems(anyMap(), anyString());
