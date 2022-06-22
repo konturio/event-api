@@ -22,7 +22,7 @@ public class GdacsSearchJob extends CapImportJob {
                 "gdacsFeedXML", "Gdacs CAP feed did not update (hours)");
     }
 
-    public Map<String, String> filterExistsAlerts(Map<String, String> alerts) {
+    public Map<String, String> filterItems(Map<String, String> alerts) {
         Map<String, String> filteredAlerts = new HashMap<>();
         Map<String, DataLake> existsDataLakes = new HashMap<>();
         getDataLakeDao().getDataLakesByExternalIds(alerts.keySet())
