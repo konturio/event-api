@@ -9,6 +9,18 @@
 #### Removed
 
 
+## 1.9 - 2022-06-29 - UNRELEASED
+
+#### Added
+
+- Added import cyclones from NHC (enable is set to false until the end of US development)
+
+#### Changed
+
+- Fixed duplicate key unique constraint violation for NIFC and GDACS
+- Changed source URL for FIRMS Modis
+
+
 ## 1.8 - 2022-06-09
 
 #### Changed

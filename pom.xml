@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>event-api</artifactId>
-	<version>1.8-SNAPSHOT</version>
+	<version>1.9-SNAPSHOT</version>
 
 	<name>event-api</name>
 	<description>Kontur Event API</description>
