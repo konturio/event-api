@@ -44,6 +44,12 @@ inciweb:
 nhc:
   host: 'https://www.nhc.noaa.gov'
 
+firms:
+  host: 'https://firms.modaps.eosdis.nasa.gov/data/active_fire'
+  modis: '/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv'
+  suomi: '/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Global_24h.csv'
+  noaa: '/noaa-20-viirs-c2/csv/J1_VIIRS_C2_Global_24h.csv'
+
 scheduler:
   hpSrvImport:
     enable: false
@@ -72,7 +78,7 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
   emDatImport:
-    enable: true
+    enable: false
     initialDelay: 999999
     fixedDelay: 999999
   staticImport:
