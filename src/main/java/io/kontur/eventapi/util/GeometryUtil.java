@@ -38,6 +38,7 @@ public class GeometryUtil {
     public static final String UNKNOWN = "unknown";
 
     public static final String WIND_SPEED_KPH = "windSpeedKph";
+    public static final String WIND_GUSTS_KPH = "windGustsKph";
     public static final String MAGNITUDE = "magnitude";
 
     public static Double calculateAreaKm2(Geometry geometry) {
