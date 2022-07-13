@@ -169,10 +169,10 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
                 .limit(3)
                 .map(prop -> ((Map<String, String>)prop.get("tags")))
                 .map(tags -> {
-                    if (tags.containsKey("int_name")) {
-                        return tags.get("int_name");
-                    } else if (tags.containsKey("name:en")) {
+                    if (tags.containsKey("name:en")) {
                         return tags.get("name:en");
+                    } else if (tags.containsKey("int_name")) {
+                        return tags.get("int_name");
                     } else {
                         return tags.get("name");
                     }
