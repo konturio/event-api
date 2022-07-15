@@ -47,7 +47,7 @@ public class NhcNormalizer extends Normalizer {
     public NormalizedObservation normalize(DataLake dataLakeDto) {
         NhcXmlParser parser = new NhcXmlParser();
         Optional<CapParsedItem> parsedItem = parser.getParsedItem(dataLakeDto.getData());
-        if (parsedItem.isPresent()) {
+        if (parsedItem.isPresent() && StringUtils.isNotBlank(parsedItem.get().getDescription())) {
             NormalizedObservation normalizedObservation = new NormalizedObservation();
 
             normalizedObservation.setObservationId(dataLakeDto.getObservationId());
@@ -60,107 +60,154 @@ public class NhcNormalizer extends Normalizer {
             normalizedObservation.setActive(null);
 
             Map<Integer, Map<Integer, String>> mainMatchers = parser.parseDescription(parsedItem.get().getDescription());
+            try {
+                if (MapUtils.isNotEmpty(mainMatchers) && MapUtils.isNotEmpty(mainMatchers.get(1))) {
+                    Map<Integer, String> mainMatches = mainMatchers.get(1);
+                    Integer currentDay;
+                    Integer currentMonth;
+                    Integer currentYear;
+                    OffsetDateTime currentDateTime;
+                    if (StringUtils.isNotBlank(mainMatches.get(EVENT_ID_POS))
+                            && StringUtils.isNotBlank(mainMatches.get(TYPE_POS))
+                            && StringUtils.isNotBlank(mainMatches.get(NAME_POS))
+                            && StringUtils.isNotBlank(mainMatches.get(ADV_NUMBER_POS)) ) {
+                        normalizedObservation.setExternalEventId(mainMatches.get(EVENT_ID_POS));
+                        normalizedObservation.setName((mainMatches.get(TYPE_POS) != null ? mainMatches.get(TYPE_POS) : "")
+                                + " " + (mainMatches.get(NAME_POS) != null ? mainMatches.get(NAME_POS) : ""));
+                        normalizedObservation.setDescription(mainMatches.get(NEWS_POS));
+                        normalizedObservation.setEpisodeDescription(mainMatches.get(NEWS_POS));
+                        normalizedObservation.setExternalEpisodeId(
+                                (mainMatches.get(EVENT_ID_POS) != null ? mainMatches.get(EVENT_ID_POS) : "") + "_"
+                                        + (mainMatches.get(ADV_NUMBER_POS) != null ? mainMatches.get(ADV_NUMBER_POS) : ""));
+                        normalizedObservation.setProperName(mainMatches.get(NAME_POS));
+                    } else {
+                        LOG.warn("Empty one of the base parameters for NHC cyclone (name, type, id, adv number). {}",
+                                parsedItem.get().getDescription());
+                        return null;
+                    }
+                    if (StringUtils.isNotBlank(mainMatches.get(CURRENT_TIME_POS))) {
+                        try {
+                            String time = mainMatches.get(CURRENT_TIME_POS).trim().replaceAll("UTC", "GMT");
+                            String timeRfc = time.substring(9, 12) + ", " //day of week
+                                    + time.substring(17, 19) + " " // day of month
+                                    + time.substring(13, 16) + " " // month
+                                    + time.substring(20) + " " // year
+                                    + time.substring(0, 2) + ":" + time.substring(2, 4) + ":00 " // time
+                                    + time.substring(5, 8); // timezone
+                            currentDateTime = DateTimeUtil.parseDateTimeFromString(timeRfc);
+                            normalizedObservation.setStartedAt(currentDateTime);
+                            currentDay = currentDateTime.getDayOfMonth();
+                            currentMonth = currentDateTime.getMonthValue();
+                            currentYear = currentDateTime.getYear();
+                        } catch (Exception e) {
+                            LOG.warn("Can't parse current time for NHC cyclone. {}", parsedItem.get().getDescription());
+                            return null;
+                        }
+                    } else {
+                        LOG.warn("Empty current time for NHC cyclone. {}", parsedItem.get().getDescription());
+                        return null;
+                    }
 
-            if (MapUtils.isNotEmpty(mainMatchers) && MapUtils.isNotEmpty(mainMatchers.get(1))) {
-                Map<Integer, String> mainMatches = mainMatchers.get(1);
-                Integer currentDay = null;
-                Integer currentMonth = null;
-                Integer currentYear = null;
-                OffsetDateTime currentDateTime = null;
-                normalizedObservation.setExternalEventId(mainMatches.get(EVENT_ID_POS));
-                normalizedObservation.setName((mainMatches.get(TYPE_POS) != null ? mainMatches.get(TYPE_POS) : "")
-                        + " " + (mainMatches.get(NAME_POS) != null ? mainMatches.get(NAME_POS) : ""));
-                normalizedObservation.setDescription(mainMatches.get(NEWS_POS));
-                normalizedObservation.setEpisodeDescription(mainMatches.get(NEWS_POS));
-                normalizedObservation.setExternalEpisodeId(
-                        (mainMatches.get(EVENT_ID_POS) != null ? mainMatches.get(EVENT_ID_POS) : "") + "_"
-                                + (mainMatches.get(ADV_NUMBER_POS) != null ? mainMatches.get(ADV_NUMBER_POS) : ""));
-                normalizedObservation.setProperName(mainMatches.get(NAME_POS));
-                if (StringUtils.isNotBlank(mainMatches.get(CURRENT_TIME_POS))) {
-                    String time = mainMatches.get(CURRENT_TIME_POS).trim().replaceAll("UTC", "GMT");
-                    String timeRfc = time.substring(9, 12) + ", " //day of week
-                            + time.substring(17, 19) + " " // day of month
-                            + time.substring(13, 16) + " " // month
-                            + time.substring(20) + " " // year
-                            + time.substring(0, 2) + ":" + time.substring(2, 4) + ":00 " // time
-                            + time.substring(5, 8); // timezone
-                    currentDateTime = DateTimeUtil.parseDateTimeFromString(timeRfc);
-                    normalizedObservation.setStartedAt(currentDateTime);
-                    currentDay = currentDateTime.getDayOfMonth();
-                    currentMonth = currentDateTime.getMonthValue();
-                    currentYear = currentDateTime.getYear();
-                }
-
-                Map<Integer, Map<Integer, String>> maxSustainedWind =
-                        parser.parseByPattern(mainMatches.get(MAX_SUSTAINED_WIND_POS), MAX_SUSTAINED_WIND_REGEXP);
-                if (MapUtils.isNotEmpty(maxSustainedWind) &&MapUtils.isNotEmpty(maxSustainedWind.get(1))) {
-                    try {
-                        int maxWind = Integer.parseInt(maxSustainedWind.get(1).get(MAX_WIND_POS));
-                        if (maxWind < SEVERITY_MINOR_MAX_WIND_SPEED) {
-                            normalizedObservation.setEventSeverity(Severity.MINOR);
-                        } else if (maxWind <= SEVERITY_MODERATE_MAX_WIND_SPEED) {
-                            normalizedObservation.setEventSeverity(Severity.MODERATE);
-                        } else if (maxWind <= SEVERITY_SEVERE_MAX_WIND_SPEED) {
-                            normalizedObservation.setEventSeverity(Severity.SEVERE);
+                    Map<Integer, Map<Integer, String>> maxSustainedWind;
+                    if (StringUtils.isNotBlank(mainMatches.get(MAX_SUSTAINED_WIND_POS))) {
+                        maxSustainedWind = parser.parseByPattern(mainMatches.get(MAX_SUSTAINED_WIND_POS),
+                                MAX_SUSTAINED_WIND_REGEXP);
+                        if (MapUtils.isNotEmpty(maxSustainedWind) && MapUtils.isNotEmpty(maxSustainedWind.get(1))) {
+                            try {
+                                int maxWind = Integer.parseInt(maxSustainedWind.get(1).get(MAX_WIND_POS));
+                                if (maxWind < SEVERITY_MINOR_MAX_WIND_SPEED) {
+                                    normalizedObservation.setEventSeverity(Severity.MINOR);
+                                } else if (maxWind <= SEVERITY_MODERATE_MAX_WIND_SPEED) {
+                                    normalizedObservation.setEventSeverity(Severity.MODERATE);
+                                } else if (maxWind <= SEVERITY_SEVERE_MAX_WIND_SPEED) {
+                                    normalizedObservation.setEventSeverity(Severity.SEVERE);
+                                } else {
+                                    normalizedObservation.setEventSeverity(Severity.EXTREME);
+                                }
+                            } catch (Exception e) {
+                                LOG.warn("Can't get max sustained wind speed from {}",
+                                        mainMatches.get(MAX_SUSTAINED_WIND_POS));
+                                return null;
+                            }
                         } else {
-                            normalizedObservation.setEventSeverity(Severity.EXTREME);
+                            LOG.warn("Can't parse max sustained wind for NHC cyclone. {}",
+                                    mainMatches.get(MAX_SUSTAINED_WIND_POS));
+                            return null;
                         }
-                    } catch (Exception e) {
-                        LOG.warn("Can't get max sustained wind speed from {}", maxSustainedWind.get(MAX_WIND_POS));
+                    } else {
+                        LOG.warn("Empty max sustained wind for NHC cyclone. {}", parsedItem.get().getDescription());
+                        return null;
                     }
-                }
-                List<Feature> featuresList = new ArrayList<>();
 
-                // Create geometry for cyclone's center point
-                Map<Integer, Map<Integer, String>> centerPointInfo =
-                        parser.parseByPattern(mainMatches.get(CENTER_POS), CENTER_REGEXP);
-                Optional<Feature> centerPointFeature = prepareFeature(centerPointInfo, maxSustainedWind,
-                        currentDay, currentMonth, currentYear, currentDateTime, CENTER_LAT_POS, CENTER_LONG_POS,
-                        CENTER_DAY_POS, CENTER_HOURS_POS, CENTER_MINUTES_POS, MAX_WIND_POS, MAX_GUSTS_POS, true);
-                centerPointFeature.ifPresent(feature ->
-                        prepareWindSections(parser, maxSustainedWind.get(1), MAX_WIND_64_POS, MAX_WIND_34_POS)
-                        .ifPresent(props -> feature.getProperties().putAll(props)));
-                centerPointFeature.ifPresent(featuresList::add);
+                    List<Feature> featuresList = new ArrayList<>();
 
-                // Create geometries for cyclone's forecast points
-                Map<Integer, Map<Integer, String>> forecastsPointInfo =
-                        parser.parseByPattern(mainMatches.get(FORECAST_POS), FORECAST_REGEXP);
-                if (MapUtils.isNotEmpty(forecastsPointInfo)) {
-                    for (Integer idx : forecastsPointInfo.keySet()) {
-                        Map<Integer, String> forecast = forecastsPointInfo.get(idx);
-                        if (MapUtils.isNotEmpty(forecast)) {
-                            Map<Integer, Map<Integer, String>> forecastInfo =
-                                    parser.parseByPattern(forecast.get(1), WIND_SPEED_REGEXP);
-                            Optional<Feature> forecastFeature = prepareFeature(forecastInfo, forecastInfo,
-                                    currentDay, currentMonth, currentYear, currentDateTime, FORECAST_LAT_POS,
-                                    FORECAST_LONG_POS, FORECAST_DAY_POS, FORECAST_HOURS_POS, FORECAST_MINUTES_POS,
-                                    FORECAST_WIND_POS, FORECAST_GUSTS_POS, false);
-                            forecastFeature.ifPresent(feature ->
-                                    prepareWindSections(parser, forecastInfo.get(1), FORECAST_64_POS, FORECAST_34_POS)
-                                            .ifPresent(props -> feature.getProperties().putAll(props)));
-                            forecastFeature.ifPresent(featuresList::add);
+                    // Create geometry for cyclone's center point
+                    if (StringUtils.isNotBlank(mainMatches.get(CENTER_POS))) {
+                        Map<Integer, Map<Integer, String>> centerPointInfo =
+                                parser.parseByPattern(mainMatches.get(CENTER_POS), CENTER_REGEXP);
+                        Optional<Feature> centerPointFeature = prepareFeature(centerPointInfo, maxSustainedWind,
+                                currentDay, currentMonth, currentYear, currentDateTime, CENTER_LAT_POS, CENTER_LONG_POS,
+                                CENTER_DAY_POS, CENTER_HOURS_POS, CENTER_MINUTES_POS, MAX_WIND_POS, MAX_GUSTS_POS,
+                                true);
+                        if (centerPointFeature.isEmpty()) {
+                            LOG.warn("Can't parse center location point for NHC cyclone. {}",
+                                    mainMatches.get(CENTER_POS));
+                            return null;
                         }
+                        centerPointFeature.ifPresent(feature ->
+                                prepareWindSections(parser, maxSustainedWind.get(1), MAX_WIND_64_POS, MAX_WIND_34_POS)
+                                        .ifPresent(props -> feature.getProperties().putAll(props)));
+                        centerPointFeature.ifPresent(featuresList::add);
+                    } else {
+                        LOG.warn("Empty center location point for NHC cyclone. {}", parsedItem.get().getDescription());
+                        return null;
                     }
-                }
-
-                // Create geometries for cyclone's outlook points
-                Map<Integer, Map<Integer, String>> outlookPointInfo =
-                        parser.parseByPattern(mainMatches.get(OUTLOOK_POS), OUTLOOK_REGEXP);
-                if (MapUtils.isNotEmpty(outlookPointInfo)) {
-                    for (Integer idx : outlookPointInfo.keySet()) {
-                        Map<Integer, String> outlook = outlookPointInfo.get(idx);
-                        if (MapUtils.isNotEmpty(outlook)) {
-                            Map<Integer, Map<Integer, String>> outlookInfo =
-                                    parser.parseByPattern(outlook.get(1), WIND_SPEED_REGEXP);
-                            Optional<Feature> outlookFeature = prepareFeature(outlookInfo, outlookInfo,
-                                    currentDay, currentMonth, currentYear, currentDateTime, FORECAST_LAT_POS,
-                                    FORECAST_LONG_POS, FORECAST_DAY_POS, FORECAST_HOURS_POS, FORECAST_MINUTES_POS,
-                                    FORECAST_WIND_POS, FORECAST_GUSTS_POS, false);
-                            outlookFeature.ifPresent(featuresList::add);
+                    // Create geometries for cyclone's forecast points
+                    Map<Integer, Map<Integer, String>> forecastsPointInfo =
+                            parser.parseByPattern(mainMatches.get(FORECAST_POS), FORECAST_REGEXP);
+                    if (MapUtils.isNotEmpty(forecastsPointInfo)) {
+                        for (Integer idx : forecastsPointInfo.keySet()) {
+                            Map<Integer, String> forecast = forecastsPointInfo.get(idx);
+                            if (MapUtils.isNotEmpty(forecast)) {
+                                Map<Integer, Map<Integer, String>> forecastInfo =
+                                        parser.parseByPattern(forecast.get(1), WIND_SPEED_REGEXP);
+                                Optional<Feature> forecastFeature = prepareFeature(forecastInfo, forecastInfo,
+                                        currentDay, currentMonth, currentYear, currentDateTime, FORECAST_LAT_POS,
+                                        FORECAST_LONG_POS, FORECAST_DAY_POS, FORECAST_HOURS_POS, FORECAST_MINUTES_POS,
+                                        FORECAST_WIND_POS, FORECAST_GUSTS_POS, false);
+                                forecastFeature.ifPresent(feature ->
+                                        prepareWindSections(parser, forecastInfo.get(1), FORECAST_64_POS, FORECAST_34_POS)
+                                                .ifPresent(props -> feature.getProperties().putAll(props)));
+                                forecastFeature.ifPresent(featuresList::add);
+                            }
                         }
                     }
+
+                    // Create geometries for cyclone's outlook points
+                    Map<Integer, Map<Integer, String>> outlookPointInfo =
+                            parser.parseByPattern(mainMatches.get(OUTLOOK_POS), OUTLOOK_REGEXP);
+                    if (MapUtils.isNotEmpty(outlookPointInfo)) {
+                        for (Integer idx : outlookPointInfo.keySet()) {
+                            Map<Integer, String> outlook = outlookPointInfo.get(idx);
+                            if (MapUtils.isNotEmpty(outlook)) {
+                                Map<Integer, Map<Integer, String>> outlookInfo =
+                                        parser.parseByPattern(outlook.get(1), WIND_SPEED_REGEXP);
+                                Optional<Feature> outlookFeature = prepareFeature(outlookInfo, outlookInfo,
+                                        currentDay, currentMonth, currentYear, currentDateTime, FORECAST_LAT_POS,
+                                        FORECAST_LONG_POS, FORECAST_DAY_POS, FORECAST_HOURS_POS, FORECAST_MINUTES_POS,
+                                        FORECAST_WIND_POS, FORECAST_GUSTS_POS, false);
+                                outlookFeature.ifPresent(featuresList::add);
+                            }
+                        }
+                    }
+                    normalizedObservation.setGeometries(new FeatureCollection(featuresList.toArray(new Feature[0])));
+                } else {
+                    LOG.warn("Can't parse description for NHC cyclone. {}", parsedItem.get().getDescription());
+                    return null;
                 }
-                normalizedObservation.setGeometries(new FeatureCollection(featuresList.toArray(new Feature[0])));
+            } catch (Exception e) {
+                LOG.warn("Error while parsing NHC cyclone's description {}", parsedItem.get().getDescription());
+                return null;
             }
             return normalizedObservation;
         } else {
