@@ -34,14 +34,14 @@ public class NhcNormalizationTest {
 
     @Test
     public void testIsApplicable() throws Exception {
-        DataLake dataLake = createDataLake();
+        DataLake dataLake = createDataLake("nhc_norm_test1.xml", NhcUtil.NHC_AT_PROVIDER);
         assertTrue(new NhcNormalizer().isApplicable(dataLake));
     }
 
     @Test
-    public void testNormalization() throws Exception {
+    public void testNormalization1() throws Exception {
         //given
-        DataLake dataLake = createDataLake();
+        DataLake dataLake = createDataLake("nhc_norm_test1.xml", NhcUtil.NHC_EP_PROVIDER);
 
         //when
         NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
@@ -61,12 +61,188 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP5+shtml/112045.shtml"), observation.getUrls());
         assertNull(observation.getPoint());
-        checkGeometriesValue(observation.getGeometries());
+        checkGeometriesValue(observation.getGeometries(), 9);
     }
 
-    private void checkGeometriesValue(FeatureCollection geom) {
+    @Test
+    public void testNormalization2() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test2.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+        assertEquals(NhcUtil.NHC_AT_PROVIDER, observation.getProvider());
+        assertEquals("AL022022", observation.getExternalEventId());
+        assertEquals("AL022022_1", observation.getExternalEpisodeId());
+        assertEquals(Severity.MODERATE, observation.getEventSeverity());
+        assertEquals("POTENTIAL TROPICAL CYCLONE TWO", observation.getName());
+        assertEquals("A TROPICAL STORM WARNING IS IN EFFECT FOR.", observation.getDescription());
+        assertEquals(EventType.CYCLONE, observation.getType());
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2022-06-27T21:00:00Z", null), observation.getStartedAt());
+        assertNull(observation.getEndedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMAT2+shtml/272045.shtml"), observation.getUrls());
+        assertNull(observation.getPoint());
+        checkGeometriesValue(observation.getGeometries(), 9);
+    }
+
+    @Test
+    public void testNormalization4() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test4.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+        assertEquals(NhcUtil.NHC_AT_PROVIDER, observation.getProvider());
+        assertEquals("AL022022", observation.getExternalEventId());
+        assertEquals("AL022022_3", observation.getExternalEpisodeId());
+        assertEquals(Severity.MODERATE, observation.getEventSeverity());
+        assertEquals("POTENTIAL TROPICAL CYCLONE TWO", observation.getName());
+        assertEquals("CHANGES IN WATCHES AND WARNINGS WITH THIS ADVISORY...", observation.getDescription());
+        assertEquals(EventType.CYCLONE, observation.getType());
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2022-06-28T09:00:00Z", null), observation.getStartedAt());
+        assertNull(observation.getEndedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMAT2+shtml/DDHHMM.shtml"), observation.getUrls());
+        assertNull(observation.getPoint());
+        checkGeometriesValue(observation.getGeometries(), 9);
+    }
+
+    @Test
+    public void testNormalization5() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test5.xml", NhcUtil.NHC_EP_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+        assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider());
+        assertEquals("EP032022", observation.getExternalEventId());
+        assertEquals("EP032022_19", observation.getExternalEpisodeId());
+        assertEquals(Severity.MINOR, observation.getEventSeverity());
+        assertEquals("TROPICAL DEPRESSION CELIA", observation.getName());
+        assertEquals("THERE ARE NO COASTAL WATCHES OR WARNINGS IN EFFECT.", observation.getDescription());
+        assertEquals(EventType.CYCLONE, observation.getType());
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2022-06-21T09:00:00Z", null), observation.getStartedAt());
+        assertNull(observation.getEndedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP3+shtml/DDHHMM.shtml"), observation.getUrls());
+        assertNull(observation.getPoint());
+        checkGeometriesValue(observation.getGeometries(), 9);
+    }
+
+    @Test
+    public void testNormalization6() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test6.xml", NhcUtil.NHC_EP_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+        assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider());
+        assertEquals("EP032022", observation.getExternalEventId());
+        assertEquals("EP032022_43", observation.getExternalEpisodeId());
+        assertEquals(Severity.MODERATE, observation.getEventSeverity());
+        assertEquals("TROPICAL STORM CELIA", observation.getName());
+        assertEquals("THERE ARE NO COASTAL WATCHES OR WARNINGS IN EFFECT.", observation.getDescription());
+        assertEquals(EventType.CYCLONE, observation.getType());
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2022-06-27T09:00:00Z", null), observation.getStartedAt());
+        assertNull(observation.getEndedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP3+shtml/270852.shtml"), observation.getUrls());
+        assertNull(observation.getPoint());
+        checkGeometriesValue(observation.getGeometries(), 6);
+    }
+
+    @Test
+    public void testNormalizationNegativeType() throws Exception {
+        //given - type is absent
+        DataLake dataLake = createDataLake("nhc_norm_test_neg1.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertNull(observation);
+    }
+
+    @Test
+    public void testNormalizationNegativeName() throws Exception {
+        //given - name is absent
+        DataLake dataLake = createDataLake("nhc_norm_test_neg2.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertNull(observation);
+    }
+
+    @Test
+    public void testNormalizationNegativeAdvisoryNumber() throws Exception {
+        //given - advisory number is absent
+        DataLake dataLake = createDataLake("nhc_norm_test_neg3.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertNull(observation);
+    }
+
+    @Test
+    public void testNormalizationNegativeId() throws Exception {
+        //given - event id is absent
+        DataLake dataLake = createDataLake("nhc_norm_test_neg4.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertNull(observation);
+    }
+
+    @Test
+    public void testNormalizationNegativeMaxWind() throws Exception {
+        //given - event id is absent
+        DataLake dataLake = createDataLake("nhc_norm_test_neg5.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertNull(observation);
+    }
+
+    @Test
+    public void testNormalizationNegativeCenterLocation() throws Exception {
+        //given - event id is absent
+        DataLake dataLake = createDataLake("nhc_norm_test_neg6.xml", NhcUtil.NHC_AT_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertNull(observation);
+    }
+
+    private void checkGeometriesValue(FeatureCollection geom, Integer expectedCount) {
         assertNotNull(geom);
-        assertEquals(9, geom.getFeatures().length);
+        assertEquals(expectedCount, geom.getFeatures().length);
         Feature feature = geom.getFeatures()[0];
         assertTrue(feature.getGeometry() instanceof Point);
         assertEquals(1, Arrays.stream(geom.getFeatures())
@@ -75,13 +251,13 @@ public class NhcNormalizationTest {
                 .filter(Boolean.TRUE::equals).toList().size());
     }
 
-    private DataLake createDataLake() throws Exception {
+    private DataLake createDataLake(String fileName, String provider) throws Exception {
         String data = IOUtils.toString(
-                Objects.requireNonNull(this.getClass().getResourceAsStream("nhc_norm_test1.xml")), "UTF-8");
-        Optional<CapParsedEvent> parsedItem = new NhcXmlParser().getParsedItemForDataLake(data, NhcUtil.NHC_EP_PROVIDER);
+                Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
+        Optional<CapParsedEvent> parsedItem = new NhcXmlParser().getParsedItemForDataLake(data, provider);
         assertTrue(parsedItem.isPresent());
         return new NhcDataLakeConverter().convertEvent((CapParsedItem) parsedItem.get(),
-                NhcUtil.NHC_EP_PROVIDER);
+                provider);
     }
 
 }
