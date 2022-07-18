@@ -25,6 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -135,6 +136,13 @@ public class FeedCompositionJob extends AbstractJob {
                 .filter(e -> !isEmpty(e.getLocation()))
                 .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getLocation).orElse(null));
+
+        feedData.setLatestSeverity(episodes.stream()
+                .max(comparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getSeverity).orElse(null));
+
+        feedData.setSeverities(new ArrayList<>(episodes.stream()
+                .map(FeedEpisode::getSeverity).distinct().collect(toList())));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
