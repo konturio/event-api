@@ -29,6 +29,8 @@ public class FeedData {
     private String location;
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
+    private Severity latestSeverity;
+    private List<Severity> severities;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;
