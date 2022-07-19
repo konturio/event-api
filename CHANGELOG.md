@@ -4,8 +4,6 @@
 
 #### Added
 
-- Added `severities` and `latest_severity` columns into `feed_data`
-
 #### Changed
 
 #### Removed

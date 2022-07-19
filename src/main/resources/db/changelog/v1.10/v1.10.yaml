@@ -1,5 +1,0 @@
-## Database Changelog
-databaseChangeLog:
-  - include:
-      relativeToChangelogFile: true
-      file: add-feed-data-severities-columns.sql
