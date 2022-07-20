@@ -18,6 +18,7 @@ import static io.kontur.eventapi.util.GeometryUtil.*;
 import static java.lang.Math.abs;
 import static java.util.stream.Collectors.toMap;
 import static org.jpmml.evaluator.EvaluatorUtil.decodeAll;
+import static org.locationtech.jts.operation.buffer.BufferOp.bufferOp;
 
 @Component
 public class LossPostProcessor extends EnrichmentPostProcessor {
@@ -73,6 +74,7 @@ public class LossPostProcessor extends EnrichmentPostProcessor {
         return Arrays.stream(fc.getFeatures())
                 .filter(feature -> allowedAreaTypes.contains(String.valueOf(feature.getProperties().get(AREA_TYPE_PROPERTY))))
                 .map(feature -> geoJSONReader.read(feature.getGeometry()))
+                .map(geom -> bufferOp(geom, 0))
                 .collect(Collectors.toCollection(HashSet::new));
     }
 
