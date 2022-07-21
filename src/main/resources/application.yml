@@ -147,15 +147,15 @@ scheduler:
     initialDelay: 1000
     fixedDelay: PT12H # every 12 hours
   nhcAtImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 1800000
   nhcCpImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 1800000
   nhcEpImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 1800000
   normalization:
