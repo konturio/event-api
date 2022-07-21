@@ -100,7 +100,7 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
   nifcImport:
-    enable: true
+    enable: false
     initialDelay: 999999
     fixedDelay: 999999
   inciwebImport:
