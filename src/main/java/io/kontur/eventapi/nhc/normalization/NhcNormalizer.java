@@ -240,8 +240,10 @@ public class NhcNormalizer extends Normalizer {
                     currentMonth, currentYear, dayPos, hoursPos, minutesPos);
             dateTime.ifPresent(value -> {
                 properties.put(TIMESTAMP_PROPERTY, value);
-                properties.put(FORECAST_HRS_PROPERTY,
-                        Duration.between(currentDateTime, value).toHours());
+                if (Boolean.FALSE.equals(isObserved) && Duration.between(currentDateTime, value).toHours() > 0) {
+                    properties.put(FORECAST_HRS_PROPERTY,
+                            Duration.between(currentDateTime, value).toHours());
+                }
             });
 
             return Optional.of(new Feature(point, properties));
