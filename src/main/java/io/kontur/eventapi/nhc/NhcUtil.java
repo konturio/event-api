@@ -14,17 +14,17 @@ public final class NhcUtil {
 
     public static final String MAIN_REGEXP = "(.*?) (TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE) (.*?)? (?=(FORECAST\\/ADVISORY))FORECAST\\/ADVISORY NUMBER ([0-9]{1,}).*((AL[0-9]{6})|(EP[0-9]{6})) ([0-9]{4} \\w{3} \\w{3} \\w{3} [0-9]{2} [0-9]{4}) (.*) (TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE) (CENTER LOCATED NEAR .*) (MAX SUSTAINED WINDS.*) (REPEAT.*?)( FORECAST VALID .*?)?( EXTENDED OUTLOOK.*?)?( OUTLOOK VALID .*?)?( REQUEST .*)";
 
-    public static final String CENTER_REGEXP = "CENTER LOCATED NEAR ([0-9]*\\.[0-9]*N|S) ([0-9]*\\.[0-9]*W|E) AT ([0-9]{2})\\/([0-9]{2})([0-9]{2})Z";
+    public static final String CENTER_REGEXP = "CENTER LOCATED NEAR\\s*([0-9]*\\.[0-9]*N|S)\\s*([0-9]*\\.[0-9]*W|E) AT ([0-9]{2})\\/([0-9]{2})([0-9]{2})Z";
 
-    public static final String MAX_SUSTAINED_WIND_REGEXP = "MAX SUSTAINED WINDS ([0-9]*) KT WITH GUSTS TO ([0-9]*) KT\\.( 64 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 50 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 34 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 12 FT SEAS\\.*[0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?";
+    public static final String MAX_SUSTAINED_WIND_REGEXP = "MAX SUSTAINED WINDS\\s*([0-9]*) KT WITH GUSTS TO\\s*([0-9]*) KT\\.(\\s*64 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*50 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*34 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*12 FT SEAS\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?";
 
-    public static final String FORECAST_REGEXP = "(FORECAST VALID [0-9]{2}\\/[0-9]{4}Z [0-9\\.]{1,}[N|S] [0-9\\.]{1,}[W|E]?.*?MAX WIND [0-9\\.]{1,} KT.*?GUSTS [0-9\\.]{1,} KT\\.( 64 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 50 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 34 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 12 FT SEAS\\.*[0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?)";
+    public static final String FORECAST_REGEXP = "(FORECAST VALID\\s*[0-9]{2}\\/[0-9]{4}Z\\s*[0-9\\.]{1,}[N|S]\\s*[0-9\\.]{1,}[W|E]?.*?MAX WIND\\s*[0-9\\.]{1,} KT.*?GUSTS\\s*[0-9\\.]{1,} KT\\.(\\s*64 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*50 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*34 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*12 FT SEAS\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?)";
 
-    public static final String OUTLOOK_REGEXP = "(OUTLOOK VALID [0-9]{2}\\/[0-9]{4}Z [0-9\\.]{1,}[N|S] [0-9\\.]{1,}[W|E].*?MAX WIND.*?[0-9\\.]{1,} KT.*?GUSTS [0-9\\.]{1,} KT\\.)";
+    public static final String OUTLOOK_REGEXP = "(OUTLOOK VALID\\s*[0-9]{2}\\/[0-9]{4}Z\\s*[0-9\\.]{1,}[N|S]\\s*[0-9\\.]{1,}[W|E].*?MAX WIND.*?[0-9\\.]{1,} KT.*?GUSTS\\s*[0-9\\.]{1,} KT\\.)";
 
-    public static final String WIND_SPEED_REGEXP = "([0-9]{2})\\/([0-9]{2})([0-9]{2})Z ([0-9\\.]{1,}[N|S])? ([0-9\\.]{1,}[W|E])?.*?MAX WIND ([0-9\\.]{1,})? KT.*?GUSTS ([0-9\\.]{1,}) KT\\.( 64 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 50 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 34 KT\\.* [0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?( 12 FT SEAS\\.*[0-9]*NE [0-9]*SE [0-9]*SW [0-9]*NW\\.)?";
+    public static final String WIND_SPEED_REGEXP = "([0-9]{2})\\/([0-9]{2})([0-9]{2})Z\\s*([0-9\\.]{1,}[N|S])?\\s*([0-9\\.]{1,}[W|E])?.*?MAX WIND\\s*([0-9\\.]{1,})? KT.*?GUSTS\\s*([0-9\\.]{1,}) KT\\.(\\s*64 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*50 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*34 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*12 FT SEAS\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?";
 
-    public static final String WIND_SECTIONS_REGEXP = "(64|50|34) KT\\.* ([0-9]*)NE ([0-9]*)SE ([0-9]*)SW ([0-9]*)NW";
+    public static final String WIND_SECTIONS_REGEXP = "(64|50|34) KT\\.*\\s*([0-9]*)NE\\s*([0-9]*)SE\\s*([0-9]*)SW\\s*([0-9]*)NW";
 
     public static final int SEVERITY_MINOR_MAX_WIND_SPEED = 33;
     public static final int SEVERITY_MODERATE_MAX_WIND_SPEED = 63;
