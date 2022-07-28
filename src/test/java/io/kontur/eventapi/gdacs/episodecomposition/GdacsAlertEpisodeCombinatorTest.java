@@ -10,6 +10,7 @@ import org.wololo.geojson.GeoJSONFactory;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -36,11 +37,11 @@ class GdacsAlertEpisodeCombinatorTest {
         NormalizedObservation geometryObservation = createObservation(GDACS_ALERT_GEOMETRY_PROVIDER, geometries);
         FeedData feedData = new FeedData(UUID.randomUUID(), UUID.randomUUID(), 1L);
 
-        Optional<FeedEpisode> feedEpisodeOpt = episodeCombinator.processObservation(alertObservation,
+        Optional<List<FeedEpisode>> feedEpisodeOpt = episodeCombinator.processObservation(alertObservation,
                 feedData, Set.of(alertObservation, geometryObservation));
 
         assertTrue(feedEpisodeOpt.isPresent());
-        FeedEpisode feedEpisode = feedEpisodeOpt.get();
+        FeedEpisode feedEpisode = feedEpisodeOpt.get().get(0);
         assertEquals(2, feedEpisode.getObservations().size());
         assertTrue(feedEpisode.getObservations().contains(alertObservation.getObservationId()));
         assertTrue(feedEpisode.getObservations().contains(geometryObservation.getObservationId()));

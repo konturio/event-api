@@ -1,0 +1,11 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: create-collect-cyclone-geometry-function.sql
+  - include:
+      relativeToChangelogFile: true
+      file: insert-nhc-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-nhc-to-kontur-public-feed.sql

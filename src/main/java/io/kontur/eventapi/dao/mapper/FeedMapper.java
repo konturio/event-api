@@ -32,7 +32,8 @@ public interface FeedMapper {
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,
                        @Param("urls") List<String> urls,
-                       @Param("location") String location);
+                       @Param("location") String location,
+                       @Param("geomFuncType") Integer geomFuncType);
 
     /**
      * Mark events below specified version outdated

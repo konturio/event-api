@@ -6,6 +6,7 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -32,7 +33,7 @@ class GdacsGeometryEpisodeCombinatorTest {
         NormalizedObservation geometryObservation = createObservation(GDACS_ALERT_GEOMETRY_PROVIDER);
         FeedData feedData = new FeedData(UUID.randomUUID(), UUID.randomUUID(), 1L);
 
-        Optional<FeedEpisode> feedEpisodeOpt = episodeCombinator.processObservation(geometryObservation,
+        Optional<List<FeedEpisode>> feedEpisodeOpt = episodeCombinator.processObservation(geometryObservation,
                 feedData, Set.of(alertObservation, geometryObservation));
 
         assertTrue(feedEpisodeOpt.isEmpty());

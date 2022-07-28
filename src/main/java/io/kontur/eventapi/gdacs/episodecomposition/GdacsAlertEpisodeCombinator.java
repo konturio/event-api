@@ -30,7 +30,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData event, Set<NormalizedObservation> eventObservations) {
+    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData event, Set<NormalizedObservation> eventObservations) {
         if (event.getEpisodes().size() > 0) return Optional.empty();
 
         Map.Entry<NormalizedObservation, NormalizedObservation> observations = checkObservationsAndGetLatest(eventObservations, event);
@@ -38,18 +38,20 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
         NormalizedObservation alertObservation = observations.getKey();
         NormalizedObservation geometryObservation = observations.getValue();
 
-        Optional<FeedEpisode> episode = createDefaultEpisode(alertObservation);
+        Optional<List<FeedEpisode>> episode = createDefaultEpisode(alertObservation);
         episode.ifPresent(ep -> {
-            ep.setObservations(findObservationsForEpisode(eventObservations));
-            ep.setGeometries(geometryObservation.getGeometries());
-            if (!CollectionUtils.isEmpty(geometryObservation.getUrls())) {
-                ep.addUrlIfNotExists(geometryObservation.getUrls());
-            }
-            if (isBlank(ep.getProperName())) {
-                ep.setProperName(geometryObservation.getProperName());
-            }
-            if (isBlank(ep.getLocation())) {
-                ep.setLocation(geometryObservation.getRegion());
+            if (!CollectionUtils.isEmpty(ep)) {
+                ep.get(0).setObservations(findObservationsForEpisode(eventObservations));
+                ep.get(0).setGeometries(geometryObservation.getGeometries());
+                if (!CollectionUtils.isEmpty(geometryObservation.getUrls())) {
+                    ep.get(0).addUrlIfNotExists(geometryObservation.getUrls());
+                }
+                if (isBlank(ep.get(0).getProperName())) {
+                    ep.get(0).setProperName(geometryObservation.getProperName());
+                }
+                if (isBlank(ep.get(0).getLocation())) {
+                    ep.get(0).setLocation(geometryObservation.getRegion());
+                }
             }
         });
         return episode;

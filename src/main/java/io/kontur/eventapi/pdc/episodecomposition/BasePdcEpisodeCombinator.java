@@ -21,6 +21,7 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import liquibase.repackaged.org.apache.commons.collections4.CollectionUtils;
 import org.bouncycastle.util.Arrays;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -29,7 +30,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
 
     protected static final long TIME_RANGE_IN_SEC = 90;
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
+    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData,
                                                     Set<NormalizedObservation> eventObservations) {
         if (episodeExistsForObservation(feedData.getEpisodes(), observation)) {
             return Optional.empty();
@@ -37,16 +38,16 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(eventObservations,
                 observation.getSourceUpdatedAt());
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
-        Optional<FeedEpisode> episode = createDefaultEpisode(latestObservation);
-        if (episode.isPresent()) {
-            episode.get().setStartedAt(findEpisodeStartedAt(episodeObservations));
-            episode.get().setEndedAt(findEpisodeEndedAt(episodeObservations));
-            episode.get().setUpdatedAt(findEpisodeUpdatedAt(episodeObservations));
-            episode.get().setObservations(mapObservationsToIDs(episodeObservations));
-            episode.get().setGeometries(computeEpisodeGeometries(episodeObservations));
-            episode.get().setName(
+        Optional<List<FeedEpisode>> episode = createDefaultEpisode(latestObservation);
+        if (episode.isPresent() && CollectionUtils.isNotEmpty(episode.get())) {
+            episode.get().get(0).setStartedAt(findEpisodeStartedAt(episodeObservations));
+            episode.get().get(0).setEndedAt(findEpisodeEndedAt(episodeObservations));
+            episode.get().get(0).setUpdatedAt(findEpisodeUpdatedAt(episodeObservations));
+            episode.get().get(0).setObservations(mapObservationsToIDs(episodeObservations));
+            episode.get().get(0).setGeometries(computeEpisodeGeometries(episodeObservations));
+            episode.get().get(0).setName(
                     findLatestEpisodeObservationWithName(episodeObservations).orElse(latestObservation).getName());
-            episode.get().setDescription(
+            episode.get().get(0).setDescription(
                     findLatestEpisodeObservationWithDescription(episodeObservations).orElse(latestObservation)
                             .getDescription());
         }

@@ -21,8 +21,16 @@
                                enrichment_attempts, urls, location)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{startedAt}, #{endedAt},
                 #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
-                #{episodes}::jsonb, true, #{enriched}, collectEventGeometries(#{episodes}::jsonb), 0,
-                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
+                #{episodes}::jsonb, true, #{enriched},
+                <choose>
+                    <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
+                        collectcyclonegeometries(#{episodes}::jsonb),
+                    </when>
+                    <otherwise>
+                        collectEventGeometries(#{episodes}::jsonb),
+                    </otherwise>
+                </choose>
+                0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
     </insert>
 
     <update id="markOutdatedEventsVersions">

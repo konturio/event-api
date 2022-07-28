@@ -7,6 +7,7 @@ import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,12 +21,12 @@ import static io.kontur.eventapi.emdat.jobs.EmDatImportJob.EM_DAT_PROVIDER;
 public class EmDatEpisodeCombinator extends EpisodeCombinator {
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         OffsetDateTime latestLoadedAt = eventObservations
                 .stream()
                 .map(NormalizedObservation::getLoadedAt)
                 .max(OffsetDateTime::compareTo)
-                .get();
+                .orElse(null);
         return observation.getLoadedAt().equals(latestLoadedAt) ? createDefaultEpisode(observation) : Optional.empty();
     }
 
