@@ -23,8 +23,10 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static io.kontur.eventapi.entity.Severity.UNKNOWN;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -135,6 +137,17 @@ public class FeedCompositionJob extends AbstractJob {
                 .filter(e -> !isEmpty(e.getLocation()))
                 .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getLocation).orElse(null));
+
+        boolean noKnownSeverity = episodes.stream().allMatch(ep -> ep.getSeverity() == null || ep.getSeverity() == UNKNOWN);
+        feedData.setLatestSeverity(episodes.stream()
+                .filter(ep -> ep.getSeverity() != null && (noKnownSeverity || ep.getSeverity() != UNKNOWN))
+                .max(comparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getSeverity).orElse(null));
+
+        feedData.setSeverities(new ArrayList<>(episodes.stream()
+                .map(FeedEpisode::getSeverity)
+                .filter(Objects::nonNull)
+                .distinct().collect(toList())));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

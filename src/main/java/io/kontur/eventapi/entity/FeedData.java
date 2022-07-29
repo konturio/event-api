@@ -1,5 +1,6 @@
 package io.kontur.eventapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.wololo.geojson.FeatureCollection;
 
@@ -30,6 +31,10 @@ public class FeedData {
     private String location;
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
+    @JsonIgnore
+    private Severity latestSeverity;
+    @JsonIgnore
+    private List<Severity> severities;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;

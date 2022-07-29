@@ -18,7 +18,7 @@
     <insert id="insertFeedData" useGeneratedKeys="false">
         insert into feed_data (event_id, feed_id, version, name, proper_name, description, started_at, ended_at,
                                updated_at, observations, episodes, is_latest_version, enriched, geometries,
-                               enrichment_attempts, urls, location)
+                               enrichment_attempts, urls, location, latest_severity, severities)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{startedAt}, #{endedAt},
                 #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 #{episodes}::jsonb, true, #{enriched},
@@ -30,7 +30,8 @@
                         collectEventGeometries(#{episodes}::jsonb),
                     </otherwise>
                 </choose>
-                0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
+                0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location},
+                #{latestSeverity}, #{severities, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
     </insert>
 
     <update id="markOutdatedEventsVersions">

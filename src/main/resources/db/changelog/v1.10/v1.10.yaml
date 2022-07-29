@@ -1,0 +1,26 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: add-feed-data-severities-columns.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-severity-values-for-latest-event-versions-2021-01-01.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-severity-values-for-latest-event-versions-2021-04-01.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-severity-values-for-latest-event-versions-2021-07-01.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-severity-values-for-latest-event-versions-2021-10-01.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-severity-values-for-latest-event-versions-2022-01-01.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-severity-values-for-latest-event-versions-2022-04-01.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-severity-values-for-latest-event-versions-after-2022-04-01.sql
