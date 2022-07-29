@@ -4,11 +4,20 @@
 
 #### Added
 
+#### Changed
+
+#### Removed
+
+
+## 1.10 - 2022-07-29
+
+#### Added
+
 - Added `severities` and `latest_severity` columns into `feed_data`
 
 #### Changed
 
-#### Removed
+- Get english names for admin boundaries
 
 
 ## 1.9 - 2022-06-29
