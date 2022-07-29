@@ -150,6 +150,7 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
             } catch (Exception e) {
                 episode.setStartedAt(obs.getStartedAt());
             }
+            episode.setEndedAt(episode.getStartedAt());
 
             // Create alert areas from point
             List<Feature> featureList = new ArrayList<>();

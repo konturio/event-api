@@ -168,9 +168,8 @@ public class FeedCompositionJob extends AbstractJob {
 
     private void addEpisode(FeedData feedData, FeedEpisode episode) {
         checkNotNull(episode.getStartedAt());
-        if (episode.getEndedAt() != null) {
-            checkState(!episode.getStartedAt().isAfter(episode.getEndedAt()));
-        }
+        checkNotNull(episode.getEndedAt());
+        checkState(!episode.getStartedAt().isAfter(episode.getEndedAt()));
 
         feedData.addEpisode(episode);
     }

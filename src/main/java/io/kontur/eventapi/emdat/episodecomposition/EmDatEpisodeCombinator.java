@@ -22,12 +22,12 @@ public class EmDatEpisodeCombinator extends EpisodeCombinator {
 
     @Override
     public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        OffsetDateTime latestLoadedAt = eventObservations
+        Optional<OffsetDateTime> latestLoadedAt = eventObservations
                 .stream()
                 .map(NormalizedObservation::getLoadedAt)
-                .max(OffsetDateTime::compareTo)
-                .orElse(null);
-        return observation.getLoadedAt().equals(latestLoadedAt) ? createDefaultEpisode(observation) : Optional.empty();
+                .max(OffsetDateTime::compareTo);
+        return (latestLoadedAt.isPresent() && observation.getLoadedAt().equals(latestLoadedAt.get()))
+                ? createDefaultEpisode(observation) : Optional.empty();
     }
 
     @Override
