@@ -20,14 +20,17 @@ databaseChangeLog:
     - relativeToChangelogFile: true
     - file: v1.2/v1.2.yaml
   - include:
-      - relativeToChangelogFile: true
-      - file: v1.3/v1.3.yaml
+    - relativeToChangelogFile: true
+    - file: v1.3/v1.3.yaml
   - include:
-      - relativeToChangelogFile: true
-      - file: v1.5/v1.5.yaml
+    - relativeToChangelogFile: true
+    - file: v1.5/v1.5.yaml
   - include:
-      - relativeToChangelogFile: true
-      - file: v1.5.1/v1.5.1.yaml
+    - relativeToChangelogFile: true
+    - file: v1.5.1/v1.5.1.yaml
   - include:
-      - relativeToChangelogFile: true
-      - file: v1.6/v1.6.yaml
+    - relativeToChangelogFile: true
+    - file: v1.6/v1.6.yaml
+  - include:
+    - relativeToChangelogFile: true
+    - file: v1.10/v1.10.yaml

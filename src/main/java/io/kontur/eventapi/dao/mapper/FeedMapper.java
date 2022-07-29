@@ -32,7 +32,9 @@ public interface FeedMapper {
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,
                        @Param("urls") List<String> urls,
-                       @Param("location") String location);
+                       @Param("location") String location,
+                       @Param("latestSeverity") Severity latestSeverity,
+                       @Param("severities") List<Severity> severities);
 
     /**
      * Mark events below specified version outdated
