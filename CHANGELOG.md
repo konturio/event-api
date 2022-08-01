@@ -6,6 +6,9 @@
 
 #### Changed
 
+- Update requests to use `latest_severity` and `severities` columns as filter
+- Update records with unknown latest severity to use the latest known severity
+
 #### Removed
 
 

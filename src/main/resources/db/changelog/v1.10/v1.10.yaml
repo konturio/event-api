@@ -24,3 +24,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: update-severity-values-for-latest-event-versions-after-2022-04-01.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-unknown-severity-values.sql
