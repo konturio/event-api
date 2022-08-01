@@ -5,7 +5,7 @@
 drop function if exists collectcyclonegeometries;
 
 create function collectcyclonegeometries(jsonb) returns jsonb
-    immutable
+    volatile
     strict
     parallel safe
     language sql
