@@ -19,7 +19,7 @@ public class CalFireEpisodeCombinator extends WildfireEpisodeCombinator {
     }
 
     @Override
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         return createDefaultEpisode(observation);
     }
 }

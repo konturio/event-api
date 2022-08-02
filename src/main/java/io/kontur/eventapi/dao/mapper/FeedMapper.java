@@ -34,7 +34,8 @@ public interface FeedMapper {
                        @Param("urls") List<String> urls,
                        @Param("location") String location,
                        @Param("latestSeverity") Severity latestSeverity,
-                       @Param("severities") List<Severity> severities);
+                       @Param("severities") List<Severity> severities,
+                       @Param("geomFuncType") Integer geomFuncType);
 
     /**
      * Mark events below specified version outdated

@@ -42,7 +42,8 @@ public class FeedDao {
                 feedData.getName(), feedData.getProperName(), feedData.getDescription(),
                 feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls(),
-                feedData.getLocation(), feedData.getLatestSeverity(), feedData.getSeverities());
+                feedData.getLocation(), feedData.getLatestSeverity(), feedData.getSeverities(),
+                feedData.getGeomFuncType());
 
         mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);

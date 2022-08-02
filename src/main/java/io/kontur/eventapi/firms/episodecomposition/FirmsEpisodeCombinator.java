@@ -61,7 +61,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     @Override
     @Counted(value = "firmsEpisodeCombinator.processObservation.counter")
     @Timed(value = "firmsEpisodeCombinator.processObservation.timer")
-    public Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Set<FeedEpisode> existingEpisodeForObservation = feedData.getEpisodes()
                 .stream()
                 .filter(ep -> ep.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt()))
@@ -70,7 +70,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         FeedEpisode feedEpisode = getOnlyElement(existingEpisodeForObservation, new FeedEpisode());
         populateMissedFields(feedEpisode, observation, feedData, eventObservations);
 
-        return existingEpisodeForObservation.isEmpty() ? Optional.of(feedEpisode) : Optional.empty();
+        return existingEpisodeForObservation.isEmpty() ? Optional.of(List.of(feedEpisode)) : Optional.empty();
     }
 
     private void populateMissedFields(FeedEpisode episode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {

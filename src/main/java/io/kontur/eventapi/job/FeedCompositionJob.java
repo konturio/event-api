@@ -153,20 +153,23 @@ public class FeedCompositionJob extends AbstractJob {
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
-            Optional<FeedEpisode> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
-            feedEpisode.ifPresent(episode -> {
-                if (episode.getStartedAt().isAfter(episode.getEndedAt())) {
-                    OffsetDateTime startedAt = episode.getStartedAt();
-                    episode.setStartedAt(episode.getEndedAt());
-                    addEpisode(feedData, episode);
+            Optional<List<FeedEpisode>> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
+            feedEpisode.ifPresent(episodes -> {
+                for (FeedEpisode episode : episodes) {
+                    if (episode.getStartedAt() != null && episode.getEndedAt() != null
+                            && episode.getStartedAt().isAfter(episode.getEndedAt())) {
+                        OffsetDateTime startedAt = episode.getStartedAt();
+                        episode.setStartedAt(episode.getEndedAt());
+                        addEpisode(feedData, episode);
 
-                    FeedEpisode newEpisode = new FeedEpisode();
-                    BeanUtils.copyProperties(episode, newEpisode);
-                    newEpisode.setStartedAt(startedAt);
-                    newEpisode.setEndedAt(startedAt);
-                    addEpisode(feedData, newEpisode);
-                } else {
-                    addEpisode(feedData, episode);
+                        FeedEpisode newEpisode = new FeedEpisode();
+                        BeanUtils.copyProperties(episode, newEpisode);
+                        newEpisode.setStartedAt(startedAt);
+                        newEpisode.setEndedAt(startedAt);
+                        addEpisode(feedData, newEpisode);
+                    } else {
+                        addEpisode(feedData, episode);
+                    }
                 }
             });
         });

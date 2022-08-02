@@ -22,6 +22,7 @@ public class FeedData {
     private Set<UUID> observations = new HashSet<>();
     private List<FeedEpisode> episodes = new ArrayList<>();
     private FeatureCollection geometries;
+    private Integer geomFuncType;
     private Map<String, Object> eventDetails;
     private Boolean enriched;
     private Long enrichmentAttempts;

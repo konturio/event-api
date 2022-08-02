@@ -21,9 +21,17 @@
                                enrichment_attempts, urls, location, latest_severity, severities)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{startedAt}, #{endedAt},
                 #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
-                #{episodes}::jsonb, true, #{enriched}, collectEventGeometries(#{episodes}::jsonb), 0,
-                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location}, #{latestSeverity},
-                #{severities, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
+                #{episodes}::jsonb, true, #{enriched},
+                <choose>
+                    <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
+                        collectcyclonegeometries(#{episodes}::jsonb),
+                    </when>
+                    <otherwise>
+                        collectEventGeometries(#{episodes}::jsonb),
+                    </otherwise>
+                </choose>
+                0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location},
+                #{latestSeverity}, #{severities, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -196,7 +204,5 @@
         <result property="location" column="location"/>
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>
-        <result property="severities" column="severities" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
-        <result property="latestSeverity" column="latest_severity"/>
     </resultMap>
 </mapper>

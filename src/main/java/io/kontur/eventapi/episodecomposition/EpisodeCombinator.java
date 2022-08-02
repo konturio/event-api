@@ -19,13 +19,15 @@ import java.util.UUID;
 
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
 
+    protected static final Integer COMMON_GEOMETRY_FUNCTION = 0;
+    protected static final Integer NHC_GEOMETRY_FUNCTION = 1;
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
         return episodes;
     }
 
-    public abstract Optional<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);
+    public abstract Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);
 
-    protected Optional<FeedEpisode> createDefaultEpisode(NormalizedObservation observation) {
+    protected Optional<List<FeedEpisode>> createDefaultEpisode(NormalizedObservation observation) {
         FeedEpisode feedEpisode = new FeedEpisode();
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
@@ -47,7 +49,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
             feedEpisode.setGeometries(observation.getGeometries());
         }
 
-        return Optional.of(feedEpisode);
+        return Optional.of(List.of(feedEpisode));
     }
 
     protected boolean episodeExistsForObservation(List<FeedEpisode> eventEpisodes, NormalizedObservation observation) {

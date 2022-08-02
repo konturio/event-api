@@ -29,6 +29,9 @@ public final class NhcUtil {
     public static final int SEVERITY_MINOR_MAX_WIND_SPEED = 33;
     public static final int SEVERITY_MODERATE_MAX_WIND_SPEED = 63;
     public static final int SEVERITY_SEVERE_MAX_WIND_SPEED = 82;
+    public static final double SEVERITY_MINOR_MAX_WIND_SPEED_KPH = 61.12;
+    public static final double SEVERITY_MODERATE_MAX_WIND_SPEED_KPH = 116.68;
+    public static final double SEVERITY_SEVERE_MAX_WIND_SPEED_KPH = 151.86;
     public static final Integer TYPE_POS = 2;
     public static final Integer NAME_POS = 3;
     public static final Integer ADV_NUMBER_POS = 5;
