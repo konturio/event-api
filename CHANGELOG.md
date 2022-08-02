@@ -4,11 +4,23 @@
 
 #### Added
 
+#### Changed
+
+- Update requests to use `latest_severity` and `severities` columns as filter
+- Update records with unknown latest severity to use the latest known severity
+
+#### Removed
+
+
+## 1.10 - 2022-07-29
+
+#### Added
+
 - Added `severities` and `latest_severity` columns into `feed_data`
 
 #### Changed
 
-#### Removed
+- Get english names for admin boundaries
 
 
 ## 1.9 - 2022-06-29

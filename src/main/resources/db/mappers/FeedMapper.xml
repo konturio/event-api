@@ -71,24 +71,14 @@
             </if>
             <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
                 <if test='"ANY".equalsIgnoreCase(episodeFilterType)'>
-                    and exists(select from jsonb_array_elements(episodes) arr(episode) where
-                    <foreach item="severity" collection="severities" separator="," open="episode ->> 'severity' in (" close=")">
-                        #{severity}
+                    <foreach item="severity" collection="severities" separator="," open="and severities &amp;&amp; array[" close="]">
+                        #{severity}::text
                     </foreach>
-                    )
                 </if>
                 <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                    and exists (
-                        with latest_episode as (
-                            select episode as ep from jsonb_array_elements(episodes) episode
-                            order by (episode ->> 'updatedAt')::timestamptz desc
-                            limit 1
-                        )
-                        select * from latest_episode where
-                        <foreach item="severity" collection="severities" separator="," open="ep ->> 'severity' in (" close=")">
-                            #{severity}
-                        </foreach>
-                    )
+                    <foreach item="severity" collection="severities" separator="," open="and latest_severity in (" close=")">
+                        #{severity}::text
+                    </foreach>
                 </if>
             </if>
             <if test='from != null'>
