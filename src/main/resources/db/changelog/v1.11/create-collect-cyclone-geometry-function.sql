@@ -52,7 +52,7 @@ $$
                         select
                             (ST_DumpPoints(ST_Segmentize(ST_MakeLine(ST_Force3DM(p.geom,
                                 greatest((p.props ->> '34_kt_NE')::float, (p.props ->> '34_kt_NW')::float,
-                                        (p.props ->> '34_kt_SE')::float, (p.props ->> '34_kt_SW')::float)))::geography,
+                                        (p.props ->> '34_kt_SE')::float, (p.props ->> '34_kt_SW')::float)::float))::geography,
                                 1000)::geometry)).*
                         from
                             positions p
@@ -78,7 +78,7 @@ $$
                         select
                             (ST_DumpPoints(ST_Segmentize(ST_MakeLine(ST_Force3DM(p.geom,
                                 greatest((p.props ->> '50_kt_NE')::float, (p.props ->> '50_kt_NW')::float,
-                                        (p.props ->> '50_kt_SE')::float, (p.props ->> '50_kt_SW')::float)))::geography,
+                                        (p.props ->> '50_kt_SE')::float, (p.props ->> '50_kt_SW')::float)::float))::geography,
                                 1000)::geometry)).*
                         from
                             positions p
@@ -104,7 +104,7 @@ $$
                         select
                             (ST_DumpPoints(ST_Segmentize(ST_MakeLine(ST_Force3DM(p.geom,
                                 greatest((p.props ->> '64_kt_NE')::float, (p.props ->> '64_kt_NW')::float,
-                                        (p.props ->> '64_kt_SE')::float, (p.props ->> '64_kt_SW')::float)))::geography,
+                                        (p.props ->> '64_kt_SE')::float, (p.props ->> '64_kt_SW')::float)::float))::geography,
                                 1000)::geometry)).*
                         from
                             positions p
