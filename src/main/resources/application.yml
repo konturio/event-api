@@ -197,7 +197,7 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public-v1, test-calfire, test-nifc, test-inciweb, test-loss, test-nhc
+    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public-v1, test-calfire, test-nifc, test-inciweb, test-loss, test-cyclone
     firmsAlias: test-firms, kontur-public
   enrichment:
     enable: true

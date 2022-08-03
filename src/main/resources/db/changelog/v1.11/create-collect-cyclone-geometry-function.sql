@@ -50,10 +50,17 @@ $$
                 from
                     (
                         select
-                            (ST_DumpPoints(ST_Segmentize(ST_MakeLine(ST_Force3DM(p.geom,
-                                greatest((p.props ->> '34_kt_NE')::float, (p.props ->> '34_kt_NW')::float,
-                                        (p.props ->> '34_kt_SE')::float, (p.props ->> '34_kt_SW')::float)::float))::geography,
-                                1000)::geometry)).*
+                            (ST_DumpPoints(ST_Segmentize(
+                                ST_MakeLine(
+                                        ST_SetSRID(ST_MakePointM(ST_X(p.geom), ST_Y(p.geom),
+                                             greatest(coalesce(p.props ->> '34_kt_NE', '0')::float,
+                                                      coalesce(p.props ->> '34_kt_NW', '0')::float,
+                                                      coalesce(p.props ->> '34_kt_SE', '0')::float,
+                                                      coalesce(p.props ->> '34_kt_SW', '0')::float,
+                                                      0::float)::float * 1000),
+                                        ST_SRID(geom))
+                                )::geography,
+                            1000)::geometry)).*
                         from
                             positions p
                     ) z
@@ -76,10 +83,17 @@ $$
                 from
                     (
                         select
-                            (ST_DumpPoints(ST_Segmentize(ST_MakeLine(ST_Force3DM(p.geom,
-                                greatest((p.props ->> '50_kt_NE')::float, (p.props ->> '50_kt_NW')::float,
-                                        (p.props ->> '50_kt_SE')::float, (p.props ->> '50_kt_SW')::float)::float))::geography,
-                                1000)::geometry)).*
+                            (ST_DumpPoints(ST_Segmentize(
+                                ST_MakeLine(
+                                        ST_SetSRID(ST_MakePointM(ST_X(geom), ST_Y(geom),
+                                             greatest(coalesce(p.props ->> '50_kt_NE', '0')::float,
+                                                      coalesce(p.props ->> '50_kt_NW', '0')::float,
+                                                      coalesce(p.props ->> '50_kt_SE', '0')::float,
+                                                      coalesce(p.props ->> '50_kt_SW', '0')::float,
+                                                      0::float)::float * 1000),
+                                        ST_SRID(geom))
+                                )::geography,
+                            1000)::geometry)).*
                         from
                             positions p
                     ) z
@@ -102,10 +116,17 @@ $$
                 from
                     (
                         select
-                            (ST_DumpPoints(ST_Segmentize(ST_MakeLine(ST_Force3DM(p.geom,
-                                greatest((p.props ->> '64_kt_NE')::float, (p.props ->> '64_kt_NW')::float,
-                                        (p.props ->> '64_kt_SE')::float, (p.props ->> '64_kt_SW')::float)::float))::geography,
-                                1000)::geometry)).*
+                            (ST_DumpPoints(ST_Segmentize(
+                                ST_MakeLine(
+                                    ST_SetSRID(ST_MakePointM(ST_X(geom), ST_Y(geom),
+                                        greatest(coalesce(p.props ->> '64_kt_NE', '0')::float,
+                                                 coalesce(p.props ->> '64_kt_NW', '0')::float,
+                                                 coalesce(p.props ->> '64_kt_SE', '0')::float,
+                                                 coalesce(p.props ->> '64_kt_SW', '0')::float,
+                                                 0::float)::float * 1000),
+                                    ST_SRID(geom))
+                                )::geography,
+                            1000)::geometry)).*
                         from
                             positions p
                     ) z
