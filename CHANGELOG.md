@@ -8,6 +8,7 @@
 
 #### Removed
 
+- Removed validation if bbox crosses antimeridian
 
 ## 1.10.1 - 2022-08-03
 
