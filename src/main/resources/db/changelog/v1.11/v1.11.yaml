@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: insert-nhc-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-index-to-feed-data-for-filter-by-bbox.sql
