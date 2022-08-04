@@ -4,6 +4,9 @@
 
 #### Added
 
+- Created index on `feed_data` table `feed_data_feed_id_latest_severity_collected_geometry_idx` 
+  to speed up requests with bbox filter
+
 #### Changed
 
 #### Removed
