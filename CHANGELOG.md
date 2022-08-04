@@ -9,6 +9,8 @@
 
 #### Changed
 
+- Updated the logic of episode composition for `kontur.events` to create episodes on change
+
 #### Removed
 
 - Removed validation if bbox crosses antimeridian
