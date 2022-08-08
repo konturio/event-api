@@ -131,7 +131,7 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
             Map<String, Object> props = pointFeature.getProperties();
             double windSpeed;
             try {
-                windSpeed = Double.parseDouble(String.valueOf(props.get(WIND_SPEED_KPH)));
+                windSpeed = Double.parseDouble(String.valueOf(props.get(WIND_SPEED_KPH))) / 1.852;
                 if (windSpeed < SEVERITY_MINOR_MAX_WIND_SPEED) {
                     episode.setSeverity(Severity.MINOR);
                 } else if (windSpeed <= SEVERITY_MODERATE_MAX_WIND_SPEED) {
