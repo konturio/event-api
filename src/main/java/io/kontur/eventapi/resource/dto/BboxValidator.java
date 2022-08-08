@@ -22,12 +22,6 @@ public class BboxValidator implements ConstraintValidator<ValidBbox, List<BigDec
                     .addConstraintViolation();
             return false;
         }
-        boolean b = checkLon(bbox.get(0)) && checkLat(bbox.get(1)) && checkLon(bbox.get(2)) && checkLat(bbox.get(3));
-        if (!b) {
-            ctx.buildConstraintViolationWithTemplate("bbox coordinates doesn't conform to WGS84 coordinate system")
-                    .addConstraintViolation();
-            return false;
-        }
 
         return true;
     }
