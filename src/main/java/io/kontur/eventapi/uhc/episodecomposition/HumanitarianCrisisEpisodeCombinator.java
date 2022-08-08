@@ -35,12 +35,12 @@ public class HumanitarianCrisisEpisodeCombinator extends EpisodeCombinator {
 
         List<NormalizedObservation> episodeObservations = findEpisodeObservations(observationsNotLinkedToEpisode);
 
-        Optional<List<FeedEpisode>> episodeOpt = createDefaultEpisode(episodeObservations.get(0));
+        NormalizedObservation latestEpisodeObservation = findLatestEpisodeObservation(new HashSet<>(episodeObservations));
+        Optional<List<FeedEpisode>> episodeOpt = createDefaultEpisode(latestEpisodeObservation);
         episodeOpt.ifPresent(episode -> {
             episode.get(0).setStartedAt(findEpisodeStartedAt(feedData.getEpisodes(), episodeObservations));
-            NormalizedObservation latestEpisodeObservation = findLatestEpisodeObservation(new HashSet<>(episodeObservations));
-            episode.get(0).setSourceUpdatedAt(latestEpisodeObservation.getSourceUpdatedAt());
             episode.get(0).setEndedAt(latestEpisodeObservation.getSourceUpdatedAt());
+            episode.get(0).setUpdatedAt(latestEpisodeObservation.getSourceUpdatedAt());
             episode.get(0).setObservations(episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
         });
 
