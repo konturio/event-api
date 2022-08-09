@@ -31,10 +31,8 @@ public class FeedData {
     private String location;
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
-    @JsonIgnore
     private Severity latestSeverity;
-    @JsonIgnore
-    private List<Severity> severities;
+    private List<Severity> severities = new ArrayList<>();
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;

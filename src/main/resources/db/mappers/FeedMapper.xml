@@ -31,7 +31,7 @@
                     </otherwise>
                 </choose>
                 0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location},
-                #{latestSeverity}, #{severities, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
+                #{latestSeverity}, #{severities, typeHandler=io.kontur.eventapi.typehandler.SeverityArrayTypeHandler})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -47,7 +47,7 @@
     <select id="searchForEvents" resultMap="feedDataDtoMap">
         select event_id, feed_id, version, name, proper_name, description, started_at, ended_at, updated_at, observations,
                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
-               composed_at, enriched_at,
+               composed_at, enriched_at, latest_severity, severities,
         <choose>
             <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                 jsonb_build_array((
@@ -204,5 +204,7 @@
         <result property="location" column="location"/>
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>
+        <result property="latestSeverity" column="latest_severity"/>
+        <result property="severities" column="severities" typeHandler="io.kontur.eventapi.typehandler.SeverityArrayTypeHandler"/>
     </resultMap>
 </mapper>
