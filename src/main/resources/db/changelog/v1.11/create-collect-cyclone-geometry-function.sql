@@ -28,13 +28,13 @@ $$
         where f.geom is not null
     ),
     trackline as (
-        select jsonb_build_object('area_type', 'track', 'wind_speed_kmph', p.props ->> 'windSpeedKph', 'isObserved',
-            (LEAD(p.props) OVER(ORDER BY (p.props ->> 'timestamp'))) ->> 'isObserved'),
+        select jsonb_build_object('areaType', 'track', 'windSpeedKph', (p.props ->> 'windSpeedKph')::numeric, 'isObserved',
+            ((LEAD(p.props) OVER(ORDER BY (p.props ->> 'timestamp'))) ->> 'isObserved')::boolean),
                ST_MakeLine(p.geom, LEAD(p.geom) OVER(ORDER BY (p.props ->> 'timestamp'))) AS geom
         from positions p
     ),
     alerts34 as (
-        select jsonb_build_object('area_type', 'alertArea', 'wind_speed_kmph', '62') as props, ST_Union(y.geom) as geom
+        select jsonb_build_object('areaType', 'alertArea', 'windSpeedKph', 62) as props, ST_Union(y.geom) as geom
         from
             (
                 select
@@ -67,7 +67,7 @@ $$
             ) y
     ),
     alerts50 as (
-        select jsonb_build_object('area_type', 'alertArea', 'wind_speed_kmph', '92') as props, ST_Union(y.geom) as geom
+        select jsonb_build_object('areaType', 'alertArea', 'windSpeedKph', 92) as props, ST_Union(y.geom) as geom
         from
             (
                 select
@@ -100,7 +100,7 @@ $$
             ) y
     ),
     alerts64 as (
-        select jsonb_build_object('area_type', 'alertArea', 'wind_speed_kmph', '118') as props, ST_Union(y.geom) as geom
+        select jsonb_build_object('areaType', 'alertArea', 'windSpeedKph', 118) as props, ST_Union(y.geom) as geom
         from
             (
                 select
