@@ -32,17 +32,26 @@ import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.util.DateTimeUtil;
 import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.measure.Measure;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
-import org.wololo.geojson.Point;
+import org.wololo.jts2geojson.GeoJSONReader;
 import org.wololo.jts2geojson.GeoJSONWriter;
+import si.uom.SI;
 
 @Component
 public class NhcEpisodeCombinator extends EpisodeCombinator {
@@ -51,6 +60,7 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
 
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
+    private final GeoJSONReader geoJSONReader = new GeoJSONReader();
 
     @Override
     public boolean isApplicable(NormalizedObservation observation) {
@@ -186,13 +196,12 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
             bufferLen.add(Double.parseDouble(String.valueOf(props.get(level + "_kt_NW"))));
         }
         if (!CollectionUtils.isEmpty(bufferLen)) {
-            double length = bufferLen.stream().max(Double::compareTo).orElse(Double.MIN_VALUE);
-            Point point = (Point) sourceFeature.getGeometry();
-            GeometryFactory factory = new GeometryFactory();
-            org.locationtech.jts.geom.Point destPoint =
-                    factory.createPoint(new Coordinate(point.getCoordinates()[0], point.getCoordinates()[1]));
-            org.locationtech.jts.geom.Polygon polygon = (org.locationtech.jts.geom.Polygon) destPoint.buffer(length);
+            double distance = bufferLen.stream().max(Double::compareTo).orElse(Double.MIN_VALUE) * 1000;
+            Measure distanceMeasure = new Measure(distance, SI.METRE);
+            Point point = (Point) geoJSONReader.read(sourceFeature.getGeometry());
             try {
+                Geometry polygon = bufferPoint(distanceMeasure, point);
+
                 Map<String, Object> properties = new HashMap<>();
                 properties.put(AREA_TYPE_PROPERTY, ALERT_AREA);
                 properties.put(IS_OBSERVED_PROPERTY, props.get(IS_OBSERVED_PROPERTY));
@@ -235,5 +244,17 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
             prev.setEndedAt(prev.getStartedAt());
         }
         return episodes;
+    }
+
+    public Geometry bufferPoint(Measure distance, Geometry point) throws TransformException, FactoryException {
+        String code = "AUTO:42001," + point.getCoordinate().x + "," + point.getCoordinate().y;
+        CoordinateReferenceSystem auto = CRS.decode(code);
+
+        MathTransform toTransform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, auto);
+        MathTransform fromTransform = CRS.findMathTransform(auto, DefaultGeographicCRS.WGS84);
+
+        Geometry transformedPoint = JTS.transform(point, toTransform);
+        Geometry polygon = transformedPoint.buffer(distance.doubleValue());
+        return JTS.transform(polygon, fromTransform);
     }
 }
