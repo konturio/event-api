@@ -4,8 +4,18 @@
 
 #### Added
 
+#### Changed
+
+#### Removed
+
+
+## 1.11 - 2022-08-16
+
+#### Added
+
 - Created index on `feed_data` table `feed_data_feed_id_latest_severity_collected_geometry_idx` 
   to speed up requests with bbox filter
+- NHC cyclones feed composition
 
 #### Changed
 
