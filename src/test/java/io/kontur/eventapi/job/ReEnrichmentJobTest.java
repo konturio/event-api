@@ -73,7 +73,7 @@ class ReEnrichmentJobTest {
 
         when(feedDao.getFeeds()).thenReturn(List.of(feedWithEnrichment, feedWithoutEnrichment));
         when(feedDao.getEnrichmentSkippedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(skippedEvent));
-        doNothing().when(feedDao).addAnalytics(any());
+        doNothing().when(feedDao).addAnalytics(any(), any());
         when(longKonturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(longKonturAppsClient, feedDao, postProcessors, enrichmentSuccess, enrichmentFail);
         ReEnrichmentJob reEnrichmentJob = new ReEnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
@@ -83,7 +83,7 @@ class ReEnrichmentJobTest {
         verify(longKonturAppsClient, times(2)).graphql(isA(InsightsApiRequest.class));
         verify(feedDao, times(1)).getEnrichmentSkippedEventsForFeed(feedWithEnrichment.getFeedId());
         verify(feedDao, times(0)).getEnrichmentSkippedEventsForFeed(feedWithoutEnrichment.getFeedId());
-        verify(feedDao, times(1)).addAnalytics(any());
+        verify(feedDao, times(1)).addAnalytics(any(), any());
     }
 
     @Test
@@ -92,7 +92,7 @@ class ReEnrichmentJobTest {
 
         when(feedDao.getFeeds()).thenReturn(List.of(feedWithEnrichment, feedWithoutEnrichment));
         when(feedDao.getEnrichmentSkippedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(skippedEvent));
-        doNothing().when(feedDao).addAnalytics(any());
+        doNothing().when(feedDao).addAnalytics(any(), any());
         when(longKonturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createErrorResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(longKonturAppsClient, feedDao, postProcessors, enrichmentSuccess, enrichmentFail);
         ReEnrichmentJob reEnrichmentJob = new ReEnrichmentJob(new SimpleMeterRegistry(), feedDao, enrichmentTask);
@@ -102,7 +102,7 @@ class ReEnrichmentJobTest {
         verify(longKonturAppsClient, times(2)).graphql(isA(InsightsApiRequest.class));
         verify(feedDao, times(1)).getEnrichmentSkippedEventsForFeed(feedWithEnrichment.getFeedId());
         verify(feedDao, times(0)).getEnrichmentSkippedEventsForFeed(feedWithoutEnrichment.getFeedId());
-        verify(feedDao, times(1)).addAnalytics(any());
+        verify(feedDao, times(1)).addAnalytics(any(), any());
     }
 
     private FeedData createFeedData(Feed feed) {

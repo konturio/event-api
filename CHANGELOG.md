@@ -4,6 +4,8 @@
 
 #### Added
 
+- Redis caching for /v1 endpoint
+
 #### Changed
 
 #### Removed

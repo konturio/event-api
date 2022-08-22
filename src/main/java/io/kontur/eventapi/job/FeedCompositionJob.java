@@ -90,7 +90,7 @@ public class FeedCompositionJob extends AbstractJob {
 
             feedData.setEnriched(feed.getEnrichment().isEmpty());
 
-            feedDao.insertFeedData(feedData);
+            feedDao.insertFeedData(feedData, feed.getAlias());
         } catch (Exception e) {
             LOG.error(
                     String.format("Error while processing event with id = '%s', for '%s' feed. Error: %s", eventId.toString(),

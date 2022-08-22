@@ -69,7 +69,7 @@ public class EnrichmentJobTest {
 
         when(feedDao.getFeeds()).thenReturn(List.of(feedWithEnrichment, feedWithoutEnrichment));
         when(feedDao.getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(notEnrichedFeedData));
-        doNothing().when(feedDao).addAnalytics(any());
+        doNothing().when(feedDao).addAnalytics(any(), any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors,
                 enrichmentSuccess, enrichmentFail);
@@ -80,7 +80,7 @@ public class EnrichmentJobTest {
         verify(konturAppsClient, times(2)).graphql(isA(InsightsApiRequest.class));
         verify(feedDao, times(1)).getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId());
         verify(feedDao, times(0)).getNotEnrichedEventsForFeed(feedWithoutEnrichment.getFeedId());
-        verify(feedDao, times(1)).addAnalytics(any());
+        verify(feedDao, times(1)).addAnalytics(any(), any());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class EnrichmentJobTest {
 
         when(feedDao.getFeeds()).thenReturn(List.of(feedWithEnrichment, feedWithoutEnrichment));
         when(feedDao.getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId())).thenReturn(List.of(notEnrichedFeedData));
-        doNothing().when(feedDao).addAnalytics(any());
+        doNothing().when(feedDao).addAnalytics(any(), any());
         when(konturAppsClient.graphql(isA(InsightsApiRequest.class))).thenReturn(createErrorResponse());
         EventEnrichmentTask enrichmentTask = new EventEnrichmentTask(konturAppsClient, feedDao, postProcessors,
                 enrichmentSuccess, enrichmentFail);
@@ -100,7 +100,7 @@ public class EnrichmentJobTest {
         verify(konturAppsClient, times(2)).graphql(isA(InsightsApiRequest.class));
         verify(feedDao, times(1)).getNotEnrichedEventsForFeed(feedWithEnrichment.getFeedId());
         verify(feedDao, times(0)).getNotEnrichedEventsForFeed(feedWithoutEnrichment.getFeedId());
-        verify(feedDao, times(1)).addAnalytics(any());
+        verify(feedDao, times(1)).addAnalytics(any(), any());
     }
 
     private FeedData createFeedData(Feed feed, boolean enriched) {

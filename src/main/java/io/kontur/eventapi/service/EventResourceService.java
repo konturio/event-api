@@ -9,6 +9,7 @@ import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.resource.dto.GeoJsonPaginationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -32,6 +33,7 @@ public class EventResourceService {
         this.dataLakeDao = dataLakeDao;
     }
 
+    @Cacheable(cacheResolver = "cacheResolver")
     public List<EventDto> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from, OffsetDateTime to,
                                        OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
                                        List<BigDecimal> bbox, EpisodeFilterType episodeFilterType) {
@@ -72,8 +74,8 @@ public class EventResourceService {
         return dataLake.getData();
     }
 
-    public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
-        return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version);
+    public Optional<EventDto> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
+        return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version).map(EventDtoConverter::convert);
     }
 
     public List<Feed> getFeeds() {

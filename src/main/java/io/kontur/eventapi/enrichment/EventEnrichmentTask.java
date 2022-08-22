@@ -57,7 +57,7 @@ public class EventEnrichmentTask {
             processEpisodes(event, feed);
             applyPostProcessors(event, feed);
             markEventStatus(event);
-            feedDao.addAnalytics(event);
+            feedDao.addAnalytics(event, feed.getAlias());
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
         }

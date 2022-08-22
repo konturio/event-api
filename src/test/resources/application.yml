@@ -188,6 +188,8 @@ spring:
         jwt:
           issuer-uri: https://keycloak01.konturlabs.com/auth/realms/dev
           jwk-set-uri: https://keycloak01.konturlabs.com/auth/realms/dev/protocol/openid-connect/certs
+  cache:
+    type: redis
 
 mybatis:
   mapper-locations: classpath:db/mappers/*Mapper.xml
