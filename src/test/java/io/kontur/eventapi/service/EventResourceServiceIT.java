@@ -65,7 +65,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         feedEpisode.setGeometries(new FeatureCollection(new Feature[]{new Feature(write, Map.of())}));
         feedData.getEpisodes().add(feedEpisode);
         feedData.setEnriched(true);
-        feedDao.insertFeedData(feedData);
+        feedDao.insertFeedData(feedData, feedAlias);
 
         //when-then
         assertEquals(fetchEvent(getBbox(10, 20, 12, 22)).size(), 1);
@@ -88,7 +88,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         feedData.setStartedAt(dateTimeOf(2020, 5, 1));
         feedData.setEndedAt(dateTimeOf(2020, 6, 1));
         feedData.setEnriched(true);
-        feedDao.insertFeedData(feedData);
+        feedDao.insertFeedData(feedData, feedAlias);
 
         var resultOfSearching01 = findEvent(dateTimeOf(2020, 4, 15), dateTimeOf(2020, 5, 15));
         assertTrue(resultOfSearching01.isPresent());
@@ -141,17 +141,17 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         var earliestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         earliestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 22), ZoneOffset.UTC));
         earliestEvent.setEnriched(true);
-        feedDao.insertFeedData(earliestEvent);
+        feedDao.insertFeedData(earliestEvent, feedAlias);
 
         var middleEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         middleEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 23), ZoneOffset.UTC));
         middleEvent.setEnriched(true);
-        feedDao.insertFeedData(middleEvent);
+        feedDao.insertFeedData(middleEvent, feedAlias);
 
         var latestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         latestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 24), ZoneOffset.UTC));
         latestEvent.setEnriched(true);
-        feedDao.insertFeedData(latestEvent);
+        feedDao.insertFeedData(latestEvent, feedAlias);
 
         //when page 1 ASC
         List<EventDto> page1Asc = eventResourceService

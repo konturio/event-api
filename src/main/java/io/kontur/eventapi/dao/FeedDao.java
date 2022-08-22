@@ -3,6 +3,7 @@ package io.kontur.eventapi.dao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.util.CacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +21,13 @@ public class FeedDao {
 
     private final FeedMapper mapper;
     private final FeedEventStatusDao feedEventStatusDao;
+    private final CacheUtil cacheUtil;
 
     @Autowired
-    public FeedDao(FeedMapper mapper, FeedEventStatusDao feedEventStatusDao) {
+    public FeedDao(FeedMapper mapper, FeedEventStatusDao feedEventStatusDao, CacheUtil cacheUtil) {
         this.mapper = mapper;
         this.feedEventStatusDao = feedEventStatusDao;
+        this.cacheUtil = cacheUtil;
     }
 
     public List<Feed> getFeeds() {
@@ -36,7 +39,7 @@ public class FeedDao {
     }
 
     @Transactional
-    public void insertFeedData(FeedData feedData) {
+    public void insertFeedData(FeedData feedData, String feed) {
         String episodesJson = writeJson(feedData.getEpisodes());
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getProperName(), feedData.getDescription(),
@@ -47,6 +50,7 @@ public class FeedDao {
 
         mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
+        if (feedData.getEnriched()) cacheUtil.evictEventListCache(feed);
     }
 
     public List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
@@ -82,11 +86,12 @@ public class FeedDao {
     }
 
     @Transactional
-    public void addAnalytics(FeedData event) {
+    public void addAnalytics(FeedData event, String feed) {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
                 event.getEventDetails() == null ? null : writeJson(event.getEventDetails()),
                 event.getEnriched(), writeJson(event.getEpisodes()), event.getName(),
                 event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
+        if (event.getEnriched()) cacheUtil.evictEventListCache(feed);
     }
 
     public Integer getNotEnrichedEventsCount() {

@@ -30,6 +30,11 @@ spring:
       client:
         composite-indicator:
           enabled: false
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379
   profiles:
     active: awsSqsDisabled, jwtAuthDisabled
 

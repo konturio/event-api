@@ -1,5 +1,7 @@
 package io.kontur.eventapi.resource.dto;
 
+import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.entity.Severity;
 import lombok.Data;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -9,61 +11,64 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 @Data
-public class EventDto implements Serializable {
+public class EpisodeDto implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 6806566181403544985L;
+    private static final long serialVersionUID = 5078150019488329350L;
 
-    private UUID eventId;
-    private Long version;
     private String name;
     private String properName;
     private String description;
+    private EventType type;
+    private Boolean active;
+    private Severity severity;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
+    private OffsetDateTime sourceUpdatedAt;
     private String location;
     private List<String> urls = new ArrayList<>();
     private Set<UUID> observations = new HashSet<>();
-    private Map<String, Object> eventDetails;
+    private Map<String, Object> episodeDetails;
     private FeatureCollection geometries;
-    private List<EpisodeDto> episodes = new ArrayList<>();
 
     @Serial
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        eventId = (UUID) in.readObject();
-        version = (Long) in.readObject();
         name = (String) in.readObject();
         properName = (String) in.readObject();
         description = (String) in.readObject();
+        type = (EventType) in.readObject();
+        active = (Boolean) in.readObject();
+        severity = (Severity) in.readObject();
         startedAt = (OffsetDateTime) in.readObject();
         endedAt = (OffsetDateTime) in.readObject();
         updatedAt = (OffsetDateTime) in.readObject();
+        sourceUpdatedAt = (OffsetDateTime) in.readObject();
         location = (String) in.readObject();
         urls = (List<String>) in.readObject();
         observations = (Set<UUID>) in.readObject();
-        eventDetails = (Map<String, Object>) in.readObject();
+        episodeDetails = (Map<String, Object>) in.readObject();
         Object geometriesObj = in.readObject();
         geometries = geometriesObj == null ? null : (FeatureCollection) GeoJSONFactory.create((String) geometriesObj);
-        episodes = (List<EpisodeDto>) in.readObject();
     }
 
     @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeObject(eventId);
-        out.writeObject(version);
         out.writeObject(name);
         out.writeObject(properName);
         out.writeObject(description);
+        out.writeObject(type);
+        out.writeObject(active);
+        out.writeObject(severity);
         out.writeObject(startedAt);
         out.writeObject(endedAt);
         out.writeObject(updatedAt);
+        out.writeObject(sourceUpdatedAt);
         out.writeObject(location);
         out.writeObject(urls);
         out.writeObject(observations);
-        out.writeObject(eventDetails);
+        out.writeObject(episodeDetails);
         out.writeObject(geometries == null ? null : geometries.toString());
-        out.writeObject(episodes);
     }
 }
