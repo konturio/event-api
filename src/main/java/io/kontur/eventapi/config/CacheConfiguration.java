@@ -7,6 +7,7 @@ import org.springframework.cache.interceptor.CacheOperationInvocationContext;
 import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -16,6 +17,7 @@ import java.util.Collection;
 
 import static io.kontur.eventapi.util.CacheUtil.*;
 import static java.lang.Thread.currentThread;
+import static java.time.Duration.ofDays;
 import static java.time.Duration.ofHours;
 import static java.util.Collections.singletonList;
 
@@ -24,12 +26,23 @@ import static java.util.Collections.singletonList;
 public class CacheConfiguration {
 
     @Bean
+    @Primary
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         return RedisCacheManager.builder(redisConnectionFactory)
                 .enableStatistics()
                 .transactionAware()
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig(currentThread().getContextClassLoader())
                         .entryTtl(ofHours(1)))
+                .build();
+    }
+
+    @Bean
+    public CacheManager longCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        return RedisCacheManager.builder(redisConnectionFactory)
+                .enableStatistics()
+                .transactionAware()
+                .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig(currentThread().getContextClassLoader())
+                        .entryTtl(ofDays(14)))
                 .build();
     }
 

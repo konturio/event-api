@@ -4,7 +4,8 @@
 
 #### Added
 
-- Redis caching for /v1 endpoint
+- Redis caching for `/v1` endpoint
+- Redis caching for `/v1/event` endpoint
 
 #### Changed
 

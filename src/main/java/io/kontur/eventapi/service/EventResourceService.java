@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static io.kontur.eventapi.util.CacheUtil.EVENT_CACHE_NAME;
+
 @Service
 public class EventResourceService {
 
@@ -74,6 +76,7 @@ public class EventResourceService {
         return dataLake.getData();
     }
 
+    @Cacheable(cacheNames = EVENT_CACHE_NAME, cacheManager = "longCacheManager")
     public Optional<EventDto> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
         return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version).map(EventDtoConverter::convert);
     }
