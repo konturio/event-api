@@ -52,7 +52,7 @@ public class EventDtoConverter {
         properties.put("episode_type", episode.getType());
         properties.put("episode_active", episode.getActive());
         properties.put("episode_severity", episode.getSeverity());
-        properties.put("episode_startedA", episode.getStartedAt());
+        properties.put("episode_startedAt", episode.getStartedAt());
         properties.put("episode_endedAt", episode.getEndedAt());
         properties.put("episode_updatedAt", episode.getUpdatedAt());
         properties.put("episode_sourceUpdatedAt", episode.getSourceUpdatedAt());
