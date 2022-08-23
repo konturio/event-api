@@ -50,7 +50,10 @@ public class FeedDao {
 
         mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
-        if (feedData.getEnriched()) cacheUtil.evictEventListCache(feed);
+        if (feedData.getEnriched()) {
+            cacheUtil.evictEventListCache(feed);
+            cacheUtil.evictEventCache(feedData.getEventId(), feed);
+        };
     }
 
     public List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
@@ -91,7 +94,10 @@ public class FeedDao {
                 event.getEventDetails() == null ? null : writeJson(event.getEventDetails()),
                 event.getEnriched(), writeJson(event.getEpisodes()), event.getName(),
                 event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
-        if (event.getEnriched()) cacheUtil.evictEventListCache(feed);
+        if (event.getEnriched()) {
+            cacheUtil.evictEventListCache(feed);
+            cacheUtil.evictEventCache(event.getEventId(), feed);
+        };
     }
 
     public Integer getNotEnrichedEventsCount() {
