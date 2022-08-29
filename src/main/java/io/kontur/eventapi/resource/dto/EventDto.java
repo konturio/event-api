@@ -1,5 +1,7 @@
 package io.kontur.eventapi.resource.dto;
 
+import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.entity.Severity;
 import lombok.Data;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -18,6 +20,8 @@ public class EventDto implements Serializable {
     private Long version;
     private String name;
     private String properName;
+    private EventType type;
+    private Severity severity;
     private String description;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
@@ -36,6 +40,8 @@ public class EventDto implements Serializable {
         version = (Long) in.readObject();
         name = (String) in.readObject();
         properName = (String) in.readObject();
+        type = (EventType) in.readObject();
+        severity = (Severity) in.readObject();
         description = (String) in.readObject();
         startedAt = (OffsetDateTime) in.readObject();
         endedAt = (OffsetDateTime) in.readObject();
@@ -55,6 +61,8 @@ public class EventDto implements Serializable {
         out.writeObject(version);
         out.writeObject(name);
         out.writeObject(properName);
+        out.writeObject(type);
+        out.writeObject(severity);
         out.writeObject(description);
         out.writeObject(startedAt);
         out.writeObject(endedAt);

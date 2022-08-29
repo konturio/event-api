@@ -16,10 +16,10 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, proper_name, description, started_at, ended_at,
+        insert into feed_data (event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
                                updated_at, observations, episodes, is_latest_version, enriched, geometries,
                                enrichment_attempts, urls, location, latest_severity, severities)
-        values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{startedAt}, #{endedAt},
+        values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{type}, #{severity}, #{description}, #{startedAt}, #{endedAt},
                 #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 #{episodes}::jsonb, true, #{enriched},
                 <choose>
@@ -45,7 +45,7 @@
     </update>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        select event_id, feed_id, version, name, proper_name, description, started_at, ended_at, updated_at, observations,
+        select event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
                composed_at, enriched_at, latest_severity, severities,
         <choose>
@@ -55,6 +55,9 @@
                     order by (episode ->> 'updatedAt')::timestamptz desc
                     limit 1
                 )) as episodes
+            </when>
+            <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                '[]'::jsonb as episodes
             </when>
             <otherwise>
                 episodes
@@ -70,16 +73,18 @@
                 </foreach>
             </if>
             <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                <if test='"ANY".equalsIgnoreCase(episodeFilterType)'>
-                    <foreach item="severity" collection="severities" separator="," open="and severities &amp;&amp; array[" close="]">
-                        #{severity}::text
-                    </foreach>
-                </if>
-                <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                    <foreach item="severity" collection="severities" separator="," open="and latest_severity in (" close=")">
-                        #{severity}::text
-                    </foreach>
-                </if>
+                <choose>
+                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                        <foreach item="severity" collection="severities" separator="," open="and latest_severity in (" close=")">
+                            #{severity}::text
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        <foreach item="severity" collection="severities" separator="," open="and severities &amp;&amp; array[" close="]">
+                            #{severity}::text
+                        </foreach>
+                    </otherwise>
+                </choose>
             </if>
             <if test='from != null'>
                 <![CDATA[
@@ -107,14 +112,28 @@
     </select>
 
     <select id="getEventByEventIdAndByVersionOrLast" resultMap="feedDataDtoMap">
-        WITH feed as (SELECT feed_id
-                      FROM feeds
-                      WHERE alias = #{feedAlias})
-        SELECT fd.*
-        FROM feed_data fd,
-             feed f
+        SELECT
+            event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
+            collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
+            composed_at, enriched_at, latest_severity, severities,
+            <choose>
+                <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                    jsonb_build_array((
+                        select episode from jsonb_array_elements(episodes) episode
+                        order by (episode ->> 'updatedAt')::timestamptz desc
+                        limit 1
+                    )) as episodes
+                </when>
+                <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                    '[]'::jsonb as episodes
+                </when>
+                <otherwise>
+                    episodes
+                </otherwise>
+            </choose>
+        FROM feed_data fd
         WHERE fd.event_id = #{eventId}
-          AND f.feed_id = fd.feed_id
+          AND fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
         <choose>
             <when test="version != null">
                 AND fd.version = #{version}
@@ -188,6 +207,7 @@
         <result property="feedId" column="feed_id" />
         <result property="version" column="version" />
         <result property="name" column="name" />
+        <result property="type" column="type" />
         <result property="properName" column="proper_name"/>
         <result property="description" column="description" />
         <result property="startedAt" column="started_at" />
@@ -206,5 +226,6 @@
         <result property="enrichedAt" column="enriched_at"/>
         <result property="latestSeverity" column="latest_severity"/>
         <result property="severities" column="severities" typeHandler="io.kontur.eventapi.typehandler.SeverityArrayTypeHandler"/>
+        <result property="severity" column="severity" />
     </resultMap>
 </mapper>

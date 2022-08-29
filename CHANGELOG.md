@@ -9,6 +9,9 @@
 
 #### Changed
 
+- Add `NONE` option to `episodeFilterType` API parameter
+- Add `episodeFilterType` parameter ro `v1/event` endpoint
+
 #### Removed
 
 

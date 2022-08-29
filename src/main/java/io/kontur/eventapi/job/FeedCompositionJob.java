@@ -3,10 +3,7 @@ package io.kontur.eventapi.job;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
-import io.kontur.eventapi.entity.Feed;
-import io.kontur.eventapi.entity.FeedData;
-import io.kontur.eventapi.entity.FeedEpisode;
-import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
@@ -148,6 +145,17 @@ public class FeedCompositionJob extends AbstractJob {
                 .map(FeedEpisode::getSeverity)
                 .filter(Objects::nonNull)
                 .distinct().collect(toList())));
+
+        feedData.setSeverity(episodes.stream()
+                .map(FeedEpisode::getSeverity)
+                .filter(Objects::nonNull)
+                .max(comparing(Severity::getValue))
+                .orElse(null));
+
+        feedData.setType(episodes.stream()
+                .filter(ep -> ep.getType() != null)
+                .max(comparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getType).orElse(null));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

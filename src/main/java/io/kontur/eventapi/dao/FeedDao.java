@@ -42,8 +42,8 @@ public class FeedDao {
     public void insertFeedData(FeedData feedData, String feed) {
         String episodesJson = writeJson(feedData.getEpisodes());
         mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
-                feedData.getName(), feedData.getProperName(), feedData.getDescription(),
-                feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
+                feedData.getName(), feedData.getProperName(), feedData.getType(), feedData.getSeverity(),
+                feedData.getDescription(), feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls(),
                 feedData.getLocation(), feedData.getLatestSeverity(), feedData.getSeverities(),
                 feedData.getGeomFuncType());
@@ -72,8 +72,8 @@ public class FeedDao {
                 null, null, null, null, episodeFilterType);
     }
 
-    public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
-        return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version);
+    public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
+        return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
     }
 
     public Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId) {
