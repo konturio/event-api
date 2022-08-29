@@ -100,9 +100,10 @@ public class EventResource {
             @Parameter(description = "Sort selection. Default value is ASC")
             @RequestParam(value = "sortOrder", defaultValue = "ASC")
                     SortOrder sortOrder,
-            @Parameter(description = "Type of filtering for event episodes (by severity): " +
-                    "<ul><li>ANY - one or more episodes match filters, all episodes are returned</li>" +
-                    "<li>LATEST - the latest episode matches filters, the latest episode is returned</li></ul>")
+            @Parameter(description = "How many episodes to select: " +
+                    "<ul><li>ANY - all episodes</li>" +
+                    "<li>LATEST - the latest episode</li>" +
+                    "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
                     EpisodeFilterType episodeFilterType) {
         String currentRequestURL = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
@@ -170,9 +171,10 @@ public class EventResource {
             @Parameter(description = "Sort selection. Default value is ASC")
             @RequestParam(value = "sortOrder", defaultValue = "ASC")
             SortOrder sortOrder,
-            @Parameter(description = "Type of filtering for event episodes (by severity): " +
-                    "<ul><li>ANY - one or more episodes match filters, all episodes are returned</li>" +
-                    "<li>LATEST - the latest episode matches filters, the latest episode is returned</li></ul>")
+            @Parameter(description = "How many episodes to select: " +
+                    "<ul><li>ANY - all episodes</li>" +
+                    "<li>LATEST - the latest episode</li>" +
+                    "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
             EpisodeFilterType episodeFilterType) {
         Optional<GeoJsonPaginationDTO> paginationDTO = eventResourceService.searchEventsGeoJson(feed, eventTypes,
@@ -206,8 +208,14 @@ public class EventResource {
     @PreAuthorize("hasAuthority('read:feed:'+#feed)")
     public ResponseEntity<EventDto> getLastEventById(@Parameter(description = "Feed name") @RequestParam(value = "feed") String feed,
                                                      @Parameter(description = "Version") @RequestParam(value = "version", required = false) Long version,
-                                                     @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId) {
-        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version)
+                                                     @Parameter(description = "Event UUID") @RequestParam(value = "eventId") UUID eventId,
+                                                     @Parameter(description = "How many episodes to select: " +
+                                                             "<ul><li>ANY - all episodes</li>" +
+                                                             "<li>LATEST - the latest episode</li>" +
+                                                             "<li>NONE - no episodes</li></ul>")
+                                                     @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
+                                                     EpisodeFilterType episodeFilterType) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

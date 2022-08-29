@@ -77,8 +77,8 @@ public class EventResourceService {
     }
 
     @Cacheable(cacheNames = EVENT_CACHE_NAME, cacheManager = "longCacheManager")
-    public Optional<EventDto> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version) {
-        return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version).map(EventDtoConverter::convert);
+    public Optional<EventDto> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
+        return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType).map(EventDtoConverter::convert);
     }
 
     public List<Feed> getFeeds() {

@@ -24,6 +24,8 @@ public interface FeedMapper {
                        @Param("version") Long version,
                        @Param("name") String name,
                        @Param("properName") String properName,
+                       @Param("type") EventType type,
+                       @Param("severity") Severity severity,
                        @Param("description") String description,
                        @Param("startedAt") OffsetDateTime startedAt,
                        @Param("endedAt") OffsetDateTime endedAt,
@@ -60,7 +62,8 @@ public interface FeedMapper {
 
     Optional<FeedData> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
                                                            @Param("feedAlias") String feedAlias,
-                                                           @Param("version") Long version);
+                                                           @Param("version") Long version,
+                                                           @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 
     Optional<Long> getLastFeedDataVersion(@Param("eventId") UUID eventId,
                                           @Param("feedId") UUID feedId);

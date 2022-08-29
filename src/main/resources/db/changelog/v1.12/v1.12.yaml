@@ -1,0 +1,8 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: add-type-column-to-feed-data.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-max-severity-column-to-feed-data.sql
