@@ -25,7 +25,7 @@ public interface DataLakeMapper {
 
     List<DataLake> getDataLakesByExternalId(@Param("externalId") String externalId);
 
-    List<DataLake> getDataLakesByExternalIds(@Param("externalIds") Set<String> externalIds);
+    List<DataLake> getDataLakesByExternalIds(@Param("externalIds") Set<String> externalIds, @Param("provider") String provider);
 
     List<DataLake> getDataLakesByExternalIdsAndProvider(@Param("externalIds") Set<String> externalIds,
                                                         @Param("provider") String provider);

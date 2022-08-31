@@ -67,9 +67,10 @@ public class GdacsSearchJobTest {
     @Test
     public void testFilterAlertsWhenExists() throws IOException {
         Map<String, String> alerts = getAlerts();
-        when(dataLakeDao.getDataLakesByExternalIds(anySet()))
-                .thenReturn(Collections.singletonList(
-                        new DataLake(UUID.randomUUID(), "GDACS_TC_1000742_1", null, null)));
+        DataLake dataLake = new DataLake(UUID.randomUUID(), "GDACS_TC_1000742_1", null, null);
+        dataLake.setData(alerts.get("GDACS_TC_1000742_1"));
+        when(dataLakeDao.getDataLakesByExternalIds(anySet(), nullable(String.class)))
+                .thenReturn(Collections.singletonList(dataLake));
 
         GdacsSearchJob gdacsSearchJob = new GdacsSearchJob(gdacsService, gdacsAlertXmlParser, dataLakeDao,
                 new SimpleMeterRegistry());
