@@ -39,8 +39,8 @@ public class DataLakeDao {
         return mapper.getDataLakesByExternalId(externalId);
     }
 
-    public List<DataLake> getDataLakesByExternalIds(Set<String> externalIds) {
-        return mapper.getDataLakesByExternalIds(externalIds);
+    public List<DataLake> getDataLakesByExternalIds(Set<String> externalIds, String provider) {
+        return mapper.getDataLakesByExternalIds(externalIds, provider);
     }
 
     public List<DataLake> getDataLakesByExternalIdsAndProvider(Set<String> externalIds, String provider) {

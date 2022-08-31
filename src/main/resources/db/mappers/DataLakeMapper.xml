@@ -51,6 +51,9 @@
         <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
             #{externalId}
         </foreach>
+        <if test="provider != null">
+            and provider = #{provider}
+        </if>
     </select>
 
     <select id="getDataLakesByExternalIdsAndProvider" resultMap="dataLakeMap">
