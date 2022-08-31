@@ -79,7 +79,7 @@ public abstract class FirmsImportJob extends AbstractJob {
             long count = 0;
             while (count * STEP < ids.size()) {
                 List<DataLake> existsDataLakesParts = dataLakeDao.getDataLakesByExternalIds(
-                        ids.stream().skip(count * STEP).limit(STEP).collect(Collectors.toSet()), null);
+                        ids.stream().skip(count * STEP).limit(STEP).collect(Collectors.toSet()));
                 existsDataLakeIds.addAll(
                         existsDataLakesParts.stream().map(DataLake::getExternalId).collect(Collectors.toSet()));
                 count++;

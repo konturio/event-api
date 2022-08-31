@@ -65,9 +65,9 @@ class GdacsServiceTest {
         when(dataLakeDao.getDataLakesByExternalId(alert.getIdentifier())).thenReturn(Collections.emptyList());
         when(gdacsClient.getGeometryByLink(alert.getEventType(), alert.getEventId(), alert.getCurrentEpisodeId()))
                 .thenReturn(geometry);
-        when(gdacsDataLakeConverter.convertGdacs(alert))
+        when(gdacsDataLakeConverter.convertGdacs(alert, alert.getDateModified()))
                 .thenReturn(createDataLake(alert, alert.getData(), GDACS_ALERT_PROVIDER));
-        when(gdacsDataLakeConverter.convertGdacsWithGeometry(alert, geometry))
+        when(gdacsDataLakeConverter.convertGdacsWithGeometry(alert, geometry, alert.getDateModified()))
                 .thenReturn(createDataLake(alert, geometry, GDACS_ALERT_GEOMETRY_PROVIDER));
 
         List<DataLake> dataLakes = gdacsService.createDataLakes(
@@ -89,8 +89,8 @@ class GdacsServiceTest {
                 Map.of("GDACS_EQ_1243255_1342589", alert), null);
 
         assertEquals(0, dataLakes.size());
-        verify(gdacsDataLakeConverter, times(0)).convertGdacs(any());
-        verify(gdacsDataLakeConverter, times(0)).convertGdacsWithGeometry(any(), anyString());
+        verify(gdacsDataLakeConverter, times(0)).convertGdacs(any(), any());
+        verify(gdacsDataLakeConverter, times(0)).convertGdacsWithGeometry(any(), anyString(), any());
     }
 
     private ParsedAlert getParsedAlert() throws IOException {
