@@ -163,8 +163,8 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         parsedAlert.setData(readMessageFromFile("alert.xml"));
 
         return List.of(
-                gdacsDataLakeConverter.convertGdacs(parsedAlert),
-                gdacsDataLakeConverter.convertGdacsWithGeometry(parsedAlert, readMessageFromFile("geometry.json"))
+                gdacsDataLakeConverter.convertGdacs(parsedAlert, parsedAlert.getDateModified()),
+                gdacsDataLakeConverter.convertGdacsWithGeometry(parsedAlert, readMessageFromFile("geometry.json"), parsedAlert.getDateModified())
         );
     }
 

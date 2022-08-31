@@ -69,7 +69,7 @@ public class GdacsSearchJobTest {
         Map<String, String> alerts = getAlerts();
         DataLake dataLake = new DataLake(UUID.randomUUID(), "GDACS_TC_1000742_1", null, null);
         dataLake.setData(alerts.get("GDACS_TC_1000742_1"));
-        when(dataLakeDao.getDataLakesByExternalIds(anySet(), nullable(String.class)))
+        when(dataLakeDao.getDataLakesByExternalIdsAndProvider(anySet(), anyString()))
                 .thenReturn(Collections.singletonList(dataLake));
 
         GdacsSearchJob gdacsSearchJob = new GdacsSearchJob(gdacsService, gdacsAlertXmlParser, dataLakeDao,

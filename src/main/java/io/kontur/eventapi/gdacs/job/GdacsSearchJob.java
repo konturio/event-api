@@ -27,13 +27,14 @@ public class GdacsSearchJob extends CapImportJob {
     public Map<String, String> filterItems(Map<String, String> alerts) {
         Map<String, String> filteredAlerts = new HashMap<>();
         Map<String, DataLake> existsDataLakes = new HashMap<>();
-        getDataLakeDao().getDataLakesByExternalIds(alerts.keySet(), GDACS_ALERT_PROVIDER)
+        getDataLakeDao().getDataLakesByExternalIdsAndProvider(alerts.keySet(), GDACS_ALERT_PROVIDER)
                 .forEach(dataLake -> existsDataLakes.put(dataLake.getExternalId(), dataLake));
         alerts.keySet().stream()
                 .filter(key -> !(existsDataLakes.containsKey(key) && existsDataLakes.get(key).getData().equals(alerts.get(key))))
                 .forEach(key -> filteredAlerts.put(key, alerts.get(key)));
         return filteredAlerts;
     }
+
     @Override
     public String getName() {
         return "gdacsSearch";

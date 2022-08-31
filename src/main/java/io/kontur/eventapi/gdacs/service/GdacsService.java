@@ -13,20 +13,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.OffsetDateTime;
+import java.util.*;
+
+import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
+import static io.kontur.eventapi.util.DateTimeUtil.uniqueOffsetDateTime;
 
 @Service
 public class GdacsService extends CapImportService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GdacsService.class);
 
+    private final DataLakeDao dataLakeDao;
+
     @Autowired
     public GdacsService(DataLakeDao dataLakeDao, GdacsDataLakeConverter dataLakeConverter, GdacsClient gdacsClient) {
         super(dataLakeDao, gdacsClient, dataLakeConverter);
+        this.dataLakeDao = dataLakeDao;
     }
 
     public Optional<String> fetchGdacsXml() {
@@ -52,8 +55,11 @@ public class GdacsService extends CapImportService {
 
             if (geometry.isPresent()) {
                 GdacsDataLakeConverter converter = (GdacsDataLakeConverter) getDataLakeConverter();
-                dataLakes.add(converter.convertGdacs(alert));
-                dataLakes.add(converter.convertGdacsWithGeometry(alert, geometry.get()));
+                boolean isFix = dataLakeDao.getDataLakesByExternalIdsAndProvider(Set.of(alert.getIdentifier()), GDACS_ALERT_PROVIDER)
+                        .stream().anyMatch(dataLake -> dataLake.getUpdatedAt().equals(alert.getDateModified()));
+                OffsetDateTime updatedAt = isFix ? uniqueOffsetDateTime() : alert.getDateModified();
+                dataLakes.add(converter.convertGdacs(alert, updatedAt));
+                dataLakes.add(converter.convertGdacsWithGeometry(alert, geometry.get(), updatedAt));
             }
         }
         dataLakes.sort(Comparator.comparing(DataLake::getLoadedAt));
