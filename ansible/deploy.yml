@@ -86,8 +86,7 @@
           systemd:
             daemon_reload: true
             scope: user
-          when: '( copy_ret.changed or replace_ret.changed )'
-
+          when: ( copy_ret.changed or replace_ret.changed )
     - name: Restarting the service
       systemd:
         name: event-api

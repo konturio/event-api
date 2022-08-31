@@ -9,39 +9,38 @@ Available profiles:
   - `test` - for TEST environment
   - `prod` - for PROD environment
 
-Profiles can be activated several ways:
+Profiles can be activated in several ways:
 - using system parameter `-Dspring.profiles.active={profile_name}`
 - using environment variable `export spring_profiles_active={profile_name}`
 
-Several profiles can be activated at once via `,` separator: `profile1,profile2`
+Several profiles can be activated at once with `,` separator: `profile1,profile2`
 
 ## Installation
 
 #### Requirements
 
-##### Postgresql extensions
+##### PostgreSQL extensions
 
- - Postgis
+ - PostGIS
  - uuid-ossp
- 
+
 #### Env properties
 
-To configure additional external config file for Spring Boot application set up Env property: 
+To configure additional external config file for Spring Boot application set up Env property:
 `SPRING_CONFIG_ADDITIONAL_LOCATION="file:%h/config.local.yaml"`
 
 #### Config file
 
-There are 5 config files:
+There are five config files:
 - `application.yml` - default config file
 - `application-dev.yml` - config file for DEV environment
 - `application-test.yml` - config file for TEST environment
 - `application-prod.yml` - config file for PROD environment
 - `config.yaml` - template of external config
 
-We should use `dev`, `test` and `prod` config files to store properties that
-are different for different environments.
+We should use `dev`, `test` and `prod` config files to store different properties for different environments.
 
-Secure data should be stored in external config file: `config.local.yaml`
+Secure data should be stored in an external config file: `config.local.yaml`
 
 ##### DB config
 
@@ -124,7 +123,7 @@ AWS S3 bucket `event-api-locker01` is used for storing static data files.
 - `PROD/` - for production
 - `TEST QA/` - for testing
 - `TEST DEV/` - for development
-- `EXP/` - for experiments 
+- `EXP/` - for experiments
 
 #### Logging configuration
 
@@ -140,5 +139,3 @@ For debugging could be used levels ERROR, WARN, INFO, DEBUG, TRACE
         </encoder>
     </appender>
 ```
-
-
