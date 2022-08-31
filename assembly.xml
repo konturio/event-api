@@ -12,7 +12,7 @@
             <outputDirectory>./</outputDirectory>
             <includes>
                 <include>${project.artifactId}-${project.version}.jar</include>
-                <include>lib/</include>
+<!--                <include>lib/</include> -->
             </includes>
         </fileSet>
         <fileSet>
