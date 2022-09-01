@@ -4,6 +4,15 @@
 
 #### Added
 
+#### Changed
+
+#### Removed
+
+
+## 1.12 - 2022-09-01
+
+#### Added
+
 - Redis caching for `/v1` endpoint
 - Redis caching for `/v1/event` endpoint
 
@@ -11,6 +20,7 @@
 
 - Add `NONE` option to `episodeFilterType` API parameter
 - Add `episodeFilterType` parameter ro `v1/event` endpoint
+- Updated GDACS provider import to allow fixes
 
 #### Removed
 
