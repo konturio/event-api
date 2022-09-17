@@ -1,0 +1,22 @@
+--- # Time-stamp: <2022-09-15 20:47:57>
+
+name: "99 Migration helper" # reusable workflow
+
+'on':
+  workflow_call:
+    outputs:
+      CI_COMMIT_REF_SLUG:
+        description: "The branch or tag name for which project is built. in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -."
+        value: ${{ jobs.migration-helper01.outputs.CI_COMMIT_REF_SLUG }}
+
+jobs:
+  migration-helper01:
+    runs-on: ubuntu-latest
+    outputs:
+      CI_COMMIT_REF_SLUG: ${{ steps.create-CI_COMMIT_REF_SLUG.outputs.CI_COMMIT_REF_SLUG }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: create-CI_COMMIT_REF_SLUG
+        run: |
+          CI_COMMIT_REF_SLUG=$(echo '${{ github.ref }}' | cut -d/ -f3- | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_-]/-/g; s/^-*//; s/-*$//')
+          echo "::set-output name=CI_COMMIT_REF_SLUG::$CI_COMMIT_REF_SLUG"
