@@ -1,4 +1,4 @@
---- # Time-stamp: <2022-09-15 21:24:57>
+--- # Time-stamp: <2022-09-16 19:23:39>
 
 name: 10 Manual Deployment
 
@@ -90,7 +90,16 @@ jobs:
 
       - name: deploy-prod
         if: "'deploy-prod' == github.event.inputs.deployment_target"
-        run: >
-          ansible-playbook -vD -e "version=${{needs.helper.outputs.CI_COMMIT_REF_SLUG}}-${{github.run_id}}
-          path_to_dist=$(find $GITHUB_WORKSPACE -maxdepth 1 -name \*.zip -print -quit)"
-          --limit=dev_event_api ansible/deploy.yml
+        env:
+          ALLOWED_REFS_PCRE: /^refs\/heads\/release-.*/
+        run: |-
+          if [[ -z "${{steps.get-cloned.outputs.REF}}" ]]; then
+            echo "::error file=${{github.event.workflow}}::${{github.event.inputs.deployment_target}} refuses to deploy from a non-symbolic ref (commit ${{steps.get-cloned.outputs.SHA}})"
+            exit 1
+          fi
+          if [[ -z $(echo '${{steps.get-cloned.outputs.REF}}' | perl -ne "print if $ALLOWED_REFS_PCRE") ]]; then
+            echo "::error file=${{github.event.workflow}}::${{github.event.inputs.deployment_target}} refuses to deploy from '${{steps.get-cloned.outputs.REF}}'"
+            exit 1
+          fi
+
+          ansible-playbook -vD -e "version=${{needs.helper.outputs.CI_COMMIT_REF_SLUG}}-${{github.run_id}} path_to_dist=$(find $GITHUB_WORKSPACE -maxdepth 1 -name \*.zip -print -quit)" --limit=prod_event_api ansible/deploy.yml
