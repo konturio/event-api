@@ -50,8 +50,10 @@ public class PdcMapSrvSearchJob extends AbstractJob {
             for (Feature feature : featureCollection.getFeatures()) {
                 String externalId = String.valueOf(feature.getProperties().get("hazard_uuid"));
                 String geoHash = (String) feature.getProperties().get("geohash");
-                ids.put(externalId, geoHash);
-                features.put(externalId, feature.toString());
+                if (geoHash != null) {
+                    ids.put(externalId, geoHash);
+                    features.put(externalId, feature.toString());
+                }
             }
             if (!ids.isEmpty()) {
                 List<ExposureGeohash> exposureGeohashes = dataLakeDao.getPdcExposureGeohashes(ids.keySet());
