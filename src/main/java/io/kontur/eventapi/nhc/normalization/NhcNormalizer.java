@@ -48,6 +48,7 @@ public class NhcNormalizer extends Normalizer {
         NhcXmlParser parser = new NhcXmlParser();
         Optional<CapParsedItem> parsedItem = parser.getParsedItem(dataLakeDto.getData());
         if (parsedItem.isPresent() && StringUtils.isNotBlank(parsedItem.get().getDescription())) {
+            String description = parsedItem.get().getDescription();
             NormalizedObservation normalizedObservation = new NormalizedObservation();
 
             normalizedObservation.setObservationId(dataLakeDto.getObservationId());
@@ -59,7 +60,7 @@ public class NhcNormalizer extends Normalizer {
             normalizedObservation.setPoint(null);
             normalizedObservation.setActive(null);
 
-            Map<Integer, Map<Integer, String>> mainMatchers = parser.parseDescription(parsedItem.get().getDescription());
+            Map<Integer, Map<Integer, String>> mainMatchers = parser.parseDescription(description);
             try {
                 if (MapUtils.isNotEmpty(mainMatchers) && MapUtils.isNotEmpty(mainMatchers.get(1))) {
                     Map<Integer, String> mainMatches = mainMatchers.get(1);
@@ -72,14 +73,16 @@ public class NhcNormalizer extends Normalizer {
                             && StringUtils.isNotBlank(mainMatches.get(NAME_POS))
                             && StringUtils.isNotBlank(mainMatches.get(ADV_NUMBER_POS)) ) {
                         normalizedObservation.setExternalEventId(mainMatches.get(EVENT_ID_POS));
-                        normalizedObservation.setName((mainMatches.get(TYPE_POS) != null ? mainMatches.get(TYPE_POS) : "")
-                                + " " + (mainMatches.get(NAME_POS) != null ? mainMatches.get(NAME_POS) : ""));
-                        normalizedObservation.setDescription(mainMatches.get(NEWS_POS));
-                        normalizedObservation.setEpisodeDescription(mainMatches.get(NEWS_POS));
+                        normalizedObservation.setName(
+                                (mainMatches.get(TYPE_POS) != null ? mainMatches.get(TYPE_POS).trim() : "")
+                                + " " + (mainMatches.get(NAME_POS) != null ? mainMatches.get(NAME_POS).trim() : ""));
+                        normalizedObservation.setDescription(mainMatches.get(NEWS_POS).trim());
+                        normalizedObservation.setEpisodeDescription(mainMatches.get(NEWS_POS).trim());
                         normalizedObservation.setExternalEpisodeId(
-                                (mainMatches.get(EVENT_ID_POS) != null ? mainMatches.get(EVENT_ID_POS) : "") + "_"
-                                        + (mainMatches.get(ADV_NUMBER_POS) != null ? mainMatches.get(ADV_NUMBER_POS) : ""));
-                        normalizedObservation.setProperName(mainMatches.get(NAME_POS));
+                                (mainMatches.get(EVENT_ID_POS) != null ? mainMatches.get(EVENT_ID_POS).trim() : "") + "_"
+                                        + (mainMatches.get(ADV_NUMBER_POS) != null
+                                        ? mainMatches.get(ADV_NUMBER_POS).trim() : ""));
+                        normalizedObservation.setProperName(mainMatches.get(NAME_POS).trim());
                     } else {
                         LOG.warn("Empty one of the base parameters for NHC cyclone (name, type, id, adv number). {}",
                                 parsedItem.get().getDescription());

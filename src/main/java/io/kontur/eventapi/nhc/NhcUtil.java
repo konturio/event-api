@@ -12,7 +12,7 @@ public final class NhcUtil {
 
     public static final List<String> NHC_PROVIDERS = List.of(NHC_AT_PROVIDER, NHC_CP_PROVIDER, NHC_EP_PROVIDER);
 
-    public static final String MAIN_REGEXP = "(.*?) (TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE) (.*?)? (?=(FORECAST\\/ADVISORY))FORECAST\\/ADVISORY NUMBER ([0-9]{1,}).*((AL[0-9]{6})|(EP[0-9]{6})) ([0-9]{4} \\w{3} \\w{3} \\w{3} [0-9]{2} [0-9]{4}) (.*) (TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE) (CENTER LOCATED NEAR .*) (MAX SUSTAINED WINDS.*) (REPEAT.*?)( FORECAST VALID .*?)?( EXTENDED OUTLOOK.*?)?( OUTLOOK VALID .*?)?( REQUEST .*)";
+    public static final String MAIN_REGEXP = "(.*?)(TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE|REMNANTS)( OF )?(.*?)?(?=(FORECAST\\/ADVISORY))FORECAST\\/ADVISORY NUMBER ([0-9]{1,}).*((AL[0-9]{6})|(EP[0-9]{6}))(.*?)?([0-9]{4} \\w{3} \\w{3} \\w{3} [0-9]{2} [0-9]{4})(.*)?(TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE|REMNANTS)( OF )?(.*)?(CENTER LOCATED NEAR .*)(MAX SUSTAINED WINDS.*)(REPEAT.*?)( FORECAST VALID .*?)?( EXTENDED OUTLOOK.*?)?( OUTLOOK VALID .*?)?( REQUEST.*)";
 
     public static final String CENTER_REGEXP = "CENTER LOCATED NEAR\\s*([0-9]*\\.[0-9]*N|S)\\s*([0-9]*\\.[0-9]*W|E) AT ([0-9]{2})\\/([0-9]{2})([0-9]{2})Z";
 
@@ -33,15 +33,15 @@ public final class NhcUtil {
     public static final double SEVERITY_MODERATE_MAX_WIND_SPEED_KPH = 116.68;
     public static final double SEVERITY_SEVERE_MAX_WIND_SPEED_KPH = 151.86;
     public static final Integer TYPE_POS = 2;
-    public static final Integer NAME_POS = 3;
-    public static final Integer ADV_NUMBER_POS = 5;
-    public static final Integer EVENT_ID_POS = 6;
-    public static final Integer CURRENT_TIME_POS = 9;
-    public static final Integer NEWS_POS = 10;
-    public static final Integer CENTER_POS = 12;
-    public static final Integer MAX_SUSTAINED_WIND_POS = 13;
-    public static final Integer FORECAST_POS = 15;
-    public static final Integer OUTLOOK_POS = 17;
+    public static final Integer NAME_POS = 4;
+    public static final Integer ADV_NUMBER_POS = 6;
+    public static final Integer EVENT_ID_POS = 7;
+    public static final Integer CURRENT_TIME_POS = 11;
+    public static final Integer NEWS_POS = 12;
+    public static final Integer CENTER_POS = 16;
+    public static final Integer MAX_SUSTAINED_WIND_POS = 17;
+    public static final Integer FORECAST_POS = 19;
+    public static final Integer OUTLOOK_POS = 21;
 
     // MAX SUSTAINED WIND
     public static final Integer MAX_WIND_POS = 1;
