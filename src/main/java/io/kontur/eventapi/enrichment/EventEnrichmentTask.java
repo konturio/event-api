@@ -17,11 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static io.kontur.eventapi.enrichment.InsightsApiResponseHandler.processResponse;
@@ -106,13 +102,13 @@ public class EventEnrichmentTask {
                 event.getFeedId(), event.getEventId(), event.getVersion());
     }
 
-    private Optional<Map<String, Object>> fetchAnalytics(FeatureCollection geometry, String enrichmentRequest, List<String> enrichmentFields) {
+    private Optional<Map<String, Object>> fetchAnalytics(FeatureCollection fc, String enrichmentRequest, List<String> enrichmentFields) {
         try {
-            Feature[] features = new Feature[geometry.getFeatures().length];
-            for (int i = 0; i < geometry.getFeatures().length; i++) {
-                Feature feature = new Feature(geometry.getFeatures()[i].getGeometry(), new HashMap<>());
-                features[i] = feature;
-            }
+            Feature[] features = Arrays.stream(fc.getFeatures())
+                    .map(Feature::getGeometry)
+                    .filter(Objects::nonNull)
+                    .map(geometry -> new Feature(geometry, new HashMap<>()))
+                    .toArray(Feature[]::new);
             FeatureCollection geom = new FeatureCollection(features);
             String query = format(enrichmentRequest, replaceAll(geom.toString(), "\"", "\\\\\\\""));
             InsightsApiRequest request = new InsightsApiRequest(query);
