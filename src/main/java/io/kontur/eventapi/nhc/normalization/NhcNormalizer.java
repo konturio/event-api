@@ -1,11 +1,7 @@
 package io.kontur.eventapi.nhc.normalization;
 
 import static io.kontur.eventapi.nhc.NhcUtil.*;
-import static io.kontur.eventapi.util.GeometryUtil.FORECAST_HRS_PROPERTY;
-import static io.kontur.eventapi.util.GeometryUtil.IS_OBSERVED_PROPERTY;
-import static io.kontur.eventapi.util.GeometryUtil.TIMESTAMP_PROPERTY;
-import static io.kontur.eventapi.util.GeometryUtil.WIND_GUSTS_KPH;
-import static io.kontur.eventapi.util.GeometryUtil.WIND_SPEED_KPH;
+import static io.kontur.eventapi.util.GeometryUtil.*;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -231,6 +227,7 @@ public class NhcNormalizer extends Normalizer {
             Point point = preparePoint(info.get(1), latPos, longPos);
 
             Double maxWind = Double.valueOf(windInfo.get(1).get(windPos));
+            properties.put(WIND_SPEED_KNOTS, maxWind);
             Double maxGusts = Double.valueOf(windInfo.get(1).get(gustsPos));
             Double maxWindKph = NhcUtil.convertKnotsToKph(maxWind, 2);
             properties.put(WIND_SPEED_KPH, maxWindKph);
