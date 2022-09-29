@@ -3,7 +3,7 @@
 --changeset event-api-migrations:v1.13/add-name-to-feeds.sql runOnChange:false
 
 alter table feeds
-    add if not exists feeds text;
+    add column if not exists name text;
 
 update feeds set
     name = 'Test CalFire'
