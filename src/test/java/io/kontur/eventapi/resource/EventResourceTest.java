@@ -25,8 +25,10 @@ import static org.mockito.Mockito.when;
 
 public class EventResourceTest {
     private static final String FIRST_ALIAS = "first_alias";
+    private static final String FIRST_NAME = "first_name";
     private static final String FIRST_DESCRIPTION = "first description";
     private static final String SECOND_ALIAS = "second_alias";
+    private static final String SECOND_NAME = "second_name";
     private static final String SECOND_DESCRIPTION = "second description";
 
     FeedDao feedDao = mock(FeedDao.class);
@@ -58,6 +60,7 @@ public class EventResourceTest {
 
         assertEquals(1, feeds.size());
         assertEquals("first_alias", feeds.get(0).getFeed());
+        assertEquals("first_name", feeds.get(0).getName());
         assertEquals("first description", feeds.get(0).getDescription());
     }
 
@@ -104,9 +107,11 @@ public class EventResourceTest {
     private List<Feed> twoFeeds() {
         Feed first = new Feed();
         first.setAlias(FIRST_ALIAS);
+        first.setName(FIRST_NAME);
         first.setDescription(FIRST_DESCRIPTION);
         Feed second = new Feed();
         second.setAlias(SECOND_ALIAS);
+        second.setName(SECOND_NAME);
         second.setDescription(SECOND_DESCRIPTION);
         return List.of(first, second);
     }
