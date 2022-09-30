@@ -77,4 +77,9 @@ public final class NhcUtil {
                 .setScale(scale, RoundingMode.HALF_UP).doubleValue();
     }
 
+    public static Integer convertKnotsToKph(Double speedInKnots) {
+        return BigDecimal.valueOf(COEFFICIENT_KNOTS_TO_KPH * speedInKnots)
+                .setScale(0, RoundingMode.HALF_UP).intValue();
+    }
+
 }
