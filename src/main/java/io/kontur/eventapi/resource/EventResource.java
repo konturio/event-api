@@ -236,7 +236,7 @@ public class EventResource {
             .collect(Collectors.toList());
 
         List<FeedSummary> resultDtos = allowedFeeds.stream()
-            .map(it -> new FeedSummary(it.getAlias(), it.getDescription()))
+            .map(it -> new FeedSummary(it.getAlias(), it.getName(), it.getDescription()))
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(resultDtos);

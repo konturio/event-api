@@ -9,6 +9,7 @@ import java.util.UUID;
 public class Feed {
 
     private UUID feedId;
+    private String name;
     private String description;
     private String alias;
     private List<String> providers;
