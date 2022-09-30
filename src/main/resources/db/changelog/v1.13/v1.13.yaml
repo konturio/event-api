@@ -2,4 +2,7 @@
 databaseChangeLog:
   - include:
       relativeToChangelogFile: true
+      file: update-collect-cyclone-geometry-function.sql
+  - include:
+      relativeToChangelogFile: true
       file: add-name-to-feeds.sql
