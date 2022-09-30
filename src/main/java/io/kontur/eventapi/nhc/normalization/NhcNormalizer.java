@@ -114,7 +114,7 @@ public class NhcNormalizer extends Normalizer {
                         if (MapUtils.isNotEmpty(maxSustainedWind) && MapUtils.isNotEmpty(maxSustainedWind.get(1))) {
                             try {
                                 int maxWind = Integer.parseInt(maxSustainedWind.get(1).get(MAX_WIND_POS));
-                                if (maxWind < SEVERITY_MINOR_MAX_WIND_SPEED) {
+                                if (maxWind <= SEVERITY_MINOR_MAX_WIND_SPEED) {
                                     normalizedObservation.setEventSeverity(Severity.MINOR);
                                 } else if (maxWind <= SEVERITY_MODERATE_MAX_WIND_SPEED) {
                                     normalizedObservation.setEventSeverity(Severity.MODERATE);
