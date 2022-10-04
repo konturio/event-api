@@ -29,9 +29,6 @@ public final class NhcUtil {
     public static final int SEVERITY_MINOR_MAX_WIND_SPEED = 33;
     public static final int SEVERITY_MODERATE_MAX_WIND_SPEED = 63;
     public static final int SEVERITY_SEVERE_MAX_WIND_SPEED = 82;
-    public static final double SEVERITY_MINOR_MAX_WIND_SPEED_KPH = 61.12;
-    public static final double SEVERITY_MODERATE_MAX_WIND_SPEED_KPH = 116.68;
-    public static final double SEVERITY_SEVERE_MAX_WIND_SPEED_KPH = 151.86;
     public static final Integer TYPE_POS = 2;
     public static final Integer NAME_POS = 4;
     public static final Integer ADV_NUMBER_POS = 6;
@@ -78,6 +75,11 @@ public final class NhcUtil {
     public static Double convertKnotsToKph(Double speedInKnots, int scale) {
         return BigDecimal.valueOf(COEFFICIENT_KNOTS_TO_KPH * speedInKnots)
                 .setScale(scale, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    public static Integer convertKnotsToKph(Double speedInKnots) {
+        return BigDecimal.valueOf(COEFFICIENT_KNOTS_TO_KPH * speedInKnots)
+                .setScale(0, RoundingMode.HALF_UP).intValue();
     }
 
 }

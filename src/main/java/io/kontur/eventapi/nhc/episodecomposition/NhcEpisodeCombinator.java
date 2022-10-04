@@ -1,17 +1,10 @@
 package io.kontur.eventapi.nhc.episodecomposition;
 
-import static io.kontur.eventapi.nhc.NhcUtil.COEFFICIENT_KNOTS_TO_KPH;
 import static io.kontur.eventapi.nhc.NhcUtil.NHC_PROVIDERS;
 import static io.kontur.eventapi.nhc.NhcUtil.SEVERITY_MINOR_MAX_WIND_SPEED;
 import static io.kontur.eventapi.nhc.NhcUtil.SEVERITY_MODERATE_MAX_WIND_SPEED;
 import static io.kontur.eventapi.nhc.NhcUtil.SEVERITY_SEVERE_MAX_WIND_SPEED;
-import static io.kontur.eventapi.util.GeometryUtil.ALERT_AREA;
-import static io.kontur.eventapi.util.GeometryUtil.AREA_TYPE_PROPERTY;
-import static io.kontur.eventapi.util.GeometryUtil.FORECAST_HRS_PROPERTY;
-import static io.kontur.eventapi.util.GeometryUtil.IS_OBSERVED_PROPERTY;
-import static io.kontur.eventapi.util.GeometryUtil.POSITION;
-import static io.kontur.eventapi.util.GeometryUtil.TIMESTAMP_PROPERTY;
-import static io.kontur.eventapi.util.GeometryUtil.WIND_SPEED_KPH;
+import static io.kontur.eventapi.util.GeometryUtil.*;
 import static java.util.Comparator.comparing;
 
 import java.util.ArrayList;
@@ -29,6 +22,7 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.kontur.eventapi.nhc.NhcUtil;
 import io.kontur.eventapi.util.DateTimeUtil;
 import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -141,8 +135,8 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
             Map<String, Object> props = pointFeature.getProperties();
             double windSpeed;
             try {
-                windSpeed = Double.parseDouble(String.valueOf(props.get(WIND_SPEED_KPH))) / 1.852;
-                if (windSpeed < SEVERITY_MINOR_MAX_WIND_SPEED) {
+                windSpeed = Double.parseDouble(String.valueOf(props.get(WIND_SPEED_KNOTS)));
+                if (windSpeed <= SEVERITY_MINOR_MAX_WIND_SPEED) {
                     episode.setSeverity(Severity.MINOR);
                 } else if (windSpeed <= SEVERITY_MODERATE_MAX_WIND_SPEED) {
                     episode.setSeverity(Severity.MODERATE);
@@ -209,7 +203,7 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
                     properties.put(FORECAST_HRS_PROPERTY, props.get(FORECAST_HRS_PROPERTY));
                 }
                 properties.put(TIMESTAMP_PROPERTY, props.get(TIMESTAMP_PROPERTY));
-                properties.put(WIND_SPEED_KPH, Math.round(level * COEFFICIENT_KNOTS_TO_KPH));
+                properties.put(WIND_SPEED_KPH, NhcUtil.convertKnotsToKph(level.doubleValue()));
 
                 return Optional.of(new Feature(geoJSONWriter.write(wktReader.read(polygon.toText())), properties));
             } catch (Exception e) {
