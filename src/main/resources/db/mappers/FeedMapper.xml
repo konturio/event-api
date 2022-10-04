@@ -68,23 +68,14 @@
             and is_latest_version
             and enriched
             <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
-                <foreach item="eventType" collection="eventTypes" separator="," open="and episode_types &amp;&amp; array[" close="]">
+                <foreach item="eventType" collection="eventTypes" separator="," open="and type in (" close=")">
                     #{eventType}::text
                 </foreach>
             </if>
             <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                <choose>
-                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        <foreach item="severity" collection="severities" separator="," open="and latest_severity in (" close=")">
-                            #{severity}::text
-                        </foreach>
-                    </when>
-                    <otherwise>
-                        <foreach item="severity" collection="severities" separator="," open="and severities &amp;&amp; array[" close="]">
-                            #{severity}::text
-                        </foreach>
-                    </otherwise>
-                </choose>
+                <foreach item="severity" collection="severities" separator="," open="and severity in (" close=")">
+                    #{severity}::text
+                </foreach>
             </if>
             <if test='from != null'>
                 <![CDATA[
