@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-name-to-feeds.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-index-for-type-column.sql
