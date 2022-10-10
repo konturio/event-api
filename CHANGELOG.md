@@ -9,6 +9,23 @@
 #### Removed
 
 
+## 1.13 - 2022-10-10
+
+#### Added
+
+- Add name to feeds
+
+#### Changed
+
+- Fix NHC description parsing
+- Fix pdcMapSrv null geometry issue
+- Fix cache for `/v1/event` endpoint
+- Update API to use `severity` and `type` columns for filtering
+- Fix NHC wind speed parsing
+
+#### Removed
+
+
 ## 1.12 - 2022-09-01
 
 #### Added
