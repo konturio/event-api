@@ -14,10 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +55,7 @@ class StaticImportJobIT extends AbstractCleanableIntegrationTest {
         Mockito.when(s3Object.getObjectContent())
                 .thenReturn(new S3ObjectInputStream(getClass().getResourceAsStream(testFile), new HttpGet()));
         staticImportJob.run();
-        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
+        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(List.of(provider));
         assertEquals(3, dataLakes.size());
         checkDataLakeFields(dataLakes.get(0));
         checkDataLakeFields(dataLakes.get(1));

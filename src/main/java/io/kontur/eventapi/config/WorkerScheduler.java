@@ -1,7 +1,6 @@
 package io.kontur.eventapi.config;
 
 import io.kontur.eventapi.calfire.job.CalFireSearchJob;
-import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
@@ -39,7 +38,6 @@ public class WorkerScheduler {
     private final EventCombinationJob eventCombinationJob;
     private final FirmsEventCombinationJob firmsEventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
-    private final FirmsFeedCompositionJob firmsFeedCompositionJob;
     private final EmDatImportJob emDatImportJob;
     private final StaticImportJob staticImportJob;
     private final StormsNoaaImportJob stormsNoaaImportJob;
@@ -117,7 +115,7 @@ public class WorkerScheduler {
                            EmDatImportJob emDatImportJob, StaticImportJob staticImportJob,
                            StormsNoaaImportJob stormsNoaaImportJob, TornadoJapanMaImportJob tornadoJapanMaImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
-                           PdcMapSrvSearchJob pdcMapSrvSearchJob, FirmsFeedCompositionJob firmsFeedCompositionJob,
+                           PdcMapSrvSearchJob pdcMapSrvSearchJob,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
@@ -138,7 +136,6 @@ public class WorkerScheduler {
         this.tornadoJapanMaImportJob = tornadoJapanMaImportJob;
         this.historicalTornadoJapanMaImportJob = historicalTornadoJapanMaImportJob;
         this.pdcMapSrvSearchJob = pdcMapSrvSearchJob;
-        this.firmsFeedCompositionJob = firmsFeedCompositionJob;
         this.enrichmentJob = enrichmentJob;
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
@@ -310,13 +307,6 @@ public class WorkerScheduler {
     public void startFeedCompositionJob() {
         if (Boolean.parseBoolean(feedCompositionEnabled)) {
             feedCompositionJob.run();
-        }
-    }
-
-    @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
-    public void startFirmsFeedCompositionJob() {
-        if (Boolean.parseBoolean(feedCompositionEnabled)) {
-            firmsFeedCompositionJob.run();
         }
     }
 

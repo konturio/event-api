@@ -34,6 +34,9 @@
         SELECT *
         FROM data_lake e
         WHERE normalized is false
+        <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
+            #{provider}
+        </foreach>
         ORDER BY loaded_at
         LIMIT 100000
     </select>

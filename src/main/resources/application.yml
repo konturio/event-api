@@ -167,43 +167,17 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
+    providers: gdacsAlert, gdacsAlertGeometry, firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   eventCombination:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers:
-      em-dat,
-      gdacsAlert,
-      gdacsAlertGeometry,
-      hpSrvMag,
-      hpSrvSearch,
-      pdcMapSrv,
-      pdcSqs,
-      tornado.canada-gov,
-      tornado.australian-bm,
-      tornado.osm-wiki,
-      tornado.des-inventar-sendai,
-      storms.noaa,
-      wildfire.frap.cal,
-      wildfire.sa-gov,
-      wildfire.qld-des-gov,
-      wildfire.victoria-gov,
-      wildfire.nsw-gov,
-      wildfire.calfire,
-      wildfire.perimeters.nifc,
-      wildfire.locations.nifc,
-      wildfire.inciweb,
-      kontur.events,
-      cyclones.nhc-at.noaa,
-      cyclones.nhc-ep.noaa,
-      cyclones.nhc-cp.noaa
-    firmsProviders: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
+    providers: gdacsAlert, gdacsAlertGeometry
   feedComposition:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public-v1, test-calfire, test-nifc, test-inciweb, test-loss, test-cyclone
-    firmsAlias: test-firms, kontur-public
+    alias: kontur-public
   enrichment:
     enable: true
     initialDelay: 1000
