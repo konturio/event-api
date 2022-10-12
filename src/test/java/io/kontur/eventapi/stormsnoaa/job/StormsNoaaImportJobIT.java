@@ -18,6 +18,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
+import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.isA;
 
@@ -53,7 +54,7 @@ class StormsNoaaImportJobIT extends AbstractCleanableIntegrationTest {
         Mockito.doNothing().when(stormsNoaaImportService).downloadFile(isA(String.class), isA(String.class));
         Mockito.when(stormsNoaaImportService.getFilePath(isA(String.class))).thenReturn(testFilePath);
         stormsNoaaImportJob.run();
-        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
+        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(List.of(STORMS_NOAA_PROVIDER));
         assertEquals(2, dataLakes.size());
         checkDataLake(dataLakes.get(0), "10096222");
         checkDataLake(dataLakes.get(1), "10120412");

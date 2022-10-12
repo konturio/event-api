@@ -59,8 +59,8 @@ public class DataLakeDao {
         return mapper.getPdcHpSrvHazardsWithoutAreas();
     }
 
-    public List<DataLake> getDenormalizedEvents() {
-        return mapper.getDenormalizedEvents();
+    public List<DataLake> getDenormalizedEvents(List<String> providers) {
+        return mapper.getDenormalizedEvents(providers);
     }
 
     public DataLake getDataLakeByObservationId(UUID observationId) {

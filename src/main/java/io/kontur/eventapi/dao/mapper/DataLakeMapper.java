@@ -21,7 +21,7 @@ public interface DataLakeMapper {
 
     List<DataLake> getPdcHpSrvHazardsWithoutAreas();
 
-    List<DataLake> getDenormalizedEvents();
+    List<DataLake> getDenormalizedEvents(@Param("providers") List<String> providers);
 
     List<DataLake> getDataLakesByExternalId(@Param("externalId") String externalId);
 

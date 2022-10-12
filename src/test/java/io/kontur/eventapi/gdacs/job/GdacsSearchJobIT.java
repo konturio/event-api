@@ -48,7 +48,7 @@ class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
 
         gdacsSearchJob.run();
 
-        checkDataLakes(dataLakeDao.getDenormalizedEvents());
+        checkDataLakes(dataLakeDao.getDenormalizedEvents(List.of(GDACS_ALERT_PROVIDER, GDACS_ALERT_GEOMETRY_PROVIDER)));
     }
 
     @Test
@@ -58,7 +58,7 @@ class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
 
         gdacsSearchJob.run();
 
-        assertEquals(0, dataLakeDao.getDenormalizedEvents().size());
+        assertEquals(0, dataLakeDao.getDenormalizedEvents(List.of(GDACS_ALERT_PROVIDER, GDACS_ALERT_GEOMETRY_PROVIDER)).size());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

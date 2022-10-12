@@ -12,7 +12,6 @@ import io.kontur.eventapi.job.EnrichmentJob;
 import io.kontur.eventapi.job.ReEnrichmentJob;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
-import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.job.MetricsJob;
 import io.kontur.eventapi.nhc.job.NhcAtImportJob;
@@ -51,7 +50,6 @@ class WorkerSchedulerTest {
     private final TornadoJapanMaImportJob tornadoJapanMaImportJob = mock(TornadoJapanMaImportJob.class);
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob = mock(HistoricalTornadoJapanMaImportJob.class);
     private final PdcMapSrvSearchJob pdcMapSrvSearchJob = mock(PdcMapSrvSearchJob.class);
-    private final FirmsFeedCompositionJob firmsFeedCompositionJob = mock(FirmsFeedCompositionJob.class);
     private final EnrichmentJob enrichmentJob = mock(EnrichmentJob.class);
     private final FirmsEventCombinationJob firmsEventCombinationJob = mock(FirmsEventCombinationJob.class);
     private final CalFireSearchJob calFireSearchJob = mock(CalFireSearchJob.class);
@@ -67,7 +65,7 @@ class WorkerSchedulerTest {
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob,
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
-            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, firmsFeedCompositionJob, enrichmentJob, calFireSearchJob,
+            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, enrichmentJob, calFireSearchJob,
             nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, nhcAtImportJob, nhcCpImportJob, nhcEpImportJob,
             metricsJob, reEnrichmentJob);
 
