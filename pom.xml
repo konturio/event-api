@@ -393,6 +393,27 @@
 					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<executions>
+					<execution>
+						<id>download-opentelemetry-agent</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<url>https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.16.0/opentelemetry-javaagent.jar</url>
+					<unpack>false</unpack>
+					<outputDirectory>${project.build.sourceDirectory}/../jib/opentelemetry/</outputDirectory>
+					<md5>4f97ebd74d075e60c76ecdf47b61006a</md5>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
