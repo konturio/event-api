@@ -25,3 +25,10 @@ humanitarianCrisis:
 aws:
   sqs:
     enabled: true
+
+feign:
+  client:
+    config:
+      default:
+        defaultRequestHeaders:
+          User-Agent: Event API TEST

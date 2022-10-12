@@ -2,10 +2,13 @@ server:
   servlet:
     contextPath: /events
   port: 8624
+  shutdown: graceful
   jetty:
     connection-idle-timeout: 3600000
 
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   datasource:
     platform: postgres
     url: 'jdbc:postgresql://localhost:5432/postgres'
@@ -262,6 +265,8 @@ management:
       enabled: true
   endpoint:
     health:
+      probes:
+        enabled: true
       status:
         http-mapping:
           down: 200
@@ -273,3 +278,6 @@ management:
     web:
       exposure:
         include: health, info, prometheus
+      base-path: /
+      path-mapping:
+        prometheus: metrics
