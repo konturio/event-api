@@ -7,7 +7,7 @@ import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
-import io.kontur.eventapi.firms.episodecomposition.FirmsFeedCompositionJob;
+import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
@@ -39,7 +39,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private final FirmsImportSuomiJob firmsImportSuomiJob;
     private final NormalizationJob normalizationJob;
     private final FirmsEventCombinationJob eventCombinationJob;
-    private final FirmsFeedCompositionJob feedCompositionJob;
+    private final FeedCompositionJob feedCompositionJob;
     private final FeedMapper feedMapper;
     private final KonturEventsDao konturEventsDao;
     private final NormalizedObservationsDao observationsDao;
@@ -52,7 +52,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     @Autowired
     public FirmsEventAndEpisodeCombinationsJobIT(FirmsImportModisJob firmsImportModisJob, FirmsImportNoaaJob firmsImportNoaaJob,
                                                  FirmsImportSuomiJob firmsImportSuomiJob, NormalizationJob normalizationJob,
-                                                 FirmsEventCombinationJob eventCombinationJob, FirmsFeedCompositionJob feedCompositionJob,
+                                                 FirmsEventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
                                                  FeedMapper feedMapper, KonturEventsDao konturEventsDao,
                                                  NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);

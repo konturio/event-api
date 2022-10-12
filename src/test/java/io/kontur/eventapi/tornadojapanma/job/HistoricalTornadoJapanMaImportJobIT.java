@@ -57,7 +57,7 @@ class HistoricalTornadoJapanMaImportJobIT extends AbstractCleanableIntegrationTe
         Mockito.when(parser.parseCases()).thenReturn(Set.of(testCase));
         job.run();
 
-        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
+        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(List.of(TORNADO_JAPAN_MA_PROVIDER));
         assertEquals(1, dataLakes.size());
 
         DataLake dataLake = dataLakes.get(0);

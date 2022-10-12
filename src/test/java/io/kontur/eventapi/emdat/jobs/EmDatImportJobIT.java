@@ -42,7 +42,7 @@ class EmDatImportJobIT extends AbstractCleanableIntegrationTest {
         emDatImportJob.run();
 
         //then
-        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
+        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(List.of(EM_DAT_PROVIDER));
         assertEquals(3, dataLakes.size());
 
         DataLake emdat1 = dataLakes.get(0);
@@ -68,7 +68,7 @@ class EmDatImportJobIT extends AbstractCleanableIntegrationTest {
         emDatImportJob.run();
 
         //then
-        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents();
+        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(List.of(EM_DAT_PROVIDER));
         assertEquals(4, dataLakes.size());
 
         DataLake emdat1 = dataLakes.get(0);
