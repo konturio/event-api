@@ -30,6 +30,7 @@
 		<spatial4j.version>0.8</spatial4j.version>
 		<jts-core.version>1.18.1</jts-core.version>
 		<jib.source.image>openjdk:16-alpine</jib.source.image>
+		<image.tag>${IMAGE_TAG}</image.tag>
 	</properties>
 
 	<dependencies>
@@ -422,24 +423,21 @@
 					<container>
 						<mainClass>io.kontur.eventapi.EventapiApplication</mainClass>
 						<jvmFlags>
-							<!--<jvmFlag>-javaagent:/opentelemetry/opentelemetry-javaagent.jar</jvmFlag>-->
+							<jvmFlag>-javaagent:/opentelemetry/opentelemetry-javaagent.jar</jvmFlag>
 							<jvmFlag>-Dlogging.config=classpath:logback-stdout-json.xml</jvmFlag>
 							<jvmFlag>-server</jvmFlag>
 							<jvmFlag>-Xmx10g</jvmFlag>
 							<jvmFlag>-Xms8g</jvmFlag>
 							<jvmFlag>-XX:+HeapDumpOnOutOfMemoryError</jvmFlag>
-							<!--<jvmFalg>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFalg>-->
+							<jvmFalg>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFalg>
 							<!--<jvmFlag>-Xlog:gc*:file=%h/log/event-api.GC.log</jvmFlag>-->
 						</jvmFlags>
-						<ports>
-							<port>8624</port>
-						</ports>
 					</container>
 					<from>
 						<image>nexus.kontur.io:8084/library/${jib.source.image}</image>
 					</from>
 					<to>
-						<image>nexus.kontur.io:8085/konturdev/${project.name}:${project.version}</image>
+						<image>nexus.kontur.io:8085/konturdev/${project.name}:${image.tag}</image>
 					</to>
 				</configuration>
 			</plugin>
