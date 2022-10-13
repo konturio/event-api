@@ -36,8 +36,8 @@ jobs:
       - name: Building with Maven
         env:
           MAVEN_CLI_OPTS: '--batch-mode'
-          NEXUS_DEPLOYER: ${{ secrets.NEXUS_READER }}
-          NEXUS_DEPLOYER_PASS: ${{ secrets.NEXUS_READER_PASS }}
+          NEXUS_DEPLOYER: ${{ secrets.NEXUS_DEPLOYER }}
+          NEXUS_DEPLOYER_PASS: ${{ secrets.NEXUS_DEPLOYER_PASS }}
           TAG: ${{ github.ref_name }}.${{ steps.get-cloned.outputs.SHA }}.${{ github.run_attempt }}
         run: |-
           set -e
