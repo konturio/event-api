@@ -182,6 +182,11 @@
         WHERE feed_id = #{feedId} AND event_id = #{eventId} AND version = #{version}
     </update>
 
+    <insert id="createFeed">
+        insert into feeds (feed_id, alias, name, providers)
+        values (#{feedId}, #{alias}, #{name}, #{providers, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
+    </insert>
+
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">
         <result property="feedId" column="feed_id" />
         <result property="description" column="description"/>

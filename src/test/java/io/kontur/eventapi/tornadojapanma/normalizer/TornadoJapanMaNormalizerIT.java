@@ -1,5 +1,6 @@
 package io.kontur.eventapi.tornadojapanma.normalizer;
 
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -21,8 +22,8 @@ class TornadoJapanMaNormalizerIT extends AbstractCleanableIntegrationTest {
     private final TornadoJapanMaNormalizer normalizer;
 
     @Autowired
-    public TornadoJapanMaNormalizerIT(JdbcTemplate jdbcTemplate, TornadoJapanMaNormalizer normalizer) {
-        super(jdbcTemplate);
+    public TornadoJapanMaNormalizerIT(JdbcTemplate jdbcTemplate, TornadoJapanMaNormalizer normalizer, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.normalizer = normalizer;
     }
 

@@ -34,8 +34,8 @@ class DataLakeDaoIT extends AbstractCleanableIntegrationTest {
     private final static OffsetDateTime loadedAt3 = OffsetDateTime.parse("2021-05-25T00:00:00Z");
 
     @Autowired
-    public DataLakeDaoIT(JdbcTemplate jdbcTemplate, DataLakeDao dataLakeDao) {
-        super(jdbcTemplate);
+    public DataLakeDaoIT(JdbcTemplate jdbcTemplate, DataLakeDao dataLakeDao, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.dataLakeDao = dataLakeDao;
     }
 

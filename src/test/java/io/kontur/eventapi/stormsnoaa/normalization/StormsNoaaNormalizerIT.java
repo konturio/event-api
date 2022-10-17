@@ -1,5 +1,6 @@
 package io.kontur.eventapi.stormsnoaa.normalization;
 
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -22,8 +23,8 @@ class StormsNoaaNormalizerIT extends AbstractCleanableIntegrationTest {
     private final StormsNoaaNormalizer normalizer;
 
     @Autowired
-    public StormsNoaaNormalizerIT(JdbcTemplate jdbcTemplate, StormsNoaaNormalizer normalizer) {
-        super(jdbcTemplate);
+    public StormsNoaaNormalizerIT(JdbcTemplate jdbcTemplate, StormsNoaaNormalizer normalizer, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.normalizer = normalizer;
     }
 

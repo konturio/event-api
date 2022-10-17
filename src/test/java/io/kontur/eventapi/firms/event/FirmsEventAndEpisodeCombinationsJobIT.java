@@ -1,6 +1,7 @@
 package io.kontur.eventapi.firms.event;
 
 import io.kontur.eventapi.client.KonturApiClient;
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
@@ -54,8 +55,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
                                                  FirmsImportSuomiJob firmsImportSuomiJob, NormalizationJob normalizationJob,
                                                  FirmsEventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
                                                  FeedMapper feedMapper, KonturEventsDao konturEventsDao,
-                                                 NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate) {
-        super(jdbcTemplate);
+                                                 NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.firmsImportModisJob = firmsImportModisJob;
         this.firmsImportNoaaJob = firmsImportNoaaJob;
         this.firmsImportSuomiJob = firmsImportSuomiJob;
@@ -83,7 +84,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         eventCombinationJob.run();
 
         //THEN
-        var firmsFeed = feedMapper.getFeeds().stream().filter(feed -> feed.getAlias().equals("test-firms")).findFirst().orElseThrow();
+        var firmsFeed = feedMapper.getFeeds().stream().filter(feed -> feed.getAlias().equals("test-feed")).findFirst().orElseThrow();
 
         List<KonturEvent> eventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
 
@@ -225,7 +226,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
     private List<FeedData> searchFeedData() {
         List<FeedData> firms = feedMapper.searchForEvents(
-                "test-firms",
+                "test-feed",
                 List.of(EventType.THERMAL_ANOMALY),
                 null,
                 null,

@@ -1,6 +1,7 @@
 package io.kontur.eventapi.firms.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
@@ -32,8 +33,9 @@ public class FirmsImportJobIT extends AbstractCleanableIntegrationTest {
 
     @Autowired
     public FirmsImportJobIT(FirmsImportModisJob firmsImportModisJob, FirmsImportNoaaJob firmsImportNoaaJob,
-                            FirmsImportSuomiJob firmsImportSuomiJob, DataLakeDao dataLakeDao, JdbcTemplate jdbcTemplate) {
-        super(jdbcTemplate);
+                            FirmsImportSuomiJob firmsImportSuomiJob, DataLakeDao dataLakeDao, JdbcTemplate jdbcTemplate,
+                            FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.firmsImportModisJob = firmsImportModisJob;
         this.firmsImportNoaaJob = firmsImportNoaaJob;
         this.firmsImportSuomiJob = firmsImportSuomiJob;

@@ -37,7 +37,7 @@ public class EventCombinationJobIT extends AbstractCleanableIntegrationTest {
     public EventCombinationJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob,
                                  DataLakeDao dataLakeDao, FeedDao feedDao, KonturEventsDao konturEventsDao,
                                  JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao) {
-        super(jdbcTemplate);
+        super(jdbcTemplate, feedDao);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.dataLakeDao = dataLakeDao;
@@ -52,7 +52,7 @@ public class EventCombinationJobIT extends AbstractCleanableIntegrationTest {
 
         var pdcFeed = feedDao.getFeeds()
                 .stream()
-                .filter(feed -> feed.getAlias().equals("test-pdc-v0"))
+                .filter(feed -> feed.getAlias().equals("test-feed"))
                 .findFirst()
                 .orElseThrow();
 
