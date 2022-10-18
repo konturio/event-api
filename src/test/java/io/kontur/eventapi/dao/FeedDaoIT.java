@@ -16,17 +16,17 @@ class FeedDaoIT extends AbstractCleanableIntegrationTest {
     private final FeedDao feedFao;
 
     @Autowired
-    public FeedDaoIT(JdbcTemplate jdbcTemplate, FeedDao feedFao) {
-        super(jdbcTemplate);
-        this.feedFao = feedFao;
+    public FeedDaoIT(JdbcTemplate jdbcTemplate, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
+        this.feedFao = feedDao;
     }
 
     @Test
     public void testGetFeedByAlias() {
-        List<Feed> feedsByAliases = feedFao.getFeedsByAliases(Collections.singletonList("kontur-public"));
+        List<Feed> feedsByAliases = feedFao.getFeedsByAliases(Collections.singletonList("test-feed"));
 
         assertEquals(1, feedsByAliases.size());
-        assertEquals("kontur-public", feedsByAliases.get(0).getAlias());
-        assertEquals("Kontur Public", feedsByAliases.get(0).getName());
+        assertEquals("test-feed", feedsByAliases.get(0).getAlias());
+        assertEquals("Test Feed", feedsByAliases.get(0).getName());
     }
 }

@@ -146,7 +146,7 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
-    alias: test-gdacs, test-em-dat, test-pdc-v0, swissre-02, kontur-public-v1, test-calfire, test-nifc, test-inciweb, test-firms, kontur-public
+    alias: test-feed
   enrichment:
     enable: false
     initialDelay: 999999

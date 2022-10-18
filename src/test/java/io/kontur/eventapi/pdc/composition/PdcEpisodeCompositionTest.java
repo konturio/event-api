@@ -40,7 +40,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
     public PdcEpisodeCompositionTest(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob,
                                      FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao,
                                      JdbcTemplate jdbcTemplate) {
-        super(jdbcTemplate);
+        super(jdbcTemplate, feedDao);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
@@ -65,7 +65,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null,
+        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -100,7 +100,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null,
+        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -139,7 +139,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null,
+        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -178,7 +178,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null,
+        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(2, feed.getEpisodes().size());

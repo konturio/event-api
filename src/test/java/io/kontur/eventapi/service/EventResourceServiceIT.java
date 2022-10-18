@@ -38,12 +38,12 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
 
-    private final String feedAlias = "test-pdc-v0";
+    private final String feedAlias = "test-feed";
     private final UUID eventUUID = UUID.randomUUID();
 
     @Autowired
     public EventResourceServiceIT(FeedDao feedDao, EventResourceService eventResourceService, JdbcTemplate jdbcTemplate) {
-        super(jdbcTemplate);
+        super(jdbcTemplate, feedDao);
         this.feedDao = feedDao;
         this.eventResourceService = eventResourceService;
     }

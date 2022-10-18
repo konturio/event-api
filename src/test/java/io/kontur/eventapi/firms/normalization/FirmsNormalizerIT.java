@@ -1,5 +1,6 @@
 package io.kontur.eventapi.firms.normalization;
 
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.firms.FirmsUtil;
@@ -25,8 +26,8 @@ public class FirmsNormalizerIT extends AbstractCleanableIntegrationTest {
     private final FirmsNormalizer firmsNormalizer;
 
     @Autowired
-    public FirmsNormalizerIT(FirmsNormalizer firmsNormalizer, JdbcTemplate jdbcTemplate) {
-        super(jdbcTemplate);
+    public FirmsNormalizerIT(FirmsNormalizer firmsNormalizer, JdbcTemplate jdbcTemplate, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.firmsNormalizer = firmsNormalizer;
     }
 
