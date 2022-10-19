@@ -36,7 +36,7 @@ spring:
     host: localhost
     port: 6379
   profiles:
-    active: awsSqsDisabled, jwtAuthDisabled
+    active: awsSqsDisabled, jwtAuthDisabled, cacheDisabled
 
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
