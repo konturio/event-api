@@ -7,6 +7,8 @@ import io.kontur.eventapi.resource.dto.FeedSummary;
 import io.kontur.eventapi.service.EventResourceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,8 +35,9 @@ public class EventResourceTest {
 
     FeedDao feedDao = mock(FeedDao.class);
     DataLakeDao dataLakeDao = mock(DataLakeDao.class);
+    Environment environment = mock(Environment.class);
 
-    EventResourceService eventResourceService = new EventResourceService(feedDao, dataLakeDao);
+    EventResourceService eventResourceService = new EventResourceService(feedDao, dataLakeDao, environment);
     EventResource eventResource;
 
     @BeforeEach
