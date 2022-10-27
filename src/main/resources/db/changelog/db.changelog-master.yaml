@@ -1,51 +1,51 @@
 ## Database Changelog
 ---
 databaseChangeLog:
-  - include:
-    - relativeToChangelogFile: true
-    - file: v0/v0.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v0.8/v0.8.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v0.9/v0.9.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.0/v1.0.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.1/v1.1.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.2/v1.2.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.3/v1.3.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.5/v1.5.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.5.1/v1.5.1.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.6/v1.6.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.10/v1.10.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.11/v1.11.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.12/v1.12.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.12.1/v1.12.1.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.13/v1.13.yaml
-  - include:
-    - relativeToChangelogFile: true
-    - file: v1.14/v1.14.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v0/v0.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v0.8/v0.8.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v0.9/v0.9.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.0/v1.0.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.1/v1.1.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.2/v1.2.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.3/v1.3.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.5/v1.5.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.5.1/v1.5.1.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.6/v1.6.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.10/v1.10.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.11/v1.11.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.12/v1.12.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.12.1/v1.12.1.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.13/v1.13.yaml
+- include:
+    relativeToChangelogFile: true
+    file: v1.14/v1.14.yaml

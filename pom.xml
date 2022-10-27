@@ -423,7 +423,7 @@
 					<container>
 						<mainClass>io.kontur.eventapi.EventapiApplication</mainClass>
 						<jvmFlags>
-							<jvmFlag>-javaagent:/opentelemetry/opentelemetry-javaagent.jar</jvmFlag>
+<!--							<jvmFlag>-javaagent:/opentelemetry/opentelemetry-javaagent.jar</jvmFlag>-->
 							<jvmFlag>-Dlogging.config=classpath:logback-stdout-json.xml</jvmFlag>
 							<jvmFlag>-server</jvmFlag>
 							<jvmFlag>-Xmx10g</jvmFlag>
@@ -439,6 +439,16 @@
 					<to>
 						<image>nexus.kontur.io:8085/konturdev/${project.name}:${image.tag}</image>
 					</to>
+<!--
+					<dockerClient>
+						<environment>
+							<DOCKER_TLS_VERIFY>${env.DOCKER_TLS_VERIFY}</DOCKER_TLS_VERIFY>
+							<DOCKER_HOST>${env.DOCKER_HOST}</DOCKER_HOST>
+							<DOCKER_CERT_PATH>${env.DOCKER_CERT_PATH}</DOCKER_CERT_PATH>
+							<MINIKUBE_ACTIVE_DOCKERD>${env.MINIKUBE_ACTIVE_DOCKERD}</MINIKUBE_ACTIVE_DOCKERD>
+						</environment>
+					</dockerClient>
+-->
 				</configuration>
 			</plugin>
 		</plugins>
