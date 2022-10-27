@@ -9,6 +9,17 @@
 #### Removed
 
 
+## 1.14 - 2022-10-27
+
+#### Added
+
+- Option to disable caches
+
+#### Removed
+
+- Drop all the feeds except of `kontur-public`
+
+
 ## 1.13 - 2022-10-10
 
 #### Added
