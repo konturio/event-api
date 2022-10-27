@@ -2,6 +2,7 @@ package io.kontur.eventapi.gdacs.job;
 
 import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.gdacs.client.GdacsClient;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
@@ -32,8 +33,8 @@ class GdacsSearchJobIT extends AbstractCleanableIntegrationTest {
     private final GdacsSearchJob gdacsSearchJob;
 
     @Autowired
-    public GdacsSearchJobIT(JdbcTemplate jdbcTemplate, DataLakeDao dataLakeDao) {
-        super(jdbcTemplate);
+    public GdacsSearchJobIT(JdbcTemplate jdbcTemplate, DataLakeDao dataLakeDao, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         GdacsService gdacsService = new GdacsService(dataLakeDao, new GdacsDataLakeConverter(), gdacsClient);
         this.gdacsSearchJob = new GdacsSearchJob(gdacsService, new GdacsAlertXmlParser(), dataLakeDao, new SimpleMeterRegistry());
         this.dataLakeDao = dataLakeDao;

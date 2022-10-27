@@ -1,6 +1,7 @@
 package io.kontur.eventapi.tornadojapanma.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import io.kontur.eventapi.tornadojapanma.dto.MainDamageSituation;
@@ -40,8 +41,8 @@ class TornadoJapanMaImportJobIT extends AbstractCleanableIntegrationTest {
 
     @Autowired
     public TornadoJapanMaImportJobIT(JdbcTemplate jdbcTemplate, DataLakeDao dataLakeDao,
-                                     TornadoJapanMaImportJob job) {
-        super(jdbcTemplate);
+                                     TornadoJapanMaImportJob job, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.dataLakeDao = dataLakeDao;
         this.job = job;
     }

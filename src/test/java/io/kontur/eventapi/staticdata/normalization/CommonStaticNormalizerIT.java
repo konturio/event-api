@@ -1,5 +1,6 @@
 package io.kontur.eventapi.staticdata.normalization;
 
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -22,8 +23,8 @@ class CommonStaticNormalizerIT extends AbstractCleanableIntegrationTest {
     private final CommonStaticNormalizer normalizer;
 
     @Autowired
-    public CommonStaticNormalizerIT(JdbcTemplate jdbcTemplate, CommonStaticNormalizer normalizer) {
-        super(jdbcTemplate);
+    public CommonStaticNormalizerIT(JdbcTemplate jdbcTemplate, CommonStaticNormalizer normalizer, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.normalizer = normalizer;
     }
 

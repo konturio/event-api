@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.staticdata.service.AwsS3Service;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
@@ -41,8 +42,8 @@ class StaticImportJobIT extends AbstractCleanableIntegrationTest {
     private AwsS3Service awsS3Service;
 
     @Autowired
-    public StaticImportJobIT(JdbcTemplate jdbcTemplate, StaticImportJob staticImportJob, DataLakeDao dataLakeDao) {
-        super(jdbcTemplate);
+    public StaticImportJobIT(JdbcTemplate jdbcTemplate, StaticImportJob staticImportJob, DataLakeDao dataLakeDao, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.staticImportJob = staticImportJob;
         this.dataLakeDao = dataLakeDao;
     }

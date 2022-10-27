@@ -43,7 +43,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
     @Autowired
     public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao) {
-        super(jdbcTemplate);
+        super(jdbcTemplate, feedDao);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
@@ -117,7 +117,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        return feedDao.searchForEvents("test-pdc-v0", List.of(), null,
+        return feedDao.searchForEvents("test-feed", List.of(), null,
                 null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
     }
 
@@ -156,7 +156,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(), null, null, startTimeForSearchingFeed,
+        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null, startTimeForSearchingFeed,
                 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(2, feed.getEpisodes().size());
 
@@ -201,7 +201,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-pdc-v0", List.of(EventType.WILDFIRE), null, null,
+        FeedData feed = feedDao.searchForEvents("test-feed", List.of(EventType.WILDFIRE), null, null,
                 loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }

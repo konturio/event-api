@@ -1,6 +1,7 @@
 package io.kontur.eventapi.stormsnoaa.job;
 
 import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.stormsnoaa.service.StormsNoaaImportService;
 import io.kontur.eventapi.stormsnoaa.parser.FileInfo;
@@ -40,8 +41,8 @@ class StormsNoaaImportJobIT extends AbstractCleanableIntegrationTest {
 
     @Autowired
     public StormsNoaaImportJobIT(JdbcTemplate jdbcTemplate, StormsNoaaImportJob stormsNoaaImportJob,
-                                 DataLakeDao dataLakeDao) {
-        super(jdbcTemplate);
+                                 DataLakeDao dataLakeDao, FeedDao feedDao) {
+        super(jdbcTemplate, feedDao);
         this.stormsNoaaImportJob = stormsNoaaImportJob;
         this.dataLakeDao = dataLakeDao;
     }
