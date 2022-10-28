@@ -24,8 +24,7 @@ jobs:
       - name: Extracting metadata from a cloned repository
         id: get-cloned
         run: |-
-          echo "::set-output name=SHA::$(git log -1 --format='%H')"
-          echo "::set-output name=REF::$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+          echo "::set-output name=SHA::$(git log -1 --format='%h')"
 
       - uses: actions/setup-java@v3
         with:
