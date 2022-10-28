@@ -74,8 +74,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .antMatchers("/metrics", "/info", "/health").permitAll()
-                .antMatchers("/actuator", "/actuator/**").permitAll() //TODO security temporarily disabled
-//                .antMatchers("/actuator", "/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyRequest().authenticated()
                 .and()
                 .oauth2ResourceServer(resourceServerConfigurer -> resourceServerConfigurer

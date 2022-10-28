@@ -423,11 +423,11 @@
 					<container>
 						<mainClass>io.kontur.eventapi.EventapiApplication</mainClass>
 						<jvmFlags>
-<!--							<jvmFlag>-javaagent:/opentelemetry/opentelemetry-javaagent.jar</jvmFlag>-->
+							<jvmFlag>-javaagent:/opentelemetry/opentelemetry-javaagent.jar</jvmFlag>
 							<jvmFlag>-Dlogging.config=classpath:logback-stdout-json.xml</jvmFlag>
 							<jvmFlag>-server</jvmFlag>
-							<jvmFlag>-Xmx10g</jvmFlag>
-							<jvmFlag>-Xms8g</jvmFlag>
+							<jvmFlag>-XX:MaxRAMPercentage=65</jvmFlag>
+							<jvmFlag>-XX:InitialRAMPercentage=50</jvmFlag>
 							<jvmFlag>-XX:+HeapDumpOnOutOfMemoryError</jvmFlag>
 							<jvmFalg>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFalg>
 							<!--<jvmFlag>-Xlog:gc*:file=%h/log/event-api.GC.log</jvmFlag>-->
