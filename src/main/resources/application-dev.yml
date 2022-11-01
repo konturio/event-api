@@ -25,3 +25,12 @@ staticdata:
 aws:
   sqs:
     enabled: true
+
+feign:
+  client:
+    config:
+      default:
+        defaultRequestHeaders:
+          User-Agent: Event API DEV
+      auth:
+        logger-level: HEADERS

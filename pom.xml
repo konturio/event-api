@@ -29,6 +29,8 @@
 		<gt-geojson.version>26-SNAPSHOT</gt-geojson.version>
 		<spatial4j.version>0.8</spatial4j.version>
 		<jts-core.version>1.18.1</jts-core.version>
+		<jib.source.image>openjdk:16-alpine</jib.source.image>
+		<image.tag>${IMAGE_TAG}</image.tag>
 	</properties>
 
 	<dependencies>
@@ -106,6 +108,17 @@
 			<groupId>io.github.openfeign</groupId>
 			<artifactId>feign-micrometer</artifactId>
 			<version>${feign-micrometer.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback.contrib</groupId>
+			<artifactId>logback-jackson</artifactId>
+			<version>0.1.5</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback.contrib</groupId>
+			<artifactId>logback-json-classic</artifactId>
+			<version>0.1.5</version>
 		</dependency>
 
 		<!-- Database -->
@@ -379,6 +392,63 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<executions>
+					<execution>
+						<id>download-opentelemetry-agent</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<url>https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.16.0/opentelemetry-javaagent.jar</url>
+					<unpack>false</unpack>
+					<outputDirectory>${project.build.sourceDirectory}/../jib/opentelemetry/</outputDirectory>
+					<md5>4f97ebd74d075e60c76ecdf47b61006a</md5>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<container>
+						<mainClass>io.kontur.eventapi.EventapiApplication</mainClass>
+						<jvmFlags>
+							<jvmFlag>-javaagent:/opentelemetry/opentelemetry-javaagent.jar</jvmFlag>
+							<jvmFlag>-Dlogging.config=classpath:logback-stdout-json.xml</jvmFlag>
+							<jvmFlag>-server</jvmFlag>
+							<jvmFlag>-XX:MaxRAMPercentage=65</jvmFlag>
+							<jvmFlag>-XX:InitialRAMPercentage=50</jvmFlag>
+							<jvmFlag>-XX:+HeapDumpOnOutOfMemoryError</jvmFlag>
+							<jvmFalg>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFalg>
+							<!--<jvmFlag>-Xlog:gc*:file=%h/log/event-api.GC.log</jvmFlag>-->
+						</jvmFlags>
+					</container>
+					<from>
+						<image>nexus.kontur.io:8084/library/${jib.source.image}</image>
+					</from>
+					<to>
+						<image>nexus.kontur.io:8085/konturdev/${project.name}:${image.tag}</image>
+					</to>
+<!--
+					<dockerClient>
+						<environment>
+							<DOCKER_TLS_VERIFY>${env.DOCKER_TLS_VERIFY}</DOCKER_TLS_VERIFY>
+							<DOCKER_HOST>${env.DOCKER_HOST}</DOCKER_HOST>
+							<DOCKER_CERT_PATH>${env.DOCKER_CERT_PATH}</DOCKER_CERT_PATH>
+							<MINIKUBE_ACTIVE_DOCKERD>${env.MINIKUBE_ACTIVE_DOCKERD}</MINIKUBE_ACTIVE_DOCKERD>
+						</environment>
+					</dockerClient>
+-->
 				</configuration>
 			</plugin>
 		</plugins>

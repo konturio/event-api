@@ -21,6 +21,11 @@ jobs:
 
       - uses: actions/checkout@v3
 
+      - name: Extracting metadata from a cloned repository
+        id: get-cloned
+        run: |-
+          echo "::set-output name=SHA::$(git log -1 --format='%h')"
+
       - uses: actions/setup-java@v3
         with:
           java-version: 16
@@ -30,14 +35,18 @@ jobs:
       - name: Building with Maven
         env:
           MAVEN_CLI_OPTS: '--batch-mode'
-          NEXUS_DEPLOYER: ${{ secrets.NEXUS_READER }}
-          NEXUS_DEPLOYER_PASS: ${{ secrets.NEXUS_READER_PASS }}
+          NEXUS_DEPLOYER: ${{ secrets.NEXUS_DEPLOYER }}
+          NEXUS_DEPLOYER_PASS: ${{ secrets.NEXUS_DEPLOYER_PASS }}
+          TAG: ${{ github.ref_name }}.${{ steps.get-cloned.outputs.SHA }}.${{ github.run_attempt }}
         run: |-
           set -e
 
           wget -q https://kontur-github-runners.s3.eu-central-1.amazonaws.com/public_resources/projects/common/2022091500.tar.xz && tar -C "$HOME" -xf 2022091500.tar.xz && rm 2022091500.tar.xz
 
-          mvn $MAVEN_CLI_OPTS clean install -U -Prelease
+          echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8084 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
+          echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8085 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
+
+          IMAGE_TAG="$TAG" mvn $MAVEN_CLI_OPTS clean install jib:build -U -Prelease
           mv -v target/*.zip .
 
       - name: Uploading build artifacts
