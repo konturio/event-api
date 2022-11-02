@@ -9,6 +9,13 @@
 #### Removed
 
 
+## 1.14.1 - 2022-11-03
+
+#### Changed
+
+- Optimized indexes in `feed_data`
+
+
 ## 1.14 - 2022-10-27
 
 #### Added
