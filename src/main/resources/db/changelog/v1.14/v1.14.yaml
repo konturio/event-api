@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: rework-feed-data-indexes.sql
+  - include:
+      relativeToChangelogFile: true
+      file: delete-firms.sql

@@ -170,7 +170,7 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2, kontur.events
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events
   eventCombination:
     enable: true
     initialDelay: 1000
