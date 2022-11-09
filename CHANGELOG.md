@@ -8,6 +8,8 @@
 
 #### Removed
 
+- Delete FIRMS data from all tables except `data_lake`
+
 
 ## 1.14.1 - 2022-11-03
 
