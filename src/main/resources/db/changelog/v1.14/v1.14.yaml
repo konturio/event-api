@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: rework-feed-data-indexes.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-index-severity.sql
