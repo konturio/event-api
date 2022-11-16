@@ -11,6 +11,13 @@
 - Delete FIRMS data from all tables except `data_lake`
 
 
+## 1.14.2 - 2022-11-10
+
+#### Changed
+
+- Event API to k8s
+
+
 ## 1.14.1 - 2022-11-03
 
 #### Changed

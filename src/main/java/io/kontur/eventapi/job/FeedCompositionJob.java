@@ -89,7 +89,7 @@ public class FeedCompositionJob extends AbstractJob {
 
             feedDao.insertFeedData(feedData, feed.getAlias());
         } catch (Exception e) {
-            LOG.error(
+            LOG.warn(
                     String.format("Error while processing event with id = '%s', for '%s' feed. Error: %s", eventId.toString(),
                             feed.getAlias(), e.getMessage()), e);
         }
