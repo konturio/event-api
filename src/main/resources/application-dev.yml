@@ -24,7 +24,7 @@ staticdata:
 
 scheduler:
   normalization:
-    providers: gdacsAlert, gdacsAlertGeometry, firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2, kontur.events, pdcSqs
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs
 aws:
   sqs:
     enabled: true
