@@ -8,6 +8,19 @@
 
 #### Removed
 
+
+## 1.14.3 - 2022-11-23
+
+#### Added
+
+- Index to optimize requests with severity
+
+#### Changed
+
+- Update LOG level for GDACS exceptions
+
+#### Removed
+
 - Delete FIRMS data from all tables except `data_lake`
 
 
