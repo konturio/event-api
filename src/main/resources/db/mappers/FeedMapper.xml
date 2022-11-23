@@ -46,36 +46,42 @@
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
         with events as (
-            select st_centroid(collected_geometry) as centroid,
-                   (case
-                        when st_geometrytype(st_envelope(collected_geometry)) not in ( 'ST_Point', 'ST_MultiPoint', 'ST_LineString')
-                            then (case when st_intersects(st_shiftlongitude(collected_geometry),
-                                                          st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
-                                        then box2d(st_shiftlongitude(collected_geometry))
-                                        else box2d(collected_geometry) end)
-                            else (case when st_intersects(st_shiftlongitude(st_buffer(collected_geometry, 1)),
-                                                          st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
-                                        then box2d(st_shiftlongitude(st_buffer(collected_geometry, 1)))
-                                        else box2d(st_buffer(collected_geometry, 1)) end)
-                    end) as bbox,
-                   event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
-                   collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
-                   composed_at, enriched_at, latest_severity, severities,
-            <choose>
-                <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                    jsonb_build_array((
-                        select episode from jsonb_array_elements(episodes) episode
-                        order by (episode ->> 'updatedAt')::timestamptz desc
-                        limit 1
-                    )) as episodes
-                </when>
-                <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
-                    '[]'::jsonb as episodes
-                </when>
-                <otherwise>
-                    episodes
-                </otherwise>
-            </choose>
+            select
+                (case
+                    when st_intersects(st_shiftlongitude(collected_geometry),
+                                        st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                    then st_pointonsurface(st_shiftlongitude(collected_geometry))
+                    else st_pointonsurface(collected_geometry)
+                end) as centroid,
+                (case
+                    when st_geometrytype(st_envelope(collected_geometry)) not in ( 'ST_Point', 'ST_MultiPoint', 'ST_LineString')
+                    then (case when st_intersects(st_shiftlongitude(collected_geometry),
+                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                then box2d(st_shiftlongitude(collected_geometry))
+                                else box2d(collected_geometry) end)
+                    else (case when st_intersects(st_shiftlongitude(st_buffer(collected_geometry, 1)),
+                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                then box2d(st_shiftlongitude(st_buffer(collected_geometry, 1)))
+                                else box2d(st_buffer(collected_geometry, 1)) end)
+                end) as bbox,
+                event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
+                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
+                composed_at, enriched_at, latest_severity, severities,
+                <choose>
+                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                        jsonb_build_array((
+                            select episode from jsonb_array_elements(episodes) episode
+                            order by (episode ->> 'updatedAt')::timestamptz desc
+                            limit 1
+                        )) as episodes
+                    </when>
+                    <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                        '[]'::jsonb as episodes
+                    </when>
+                    <otherwise>
+                        episodes
+                    </otherwise>
+                </choose>
             from feed_data fd
             where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
                 and is_latest_version
@@ -115,10 +121,10 @@
             limit #{limit}
         )
         select event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
-                updated_at, observations, collected_geometry, episode_types, is_latest_version, geometries, event_details,
-                enriched, urls, location, composed_at, enriched_at, latest_severity, severities,episodes as episodes,
-                ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
-                ARRAY[st_x(centroid), st_y(centroid)] as centroid
+               updated_at, observations, collected_geometry, episode_types, is_latest_version, geometries, event_details,
+               enriched, urls, location, composed_at, enriched_at, latest_severity, severities,episodes as episodes,
+               ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
+               ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from events
     </select>
 
