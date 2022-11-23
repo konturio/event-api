@@ -32,6 +32,8 @@ public class EventDto implements Serializable {
     private Map<String, Object> eventDetails;
     private FeatureCollection geometries;
     private List<EpisodeDto> episodes = new ArrayList<>();
+    private List<Double> bbox = new ArrayList<>();
+    private List<Double> centroid = new ArrayList<>();
 
     @Serial
     @SuppressWarnings("unchecked")
@@ -53,6 +55,8 @@ public class EventDto implements Serializable {
         Object geometriesObj = in.readObject();
         geometries = geometriesObj == null ? null : (FeatureCollection) GeoJSONFactory.create((String) geometriesObj);
         episodes = (List<EpisodeDto>) in.readObject();
+        bbox = (List<Double>) in.readObject();
+        centroid = (List<Double>) in.readObject();
     }
 
     @Serial
@@ -73,5 +77,7 @@ public class EventDto implements Serializable {
         out.writeObject(eventDetails);
         out.writeObject(geometries == null ? null : geometries.toString());
         out.writeObject(episodes);
+        out.writeObject(bbox);
+        out.writeObject(centroid);
     }
 }

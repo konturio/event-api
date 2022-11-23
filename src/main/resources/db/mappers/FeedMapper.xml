@@ -45,61 +45,81 @@
     </update>
 
     <select id="searchForEvents" resultMap="feedDataDtoMap">
-        select event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
-               collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
-               composed_at, enriched_at, latest_severity, severities,
-        <choose>
-            <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                jsonb_build_array((
-                    select episode from jsonb_array_elements(episodes) episode
-                    order by (episode ->> 'updatedAt')::timestamptz desc
-                    limit 1
-                )) as episodes
-            </when>
-            <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
-                '[]'::jsonb as episodes
-            </when>
-            <otherwise>
-                episodes
-            </otherwise>
-        </choose>
-        from feed_data fd
-        where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
-            and is_latest_version
-            and enriched
-            <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
-                <foreach item="eventType" collection="eventTypes" separator="," open="and type in (" close=")">
-                    #{eventType}::text
-                </foreach>
-            </if>
-            <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                <foreach item="severity" collection="severities" separator="," open="and severity in (" close=")">
-                    #{severity}::text
-                </foreach>
-            </if>
-            <if test='from != null'>
-                <![CDATA[
-                and (fd.ended_at >= #{from})
-                ]]>
-            </if>
-            <if test='to != null'>
-                <![CDATA[
-                and (fd.started_at <= #{to})
-                ]]>
-            </if>
-            <if test='updatedAfter != null'>
-                <if test='"ASC".equalsIgnoreCase(sortOrder)'>
-                    and fd.updated_at > #{updatedAfter}
+        with events as (
+            select st_centroid(collected_geometry) as centroid,
+                   (case
+                        when st_geometrytype(st_envelope(collected_geometry)) not in ( 'ST_Point', 'ST_MultiPoint', 'ST_LineString')
+                            then (case when st_intersects(st_shiftlongitude(collected_geometry),
+                                                          st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                        then box2d(st_shiftlongitude(collected_geometry))
+                                        else box2d(collected_geometry) end)
+                            else (case when st_intersects(st_shiftlongitude(st_buffer(collected_geometry, 1)),
+                                                          st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                        then box2d(st_shiftlongitude(st_buffer(collected_geometry, 1)))
+                                        else box2d(st_buffer(collected_geometry, 1)) end)
+                    end) as bbox,
+                   event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
+                   collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
+                   composed_at, enriched_at, latest_severity, severities,
+            <choose>
+                <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                    jsonb_build_array((
+                        select episode from jsonb_array_elements(episodes) episode
+                        order by (episode ->> 'updatedAt')::timestamptz desc
+                        limit 1
+                    )) as episodes
+                </when>
+                <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                    '[]'::jsonb as episodes
+                </when>
+                <otherwise>
+                    episodes
+                </otherwise>
+            </choose>
+            from feed_data fd
+            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+                and is_latest_version
+                and enriched
+                <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
+                    <foreach item="eventType" collection="eventTypes" separator="," open="and type in (" close=")">
+                        #{eventType}::text
+                    </foreach>
                 </if>
-                <if test='"DESC".equalsIgnoreCase(sortOrder)'>
-                    and fd.updated_at &lt; #{updatedAfter}
+                <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
+                    <foreach item="severity" collection="severities" separator="," open="and severity in (" close=")">
+                        #{severity}::text
+                    </foreach>
                 </if>
-            </if>
-            <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
-                and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
-            </if>
-        order by fd.updated_at ${sortOrder}
-        limit #{limit};
+                <if test='from != null'>
+                    <![CDATA[
+                    and (fd.ended_at >= #{from})
+                    ]]>
+                </if>
+                <if test='to != null'>
+                    <![CDATA[
+                    and (fd.started_at <= #{to})
+                    ]]>
+                </if>
+                <if test='updatedAfter != null'>
+                    <if test='"ASC".equalsIgnoreCase(sortOrder)'>
+                        and fd.updated_at > #{updatedAfter}
+                    </if>
+                    <if test='"DESC".equalsIgnoreCase(sortOrder)'>
+                        and fd.updated_at &lt; #{updatedAfter}
+                    </if>
+                </if>
+                <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
+                    and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
+                </if>
+            order by fd.updated_at ${sortOrder}
+            limit #{limit}
+        )
+        select event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
+                updated_at, observations, collected_geometry, episode_types, is_latest_version, geometries, event_details,
+                enriched, urls, location, composed_at, enriched_at, latest_severity, severities,episodes as episodes,
+                ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
+                ARRAY[st_x(centroid), st_y(centroid)] as centroid
+        from events
     </select>
 
     <select id="getEventByEventIdAndByVersionOrLast" resultMap="feedDataDtoMap">
@@ -222,5 +242,7 @@
         <result property="latestSeverity" column="latest_severity"/>
         <result property="severities" column="severities" typeHandler="io.kontur.eventapi.typehandler.SeverityArrayTypeHandler"/>
         <result property="severity" column="severity" />
+        <result property="bbox" column="bbox" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
+        <result property="centroid" column="centroid" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
     </resultMap>
 </mapper>
