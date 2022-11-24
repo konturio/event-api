@@ -5,17 +5,13 @@ import static io.kontur.eventapi.util.DateTimeUtil.parseDateTimeFromString;
 
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 
 import io.kontur.eventapi.cap.converter.CapBaseXmlParser;
 import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import io.kontur.eventapi.cap.dto.CapParsedItem;
-import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +62,7 @@ public class NhcXmlParser extends CapBaseXmlParser {
             item.setLink(getValueByTagName(xmlDocument, LINK));
             return Optional.of(item);
         } catch (ParserConfigurationException | IOException | SAXException | DateTimeParseException | NumberFormatException e) {
-            LOG.error("Error while parsing item from InciWeb events list. {}",
+            LOG.error("Error while parsing item from NHC events list. {}",
                     StringUtils.isNotBlank(item.getGuid()) ? item.getGuid() : "unknown");
             return Optional.empty();
         }
@@ -78,32 +74,6 @@ public class NhcXmlParser extends CapBaseXmlParser {
                 .replaceAll("\\r", " ")
                 .replaceAll("\\s+", " ");
         return parseByPattern(desc, MAIN_REGEXP);
-    }
-
-    public Map<Integer, Map<Integer, String>> parseByPattern(String source, String patternString) {
-        Map<Integer, Map<Integer, String>> matches = new HashMap<>();
-        if (StringUtils.isNotBlank(source)) {
-            Pattern pattern = Pattern.compile(patternString);
-            Matcher matcher = pattern.matcher(source);
-            int idx = 1;
-            while (matcher.find()) {
-                Map<Integer, String> match = new HashMap<>();
-                for (int i = 1; i <= matcher.groupCount(); i++) {
-                    if (matcher.group(i) != null) {
-                        match.put(i, matcher.group(i).trim());
-                    }
-                }
-                if (MapUtils.isNotEmpty(match)) {
-                    matches.put(idx++, match);
-                }
-            }
-        }
-        return matches;
-
-    }
-
-    protected String substringBetween(String source, String start, String end) {
-        return StringUtils.substringBefore(StringUtils.substringAfter(source, start), end).trim();
     }
 
 }

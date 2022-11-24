@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,6 +30,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import io.kontur.eventapi.cap.dto.CapParsedEvent;
+import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +45,6 @@ public abstract class CapBaseXmlParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(CapBaseXmlParser.class);
     protected static final String DEFAULT_NS = "*";
-    protected static final String PUBDATE = "pubDate";
 
     public OffsetDateTime getPubDate(String xml)
             throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
@@ -141,6 +143,31 @@ public abstract class CapBaseXmlParser {
             LOG.warn("Event contains more than one tag '{}'", tagName);
         }
         return nodeList.item(0).getTextContent();
+    }
+
+    protected String substringBetween(String source, String start, String end) {
+        return StringUtils.substringBefore(StringUtils.substringAfter(source, start), end).trim();
+    }
+
+    public Map<Integer, Map<Integer, String>> parseByPattern(String source, String patternString) {
+        Map<Integer, Map<Integer, String>> matches = new HashMap<>();
+        if (StringUtils.isNotBlank(source)) {
+            Pattern pattern = Pattern.compile(patternString);
+            Matcher matcher = pattern.matcher(source);
+            int idx = 1;
+            while (matcher.find()) {
+                Map<Integer, String> match = new HashMap<>();
+                for (int i = 1; i <= matcher.groupCount(); i++) {
+                    if (matcher.group(i) != null) {
+                        match.put(i, matcher.group(i).trim());
+                    }
+                }
+                if (MapUtils.isNotEmpty(match)) {
+                    matches.put(idx++, match);
+                }
+            }
+        }
+        return matches;
     }
 
     protected String getItemName() {
