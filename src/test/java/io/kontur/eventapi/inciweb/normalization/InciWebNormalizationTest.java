@@ -44,18 +44,17 @@ class InciWebNormalizationTest {
         //then
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(InciWebImportJob.INCIWEB_PROVIDER, observation.getProvider());
-        assertEquals("http://example.com/incident/1/", observation.getExternalEventId());
+        assertEquals("312576", observation.getExternalEventId());
         assertNull(observation.getExternalEpisodeId());
         assertEquals(Severity.UNKNOWN, observation.getEventSeverity());
         assertEquals("Title 1", observation.getName());
-        assertEquals("Description 1", observation.getDescription());
         assertEquals(EventType.WILDFIRE, observation.getType());
         assertEquals(dataLake.getUpdatedAt(), observation.getStartedAt());
         assertEquals(dataLake.getUpdatedAt(), observation.getEndedAt());
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
-        assertEquals(List.of("http://example.com/incident/1/"), observation.getUrls());
-        assertEquals("POINT(-110.111 10.111)", observation.getPoint());
+        assertEquals(List.of("http://inciweb.nwcg.gov/incident-information/wapcs-chinook-complex"), observation.getUrls());
+        assertEquals("POINT(-123.5 46.5)", observation.getPoint());
         checkGeometriesValue(observation.getGeometries());
     }
 
@@ -65,8 +64,8 @@ class InciWebNormalizationTest {
         Feature feature = geom.getFeatures()[0];
         assertTrue(feature.getGeometry() instanceof Point);
         Point point = (Point) feature.getGeometry();
-        assertEquals(-110.111, point.getCoordinates()[0]);
-        assertEquals(10.111, point.getCoordinates()[1]);
+        assertEquals(-123.5, point.getCoordinates()[0]);
+        assertEquals(46.5, point.getCoordinates()[1]);
         assertEquals(INCIWEB_PROPERTIES, feature.getProperties());
     }
 

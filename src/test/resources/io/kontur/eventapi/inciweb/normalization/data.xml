@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<item>
-    <title>Title 1</title>
-    <published>Fri, 03 Dec 2021 01:00:00 -06:00</published>
-    <pubDate>Fri, 03 Dec 2021 01:00:00 -06:00</pubDate>
-    <georss:point xmlns:georss="http://www.georss.org/georss">10.111 -110.111</georss:point>
-    <geo:lat xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">10.111</geo:lat>
-    <geo:long xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">-110.111</geo:long>
-    <link>http://example.com/incident/1/</link>
-    <guid isPermaLink="true">http://example.com/incident/1/</guid>
-    <description>Description 1</description>
+<item><title>Title 1</title><link>http://inciweb.nwcg.gov/incident-information/wapcs-chinook-complex</link><description>Last updated: &lt;time datetime="35Z"&gt;2022-11-23&lt;/time&gt;&lt;br /&gt;
+    The type of incident is Wildfire and involves the following unit(s) Pacific Cascade Region-DNR.
+    &lt;br /&gt;
+    Coordinates:
+    &lt;br /&gt;
+    Latitude: 46°30'0''Longitude: -123°30'0''
+    &lt;br /&gt;
+    NOTE: All fire perimeters and points are approximations.
+    &lt;br /&gt;
+    Incident Overview: &lt;p&gt;The Chinook and Brix Fires make up the Chinook Complex, which is located near Chinook WA in Pacific County. The fires are burning in slash on private land under the Washington DNR fire response area. The Chinook Fire started on Tuesday November 15, 2022 at approximately 11:00am and the Brix Fire started late Thursday evening on November 17, 2022. Due to the increased size and complexity of the Chinook Fire a Washington DNR Type III Incident Management Team wasput in place. &lt;span&gt;Due to better mapping the Chinook Fire is being reported to be approximately 120 acres in size, and is currently 100 percent contained. &lt;/span&gt; The Brix Fire is 8.5 acres and is currently in patrol status. &lt;/p&gt;</description><pubDate>Sun, 20 Nov 2022 12:23:23 EST</pubDate><creator>sharonsteriti</creator><guid isPermaLink="false">312576</guid>
 </item>

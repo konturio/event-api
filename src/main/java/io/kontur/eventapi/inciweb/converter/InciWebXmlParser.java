@@ -93,8 +93,13 @@ public class InciWebXmlParser extends CapBaseXmlParser {
             String coord_deg = StringUtils.isNotBlank(source.get(degreePos)) ? source.get(degreePos) : "0";
             String coord_min = StringUtils.isNotBlank(source.get(minPos)) ? source.get(minPos) : "0";
             String coord_sec = StringUtils.isNotBlank(source.get(secPos)) ? source.get(secPos) : "0";
-            return Double.parseDouble(coord_deg) + Double.parseDouble(coord_min) / 60
-                    + Double.parseDouble(coord_sec) / 3600;
+            if (coord_deg.startsWith("-")) {
+                return Double.parseDouble(coord_deg) - Double.parseDouble(coord_min) / 60
+                        - Double.parseDouble(coord_sec) / 3600;
+            } else {
+                return Double.parseDouble(coord_deg) + Double.parseDouble(coord_min) / 60
+                        + Double.parseDouble(coord_sec) / 3600;
+            }
         } catch (Exception e) {
             LOG.warn("Can't parse {} for InciWeb event {}", coordName, guid);
         }
