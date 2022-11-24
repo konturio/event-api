@@ -1,5 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" 
-		xmlns:atom="http://www.w3.org/2005/Atom"
-		xmlns:georss="http://www.georss.org/georss"
-		xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"><channel><atom:link href="http://example.com/feeds/rss/incidents/" rel="self" type="application/rss+xml" /><title>InciWeb National Incidents</title><link>http://example.com</link><description>Latest incident updates nationally</description><pubDate>Fri, 03 Dec 2021 04:00:00 -06:00</pubDate><language>en-us</language><item><title>Title 1</title><published>Fri, 03 Dec 2021 01:00:00 -06:00</published><pubDate>Fri, 03 Dec 2021 01:00:00 -06:00</pubDate><georss:point>10.111 -110.111</georss:point><geo:lat>10.111</geo:lat><geo:long>-110.111</geo:long><link>http://example.com/incident/1/</link><guid isPermaLink="true">http://example.com/incident/1/</guid><description>Description 1</description></item><item><title>Title 2</title><published>Fri, 03 Dec 2021 02:00:00 -06:00</published><pubDate>Fri, 03 Dec 2021 02:00:00 -06:00</pubDate><georss:point>20.222 -120.222</georss:point><geo:lat>20.222</geo:lat><geo:long>-120.222</geo:long><link>http://example.com/incident/2/</link><guid isPermaLink="true">http://example.com/incident/2/</guid><description>Description 2</description></item><item><title>Title 3</title><published>Fri, 03 Dec 2021 03:00:00 -06:00</published><pubDate>Fri, 03 Dec 2021 03:00:00 -06:00</pubDate><georss:point>30.333 -130.333</georss:point><geo:lat>30.333</geo:lat><geo:long>-130.333</geo:long><link>http://example.com/incident/3/</link><guid isPermaLink="true">http://example.com/incident/3/</guid><description>Description 3</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+	 xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	 xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:og="http://ogp.me/ns#"
+	 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	 xmlns:schema="http://schema.org/"
+	 xmlns:sioc="http://rdfs.org/sioc/ns#"
+	 xmlns:sioct="http://rdfs.org/sioc/types#"
+	 xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	 xml:base="http://inciweb.nwcg.gov/"><channel><title>InciWeb</title><link>http://inciweb.nwcg.gov/</link><description>Inciweb Fire Incidents</description><language>en</language>
+	<item><title>WAPCS Chinook Complex</title><link>http://inciweb.nwcg.gov/incident-information/wapcs-chinook-complex</link><description>Last updated: &lt;time datetime="35Z"&gt;2022-11-23&lt;/time&gt;&lt;br /&gt;
+		The type of incident is Wildfire and involves the following unit(s) Pacific Cascade Region-DNR.
+		&lt;br /&gt;
+		Coordinates:
+		&lt;br /&gt;
+		Latitude: 46°16'568''Longitude: -123°55'08''
+		&lt;br /&gt;
+		NOTE: All fire perimeters and points are approximations.
+		&lt;br /&gt;
+		Incident Overview: &lt;p&gt;The Chinook and Brix Fires make up the Chinook Complex, which is located near Chinook WA in Pacific County. The fires are burning in slash on private land under the Washington DNR fire response area. The Chinook Fire started on Tuesday November 15, 2022 at approximately 11:00am and the Brix Fire started late Thursday evening on November 17, 2022. Due to the increased size and complexity of the Chinook Fire a Washington DNR Type III Incident Management Team wasput in place. &lt;span&gt;Due to better mapping the Chinook Fire is being reported to be approximately 120 acres in size, and is currently 100 percent contained. &lt;/span&gt; The Brix Fire is 8.5 acres and is currently in patrol status. &lt;/p&gt;</description><pubDate>Sun, 20 Nov 2022 12:23:23 EST</pubDate><dc:creator>sharonsteriti</dc:creator><guid isPermaLink="false">312576</guid>
+	</item>
+	<item><title>WAPCS Chinook Complex</title><link>http://inciweb.nwcg.gov/incident-information/wapcs-chinook-complex</link><description>Last updated: &lt;time datetime="35Z"&gt;2022-11-23&lt;/time&gt;&lt;br /&gt;
+		The type of incident is Wildfire and involves the following unit(s) Pacific Cascade Region-DNR.
+		&lt;br /&gt;
+		Coordinates:
+		&lt;br /&gt;
+		Latitude: 46°16'568''Longitude: -123°55'08''
+		&lt;br /&gt;
+		NOTE: All fire perimeters and points are approximations.
+		&lt;br /&gt;
+		Incident Overview: &lt;p&gt;The Chinook and Brix Fires make up the Chinook Complex, which is located near Chinook WA in Pacific County. The fires are burning in slash on private land under the Washington DNR fire response area. The Chinook Fire started on Tuesday November 15, 2022 at approximately 11:00am and the Brix Fire started late Thursday evening on November 17, 2022. Due to the increased size and complexity of the Chinook Fire a Washington DNR Type III Incident Management Team wasput in place. &lt;span&gt;Due to better mapping the Chinook Fire is being reported to be approximately 120 acres in size, and is currently 100 percent contained. &lt;/span&gt; The Brix Fire is 8.5 acres and is currently in patrol status. &lt;/p&gt;</description><pubDate>Sun, 20 Nov 2022 12:23:24 EST</pubDate><dc:creator>sharonsteriti</dc:creator><guid isPermaLink="false">312577</guid>
+	</item>
+	<item><title>WAPCS Chinook Complex</title><link>http://inciweb.nwcg.gov/incident-information/wapcs-chinook-complex</link><description>Last updated: &lt;time datetime="35Z"&gt;2022-11-23&lt;/time&gt;&lt;br /&gt;
+		The type of incident is Wildfire and involves the following unit(s) Pacific Cascade Region-DNR.
+		&lt;br /&gt;
+		Coordinates:
+		&lt;br /&gt;
+		Latitude: 46°16'568''Longitude: -123°55'08''
+		&lt;br /&gt;
+		NOTE: All fire perimeters and points are approximations.
+		&lt;br /&gt;
+		Incident Overview: &lt;p&gt;The Chinook and Brix Fires make up the Chinook Complex, which is located near Chinook WA in Pacific County. The fires are burning in slash on private land under the Washington DNR fire response area. The Chinook Fire started on Tuesday November 15, 2022 at approximately 11:00am and the Brix Fire started late Thursday evening on November 17, 2022. Due to the increased size and complexity of the Chinook Fire a Washington DNR Type III Incident Management Team wasput in place. &lt;span&gt;Due to better mapping the Chinook Fire is being reported to be approximately 120 acres in size, and is currently 100 percent contained. &lt;/span&gt; The Brix Fire is 8.5 acres and is currently in patrol status. &lt;/p&gt;</description><pubDate>Sun, 20 Nov 2022 12:23:25 EST</pubDate><dc:creator>sharonsteriti</dc:creator><guid isPermaLink="false">312578</guid>
+	</item>
+</channel></rss>

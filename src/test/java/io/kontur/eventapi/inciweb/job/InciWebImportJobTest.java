@@ -104,9 +104,10 @@ class InciWebImportJobTest {
         assertEquals(1, dataLakes.size());
         DataLake dataLake = dataLakes.get(0);
         assertNotNull(dataLake);
-        assertEquals("http://example.com/incident/1/", dataLake.getExternalId());
+        assertEquals("312576", dataLake.getExternalId());
         assertEquals(INCIWEB_PROVIDER, dataLake.getProvider());
-        assertEquals(DateTimeUtil.parseDateTimeFromString("Fri, 03 Dec 2021 01:00:00 -06:00"), dataLake.getUpdatedAt());
+        assertEquals(DateTimeUtil.parseZonedDateTimeByFormatter("Sun, 20 Nov 2022 12:23:23 EST",
+                DateTimeUtil.ZONED_DATETIME_FORMATTER), dataLake.getUpdatedAt());
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
