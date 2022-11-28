@@ -29,6 +29,8 @@ public class InciWebXmlParser extends CapBaseXmlParser {
     public static final String GUID = "guid";
 
     private static final String PUBDATE = "pubDate";
+    private static final String LONGITUDE = "long";
+    private static final String LATITUDE = "lat";
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
     private static final String LINK = "link";
@@ -66,17 +68,22 @@ public class InciWebXmlParser extends CapBaseXmlParser {
             String description = getValueByTagName(xmlDocument, DESCRIPTION);
             item.setDescription(description);
             item.setLink(getValueByTagName(xmlDocument, LINK));
-
-            // get coordinates from description
-            Map<Integer, Map<Integer, String>> matchers = parseByPattern(description, InciWebUtil.COORDINATES_REGEXP);
-            if (MapUtils.isNotEmpty(matchers) && MapUtils.isNotEmpty(matchers.get(1))) {
-                Map<Integer, String> matches = matchers.get(1);
-                if (StringUtils.isNotBlank(matches.get(InciWebUtil.LAT_DEGREE))
-                        && StringUtils.isNotBlank(matches.get(InciWebUtil.LON_DEGREE))) {
-                    item.setLatitude(parseAndConvertCoordinateToDouble(matches, InciWebUtil.LAT_DEGREE,
-                            InciWebUtil.LAT_MINUTES, InciWebUtil.LAT_SECONDS, "latitude", item.getGuid()));
-                    item.setLongitude(parseAndConvertCoordinateToDouble(matches, InciWebUtil.LON_DEGREE,
-                            InciWebUtil.LON_MINUTES, InciWebUtil.LON_SECONDS, "longitude", item.getGuid()));
+            if (StringUtils.isNotBlank(getValueByTagName(xmlDocument, LONGITUDE))
+                    && StringUtils.isNotBlank(getValueByTagName(xmlDocument, LATITUDE))) {
+                item.setLongitude(Double.parseDouble(getValueByTagName(xmlDocument, LONGITUDE)));
+                item.setLatitude(Double.parseDouble(getValueByTagName(xmlDocument, LATITUDE)));
+            } else {
+                // get coordinates from description
+                Map<Integer, Map<Integer, String>> matchers = parseByPattern(description, InciWebUtil.COORDINATES_REGEXP);
+                if (MapUtils.isNotEmpty(matchers) && MapUtils.isNotEmpty(matchers.get(1))) {
+                    Map<Integer, String> matches = matchers.get(1);
+                    if (StringUtils.isNotBlank(matches.get(InciWebUtil.LAT_DEGREE))
+                            && StringUtils.isNotBlank(matches.get(InciWebUtil.LON_DEGREE))) {
+                        item.setLatitude(parseAndConvertCoordinateToDouble(matches, InciWebUtil.LAT_DEGREE,
+                                InciWebUtil.LAT_MINUTES, InciWebUtil.LAT_SECONDS, "latitude", item.getGuid()));
+                        item.setLongitude(parseAndConvertCoordinateToDouble(matches, InciWebUtil.LON_DEGREE,
+                                InciWebUtil.LON_MINUTES, InciWebUtil.LON_SECONDS, "longitude", item.getGuid()));
+                    }
                 }
             }
             return Optional.of(item);

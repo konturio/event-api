@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<item>
+    <title>Title 1</title>
+    <published>Fri, 03 Dec 2021 01:00:00 -06:00</published>
+    <pubDate>Fri, 03 Dec 2021 01:00:00 -06:00</pubDate>
+    <georss:point xmlns:georss="http://www.georss.org/georss">46.5 -123.5</georss:point>
+    <geo:lat xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">46.5</geo:lat>
+    <geo:long xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">-123.5</geo:long>
+    <link>http://example.com/incident/1/</link>
+    <guid isPermaLink="true">http://example.com/incident/1/</guid>
+    <description>Description 1</description>
+</item>

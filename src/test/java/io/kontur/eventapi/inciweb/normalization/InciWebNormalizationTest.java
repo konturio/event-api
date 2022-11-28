@@ -29,14 +29,40 @@ class InciWebNormalizationTest {
 
     @Test
     public void testIsApplicable() throws Exception {
-        DataLake dataLake = createDataLake();
+        DataLake dataLake = createDataLake("data.xml");
         assertTrue(new InciWebNormalizer().isApplicable(dataLake));
+    }
+
+    @Test
+    public void testNormalizationOld() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("data_old.xml");
+
+        //when
+        NormalizedObservation observation = new InciWebNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+        assertEquals(InciWebImportJob.INCIWEB_PROVIDER, observation.getProvider());
+        assertEquals("http://example.com/incident/1/", observation.getExternalEventId());
+        assertNull(observation.getExternalEpisodeId());
+        assertEquals(Severity.UNKNOWN, observation.getEventSeverity());
+        assertEquals("Title 1", observation.getName());
+        assertEquals("Description 1", observation.getDescription());
+        assertEquals(EventType.WILDFIRE, observation.getType());
+        assertEquals(dataLake.getUpdatedAt(), observation.getStartedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getEndedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+        assertEquals(List.of("http://example.com/incident/1/"), observation.getUrls());
+        assertEquals("POINT(-123.5 46.5)", observation.getPoint());
+        checkGeometriesValue(observation.getGeometries());
     }
 
     @Test
     public void testNormalization() throws Exception {
         //given
-        DataLake dataLake = createDataLake();
+        DataLake dataLake = createDataLake("data.xml");
 
         //when
         NormalizedObservation observation = new InciWebNormalizer().normalize(dataLake);
@@ -69,9 +95,9 @@ class InciWebNormalizationTest {
         assertEquals(INCIWEB_PROPERTIES, feature.getProperties());
     }
 
-    private DataLake createDataLake() throws Exception {
+    private DataLake createDataLake(String sourceFile) throws Exception {
         String data = IOUtils.toString(
-                Objects.requireNonNull(this.getClass().getResourceAsStream("data.xml")), "UTF-8");
+                Objects.requireNonNull(this.getClass().getResourceAsStream(sourceFile)), "UTF-8");
         Optional<CapParsedEvent> parsedItem = new InciWebXmlParser().getParsedItemForDataLake(data, "provider");
         assertTrue(parsedItem.isPresent());
         return new InciWebDataLakeConverter().convertEvent((CapParsedItem) parsedItem.get(),
