@@ -122,37 +122,54 @@
     </select>
 
     <select id="getEventByEventIdAndByVersionOrLast" resultMap="feedDataDtoMap">
-        SELECT
-            event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
-            collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
-            composed_at, enriched_at, latest_severity, severities,
+        with event as (
+            select
+                (case when st_geometrytype(st_collectionextract(collected_geometry)) not in ( 'ST_Point', 'ST_MultiPoint', 'ST_LineString', 'ST_MultiLineString')
+                    then (case when st_intersects(st_makevalid(st_shiftlongitude(st_buffer(collected_geometry, 0))),
+                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                            then st_shiftlongitude(st_buffer(collected_geometry, 0))
+                            else st_buffer(collected_geometry, 0) end)
+                    else (case when st_intersects(st_makevalid(st_shiftlongitude(st_buffer(collected_geometry, 1))),
+                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                            then st_shiftlongitude(st_buffer(collected_geometry, 1))
+                            else st_buffer(collected_geometry, 1) end)
+                end) as geom,
+                event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
+                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
+                composed_at, enriched_at, latest_severity, severities,
+                <choose>
+                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                        jsonb_build_array((
+                            select episode from jsonb_array_elements(episodes) episode
+                            order by (episode ->> 'updatedAt')::timestamptz desc
+                            limit 1
+                        )) as episodes
+                    </when>
+                    <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                        '[]'::jsonb as episodes
+                    </when>
+                    <otherwise>
+                        episodes
+                    </otherwise>
+                </choose>
+            FROM feed_data fd
+            WHERE fd.event_id = #{eventId}
+              AND fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
             <choose>
-                <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                    jsonb_build_array((
-                        select episode from jsonb_array_elements(episodes) episode
-                        order by (episode ->> 'updatedAt')::timestamptz desc
-                        limit 1
-                    )) as episodes
-                </when>
-                <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
-                    '[]'::jsonb as episodes
+                <when test="version != null">
+                    AND fd.version = #{version}
                 </when>
                 <otherwise>
-                    episodes
+                    AND is_latest_version
                 </otherwise>
             </choose>
-        FROM feed_data fd
-        WHERE fd.event_id = #{eventId}
-          AND fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
-        <choose>
-            <when test="version != null">
-                AND fd.version = #{version}
-            </when>
-            <otherwise>
-                AND is_latest_version
-            </otherwise>
-        </choose>
-
+        )
+        select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
+                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
+                composed_at, enriched_at, latest_severity, severities, episodes,
+                ARRAY[st_xmin(box2d(geom)), st_ymin(box2d(geom)), st_xmax(box2d(geom)),st_ymax(box2d(geom))] as bbox,
+                ARRAY[st_x(st_pointonsurface(geom)), st_y(st_pointonsurface(geom))] as centroid
+        from event
     </select>
 
     <select id="getLastFeedDataVersion" resultType="java.lang.Long">
