@@ -73,7 +73,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .antMatchers("/metrics", "/info", "/health").permitAll()
+                .antMatchers("/metrics", "/info", "/health", "/health/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2ResourceServer(resourceServerConfigurer -> resourceServerConfigurer
