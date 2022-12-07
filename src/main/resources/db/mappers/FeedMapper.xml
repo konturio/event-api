@@ -47,16 +47,8 @@
     <select id="searchForEvents" resultMap="feedDataDtoMap">
         with events as (
             select
-                (case when st_geometrytype(st_collectionextract(collected_geometry)) not in ( 'ST_Point', 'ST_MultiPoint', 'ST_LineString', 'ST_MultiLineString')
-                    then (case when st_intersects(st_makevalid(st_shiftlongitude(st_buffer(collected_geometry, 0))),
-                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
-                            then st_shiftlongitude(st_buffer(collected_geometry, 0))
-                            else st_buffer(collected_geometry, 0) end)
-                    else (case when st_intersects(st_makevalid(st_shiftlongitude(st_buffer(collected_geometry, 1))),
-                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
-                            then st_shiftlongitude(st_buffer(collected_geometry, 1))
-                            else st_buffer(collected_geometry, 1) end)
-                end) as geom,
+                box2d(collected_geometry) as bbox,
+                st_pointonsurface(collected_geometry) as centroid,
                 event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
                 collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
                 composed_at, enriched_at, latest_severity, severities,
@@ -116,24 +108,16 @@
         select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
                 collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
                 composed_at, enriched_at, latest_severity, severities, episodes,
-                ARRAY[st_xmin(box2d(geom)), st_ymin(box2d(geom)), st_xmax(box2d(geom)),st_ymax(box2d(geom))] as bbox,
-                ARRAY[st_x(st_pointonsurface(geom)), st_y(st_pointonsurface(geom))] as centroid
+                ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
+                ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from events
     </select>
 
     <select id="getEventByEventIdAndByVersionOrLast" resultMap="feedDataDtoMap">
         with event as (
             select
-                (case when st_geometrytype(st_collectionextract(collected_geometry)) not in ( 'ST_Point', 'ST_MultiPoint', 'ST_LineString', 'ST_MultiLineString')
-                    then (case when st_intersects(st_makevalid(st_shiftlongitude(st_buffer(collected_geometry, 0))),
-                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
-                            then st_shiftlongitude(st_buffer(collected_geometry, 0))
-                            else st_buffer(collected_geometry, 0) end)
-                    else (case when st_intersects(st_makevalid(st_shiftlongitude(st_buffer(collected_geometry, 1))),
-                                                    st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
-                            then st_shiftlongitude(st_buffer(collected_geometry, 1))
-                            else st_buffer(collected_geometry, 1) end)
-                end) as geom,
+                box2d(collected_geometry) as bbox,
+                st_pointonsurface(collected_geometry) as centroid,
                 event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
                 collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
                 composed_at, enriched_at, latest_severity, severities,
@@ -167,8 +151,8 @@
         select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
                 collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
                 composed_at, enriched_at, latest_severity, severities, episodes,
-                ARRAY[st_xmin(box2d(geom)), st_ymin(box2d(geom)), st_xmax(box2d(geom)),st_ymax(box2d(geom))] as bbox,
-                ARRAY[st_x(st_pointonsurface(geom)), st_y(st_pointonsurface(geom))] as centroid
+                ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
+                ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from event
     </select>
 
