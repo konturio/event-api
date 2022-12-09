@@ -1,0 +1,11 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: update-schema-for-collectcyclonegeometry-function.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-schema-for-collectgeometryfromepisodes-function.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-schema-for-collecteventgeometries-function.sql
