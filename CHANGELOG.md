@@ -9,6 +9,17 @@
 #### Removed
 
 
+## 1.14.4 - 2022-12-15
+
+#### Added
+
+- Bbox and centroid to API response
+
+#### Changed
+
+- Switched off EM-DAT
+
+
 ## 1.14.3 - 2022-11-23
 
 #### Added
