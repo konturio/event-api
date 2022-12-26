@@ -17,6 +17,7 @@ public class DataLake {
     private String provider;
     private String data;
     private boolean normalized = false;
+    private boolean skipped = false;
 
     public DataLake(UUID observationId, String externalId, OffsetDateTime updatedAt, OffsetDateTime loadedAt) {
         this.observationId = observationId;

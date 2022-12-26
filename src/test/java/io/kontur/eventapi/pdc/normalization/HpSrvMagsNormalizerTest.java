@@ -30,7 +30,7 @@ class HpSrvMagsNormalizerTest {
         DataLake dataLake = createDataLakeObject();
         dataLake.setExternalId(UUID.randomUUID().toString());
 
-        NormalizedObservation obs = new HpSrvMagsNormalizer().normalize(dataLake);
+        NormalizedObservation obs = new HpSrvMagsNormalizer().normalize(dataLake).get();
 
         assertEquals(dataLake.getObservationId(), obs.getObservationId());
         assertEquals(dataLake.getProvider(), obs.getProvider());

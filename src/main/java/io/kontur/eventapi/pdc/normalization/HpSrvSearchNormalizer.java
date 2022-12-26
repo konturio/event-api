@@ -17,6 +17,7 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
@@ -35,7 +36,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
@@ -70,7 +71,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
             LOG.warn(e.getMessage(), e);
         }
 
-        return normalizedDto;
+        return Optional.of(normalizedDto);
     }
 
     private FeatureCollection convertGeometry(String point, Map<String, Object> props) throws ParseException {

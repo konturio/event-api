@@ -37,7 +37,7 @@ class FrapCalStaticNormalizerIT extends AbstractCleanableIntegrationTest {
     @Test
     public void testNormalize() {
         DataLake dataLake = createTestDataLake();
-        NormalizedObservation normalizedObservation = normalizer.normalize(dataLake);
+        NormalizedObservation normalizedObservation = normalizer.normalize(dataLake).get();
 
         assertEquals(dataLake.getObservationId(), normalizedObservation.getObservationId());
         assertEquals(dataLake.getExternalId(), normalizedObservation.getExternalEventId());

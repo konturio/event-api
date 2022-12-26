@@ -23,7 +23,7 @@ class AustraliaWildfireNormalizerTest {
     public void testNormalize_WildfireSaGov() throws IOException {
         DataLake dataLake = createDataLake("AustraliaWildfireNormalizerTest_sa-gov.json", "wildfire.sa-gov");
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(OffsetDateTime.parse("2012-01-01T00:00:00Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2012-01-01T00:00:00Z"), observation.getEndedAt());
@@ -34,7 +34,7 @@ class AustraliaWildfireNormalizerTest {
     public void testNormalize_WildfireQldDesGov() throws IOException {
         DataLake dataLake = createDataLake("AustraliaWildfireNormalizerTest_qld-des-gov.json", "wildfire.qld-des-gov");
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(OffsetDateTime.parse("2012-01-01T00:00:00Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2012-01-05T00:00:00Z"), observation.getEndedAt());
@@ -45,7 +45,7 @@ class AustraliaWildfireNormalizerTest {
     public void testNormalize_WildfireVictoriaGov() throws IOException {
         DataLake dataLake = createDataLake("AustraliaWildfireNormalizerTest_victoria-gov.json", "wildfire.victoria-gov");
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(OffsetDateTime.parse("2012-01-01T00:00:00Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2012-01-01T00:00:00Z"), observation.getEndedAt());
@@ -56,7 +56,7 @@ class AustraliaWildfireNormalizerTest {
     public void testNormalize_WildfireNswGov() throws IOException {
         DataLake dataLake = createDataLake("AustraliaWildfireNormalizerTest_nsw-gov.json", "wildfire.nsw-gov");
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(OffsetDateTime.parse("2012-01-01T00:00:00Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2012-01-05T00:00:00Z"), observation.getEndedAt());

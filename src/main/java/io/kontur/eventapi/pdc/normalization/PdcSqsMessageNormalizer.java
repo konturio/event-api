@@ -19,8 +19,10 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.kontur.eventapi.entity.EventType.CYCLONE;
+import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 
@@ -38,7 +40,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
         JsonNode sns = JsonUtil.readTree(dataLakeDto.getData()).get("Sns");
         JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
         JsonNode event = JsonUtil.readTree(message.get("event").asText());
@@ -63,7 +65,11 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
             default:
                 throw new IllegalArgumentException("Unexpected message type: " + type);
         }
-        return normalizedDto;
+
+        if (FLOOD.equals(normalizedDto.getType()) && normalizedDto.getDescription() != null && normalizedDto.getDescription().contains("NASA")) {
+            return Optional.of(normalizedDto);
+        }
+        return Optional.empty();
     }
 
     @SuppressWarnings("unchecked")

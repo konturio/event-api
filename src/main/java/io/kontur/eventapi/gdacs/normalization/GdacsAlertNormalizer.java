@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
 import static java.lang.String.format;
@@ -34,14 +35,14 @@ public class GdacsAlertNormalizer extends GdacsNormalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
         var normalizedObservation = new NormalizedObservation();
         try {
             ParsedAlert parsedAlert = parser.getParsedAlertToNormalization(dataLakeDto.getData());
             normalizedObservation.setActive(true);
             setDataFromDataLakeDto(normalizedObservation, dataLakeDto);
             setDataFromParsedAlert(normalizedObservation, parsedAlert);
-            return normalizedObservation;
+            return Optional.of(normalizedObservation);
         } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
             throw new RuntimeException(format("Alert can not be parsed %s", dataLakeDto.getObservationId()));
         }

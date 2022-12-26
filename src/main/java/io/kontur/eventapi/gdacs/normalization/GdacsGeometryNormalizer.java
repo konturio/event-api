@@ -31,7 +31,7 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setProvider(dataLakeDto.getProvider());
@@ -61,7 +61,7 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
             normalizedObservation.setUrls(List.of(url));
         }
 
-        return normalizedObservation;
+        return Optional.of(normalizedObservation);
     }
 
     private OffsetDateTime parseDateTime(String dateTimeString) {

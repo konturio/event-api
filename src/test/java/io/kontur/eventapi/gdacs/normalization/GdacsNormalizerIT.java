@@ -86,7 +86,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
     @Test
     @Order(4)
     public void normalizeGdacsAlert() {
-        var observation = gdacsAlertNormalizer.normalize(dataLakeAlert);
+        var observation = gdacsAlertNormalizer.normalize(dataLakeAlert).get();
 
         String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
         String name = "Green earthquake alert (Magnitude 4.9M, Depth:28.99km) in Mexico 12/10/2020 07:03 UTC, About 13000 people within 100km.";
@@ -131,7 +131,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
     @Test
     @Order(5)
     public void normalizeGdacsGeometry() {
-        var observation = gdacsGeometryNormalizer.normalize(dataLakeAlertGeometry);
+        var observation = gdacsGeometryNormalizer.normalize(dataLakeAlertGeometry).get();
 
         assertEquals(dataLakeAlertGeometry.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLakeAlertGeometry.getObservationId(), observation.getObservationId());

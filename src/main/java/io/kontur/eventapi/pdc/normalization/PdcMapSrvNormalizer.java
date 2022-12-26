@@ -11,6 +11,7 @@ import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 
@@ -23,7 +24,7 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setProvider(dataLakeDto.getProvider());
@@ -42,7 +43,7 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
         normalizedObservation.setType(defineType(readString(properties, "type_id")));
         normalizedObservation.setGeometries(convertGeometries(geometry));
         normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
-        return normalizedObservation;
+        return Optional.of(normalizedObservation);
     }
 
     private FeatureCollection convertGeometries(Geometry geometry) {

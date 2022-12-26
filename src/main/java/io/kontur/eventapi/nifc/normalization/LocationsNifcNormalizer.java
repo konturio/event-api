@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCATIONS_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
@@ -24,7 +25,7 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
         NormalizedObservation observation = createObservationFromDataLake(dataLakeDto);
 
         Feature feature = readFeature(dataLakeDto.getData());
@@ -49,6 +50,6 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
         long durationHours = between(observation.getStartedAt(), observation.getEndedAt()).toHours();
         observation.setEventSeverity(calculateSeverity(areaSqKm2, durationHours));
 
-        return observation;
+        return Optional.of(observation);
     }
 }

@@ -67,7 +67,7 @@ public class EmDatNormalizer extends Normalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLake) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLake) {
         Map<String, String> csvData = getCsvDataMap(dataLake);
         NormalizedObservation obs = new NormalizedObservation();
         obs.setObservationId(dataLake.getObservationId());
@@ -113,7 +113,7 @@ public class EmDatNormalizer extends Normalizer {
                 .orElse(null);
         obs.setGeometries(geometryConverter.convertGeometry(geom, point, csvData.get("Dis Mag Scale"), csvData.get("Dis Mag Value")));
 
-        return obs;
+        return Optional.of(obs);
     }
 
     private Map<String, String> getCsvDataMap(DataLake dataLake) {

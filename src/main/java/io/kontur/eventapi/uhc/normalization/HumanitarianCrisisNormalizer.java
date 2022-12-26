@@ -8,6 +8,7 @@ import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureColle
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
@@ -38,7 +39,7 @@ public class HumanitarianCrisisNormalizer extends Normalizer {
     }
 
     @Override
-    public NormalizedObservation normalize(DataLake dataLakeDto) {
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
 
@@ -97,7 +98,7 @@ public class HumanitarianCrisisNormalizer extends Normalizer {
         normalizedObservation.setExternalEpisodeId(null);
         normalizedObservation.setProperName(readString(properties, "name"));
 
-        return normalizedObservation;
+        return Optional.of(normalizedObservation);
     }
 
 }

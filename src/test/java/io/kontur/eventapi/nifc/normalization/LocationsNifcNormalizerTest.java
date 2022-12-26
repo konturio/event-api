@@ -26,7 +26,7 @@ class LocationsNifcNormalizerTest {
     void testNormalize() throws IOException {
         DataLake dataLake = createDataLake();
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());

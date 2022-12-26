@@ -49,7 +49,7 @@ public class FirmsNormalizerIT extends AbstractCleanableIntegrationTest {
         var dataLake = createDataLakeObject();
 
         //when
-        var observation = firmsNormalizer.normalize(dataLake);
+        var observation = firmsNormalizer.normalize(dataLake).get();
 
         //then
         assertEquals(dataLake.getExternalId(), observation.getExternalEventId());

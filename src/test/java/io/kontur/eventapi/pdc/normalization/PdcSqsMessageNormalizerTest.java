@@ -32,7 +32,7 @@ class PdcSqsMessageNormalizerTest {
         String filename = "PdcSqsMessageNormalizerTest_HAZARD.json";
         DataLake dataLake = createDataLake(filename);
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getProvider(), observation.getProvider());
@@ -70,7 +70,7 @@ class PdcSqsMessageNormalizerTest {
         String filename = "PdcSqsMessageNormalizerTest_HAZARD_CYCLONE.json";
         DataLake dataLake = createDataLake(filename);
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getProvider(), observation.getProvider());
@@ -108,7 +108,7 @@ class PdcSqsMessageNormalizerTest {
         String filename = "PdcSqsMessageNormalizerTest_MAG.json";
         DataLake dataLake = createDataLake(filename);
 
-        NormalizedObservation observation = normalizer.normalize(dataLake);
+        NormalizedObservation observation = normalizer.normalize(dataLake).get();
 
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getProvider(), observation.getProvider());

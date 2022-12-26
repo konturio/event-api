@@ -1,0 +1,5 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: add-data-lake-skipped-column.sql
