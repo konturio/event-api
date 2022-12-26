@@ -170,12 +170,12 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv
   eventCombination:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv
   feedComposition:
     enable: true
     initialDelay: 1000

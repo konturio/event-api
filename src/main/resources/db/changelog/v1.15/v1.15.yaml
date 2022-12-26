@@ -3,3 +3,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-data-lake-skipped-column.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-pdc-providers-to-public-feed.sql

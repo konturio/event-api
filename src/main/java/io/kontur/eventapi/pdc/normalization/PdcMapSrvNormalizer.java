@@ -13,6 +13,7 @@ import org.wololo.geojson.Geometry;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 
 @Component
@@ -43,7 +44,11 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
         normalizedObservation.setType(defineType(readString(properties, "type_id")));
         normalizedObservation.setGeometries(convertGeometries(geometry));
         normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
-        return Optional.of(normalizedObservation);
+        // TODO: check if flood is from NASA
+        if (FLOOD.equals(normalizedObservation.getType())) {
+            return Optional.of(normalizedObservation);
+        }
+        return Optional.empty();
     }
 
     private FeatureCollection convertGeometries(Geometry geometry) {
