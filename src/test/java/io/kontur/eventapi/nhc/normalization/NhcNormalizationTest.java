@@ -174,10 +174,10 @@ public class NhcNormalizationTest {
         DataLake dataLake = createDataLake("nhc_norm_test_neg1.xml", NhcUtil.NHC_AT_PROVIDER);
 
         //when
-        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake).get();
+        Optional<NormalizedObservation> observation = new NhcNormalizer().normalize(dataLake);
 
         //then
-        assertNull(observation);
+        assertTrue(observation.isEmpty());
     }
 
     @Test
@@ -186,10 +186,10 @@ public class NhcNormalizationTest {
         DataLake dataLake = createDataLake("nhc_norm_test_neg2.xml", NhcUtil.NHC_AT_PROVIDER);
 
         //when
-        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake).get();
+        Optional<NormalizedObservation> observation = new NhcNormalizer().normalize(dataLake);
 
         //then
-        assertNull(observation);
+        assertTrue(observation.isEmpty());
     }
 
     @Test
@@ -198,10 +198,10 @@ public class NhcNormalizationTest {
         DataLake dataLake = createDataLake("nhc_norm_test_neg3.xml", NhcUtil.NHC_AT_PROVIDER);
 
         //when
-        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake).get();
+        Optional<NormalizedObservation> observation = new NhcNormalizer().normalize(dataLake);
 
         //then
-        assertNull(observation);
+        assertTrue(observation.isEmpty());
     }
 
     @Test
@@ -210,10 +210,10 @@ public class NhcNormalizationTest {
         DataLake dataLake = createDataLake("nhc_norm_test_neg4.xml", NhcUtil.NHC_AT_PROVIDER);
 
         //when
-        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake).get();
+        Optional<NormalizedObservation> observation = new NhcNormalizer().normalize(dataLake);
 
         //then
-        assertNull(observation);
+        assertTrue(observation.isEmpty());
     }
 
     @Test
@@ -222,10 +222,10 @@ public class NhcNormalizationTest {
         DataLake dataLake = createDataLake("nhc_norm_test_neg5.xml", NhcUtil.NHC_AT_PROVIDER);
 
         //when
-        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake).get();
+        Optional<NormalizedObservation> observation = new NhcNormalizer().normalize(dataLake);
 
         //then
-        assertNull(observation);
+        assertTrue(observation.isEmpty());
     }
 
     @Test
@@ -234,10 +234,10 @@ public class NhcNormalizationTest {
         DataLake dataLake = createDataLake("nhc_norm_test_neg6.xml", NhcUtil.NHC_AT_PROVIDER);
 
         //when
-        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake).get();
+        Optional<NormalizedObservation> observation = new NhcNormalizer().normalize(dataLake);
 
         //then
-        assertNull(observation);
+        assertTrue(observation.isEmpty());
     }
 
     private void checkGeometriesValue(FeatureCollection geom, Integer expectedCount) {
