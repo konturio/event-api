@@ -12,6 +12,7 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static io.kontur.eventapi.entity.EventType.*;
@@ -48,10 +49,10 @@ class PdcSqsMessageNormalizerTest {
         assertEquals("2", observation.getExternalEventId());
         assertEquals("2", observation.getExternalEpisodeId());
         assertEquals(MINOR, observation.getEventSeverity());
-        assertEquals(WILDFIRE, observation.getType());
+        assertEquals(FLOOD, observation.getType());
         assertEquals("hazard name", observation.getName());
-        assertEquals("hazard description", observation.getDescription());
-        assertEquals("hazard description", observation.getEpisodeDescription());
+        assertEquals("hazard description (NASA)", observation.getDescription());
+        assertEquals("hazard description (NASA)", observation.getEpisodeDescription());
         assertEquals(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getEndedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
@@ -69,38 +70,39 @@ class PdcSqsMessageNormalizerTest {
     public void testNormalize_HazardCyclone() throws IOException, ParseException {
         String filename = "PdcSqsMessageNormalizerTest_HAZARD_CYCLONE.json";
         DataLake dataLake = createDataLake(filename);
-
-        NormalizedObservation observation = normalizer.normalize(dataLake).get();
-
-        assertEquals(dataLake.getObservationId(), observation.getObservationId());
-        assertEquals(dataLake.getProvider(), observation.getProvider());
-        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
-
-        assertEquals("POINT(10.0 10.0)", observation.getPoint());
-
-        assertEquals(1, observation.getGeometries().getFeatures().length);
-        assertEquals(geoJSONWriter.write(wktReader.read("POINT(10.0 10.0)")).toString(),
-                observation.getGeometries().getFeatures()[0].getGeometry().toString());
-        assertEquals(SQS_CYCLONE_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
-
-        assertEquals("2", observation.getExternalEventId());
-        assertEquals("2", observation.getExternalEpisodeId());
-        assertEquals(MINOR, observation.getEventSeverity());
-        assertEquals(CYCLONE, observation.getType());
-        assertEquals("hazard name", observation.getName());
-        assertEquals("hazard description", observation.getDescription());
-        assertEquals("hazard description", observation.getEpisodeDescription());
-        assertEquals(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"), observation.getStartedAt());
-        assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getEndedAt());
-        assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
-
-        assertNull(observation.getActive());
-        assertTrue(observation.getUrls().isEmpty());
-        assertNull(observation.getCost());
-        assertNull(observation.getRegion());
-        assertNull(observation.getProperName());
-        assertNull(observation.getNormalizedAt());
-        assertFalse(observation.getRecombined());
+        Optional<NormalizedObservation> observation = normalizer.normalize(dataLake);
+        assertTrue(observation.isEmpty());
+//        NormalizedObservation observation = normalizer.normalize(dataLake).get();
+//
+//        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+//        assertEquals(dataLake.getProvider(), observation.getProvider());
+//        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+//
+//        assertEquals("POINT(10.0 10.0)", observation.getPoint());
+//
+//        assertEquals(1, observation.getGeometries().getFeatures().length);
+//        assertEquals(geoJSONWriter.write(wktReader.read("POINT(10.0 10.0)")).toString(),
+//                observation.getGeometries().getFeatures()[0].getGeometry().toString());
+//        assertEquals(SQS_CYCLONE_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
+//
+//        assertEquals("2", observation.getExternalEventId());
+//        assertEquals("2", observation.getExternalEpisodeId());
+//        assertEquals(MINOR, observation.getEventSeverity());
+//        assertEquals(CYCLONE, observation.getType());
+//        assertEquals("hazard name", observation.getName());
+//        assertEquals("hazard description", observation.getDescription());
+//        assertEquals("hazard description", observation.getEpisodeDescription());
+//        assertEquals(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"), observation.getStartedAt());
+//        assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getEndedAt());
+//        assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());
+//
+//        assertNull(observation.getActive());
+//        assertTrue(observation.getUrls().isEmpty());
+//        assertNull(observation.getCost());
+//        assertNull(observation.getRegion());
+//        assertNull(observation.getProperName());
+//        assertNull(observation.getNormalizedAt());
+//        assertFalse(observation.getRecombined());
     }
 
     @Test
@@ -126,8 +128,8 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(EXTREME, observation.getEventSeverity());
         assertEquals(FLOOD, observation.getType());
         assertEquals("hazard name", observation.getName());
-        assertEquals("hazard description", observation.getDescription());
-        assertEquals("hazard description", observation.getEpisodeDescription());
+        assertEquals("hazard description (NASA)", observation.getDescription());
+        assertEquals("hazard description (NASA)", observation.getEpisodeDescription());
         assertEquals(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"), observation.getStartedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getEndedAt());
         assertEquals(OffsetDateTime.parse("2020-01-01T01:00:00.000Z"), observation.getSourceUpdatedAt());

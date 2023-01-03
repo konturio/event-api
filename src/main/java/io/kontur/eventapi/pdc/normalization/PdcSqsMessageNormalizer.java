@@ -66,7 +66,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
                 throw new IllegalArgumentException("Unexpected message type: " + type);
         }
 
-        if (FLOOD.equals(normalizedDto.getType()) && normalizedDto.getDescription() != null && normalizedDto.getDescription().contains("NASA")) {
+        if (FLOOD.equals(normalizedDto.getType()) && normalizedDto.getOrigin() != null && ORIGIN_NASA.equals(normalizedDto.getOrigin())) {
             return Optional.of(normalizedDto);
         }
         return Optional.empty();
@@ -87,6 +87,8 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         String description = readString((Map<String, Object>) props.get("hazardDescription"), "description");
         normalizedDto.setDescription(description);
         normalizedDto.setEpisodeDescription(description);
+        String origin = description != null && description.contains(ORIGIN_NASA) ? ORIGIN_NASA : null;
+        normalizedDto.setOrigin(origin);
         normalizedDto.setStartedAt(readDateTime(props, "startDate"));
         normalizedDto.setEndedAt(readDateTime(props, "endDate"));
         normalizedDto.setEventSeverity(

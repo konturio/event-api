@@ -18,6 +18,7 @@ public interface NormalizedObservationsMapper {
                @Param("externalEventId") String externalEventId,
                @Param("externalEpisodeId") String externalEpisodeId,
                @Param("provider") String provider,
+               @Param("origin") String origin,
                @Param("point") String point,
                @Param("geometries") String geometries,
                @Param("eventSeverity") Severity eventSeverity,

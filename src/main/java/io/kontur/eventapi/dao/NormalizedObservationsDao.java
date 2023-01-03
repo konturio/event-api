@@ -27,10 +27,10 @@ public class NormalizedObservationsDao {
         dataLakeDao.markAsNormalized(obs.getObservationId());
         String geometries = writeJson(obs.getGeometries());
         return mapper.insert(obs.getObservationId(), obs.getExternalEventId(), obs.getExternalEpisodeId(),
-                obs.getProvider(), obs.getPoint(), geometries, obs.getEventSeverity(), obs.getName(), obs.getProperName(),
-                obs.getDescription(), obs.getEpisodeDescription(), obs.getType(), obs.getActive(), obs.getCost(),
-                obs.getRegion(), obs.getLoadedAt(), obs.getStartedAt(), obs.getEndedAt(), obs.getSourceUpdatedAt(),
-                obs.getUrls(), obs.getRecombined());
+                obs.getProvider(), obs.getOrigin(), obs.getPoint(), geometries, obs.getEventSeverity(), obs.getName(),
+                obs.getProperName(), obs.getDescription(), obs.getEpisodeDescription(), obs.getType(), obs.getActive(),
+                obs.getCost(), obs.getRegion(), obs.getLoadedAt(), obs.getStartedAt(), obs.getEndedAt(),
+                obs.getSourceUpdatedAt(), obs.getUrls(), obs.getRecombined());
     }
 
     public void markAsRecombined(UUID observationId) {

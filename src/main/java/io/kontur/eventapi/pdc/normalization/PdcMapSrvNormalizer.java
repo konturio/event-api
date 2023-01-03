@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
+import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 
 @Component
 public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
@@ -26,27 +27,36 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
     @Override
     public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
-        NormalizedObservation normalizedObservation = new NormalizedObservation();
-        normalizedObservation.setObservationId(dataLakeDto.getObservationId());
-        normalizedObservation.setProvider(dataLakeDto.getProvider());
-        normalizedObservation.setActive(true);
-        normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
-        normalizedObservation.setStartedAt(dataLakeDto.getLoadedAt());
-        normalizedObservation.setEndedAt(dataLakeDto.getLoadedAt());
-        normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
-        normalizedObservation.setEventSeverity(Severity.UNKNOWN);
-        normalizedObservation.setExternalEventId(dataLakeDto.getExternalId());
+        NormalizedObservation observation = new NormalizedObservation();
+
+        observation.setObservationId(dataLakeDto.getObservationId());
+        observation.setProvider(dataLakeDto.getProvider());
+        observation.setActive(true);
+        observation.setLoadedAt(dataLakeDto.getLoadedAt());
+        observation.setEventSeverity(Severity.UNKNOWN);
+        observation.setExternalEventId(dataLakeDto.getExternalId());
 
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
         Map<String, Object> properties = feature.getProperties();
         Geometry geometry = feature.getGeometry();
 
-        normalizedObservation.setType(defineType(readString(properties, "type_id")));
-        normalizedObservation.setGeometries(convertGeometries(geometry));
-        normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
-        // TODO: check if flood is from NASA
-        if (FLOOD.equals(normalizedObservation.getType())) {
-            return Optional.of(normalizedObservation);
+        Long createDate = readLong(properties, "create_date");
+        observation.setStartedAt(createDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(createDate));
+        Long updateDate = readLong(properties, "update_date");
+        observation.setEndedAt(updateDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(updateDate));
+        observation.setSourceUpdatedAt(observation.getEndedAt());
+
+        observation.setType(defineType(readString(properties, "type_id")));
+        String description = readString(properties, "exp_description");
+        observation.setDescription(description);
+        observation.setEpisodeDescription(description);
+
+        observation.setOrigin(observation.getDescription() != null && observation.getDescription().contains(ORIGIN_NASA) ? ORIGIN_NASA : null);
+
+        observation.setGeometries(convertGeometries(geometry));
+        observation.setPoint(GeometryUtil.getCentroid(geometry, observation.getObservationId()));
+        if (FLOOD.equals(observation.getType()) && observation.getOrigin() != null && ORIGIN_NASA.equals(observation.getOrigin())) {
+            return Optional.of(observation);
         }
         return Optional.empty();
     }

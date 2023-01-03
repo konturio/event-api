@@ -13,12 +13,17 @@ import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 import static io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer.EXPOSURE_PROPERTIES;
+import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PdcMapSrvNormalizerTest {
 
-    private static final String HAZARD_ID = "e069a69d-2907-44ae-8d73-d506634fa171";
+    private static final String HAZARD_ID = "b456d05e-b592-4fc6-8876-1c918e5b181c";
     private static final OffsetDateTime LOADED_AT = OffsetDateTime.parse("2021-05-20T10:15:30Z");
+    private static final OffsetDateTime CREATE_DATE = getDateTimeFromMilli(1667418269000L);
+    private static final OffsetDateTime UPDATE_DATE = getDateTimeFromMilli(1667418269000L);
+    private static final String DESCRIPTION = "Aggregated pfaf6 watershed polygons (NASA)";
+
 
     @Test
     public void testIsApplicable() throws IOException {
@@ -38,16 +43,16 @@ class PdcMapSrvNormalizerTest {
         assertEquals(EXPOSURE_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
         assertEquals(Severity.UNKNOWN, observation.getEventSeverity());
         assertNull(observation.getName());
-        assertNull(observation.getDescription());
-        assertNull(observation.getEpisodeDescription());
-        assertEquals(EventType.CYCLONE, observation.getType());
+        assertEquals(DESCRIPTION, observation.getDescription());
+        assertEquals(DESCRIPTION, observation.getEpisodeDescription());
+        assertEquals(EventType.FLOOD, observation.getType());
         assertTrue(observation.getActive());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
-        assertEquals(dataLake.getLoadedAt(), observation.getStartedAt());
-        assertEquals(dataLake.getLoadedAt(), observation.getEndedAt());
-        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(CREATE_DATE, observation.getStartedAt());
+        assertEquals(UPDATE_DATE, observation.getEndedAt());
+        assertEquals(UPDATE_DATE, observation.getSourceUpdatedAt());
         assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());
     }

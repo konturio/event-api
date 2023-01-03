@@ -257,11 +257,17 @@
 	]
   },
   "properties": {
-	"type_id": "CYCLONE",
-	"objectid": "1537631",
-	"hazard_id": 153763,
-	"hazard_uuid": "e069a69d-2907-44ae-8d73-d506634fa171",
-	"exposure": "TAOS Wind Impact",
-	"ESRI_OID": 1
+	  "type_id": "FLOOD",
+	  "objectid": "b8da086b-866b-49f6-b2ce-4fb572bf0b7d",
+	  "hazard_uuid": "b456d05e-b592-4fc6-8876-1c918e5b181c",
+	  "ESRI_OID": 273,
+	  "geohash": "wjhyhfvrn32cb6kvfhp6tsrzzzzzzzzzzzzz",
+	  "master_incident_id": null,
+	  "exp_description": "Aggregated pfaf6 watershed polygons (NASA)",
+	  "exposure_level": 0,
+	  "hazard_id": 187033,
+	  "create_date": 1667418269000,
+	  "update_date": 1667418269000
+  }
   }
 }
