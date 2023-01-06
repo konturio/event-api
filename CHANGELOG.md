@@ -9,6 +9,12 @@
 #### Removed
 
 
+## 1.14.5 - 2023-01-06
+
+#### Changed
+
+- update EM-DAT license and turn it on for import 
+
 ## 1.14.4 - 2022-12-15
 
 #### Added
