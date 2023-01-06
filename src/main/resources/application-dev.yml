@@ -22,9 +22,6 @@ humanitarianCrisis:
 staticdata:
   s3Folder: 'TEST DEV/'
 
-scheduler:
-  normalization:
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv
 aws:
   sqs:
     enabled: true
