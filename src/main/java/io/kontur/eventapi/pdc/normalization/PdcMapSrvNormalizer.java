@@ -11,22 +11,25 @@ import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 @Component
 public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return PDC_MAP_SRV_PROVIDER.equals(dataLakeDto.getProvider());
+        Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
+        return PDC_MAP_SRV_PROVIDER.equals(dataLakeDto.getProvider())
+                && !(FLOOD.equals(defineType(readString(feature.getProperties(), "type_id")))
+                && contains(readString(feature.getProperties(), "exp_description"), ORIGIN_NASA));
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation runNormalization(DataLake dataLakeDto) {
         NormalizedObservation observation = new NormalizedObservation();
 
         observation.setObservationId(dataLakeDto.getObservationId());
@@ -55,10 +58,8 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
         observation.setGeometries(convertGeometries(geometry));
         observation.setPoint(GeometryUtil.getCentroid(geometry, observation.getObservationId()));
-        if (FLOOD.equals(observation.getType()) && observation.getOrigin() != null && ORIGIN_NASA.equals(observation.getOrigin())) {
-            return Optional.of(observation);
-        }
-        return Optional.empty();
+
+        return observation;
     }
 
     private FeatureCollection convertGeometries(Geometry geometry) {

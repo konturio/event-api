@@ -19,12 +19,12 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static io.kontur.eventapi.entity.EventType.CYCLONE;
 import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 @Component
 public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
@@ -36,14 +36,15 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider());
+        Map<String, Object> props = parseProps(parseEvent(dataLakeDto.getData()));
+        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider())
+                && !(FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
+                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA));
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
-        JsonNode sns = JsonUtil.readTree(dataLakeDto.getData()).get("Sns");
-        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
-        JsonNode event = JsonUtil.readTree(message.get("event").asText());
+    public NormalizedObservation runNormalization(DataLake dataLakeDto) {
+        JsonNode event = parseEvent(dataLakeDto.getData());
         String type = event.get("syncDa").get("masterSyncEvents").get("type").asText();
 
         NormalizedObservation normalizedDto = new NormalizedObservation();
@@ -51,7 +52,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         normalizedDto.setProvider(dataLakeDto.getProvider());
         normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
 
-        Map<String, Object> props = readJson(event.get("json").asText(), new TypeReference<>() {});
+        Map<String, Object> props = parseProps(event);
         normalizedDto.setSourceUpdatedAt(readDateTime(props, "updateDate"));
 
         switch (type) {
@@ -66,10 +67,17 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
                 throw new IllegalArgumentException("Unexpected message type: " + type);
         }
 
-        if (FLOOD.equals(normalizedDto.getType()) && normalizedDto.getOrigin() != null && ORIGIN_NASA.equals(normalizedDto.getOrigin())) {
-            return Optional.of(normalizedDto);
-        }
-        return Optional.empty();
+        return normalizedDto;
+    }
+
+    protected JsonNode parseEvent(String data) {
+        JsonNode sns = JsonUtil.readTree(data).get("Sns");
+        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
+        return JsonUtil.readTree(message.get("event").asText());
+    }
+
+    protected Map<String, Object> parseProps(JsonNode event) {
+        return readJson(event.get("json").asText(), new TypeReference<>() {});
     }
 
     @SuppressWarnings("unchecked")

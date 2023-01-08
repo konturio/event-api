@@ -23,7 +23,7 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation runNormalization(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
@@ -52,7 +52,7 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
                     readDouble(props, "hazard.latitude")));
         }
 
-        return Optional.of(normalizedDto);
+        return normalizedDto;
     }
 
     private FeatureCollection convertGeometries(List<Feature> input) {

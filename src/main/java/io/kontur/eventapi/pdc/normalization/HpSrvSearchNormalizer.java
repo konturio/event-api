@@ -36,7 +36,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation runNormalization(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
@@ -71,7 +71,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
             LOG.warn(e.getMessage(), e);
         }
 
-        return Optional.of(normalizedDto);
+        return normalizedDto;
     }
 
     private FeatureCollection convertGeometry(String point, Map<String, Object> props) throws ParseException {

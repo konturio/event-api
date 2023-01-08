@@ -1,10 +1,13 @@
 package io.kontur.eventapi.pdc.normalization;
 
+import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
+import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static io.kontur.eventapi.util.GeometryUtil.*;
 
@@ -45,4 +48,14 @@ public abstract class PdcHazardNormalizer extends Normalizer {
         return typeMap.getOrDefault(typeId, EventType.OTHER);
     }
 
+    @Override
+    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+        return isObservationSkipped() ? Optional.empty() : Optional.of(runNormalization(dataLakeDto));
+    }
+
+    protected abstract NormalizedObservation runNormalization(DataLake dataLake);
+
+    protected boolean isObservationSkipped() {
+        return true;
+    }
 }
