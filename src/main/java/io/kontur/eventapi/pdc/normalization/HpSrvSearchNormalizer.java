@@ -82,4 +82,8 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
 
     }
 
+    @Override
+    protected boolean isObservationSkipped() {
+        return false;
+    }
 }

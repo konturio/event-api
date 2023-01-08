@@ -68,4 +68,9 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
         String dateTime = readString(map, key);
         return dateTime == null ? null : OffsetDateTime.parse(dateTime, magsDateTimeFormatter);
     }
+
+    @Override
+    protected boolean isObservationSkipped() {
+        return false;
+    }
 }
