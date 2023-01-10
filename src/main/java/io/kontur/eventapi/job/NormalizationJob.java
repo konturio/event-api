@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 @Component
 public class NormalizationJob extends AbstractJob {
 

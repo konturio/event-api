@@ -36,10 +36,12 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        Map<String, Object> props = parseProps(parseEvent(dataLakeDto.getData()));
-        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider())
-                && !(FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
-                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA));
+        if (PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider())) {
+            Map<String, Object> props = parseProps(parseEvent(dataLakeDto.getData()));
+            return !(FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
+                    && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA));
+        }
+        return false;
     }
 
     @Override

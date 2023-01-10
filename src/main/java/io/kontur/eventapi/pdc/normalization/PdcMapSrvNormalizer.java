@@ -22,16 +22,17 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
-        return PDC_MAP_SRV_PROVIDER.equals(dataLakeDto.getProvider())
-                && !(FLOOD.equals(defineType(readString(feature.getProperties(), "type_id")))
-                && contains(readString(feature.getProperties(), "exp_description"), ORIGIN_NASA));
+        if (PDC_MAP_SRV_PROVIDER.equals(dataLakeDto.getProvider())) {
+            Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
+            return !(FLOOD.equals(defineType(readString(feature.getProperties(), "type_id")))
+                    && contains(readString(feature.getProperties(), "exp_description"), ORIGIN_NASA));
+        }
+        return false;
     }
 
     @Override
     public NormalizedObservation runNormalization(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
-
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setProvider(dataLakeDto.getProvider());
         normalizedObservation.setActive(true);
