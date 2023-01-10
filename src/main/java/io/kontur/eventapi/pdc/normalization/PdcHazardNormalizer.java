@@ -53,7 +53,7 @@ public abstract class PdcHazardNormalizer extends Normalizer {
         return isObservationSkipped() ? Optional.empty() : Optional.of(runNormalization(dataLakeDto));
     }
 
-    protected abstract NormalizedObservation runNormalization(DataLake dataLake);
+    public abstract NormalizedObservation runNormalization(DataLake dataLake);
 
     protected boolean isObservationSkipped() {
         return true;

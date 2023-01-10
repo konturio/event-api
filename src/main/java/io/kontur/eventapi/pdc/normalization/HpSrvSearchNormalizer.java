@@ -17,7 +17,6 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;

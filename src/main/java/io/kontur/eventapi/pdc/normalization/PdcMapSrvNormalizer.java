@@ -30,36 +30,35 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
     @Override
     public NormalizedObservation runNormalization(DataLake dataLakeDto) {
-        NormalizedObservation observation = new NormalizedObservation();
+        NormalizedObservation normalizedObservation = new NormalizedObservation();
 
-        observation.setObservationId(dataLakeDto.getObservationId());
-        observation.setProvider(dataLakeDto.getProvider());
-        observation.setActive(true);
-        observation.setLoadedAt(dataLakeDto.getLoadedAt());
-        observation.setEventSeverity(Severity.UNKNOWN);
-        observation.setExternalEventId(dataLakeDto.getExternalId());
+        normalizedObservation.setObservationId(dataLakeDto.getObservationId());
+        normalizedObservation.setProvider(dataLakeDto.getProvider());
+        normalizedObservation.setActive(true);
+        normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
+        normalizedObservation.setEventSeverity(Severity.UNKNOWN);
+        normalizedObservation.setExternalEventId(dataLakeDto.getExternalId());
 
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
         Map<String, Object> properties = feature.getProperties();
         Geometry geometry = feature.getGeometry();
 
         Long createDate = readLong(properties, "create_date");
-        observation.setStartedAt(createDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(createDate));
+        normalizedObservation.setStartedAt(createDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(createDate));
         Long updateDate = readLong(properties, "update_date");
-        observation.setEndedAt(updateDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(updateDate));
-        observation.setSourceUpdatedAt(observation.getEndedAt());
+        normalizedObservation.setEndedAt(updateDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(updateDate));
+        normalizedObservation.setSourceUpdatedAt(normalizedObservation.getEndedAt());
 
-        observation.setType(defineType(readString(properties, "type_id")));
         String description = readString(properties, "exp_description");
-        observation.setDescription(description);
-        observation.setEpisodeDescription(description);
+        normalizedObservation.setDescription(description);
+        normalizedObservation.setEpisodeDescription(description);
 
-        observation.setOrigin(observation.getDescription() != null && observation.getDescription().contains(ORIGIN_NASA) ? ORIGIN_NASA : null);
+        normalizedObservation.setOrigin(contains(description, ORIGIN_NASA) ? ORIGIN_NASA : null);
 
-        observation.setGeometries(convertGeometries(geometry));
-        observation.setPoint(GeometryUtil.getCentroid(geometry, observation.getObservationId()));
-
-        return observation;
+        normalizedObservation.setType(defineType(readString(properties, "type_id")));
+        normalizedObservation.setGeometries(convertGeometries(geometry));
+        normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
+        return normalizedObservation;
     }
 
     private FeatureCollection convertGeometries(Geometry geometry) {

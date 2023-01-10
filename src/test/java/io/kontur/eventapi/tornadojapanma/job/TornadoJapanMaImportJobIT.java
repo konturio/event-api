@@ -9,7 +9,7 @@ import io.kontur.eventapi.tornadojapanma.dto.ParsedCase;
 import io.kontur.eventapi.tornadojapanma.parser.TornadoJapanMaHtmlParser;
 import io.kontur.eventapi.tornadojapanma.service.TornadoJapanMaImportService;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;

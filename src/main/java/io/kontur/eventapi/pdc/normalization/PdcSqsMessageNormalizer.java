@@ -66,7 +66,6 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
             default:
                 throw new IllegalArgumentException("Unexpected message type: " + type);
         }
-
         return normalizedDto;
     }
 
