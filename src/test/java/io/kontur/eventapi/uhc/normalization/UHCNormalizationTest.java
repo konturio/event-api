@@ -48,7 +48,7 @@ class UHCNormalizationTest {
         DataLake dataLake = createDataLake();
 
         //when
-        NormalizedObservation observation = new HumanitarianCrisisNormalizer().normalize(dataLake).get();
+        NormalizedObservation observation = new HumanitarianCrisisNormalizer().normalize(dataLake);
 
         //then
         assertEquals(dataLake.getObservationId(), observation.getObservationId());

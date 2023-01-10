@@ -26,7 +26,7 @@ class PerimetersNifcNormalizerTest {
     void testNormalize() throws IOException {
         DataLake dataLake = createDataLake();
 
-        NormalizedObservation observation = normalizer.normalize(dataLake).get();
+        NormalizedObservation observation = normalizer.normalize(dataLake);
 
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());

@@ -17,7 +17,6 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.firms.FirmsUtil.FIRMS_PROVIDERS;
@@ -47,7 +46,7 @@ public class FirmsNormalizer extends Normalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         var normalizedObservation = new NormalizedObservation();
 
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
@@ -70,7 +69,7 @@ public class FirmsNormalizer extends Normalizer {
             String wktPolygon = createWktPolygon(longitude, latitude);
             normalizedObservation.setGeometries(createGeometry(wktPolygon));
         }
-        return Optional.of(normalizedObservation);
+        return normalizedObservation;
     }
 
     private String createWktPolygon(Double longitude, Double latitude) {

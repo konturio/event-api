@@ -33,7 +33,7 @@ class CalFireNormalizationTest {
         DataLake dataLake = createDataLake();
 
         //when
-        NormalizedObservation observation = new CalFireNormalizer().normalize(dataLake).get();
+        NormalizedObservation observation = new CalFireNormalizer().normalize(dataLake);
 
         //then
         assertEquals(dataLake.getObservationId(), observation.getObservationId());

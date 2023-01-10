@@ -9,11 +9,15 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
-import java.util.Optional;
 
 public abstract class Normalizer implements Applicable<DataLake> {
 
-    public abstract Optional<NormalizedObservation> normalize(DataLake dataLakeDto);
+    public abstract NormalizedObservation normalize(DataLake dataLakeDto);
+
+    public boolean isSkipped() {
+        return false;
+    }
+
     protected final static ObjectMapper mapper = new ObjectMapper();
 
     protected String readString(Map<String, Object> map, String key) {

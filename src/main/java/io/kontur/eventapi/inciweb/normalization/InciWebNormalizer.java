@@ -33,7 +33,7 @@ public class InciWebNormalizer extends Normalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         Optional<CapParsedItem> parsedItem = new InciWebXmlParser().getParsedItem(dataLakeDto.getData());
         if (parsedItem.isPresent()) {
             NormalizedObservation normalizedObservation = new NormalizedObservation();
@@ -58,7 +58,7 @@ public class InciWebNormalizer extends Normalizer {
             normalizedObservation.setPoint(
                     makeWktPoint(parsedItem.get().getLongitude(), parsedItem.get().getLatitude()));
 
-            return Optional.of(normalizedObservation);
+            return normalizedObservation;
         } else {
             LOG.error("Can't parse input source for normalization for event: {}", dataLakeDto.getExternalId());
         }

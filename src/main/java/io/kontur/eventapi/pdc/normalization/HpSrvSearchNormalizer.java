@@ -35,7 +35,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
     }
 
     @Override
-    public NormalizedObservation runNormalization(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
@@ -65,7 +65,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         normalizedDto.setPoint(pointWkt);
 
         try {
-            normalizedDto.setGeometries(convertGeometry(pointWkt, props));
+            normalizedDto.setGeometries(convertGeometry(pointWkt));
         } catch (ParseException e) {
             LOG.warn(e.getMessage(), e);
         }
@@ -73,7 +73,7 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         return normalizedDto;
     }
 
-    private FeatureCollection convertGeometry(String point, Map<String, Object> props) throws ParseException {
+    private FeatureCollection convertGeometry(String point) throws ParseException {
         Geometry geometry = geoJSONWriter.write(wktReader.read(point));
         Feature feature = new Feature(geometry, HAZARD_PROPERTIES);
 
@@ -81,8 +81,4 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
 
     }
 
-    @Override
-    protected boolean isObservationSkipped() {
-        return false;
-    }
 }

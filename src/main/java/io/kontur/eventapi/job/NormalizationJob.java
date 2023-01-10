@@ -16,7 +16,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Component
 public class NormalizationJob extends AbstractJob {
@@ -61,14 +62,14 @@ public class NormalizationJob extends AbstractJob {
 
     @Timed(value = "normalization.observation.timer")
     @Counted(value = "normalization.observation.counter")
-    private boolean normalize(DataLake dataLake) {
+    private boolean normalize(DataLake denormalizedEvent) {
         try {
-            Normalizer normalizer = Applicable.get(normalizers, dataLake);
-            Optional<NormalizedObservation> normalizedObservationOpt = normalizer.normalize(dataLake);
-            if (normalizedObservationOpt.isPresent()) {
-                normalizedObservationsDao.insert(normalizedObservationOpt.get());
+            Normalizer normalizer = Applicable.get(normalizers, denormalizedEvent);
+            if (!normalizer.isSkipped()) {
+                NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
+                normalizedObservationsDao.insert(checkNotNull(normalizedDto));
             } else {
-                dataLakeDao.markAsSkipped(dataLake.getObservationId());
+                dataLakeDao.markAsSkipped(denormalizedEvent.getObservationId());
             }
             return true;
         } catch (Exception e) {

@@ -23,7 +23,7 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
     }
 
     @Override
-    public NormalizedObservation runNormalization(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
@@ -67,10 +67,5 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
     protected OffsetDateTime readDateTime(Map<String, Object> map, String key) {
         String dateTime = readString(map, key);
         return dateTime == null ? null : OffsetDateTime.parse(dateTime, magsDateTimeFormatter);
-    }
-
-    @Override
-    protected boolean isObservationSkipped() {
-        return false;
     }
 }

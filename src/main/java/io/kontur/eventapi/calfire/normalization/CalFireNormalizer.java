@@ -19,7 +19,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static io.kontur.eventapi.calfire.converter.CalFireDataLakeConverter.CALFIRE_PROVIDER;
 import static io.kontur.eventapi.util.GeometryUtil.*;
@@ -39,7 +38,7 @@ public class CalFireNormalizer extends Normalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
         Geometry geometry = feature.getGeometry();
@@ -98,6 +97,6 @@ public class CalFireNormalizer extends Normalizer {
                 normalizedObservation.setEventSeverity(Severity.EXTREME);
             }
         }
-        return Optional.of(normalizedObservation);
+        return normalizedObservation;
     }
 }

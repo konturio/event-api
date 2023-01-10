@@ -28,7 +28,7 @@ class PdcMapSrvNormalizerTest {
     @Test
     public void testNormalize() throws IOException {
         DataLake dataLake = generateDataLake();
-        NormalizedObservation observation = new PdcMapSrvNormalizer().runNormalization(dataLake);
+        NormalizedObservation observation = new PdcMapSrvNormalizer().normalize(dataLake);
 
         assertEquals(dataLake.getObservationId(), observation.getObservationId());
         assertEquals(dataLake.getExternalId(), observation.getExternalEventId());

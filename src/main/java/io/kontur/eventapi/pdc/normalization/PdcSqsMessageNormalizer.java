@@ -36,18 +36,26 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        if (PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider())) {
-            Map<String, Object> props = parseProps(parseEvent(dataLakeDto.getData()));
-            return !(FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
-                    && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA));
-        }
-        return false;
+        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider()) && !isNasaFlood(dataLakeDto);
+    }
+
+    protected boolean isNasaFlood(DataLake dataLake) {
+        JsonNode event = parseEvent(dataLake.getData());
+        Map<String, Object> props = parseProps(event);
+        return "HAZARD".equals(getType(event))
+                && FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
+                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA);
     }
 
     @Override
-    public NormalizedObservation runNormalization(DataLake dataLakeDto) {
+    public boolean isSkipped() {
+        return true;
+    }
+
+    @Override
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         JsonNode event = parseEvent(dataLakeDto.getData());
-        String type = event.get("syncDa").get("masterSyncEvents").get("type").asText();
+        String type = getType(event);
 
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
@@ -81,6 +89,10 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         return readJson(event.get("json").asText(), new TypeReference<>() {});
     }
 
+    protected String getType(JsonNode event) {
+        return event.get("syncDa").get("masterSyncEvents").get("type").asText();
+    }
+
     @SuppressWarnings("unchecked")
     private void convertMagTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props, String uniqueExternalId) {
         normalizedDto.setExternalEpisodeId(uniqueExternalId);
@@ -96,8 +108,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         String description = readString((Map<String, Object>) props.get("hazardDescription"), "description");
         normalizedDto.setDescription(description);
         normalizedDto.setEpisodeDescription(description);
-        String origin = description != null && description.contains(ORIGIN_NASA) ? ORIGIN_NASA : null;
-        normalizedDto.setOrigin(origin);
+        normalizedDto.setOrigin(contains(description, ORIGIN_NASA) ? ORIGIN_NASA : null);
         normalizedDto.setStartedAt(readDateTime(props, "startDate"));
         normalizedDto.setEndedAt(readDateTime(props, "endDate"));
         normalizedDto.setEventSeverity(

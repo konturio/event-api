@@ -102,7 +102,7 @@ public class StormsNoaaNormalizer extends Normalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setProvider(dataLakeDto.getProvider());
@@ -135,7 +135,7 @@ public class StormsNoaaNormalizer extends Normalizer {
         String state = parseString(data, "STATE");
         normalizedObservation.setName(createName(eventType, zone, state, "USA"));
 
-        return Optional.of(normalizedObservation);
+        return normalizedObservation;
     }
 
     private void setGeometry(Map<String, String> data, NormalizedObservation normalizedObservation) {

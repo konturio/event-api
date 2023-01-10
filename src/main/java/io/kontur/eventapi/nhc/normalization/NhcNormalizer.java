@@ -40,7 +40,7 @@ public class NhcNormalizer extends Normalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         NhcXmlParser parser = new NhcXmlParser();
         Optional<CapParsedItem> parsedItem = parser.getParsedItem(dataLakeDto.getData());
         if (parsedItem.isPresent() && StringUtils.isNotBlank(parsedItem.get().getDescription())) {
@@ -82,7 +82,7 @@ public class NhcNormalizer extends Normalizer {
                     } else {
                         LOG.warn("Empty one of the base parameters for NHC cyclone (name, type, id, adv number). {}",
                                 parsedItem.get().getDescription());
-                        return Optional.empty();
+                        return null;
                     }
                     if (StringUtils.isNotBlank(mainMatches.get(CURRENT_TIME_POS))) {
                         try {
@@ -100,11 +100,11 @@ public class NhcNormalizer extends Normalizer {
                             currentYear = currentDateTime.getYear();
                         } catch (Exception e) {
                             LOG.warn("Can't parse current time for NHC cyclone. {}", parsedItem.get().getDescription());
-                            return Optional.empty();
+                            return null;
                         }
                     } else {
                         LOG.warn("Empty current time for NHC cyclone. {}", parsedItem.get().getDescription());
-                        return Optional.empty();
+                        return null;
                     }
 
                     Map<Integer, Map<Integer, String>> maxSustainedWind;
@@ -126,16 +126,16 @@ public class NhcNormalizer extends Normalizer {
                             } catch (Exception e) {
                                 LOG.warn("Can't get max sustained wind speed from {}",
                                         mainMatches.get(MAX_SUSTAINED_WIND_POS));
-                                return Optional.empty();
+                                return null;
                             }
                         } else {
                             LOG.warn("Can't parse max sustained wind for NHC cyclone. {}",
                                     mainMatches.get(MAX_SUSTAINED_WIND_POS));
-                            return Optional.empty();
+                            return null;
                         }
                     } else {
                         LOG.warn("Empty max sustained wind for NHC cyclone. {}", parsedItem.get().getDescription());
-                        return Optional.empty();
+                        return null;
                     }
 
                     List<Feature> featuresList = new ArrayList<>();
@@ -151,7 +151,7 @@ public class NhcNormalizer extends Normalizer {
                         if (centerPointFeature.isEmpty()) {
                             LOG.warn("Can't parse center location point for NHC cyclone. {}",
                                     mainMatches.get(CENTER_POS));
-                            return Optional.empty();
+                            return null;
                         }
                         centerPointFeature.ifPresent(feature ->
                                 prepareWindSections(parser, maxSustainedWind.get(1), MAX_WIND_64_POS, MAX_WIND_34_POS)
@@ -159,7 +159,7 @@ public class NhcNormalizer extends Normalizer {
                         centerPointFeature.ifPresent(featuresList::add);
                     } else {
                         LOG.warn("Empty center location point for NHC cyclone. {}", parsedItem.get().getDescription());
-                        return Optional.empty();
+                        return null;
                     }
                     // Create geometries for cyclone's forecast points
                     Map<Integer, Map<Integer, String>> forecastsPointInfo =
@@ -202,17 +202,17 @@ public class NhcNormalizer extends Normalizer {
                     normalizedObservation.setGeometries(new FeatureCollection(featuresList.toArray(new Feature[0])));
                 } else {
                     LOG.warn("Can't parse description for NHC cyclone. {}", parsedItem.get().getDescription());
-                    return Optional.empty();
+                    return null;
                 }
             } catch (Exception e) {
                 LOG.warn("Error while parsing NHC cyclone's description {}", parsedItem.get().getDescription());
-                return Optional.empty();
+                return null;
             }
-            return Optional.of(normalizedObservation);
+            return normalizedObservation;
         } else {
             LOG.error("Can't parse input source for normalization for event: {}", dataLakeDto.getExternalId());
         }
-        return Optional.empty();
+        return null;
     }
 
     private Optional<Feature> prepareFeature(Map<Integer, Map<Integer, String>> info,

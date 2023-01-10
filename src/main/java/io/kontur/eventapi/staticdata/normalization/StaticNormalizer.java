@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.util.GeometryUtil.*;
@@ -29,11 +28,11 @@ public abstract class StaticNormalizer extends Normalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         setCommonFields(dataLakeDto, normalizedObservation);
         setExtraFields(dataLakeDto, normalizedObservation);
-        return Optional.of(normalizedObservation);
+        return normalizedObservation;
     }
 
     private void setCommonFields(DataLake dataLake, NormalizedObservation normalizedObservation) {

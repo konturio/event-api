@@ -1,13 +1,10 @@
 package io.kontur.eventapi.pdc.normalization;
 
-import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
-import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static io.kontur.eventapi.util.GeometryUtil.*;
 
@@ -17,7 +14,7 @@ public abstract class PdcHazardNormalizer extends Normalizer {
     protected final static Map<String, Object> HAZARD_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, CENTER_POINT);
     protected final static Map<String, Object> MAG_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, ALERT_AREA, IS_OBSERVED_PROPERTY, true);
     protected final static Map<String, Object> SQS_CYCLONE_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, POSITION, IS_OBSERVED_PROPERTY, true);
-    protected final String ORIGIN_NASA = "NASA";
+    protected final static String ORIGIN_NASA = "NASA";
 
     private static final Map<String, EventType> typeMap = Map.of(
             "FLOOD", EventType.FLOOD,
@@ -48,14 +45,4 @@ public abstract class PdcHazardNormalizer extends Normalizer {
         return typeMap.getOrDefault(typeId, EventType.OTHER);
     }
 
-    @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
-        return isObservationSkipped() ? Optional.empty() : Optional.of(runNormalization(dataLakeDto));
-    }
-
-    public abstract NormalizedObservation runNormalization(DataLake dataLake);
-
-    protected boolean isObservationSkipped() {
-        return true;
-    }
 }

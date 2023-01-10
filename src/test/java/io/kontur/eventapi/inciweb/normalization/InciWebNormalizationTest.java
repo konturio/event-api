@@ -39,7 +39,7 @@ class InciWebNormalizationTest {
         DataLake dataLake = createDataLake();
 
         //when
-        NormalizedObservation observation = new InciWebNormalizer().normalize(dataLake).get();
+        NormalizedObservation observation = new InciWebNormalizer().normalize(dataLake);
 
         //then
         assertEquals(dataLake.getObservationId(), observation.getObservationId());

@@ -34,7 +34,7 @@ class HpSrvSearchNormalizerTest {
         dataLake.setExternalId(UUID.randomUUID().toString());
 
         //when
-        NormalizedObservation obs = new HpSrvSearchNormalizer().runNormalization(dataLake);
+        NormalizedObservation obs = new HpSrvSearchNormalizer().normalize(dataLake);
 
         //then
         assertEquals(dataLake.getObservationId(), obs.getObservationId());

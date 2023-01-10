@@ -38,7 +38,7 @@ class StormsNoaaNormalizerIT extends AbstractCleanableIntegrationTest {
     @Test
     public void testNormalize() {
         DataLake dataLake = createTestDataLake();
-        NormalizedObservation normalizedObservation = normalizer.normalize(dataLake).get();
+        NormalizedObservation normalizedObservation = normalizer.normalize(dataLake);
 
         assertEquals(dataLake.getObservationId(), normalizedObservation.getObservationId());
         assertEquals(dataLake.getLoadedAt(), normalizedObservation.getLoadedAt());

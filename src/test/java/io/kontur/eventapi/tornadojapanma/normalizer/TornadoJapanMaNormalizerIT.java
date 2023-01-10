@@ -7,7 +7,7 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -36,7 +36,7 @@ class TornadoJapanMaNormalizerIT extends AbstractCleanableIntegrationTest {
     @Test
     public void testNormalize() {
         DataLake dataLake = createTestDataLake();
-        NormalizedObservation normalizedObservation = normalizer.normalize(dataLake).get();
+        NormalizedObservation normalizedObservation = normalizer.normalize(dataLake);
         assertEquals(dataLake.getObservationId(), normalizedObservation.getObservationId());
         assertEquals(dataLake.getExternalId(), normalizedObservation.getExternalEventId());
         assertEquals(dataLake.getUpdatedAt(), normalizedObservation.getSourceUpdatedAt());

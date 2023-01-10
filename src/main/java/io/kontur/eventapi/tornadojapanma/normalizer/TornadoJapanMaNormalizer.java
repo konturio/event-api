@@ -24,7 +24,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,7 +53,7 @@ public class TornadoJapanMaNormalizer extends Normalizer {
     }
 
     @Override
-    public Optional<NormalizedObservation> normalize(DataLake dataLakeDto) {
+    public NormalizedObservation normalize(DataLake dataLakeDto) {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
@@ -82,7 +85,7 @@ public class TornadoJapanMaNormalizer extends Normalizer {
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
         }
-        return Optional.of(normalizedObservation);
+        return normalizedObservation;
     }
 
     private void setGeometries(NormalizedObservation normalizedObservation, Details details) {
