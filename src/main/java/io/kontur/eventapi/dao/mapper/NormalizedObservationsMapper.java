@@ -29,6 +29,7 @@ public interface NormalizedObservationsMapper {
                @Param("type") EventType type,
                @Param("active") Boolean active,
                @Param("cost") BigDecimal cost,
+               @Param("loss") Map<String, Object> loss,
                @Param("region") String region,
                @Param("loadedAt") OffsetDateTime loadedAt,
                @Param("startedAt") OffsetDateTime startedAt,

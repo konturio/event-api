@@ -9,3 +9,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-pdc-providers-to-public-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add--normalized-observations-loss-column.sql
