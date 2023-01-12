@@ -162,7 +162,8 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
                 .anyMatch(episode -> episode.getObservations().size() > 1);
-        assertTrue(oneEpisodeForTwoObservation);
+        // TODO: assertTrue when MAGS are not skipped
+        assertFalse(oneEpisodeForTwoObservation);
     }
 
     @Test
@@ -201,7 +202,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-feed", List.of(EventType.WILDFIRE), null, null,
+        FeedData feed = feedDao.searchForEvents("test-feed", List.of(EventType.FLOOD), null, null,
                 loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }

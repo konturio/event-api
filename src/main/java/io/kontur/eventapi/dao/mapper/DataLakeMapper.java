@@ -16,6 +16,7 @@ public interface DataLakeMapper {
     void create(DataLake dataLake);
 
     void markAsNormalized(@Param("observationId") UUID observationId);
+    void markAsSkipped(@Param("observationId") UUID observationId);
 
     Optional<DataLake> getLatestUpdatedEventForProvider(@Param("provider") String provider);
 

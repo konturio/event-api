@@ -16,6 +16,7 @@ public class NormalizedObservation {
     private String externalEventId;
     private String externalEpisodeId;
     private String provider;
+    private String origin;
     private String point;
     private FeatureCollection geometries;
     private Severity eventSeverity;
