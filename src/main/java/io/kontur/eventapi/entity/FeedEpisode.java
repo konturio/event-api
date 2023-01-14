@@ -22,10 +22,11 @@ public class FeedEpisode {
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime sourceUpdatedAt;
-    private Set<UUID> observations = new HashSet<>();
-    private Map<String, Object> episodeDetails;
-    private List<String> urls = new ArrayList<>();
     private String location;
+    private List<String> urls = new ArrayList<>();
+    private Map<String, Object> loss;
+    private Map<String, Object> episodeDetails;
+    private Set<UUID> observations = new HashSet<>();
     private FeatureCollection geometries;
 
     public void addUrlIfNotExists(String url) {

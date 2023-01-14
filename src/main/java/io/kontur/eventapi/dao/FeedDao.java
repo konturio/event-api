@@ -46,7 +46,7 @@ public class FeedDao {
                 feedData.getDescription(), feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls(),
                 feedData.getLocation(), feedData.getLatestSeverity(), feedData.getSeverities(),
-                feedData.getGeomFuncType());
+                feedData.getGeomFuncType(), feedData.getLoss());
 
         mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
         feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
@@ -91,7 +91,7 @@ public class FeedDao {
     @Transactional
     public void addAnalytics(FeedData event, String feed) {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
-                event.getEventDetails() == null ? null : writeJson(event.getEventDetails()),
+                event.getEventDetails(),
                 event.getEnriched(), writeJson(event.getEpisodes()), event.getName(),
                 event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
         if (event.getEnriched()) {

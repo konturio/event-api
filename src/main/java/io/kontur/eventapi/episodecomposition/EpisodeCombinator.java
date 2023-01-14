@@ -44,6 +44,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         }
         feedEpisode.setProperName(observation.getProperName());
         feedEpisode.setLocation(observation.getRegion());
+        feedEpisode.setLoss(observation.getLoss());
 
         if (observation.getGeometries() != null) {
             feedEpisode.setGeometries(observation.getGeometries());

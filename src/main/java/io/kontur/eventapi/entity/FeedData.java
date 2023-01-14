@@ -30,6 +30,7 @@ public class FeedData {
     private Boolean enrichmentSkipped;
     private List<String> urls = new ArrayList<>();
     private String location;
+    private Map<String, Object> loss;
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
     private Severity latestSeverity;

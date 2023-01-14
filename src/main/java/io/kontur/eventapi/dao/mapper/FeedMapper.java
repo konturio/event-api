@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Map;
 
 @Mapper
 public interface FeedMapper {
@@ -37,7 +38,8 @@ public interface FeedMapper {
                        @Param("location") String location,
                        @Param("latestSeverity") Severity latestSeverity,
                        @Param("severities") List<Severity> severities,
-                       @Param("geomFuncType") Integer geomFuncType);
+                       @Param("geomFuncType") Integer geomFuncType,
+                       @Param("loss") Map<String, Object> loss);
 
     /**
      * Mark events below specified version outdated
@@ -75,7 +77,7 @@ public interface FeedMapper {
     void addAnalytics(@Param("feedId") UUID feedId,
                       @Param("eventId") UUID eventId,
                       @Param("version") Long version,
-                      @Param("eventDetails") String eventDetails,
+                      @Param("eventDetails") Map<String, Object> eventDetails,
                       @Param("enriched") Boolean enriched,
                       @Param("episodes") String episodes,
                       @Param("name") String name,

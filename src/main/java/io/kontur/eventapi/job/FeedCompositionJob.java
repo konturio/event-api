@@ -156,6 +156,11 @@ public class FeedCompositionJob extends AbstractJob {
                 .filter(ep -> ep.getType() != null)
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getType).orElse(null));
+
+        feedData.setLoss(episodes.stream()
+                .filter(ep -> ep.getLoss() != null && !ep.getLoss().isEmpty())
+                .max(comparing(FeedEpisode::getUpdatedAt))
+                .map(FeedEpisode::getLoss).orElse(null));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

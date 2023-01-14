@@ -16,22 +16,31 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
-                               updated_at, observations, episodes, is_latest_version, enriched, geometries,
-                               enrichment_attempts, urls, location, latest_severity, severities)
-        values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{type}, #{severity}, #{description}, #{startedAt}, #{endedAt},
-                #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
-                #{episodes}::jsonb, true, #{enriched},
-                <choose>
-                    <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
-                        collectcyclonegeometries(#{episodes}::jsonb),
-                    </when>
-                    <otherwise>
-                        collectEventGeometries(#{episodes}::jsonb),
-                    </otherwise>
-                </choose>
-                0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location},
-                #{latestSeverity}, #{severities, typeHandler=io.kontur.eventapi.typehandler.SeverityArrayTypeHandler})
+        insert into feed_data (
+            event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
+            updated_at, location, is_latest_version, enriched, enrichment_attempts, urls, observations, episodes,
+            <if test='loss != null'>
+                loss
+            </if>
+            geometries,  latest_severity, severities
+        )
+        values (
+            #{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{type}, #{severity}, #{description}, #{startedAt}, #{endedAt},
+            #{updatedAt}, #{location}, true, #{enriched}, 0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+            #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler}, #{episodes}::jsonb,
+            <if test='loss != null'>
+                #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
+            </if>
+            <choose>
+                <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
+                    collectcyclonegeometries(#{episodes}::jsonb),
+                </when>
+                <otherwise>
+                    collectEventGeometries(#{episodes}::jsonb),
+                </otherwise>
+            </choose>
+            #{latestSeverity}, #{severities, typeHandler=io.kontur.eventapi.typehandler.SeverityArrayTypeHandler}
+        )
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -190,7 +199,7 @@
         UPDATE feed_data
         SET
             <if test='eventDetails != null'>
-                event_details = #{eventDetails}::jsonb,
+                event_details = #{eventDetails,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
             </if>
             enriched_at = current_timestamp,
             enriched = #{enriched},
@@ -236,6 +245,7 @@
         <result property="enrichmentAttempts" column="enrichment_attempts" />
         <result property="enrichmentSkipped" column="enrichment_skipped" />
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
+        <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler" />
         <result property="location" column="location"/>
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>

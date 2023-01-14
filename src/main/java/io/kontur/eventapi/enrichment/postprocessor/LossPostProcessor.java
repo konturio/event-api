@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import static io.kontur.eventapi.enrichment.EnrichmentConfig.*;
 import static io.kontur.eventapi.entity.EventType.*;
 import static io.kontur.eventapi.util.GeometryUtil.*;
+import static io.kontur.eventapi.util.LossUtil.ESTIMATED_LOSS;
+import static io.kontur.eventapi.util.LossUtil.ESTIMATED_LOSS_BOUND;
 import static java.lang.Math.abs;
 import static java.util.stream.Collectors.toMap;
 import static org.jpmml.evaluator.EvaluatorUtil.decodeAll;
@@ -49,8 +51,11 @@ public class LossPostProcessor extends EnrichmentPostProcessor {
                     .stream()
                     .collect(toMap(ModelField::getName, field -> field.prepare(features.get(field.getName()))));
             Double loss = (Double) decodeAll(evaluator.evaluate(arguments)).get(TARGET);
-            event.getEventDetails().put(LOSS, loss >= 0 ? loss : 0.);
-            event.getEventDetails().put(LOSS_BOUND, abs(loss * errorBoundPct));
+            if (event.getLoss() == null) {
+                event.setLoss(new HashMap<>());
+            }
+            event.getLoss().put(ESTIMATED_LOSS, loss >= 0 ? loss : 0.);
+            event.getLoss().put(ESTIMATED_LOSS_BOUND, abs(loss * errorBoundPct));
         }
     }
 
