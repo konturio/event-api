@@ -26,10 +26,10 @@ create table public.feed_data_upd
     event_id            uuid,                                               --8+8
     feed_id             uuid,                                               --8+8
     version             smallint,                                           --2
-    enrichment_attempts smallint,                                           --2
+    enrichment_attempts smallint                 default 0,                 --2
     severity_id         smallint                 default -1,                --2
-    is_latest_version   boolean                  default false,             --1
-    enriched            boolean                  default true,              --1
+    is_latest_version   boolean                  default true,              --1
+    enriched            boolean                  default false,             --1
     updated_at          timestamp with time zone,                           --8
     started_at          timestamp with time zone,                           --8
     ended_at            timestamp with time zone,                           --8
@@ -42,8 +42,7 @@ create table public.feed_data_upd
     episodes            jsonb,
     observations        uuid[],
     collected_geometry  public.geometry GENERATED ALWAYS AS (public.collectgeometryfromepisodes(episodes)) STORED,
-    episode_types       text[] GENERATED ALWAYS AS (public.collecttypesfromepisodes(episodes)) STORED,
-    event_details       jsonb,
+    event_details       jsonb                    default '{}'::jsonb,
     geometries          jsonb,
     urls                text[]                   default '{}'::text[],
     proper_name         text,

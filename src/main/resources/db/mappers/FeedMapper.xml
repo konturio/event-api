@@ -17,8 +17,7 @@
 
     <insert id="insertFeedData" useGeneratedKeys="false">
         insert into feed_data (event_id, feed_id, version, name, proper_name, type, severity_id, description, started_at, ended_at,
-                               updated_at, observations, episodes, is_latest_version, enriched, geometries,
-                               enrichment_attempts, urls, location)
+                               updated_at, observations, episodes, is_latest_version, enriched, geometries, urls, location)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{type},
                 (select severity_id from severities where severity = #{severity}),
                 #{description}, #{startedAt}, #{endedAt},
@@ -32,7 +31,7 @@
                         collectEventGeometries(#{episodes}::jsonb),
                     </otherwise>
                 </choose>
-                0, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
+                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -51,9 +50,8 @@
                 box2d(fd.collected_geometry) as bbox,
                 st_pointonsurface(fd.collected_geometry) as centroid,
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.type, sv.severity, fd.description,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.collected_geometry, fd.episode_types,
-                fd.is_latest_version, fd.geometries, fd.event_details, fd.enriched, fd.urls, fd.location,
-                fd.composed_at, fd.enriched_at,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.event_details, fd.urls,
+                fd.location,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((
@@ -80,7 +78,10 @@
                     </foreach>
                 </if>
                 <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id >= (select min(severity_id) from severities where severity in (" close="))">
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
+                        #{severity}::text
+                    </foreach>
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
                         #{severity}::text
                     </foreach>
                 </if>
@@ -108,9 +109,8 @@
             order by fd.updated_at ${sortOrder}
             limit #{limit}
         )
-        select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
-                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
-                composed_at, enriched_at, episodes,
+        select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
+                updated_at, observations, geometries, event_details, urls, location, episodes,
                 ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
                 ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from events
@@ -122,9 +122,8 @@
                 box2d(fd.collected_geometry) as bbox,
                 st_pointonsurface(fd.collected_geometry) as centroid,
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.type, sv.severity, fd.description,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.collected_geometry, fd.episode_types,
-                fd.is_latest_version, fd.geometries, fd.event_details, fd.enriched, fd.urls, fd.location,
-                fd.composed_at, fd.enriched_at,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.event_details, fd.urls,
+                fd.location,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((
@@ -153,9 +152,8 @@
                 </otherwise>
             </choose>
         )
-        select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at, updated_at, observations,
-                collected_geometry, episode_types, is_latest_version, geometries, event_details, enriched, urls, location,
-                composed_at, enriched_at, episodes,
+        select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
+                updated_at, observations, geometries, event_details, urls, location, episodes,
                 ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
                 ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from event
