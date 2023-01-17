@@ -17,12 +17,12 @@
 
     <insert id="insertFeedData" useGeneratedKeys="false">
         insert into feed_data (event_id, feed_id, version, name, proper_name, type, severity_id, description, started_at, ended_at,
-                               updated_at, observations, episodes, is_latest_version, enriched, geometries, urls, location)
+                               updated_at, observations, episodes, enriched, geometries, urls, location)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{type},
                 (select severity_id from severities where severity = #{severity}),
                 #{description}, #{startedAt}, #{endedAt},
                 #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
-                #{episodes}::jsonb, true, #{enriched},
+                #{episodes}::jsonb, #{enriched},
                 <choose>
                     <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
                         collectcyclonegeometries(#{episodes}::jsonb),

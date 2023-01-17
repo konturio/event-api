@@ -52,8 +52,7 @@ create table public.feed_data_upd
     FOREIGN KEY (severity_id)
         REFERENCES public.severities (severity_id),
     UNIQUE (event_id, version, feed_id)
-)
-    WITH (fillfactor = 100);
+);
 
 insert into public.feed_data_upd
 (event_id,
