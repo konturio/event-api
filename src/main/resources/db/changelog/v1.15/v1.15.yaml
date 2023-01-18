@@ -1,0 +1,8 @@
+## Database Changelog
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: create-new-feed-data-table.sql
+  - include:
+      relativeToChangelogFile: true
+      file: replace-feed-data-table-with-new-one.sql

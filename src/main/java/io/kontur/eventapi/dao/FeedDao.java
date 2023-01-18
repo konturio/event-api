@@ -41,19 +41,21 @@ public class FeedDao {
     @Transactional
     public void insertFeedData(FeedData feedData, String feed) {
         String episodesJson = writeJson(feedData.getEpisodes());
-        mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
+        int count = mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getProperName(), feedData.getType(), feedData.getSeverity(),
                 feedData.getDescription(), feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
                 feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls(),
-                feedData.getLocation(), feedData.getLatestSeverity(), feedData.getSeverities(),
+                feedData.getLocation(),
                 feedData.getGeomFuncType());
 
-        mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
-        feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
-        if (feedData.getEnriched()) {
-            cacheUtil.evictEventListCache(feed);
-            cacheUtil.evictEventCache(feedData.getEventId(), feed);
-        };
+        if (count > 0) {
+            mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
+            feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
+            if (feedData.getEnriched()) {
+                cacheUtil.evictEventListCache(feed);
+                cacheUtil.evictEventCache(feedData.getEventId(), feed);
+            }
+        }
     }
 
     public List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
@@ -97,7 +99,7 @@ public class FeedDao {
         if (event.getEnriched()) {
             cacheUtil.evictEventListCache(feed);
             cacheUtil.evictEventCache(event.getEventId(), feed);
-        };
+        }
     }
 
     public Integer getNotEnrichedEventsCount() {

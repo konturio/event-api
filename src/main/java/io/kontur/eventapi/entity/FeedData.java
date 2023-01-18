@@ -32,8 +32,6 @@ public class FeedData {
     private String location;
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
-    private Severity latestSeverity;
-    private List<Severity> severities = new ArrayList<>();
     private List<Double> centroid = new ArrayList<>();
     private List<Double> bbox = new ArrayList<>();
 
