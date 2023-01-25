@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:v1.15/create-private-feed.sql runOnChange:true
+--changeset event-api-migrations:v1.16/create-private-feed.sql runOnChange:true
 
 insert into feeds (
     feed_id,
