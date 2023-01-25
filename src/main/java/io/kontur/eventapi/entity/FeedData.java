@@ -33,8 +33,6 @@ public class FeedData {
     private Map<String, Object> loss;
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
-    private Severity latestSeverity;
-    private List<Severity> severities = new ArrayList<>();
     private List<Double> centroid = new ArrayList<>();
     private List<Double> bbox = new ArrayList<>();
 

@@ -2,16 +2,7 @@
 databaseChangeLog:
   - include:
       relativeToChangelogFile: true
-      file: add-data-lake-skipped-column.sql
+      file: create-new-feed-data-table.sql
   - include:
       relativeToChangelogFile: true
-      file: add-normalized-observations-origin-column.sql
-  - include:
-      relativeToChangelogFile: true
-      file: create-private-feed.sql
-  - include:
-      relativeToChangelogFile: true
-      file: add--normalized-observations-loss-column.sql
-  - include:
-      relativeToChangelogFile: true
-      file: add-feed-data-loss-column.sql
+      file: replace-feed-data-table-with-new-one.sql

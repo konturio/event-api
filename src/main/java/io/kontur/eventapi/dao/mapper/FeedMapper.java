@@ -7,10 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.Map;
 
 @Mapper
@@ -36,8 +33,6 @@ public interface FeedMapper {
                        @Param("enriched") Boolean enriched,
                        @Param("urls") List<String> urls,
                        @Param("location") String location,
-                       @Param("latestSeverity") Severity latestSeverity,
-                       @Param("severities") List<Severity> severities,
                        @Param("geomFuncType") Integer geomFuncType,
                        @Param("loss") Map<String, Object> loss);
 
