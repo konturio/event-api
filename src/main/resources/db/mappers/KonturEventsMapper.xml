@@ -7,6 +7,7 @@
     <insert id="insert" useGeneratedKeys="false">
         INSERT INTO kontur_events (event_id, provider, observation_id)
         VALUES (#{eventId}, #{provider}, #{observationId})
+        ON CONFLICT (event_id, observation_id) DO NOTHING
     </insert>
 
     <select id="getEventByExternalId" resultMap="konturEventDtoMap" >
