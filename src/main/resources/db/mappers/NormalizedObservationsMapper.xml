@@ -57,6 +57,31 @@
             #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
             #{recombined}
         )
+        on conflict (observation_id) do update
+        set provider = #{provider},
+            external_event_id = #{externalEventId},
+            external_episode_id = #{externalEpisodeId},
+            <if test='point != null'>
+                point = 'SRID=4326;${point}'::geometry,
+            </if>
+            <if test='geometries != null'>
+                geometries = #{geometries}::jsonb,
+            </if>
+            event_severity = #{eventSeverity},
+            name = #{name},
+            proper_name = #{properName},
+            description = #{description},
+            episode_description = #{episodeDescription},
+            type = #{type},
+            active = #{active},
+            cost = #{cost},
+            region = #{region},
+            loaded_at = #{loadedAt},
+            started_at = #{startedAt},
+            ended_at = #{endedAt},
+            source_updated_at = #{sourceUpdatedAt},
+            urls = #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+            recombined = #{recombined}
     </insert>
 
     <insert id="markAsRecombined">

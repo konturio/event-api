@@ -6,3 +6,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: replace-feed-data-table-with-new-one.sql
+  - include:
+      relativeToChangelogFile: true
+      file: recalculate-events.sql
