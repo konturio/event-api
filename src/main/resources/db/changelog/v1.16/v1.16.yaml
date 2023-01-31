@@ -9,4 +9,7 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-normalized-observations-origin-column.sql
+  - include:
+      relativeToChangelogFile: true
+      file: create-private-feed.sql
 
