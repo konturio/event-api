@@ -9,3 +9,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: recalculate-events.sql
+  - include:
+      relativeToChangelogFile: true
+      file: recalculate-type-column.sql
