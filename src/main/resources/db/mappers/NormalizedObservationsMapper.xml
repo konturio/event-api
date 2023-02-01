@@ -7,6 +7,7 @@
         INSERT INTO normalized_observations (
             observation_id,
             provider,
+            origin,
             external_event_id,
             external_episode_id,
             <if test='point != null'>
@@ -23,6 +24,9 @@
             type,
             active,
             cost,
+            <if test='loss != null'>
+                loss,
+            </if>
             region,
             loaded_at,
             started_at,
@@ -33,6 +37,7 @@
         ) VALUES (
             #{observationId},
             #{provider},
+            #{origin},
             #{externalEventId},
             #{externalEpisodeId},
             <if test='point != null'>
@@ -49,6 +54,9 @@
             #{type},
             #{active},
             #{cost},
+            <if test='loss != null'>
+                #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
+            </if>
             #{region},
             #{loadedAt},
             #{startedAt},
@@ -182,6 +190,7 @@
         <result property="type" column="type"/>
         <result property="active" column="active"/>
         <result property="cost" column="cost"/>
+        <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="region" column="region"/>
         <result property="loadedAt" column="loaded_at"/>
         <result property="startedAt" column="started_at"/>

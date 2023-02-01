@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -16,6 +17,7 @@ public class NormalizedObservation {
     private String externalEventId;
     private String externalEpisodeId;
     private String provider;
+    private String origin;
     private String point;
     private FeatureCollection geometries;
     private Severity eventSeverity;
@@ -26,6 +28,7 @@ public class NormalizedObservation {
     private EventType type;
     private Boolean active;
     private BigDecimal cost;
+    private Map<String, Object> loss;
     private String region;
     private OffsetDateTime loadedAt;
     private OffsetDateTime startedAt;

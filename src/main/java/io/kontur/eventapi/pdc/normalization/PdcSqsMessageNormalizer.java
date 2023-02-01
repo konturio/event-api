@@ -17,12 +17,18 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.kontur.eventapi.entity.EventType.CYCLONE;
+import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
+import static io.kontur.eventapi.util.LossUtil.INFRASTRUCTURE_REPLACEMENT_VALUE;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 @Component
 public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
@@ -34,22 +40,33 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider());
+        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider()) && !isNasaFlood(dataLakeDto);
+    }
+
+    protected boolean isNasaFlood(DataLake dataLake) {
+        JsonNode event = parseEvent(dataLake.getData());
+        Map<String, Object> props = parseProps(event);
+        return "HAZARD".equals(getType(event))
+                && FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
+                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA);
+    }
+
+    @Override
+    public boolean isSkipped() {
+        return true;
     }
 
     @Override
     public NormalizedObservation normalize(DataLake dataLakeDto) {
-        JsonNode sns = JsonUtil.readTree(dataLakeDto.getData()).get("Sns");
-        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
-        JsonNode event = JsonUtil.readTree(message.get("event").asText());
-        String type = event.get("syncDa").get("masterSyncEvents").get("type").asText();
+        JsonNode event = parseEvent(dataLakeDto.getData());
+        String type = getType(event);
 
         NormalizedObservation normalizedDto = new NormalizedObservation();
         normalizedDto.setObservationId(dataLakeDto.getObservationId());
         normalizedDto.setProvider(dataLakeDto.getProvider());
         normalizedDto.setLoadedAt(dataLakeDto.getLoadedAt());
 
-        Map<String, Object> props = readJson(event.get("json").asText(), new TypeReference<>() {});
+        Map<String, Object> props = parseProps(event);
         normalizedDto.setSourceUpdatedAt(readDateTime(props, "updateDate"));
 
         switch (type) {
@@ -64,6 +81,20 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
                 throw new IllegalArgumentException("Unexpected message type: " + type);
         }
         return normalizedDto;
+    }
+
+    protected JsonNode parseEvent(String data) {
+        JsonNode sns = JsonUtil.readTree(data).get("Sns");
+        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
+        return JsonUtil.readTree(message.get("event").asText());
+    }
+
+    protected Map<String, Object> parseProps(JsonNode event) {
+        return readJson(event.get("json").asText(), new TypeReference<>() {});
+    }
+
+    protected String getType(JsonNode event) {
+        return event.get("syncDa").get("masterSyncEvents").get("type").asText();
     }
 
     @SuppressWarnings("unchecked")
@@ -81,6 +112,9 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         String description = readString((Map<String, Object>) props.get("hazardDescription"), "description");
         normalizedDto.setDescription(description);
         normalizedDto.setEpisodeDescription(description);
+        normalizedDto.setOrigin(contains(description, ORIGIN_NASA) ? ORIGIN_NASA : null);
+        BigDecimal rebuildCost = parseRebuildCost(description);
+        normalizedDto.setLoss(rebuildCost == null ? null : Map.of(INFRASTRUCTURE_REPLACEMENT_VALUE, rebuildCost));
         normalizedDto.setStartedAt(readDateTime(props, "startDate"));
         normalizedDto.setEndedAt(readDateTime(props, "endDate"));
         normalizedDto.setEventSeverity(
@@ -120,5 +154,26 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         org.wololo.geojson.Geometry geometry = geoJSONWriter.write(wktReader.read(point));
         Feature feature = new Feature(geometry, type == CYCLONE ? SQS_CYCLONE_PROPERTIES : HAZARD_PROPERTIES);
         return new FeatureCollection(new Feature[] {feature});
+    }
+
+    private BigDecimal parseRebuildCost(String description) {
+        if (description != null) {
+            if (contains(description, "currently, no major population centers are within the affected area")) {
+                return BigDecimal.ZERO;
+            }
+            Matcher lossSubstringMatcher = Pattern.compile("\\$[\\d.,]+\\s(Million|Billion|Trillion)?\\s?of infrastructure").matcher(description);
+            if (lossSubstringMatcher.find()) {
+                String lossSubstring = lossSubstringMatcher.group();
+                String[] parts = lossSubstring.split(" ");
+                BigDecimal loss = new BigDecimal(parts[0].substring(1).replace(',', '.'));
+                switch (parts[1]) {
+                    case "Million" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000.));
+                    case "Billion" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000_000.));
+                    case "Trillion" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000_000_000.));
+                }
+                return loss;
+            }
+        }
+        return null;
     }
 }

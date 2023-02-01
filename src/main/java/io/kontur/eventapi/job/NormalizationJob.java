@@ -65,8 +65,12 @@ public class NormalizationJob extends AbstractJob {
     private boolean normalize(DataLake denormalizedEvent) {
         try {
             Normalizer normalizer = Applicable.get(normalizers, denormalizedEvent);
-            NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
-            normalizedObservationsDao.insert(checkNotNull(normalizedDto));
+            if (!normalizer.isSkipped()) {
+                NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
+                normalizedObservationsDao.insert(checkNotNull(normalizedDto));
+            } else {
+                dataLakeDao.markAsSkipped(denormalizedEvent.getObservationId());
+            }
             return true;
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);

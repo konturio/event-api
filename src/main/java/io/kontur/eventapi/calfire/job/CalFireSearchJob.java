@@ -70,7 +70,7 @@ public class CalFireSearchJob extends AbstractJob {
                 dataLakeDao.storeDataLakes(dataLakes);
             }
         } catch (Exception e) {
-            LOG.error("Error while obtaining and processing calfire features. {}", e.getMessage());
+            LOG.warn("Error while obtaining and processing calfire features. {}", e.getMessage());
         }
 
     }

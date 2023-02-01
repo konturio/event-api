@@ -5,12 +5,16 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.DataLakeMapper">
 
     <insert id="create" useGeneratedKeys="false">
-        INSERT INTO data_lake (observation_id, external_id, updated_at, loaded_at, provider, data, normalized)
-        VALUES (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data}, #{normalized})
+        INSERT INTO data_lake (observation_id, external_id, updated_at, loaded_at, provider, data, normalized, skipped)
+        VALUES (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data}, #{normalized}, #{skipped})
     </insert>
 
     <insert id="markAsNormalized">
         UPDATE data_lake SET normalized = 'true' WHERE observation_id = #{observationId}
+    </insert>
+
+    <insert id="markAsSkipped">
+        UPDATE data_lake SET skipped = true WHERE observation_id = #{observationId}
     </insert>
 
     <select id="getLatestUpdatedEventForProvider" resultType="io.kontur.eventapi.entity.DataLake">
@@ -33,7 +37,7 @@
     <select id="getDenormalizedEvents" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake e
-        WHERE normalized is false
+        WHERE normalized is false and skipped is false
         <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
             #{provider}
         </foreach>
@@ -127,7 +131,7 @@
     </select>
 
     <select id="getNotNormalizedObservationsCount" resultType="java.lang.Integer">
-        select count(*) from data_lake where not normalized;
+        select count(*) from data_lake where not normalized and not skipped;
     </select>
 
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
@@ -138,6 +142,7 @@
         <result property="provider" column="provider" />
         <result property="data" column="data" />
         <result property="normalized" column="normalized" />
+        <result property="skipped" column="skipped" />
     </resultMap>
 
     <resultMap id="exposureGeohash" type="io.kontur.eventapi.entity.ExposureGeohash">

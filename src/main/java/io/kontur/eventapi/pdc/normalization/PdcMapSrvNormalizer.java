@@ -12,14 +12,28 @@ import org.wololo.geojson.Geometry;
 
 import java.util.Map;
 
+import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
+import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 @Component
 public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return PDC_MAP_SRV_PROVIDER.equals(dataLakeDto.getProvider());
+        return PDC_MAP_SRV_PROVIDER.equals(dataLakeDto.getProvider()) && !isNasaFlood(dataLakeDto);
+    }
+
+    protected boolean isNasaFlood(DataLake dataLake) {
+        Feature feature = (Feature) GeoJSONFactory.create(dataLake.getData());
+        return FLOOD.equals(defineType(readString(feature.getProperties(), "type_id")))
+                && contains(readString(feature.getProperties(), "exp_description"), ORIGIN_NASA);
+    }
+
+    @Override
+    public boolean isSkipped() {
+        return true;
     }
 
     @Override
@@ -29,15 +43,24 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
         normalizedObservation.setProvider(dataLakeDto.getProvider());
         normalizedObservation.setActive(true);
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
-        normalizedObservation.setStartedAt(dataLakeDto.getLoadedAt());
-        normalizedObservation.setEndedAt(dataLakeDto.getLoadedAt());
-        normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
         normalizedObservation.setEventSeverity(Severity.UNKNOWN);
         normalizedObservation.setExternalEventId(dataLakeDto.getExternalId());
 
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
         Map<String, Object> properties = feature.getProperties();
         Geometry geometry = feature.getGeometry();
+
+        Long createDate = readLong(properties, "create_date");
+        normalizedObservation.setStartedAt(createDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(createDate));
+        Long updateDate = readLong(properties, "update_date");
+        normalizedObservation.setEndedAt(updateDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(updateDate));
+        normalizedObservation.setSourceUpdatedAt(normalizedObservation.getEndedAt());
+
+        String description = readString(properties, "exp_description");
+        normalizedObservation.setDescription(description);
+        normalizedObservation.setEpisodeDescription(description);
+
+        normalizedObservation.setOrigin(contains(description, ORIGIN_NASA) ? ORIGIN_NASA : null);
 
         normalizedObservation.setType(defineType(readString(properties, "type_id")));
         normalizedObservation.setGeometries(convertGeometries(geometry));

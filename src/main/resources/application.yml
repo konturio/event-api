@@ -121,11 +121,11 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 3600000
   emDatImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: PT3H # every 3 hours
   staticImport:
-    enable: true
+    enable: false
     initialDelay: 1000
   stormsNoaaImport:
     enable: true
@@ -147,11 +147,11 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 300000
   inciwebImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 300000
   humanitarianCrisisImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: PT12H # every 12 hours
   nhcAtImport:
@@ -170,12 +170,12 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv
   eventCombination:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv
   feedComposition:
     enable: true
     initialDelay: 1000

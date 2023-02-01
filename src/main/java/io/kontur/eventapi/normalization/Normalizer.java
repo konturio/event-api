@@ -13,6 +13,11 @@ import java.util.Map;
 public abstract class Normalizer implements Applicable<DataLake> {
 
     public abstract NormalizedObservation normalize(DataLake dataLakeDto);
+
+    public boolean isSkipped() {
+        return false;
+    }
+
     protected final static ObjectMapper mapper = new ObjectMapper();
 
     protected String readString(Map<String, Object> map, String key) {

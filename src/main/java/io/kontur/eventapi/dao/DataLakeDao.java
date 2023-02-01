@@ -35,6 +35,10 @@ public class DataLakeDao {
         mapper.markAsNormalized(observationId);
     }
 
+    public void markAsSkipped(UUID observationId) {
+        mapper.markAsSkipped(observationId);
+    }
+
     public List<DataLake> getDataLakesByExternalId(String externalId) {
         return mapper.getDataLakesByExternalId(externalId);
     }
