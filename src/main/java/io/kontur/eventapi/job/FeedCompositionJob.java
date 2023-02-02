@@ -22,6 +22,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -144,10 +146,15 @@ public class FeedCompositionJob extends AbstractJob {
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getType).orElse(null));
 
-        feedData.setLoss(episodes.stream()
-                .filter(ep -> ep.getLoss() != null && !ep.getLoss().isEmpty())
+        Set<String> lossKeys = episodes.stream()
+                .map(episode -> episode.getLoss().keySet())
+                .flatMap(Collection::stream)
+                .collect(toSet());
+        feedData.setLoss(lossKeys.stream().collect(toMap(identity(), key -> episodes.stream()
+                .filter(ep -> ep.getLoss() != null && ep.getLoss().containsKey(key) && ep.getLoss().get(key) != null)
                 .max(comparing(FeedEpisode::getUpdatedAt))
-                .map(FeedEpisode::getLoss).orElse(null));
+                .map(ep -> ep.getLoss().get(key)).orElseThrow()
+        )));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

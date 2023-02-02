@@ -16,21 +16,17 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (
-            event_id, feed_id, version, name, proper_name, type, severity_id, description, started_at, ended_at,
-            updated_at, location, enriched,
-            <if test='loss != null'>
-                loss
-            </if>
-            geometries, urls, observations, episodes,
-        )
+        insert into feed_data (event_id, feed_id, version, name, proper_name, type, severity_id, description, started_at, ended_at,
+                               updated_at, observations, episodes, enriched, geometries,
+                               <if test='loss != null'>
+                                   loss,
+                               </if>
+                               urls, location)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{type},
                 (select severity_id from severities where severity = #{severity}),
                 #{description}, #{startedAt}, #{endedAt},
-                #{updatedAt}, #{location}, #{enriched},
-                <if test='loss != null'>
-                    #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
-                </if>
+                #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
+                #{episodes}::jsonb, #{enriched},
                 <choose>
                     <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
                         collectcyclonegeometries(#{episodes}::jsonb),
@@ -39,10 +35,10 @@
                         collectEventGeometries(#{episodes}::jsonb),
                     </otherwise>
                 </choose>
-                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
-                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
-                #{episodes}::jsonb
-        )
+                <if test='loss != null'>
+                    #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
+                </if>
+                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
     </insert>
 
     <update id="markOutdatedEventsVersions">

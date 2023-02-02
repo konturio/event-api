@@ -30,7 +30,7 @@ public class FeedData {
     private Boolean enrichmentSkipped;
     private List<String> urls = new ArrayList<>();
     private String location;
-    private Map<String, Object> loss;
+    private Map<String, Object> loss = new HashMap<>();
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
     private List<Double> centroid = new ArrayList<>();

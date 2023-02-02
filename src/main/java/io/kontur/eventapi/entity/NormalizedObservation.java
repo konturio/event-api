@@ -5,10 +5,7 @@ import org.wololo.geojson.FeatureCollection;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 public class NormalizedObservation {
@@ -28,7 +25,7 @@ public class NormalizedObservation {
     private EventType type;
     private Boolean active;
     private BigDecimal cost;
-    private Map<String, Object> loss;
+    private Map<String, Object> loss = new HashMap<>();
     private String region;
     private OffsetDateTime loadedAt;
     private OffsetDateTime startedAt;
