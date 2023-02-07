@@ -48,13 +48,11 @@ public class EventResourceService {
                                        OffsetDateTime updatedAfter, int limit, List<Severity> severities, SortOrder sortOrder,
                                        List<BigDecimal> bbox, EpisodeFilterType episodeFilterType) {
         LOG.debug("Start searchEvents DB call");
-        List<FeedData> feedData = feedDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities,
+        List<EventDto> events = feedDao.searchForEventDtos(feedAlias, eventTypes, from, to, updatedAfter, limit, severities,
                 sortOrder, bbox, episodeFilterType);
         LOG.debug("Finished searchEvents DB call");
         LOG.debug("Process result");
-        return feedData.stream()
-                .map(EventDtoConverter::convert)
-                .collect(Collectors.toList());
+        return events;
     }
 
     public Optional<GeoJsonPaginationDTO> searchEventsGeoJson(String feedAlias, List<EventType> eventTypes,
@@ -86,7 +84,7 @@ public class EventResourceService {
 
     @Cacheable(cacheNames = EVENT_CACHE_NAME, cacheManager = "longCacheManager", condition = "#root.target.isCacheEnabled()")
     public Optional<EventDto> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
-        return feedDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType).map(EventDtoConverter::convert);
+        return feedDao.getEventDtoByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
     }
 
     public List<Feed> getFeeds() {
