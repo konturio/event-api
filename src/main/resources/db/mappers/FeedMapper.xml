@@ -377,7 +377,7 @@
         <result property="endedAt" column="ended_at" />
         <result property="updatedAt" column="updated_at" />
         <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
-        <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
+        <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.EventEpisodeTypeHandler"/>
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
         <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
