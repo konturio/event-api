@@ -4,6 +4,7 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -63,7 +64,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
                 .filter(obs -> obs.getProvider().equals(GDACS_ALERT_PROVIDER))
                 .map(obs -> Map.entry(obs, getGeometryObservationForAlert(obs, eventObservations)))
                 .max(comparing(obs -> obs.getKey().getLoadedAt()))
-                .orElseThrow(() -> new RuntimeException(format(
+                .orElseThrow(() -> new FeedCompositionSkipException(format(
                         "No alert observation present for event: event_id = '%s', feed_id = '%s', version = %d",
                         event.getFeedId(), event.getEventId(), event.getVersion())));
     }
@@ -74,7 +75,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
                         && obs.getExternalEpisodeId().equals(alertObservation.getExternalEpisodeId())
                         && obs.getSourceUpdatedAt().equals(alertObservation.getSourceUpdatedAt()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Geometry observation not found for alert: " + alertObservation.getObservationId()));
+                .orElseThrow(() -> new FeedCompositionSkipException("Geometry observation not found for alert: " + alertObservation.getObservationId()));
     }
 
     private Set<UUID> findObservationsForEpisode(Set<NormalizedObservation> eventObservations) {

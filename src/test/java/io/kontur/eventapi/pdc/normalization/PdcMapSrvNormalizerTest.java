@@ -45,8 +45,8 @@ class PdcMapSrvNormalizerTest {
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
-        assertEquals(dataLake.getLoadedAt(), observation.getStartedAt());
-        assertEquals(dataLake.getLoadedAt(), observation.getEndedAt());
+        assertNull(observation.getStartedAt());
+        assertNull(observation.getEndedAt());
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());

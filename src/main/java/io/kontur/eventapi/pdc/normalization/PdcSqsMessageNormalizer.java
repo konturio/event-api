@@ -48,7 +48,10 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         Map<String, Object> props = parseProps(event);
         return "HAZARD".equals(getType(event))
                 && FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
-                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA);
+                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA)
+                || "MAG".equals(getType(event))
+                && FLOOD.equals(defineType(readString((Map<String, Object>) ((Map<String, Object>) props.get("hazard")).get("hazardType"), "typeId")))
+                && contains(readString((Map<String, Object>) ((Map<String, Object>) props.get("hazard")).get("hazardDescription"), "description"), ORIGIN_NASA);
     }
 
     @Override

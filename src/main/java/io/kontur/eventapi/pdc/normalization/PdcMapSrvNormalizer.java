@@ -50,11 +50,8 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
         Map<String, Object> properties = feature.getProperties();
         Geometry geometry = feature.getGeometry();
 
-        Long createDate = readLong(properties, "create_date");
-        normalizedObservation.setStartedAt(createDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(createDate));
         Long updateDate = readLong(properties, "update_date");
-        normalizedObservation.setEndedAt(updateDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(updateDate));
-        normalizedObservation.setSourceUpdatedAt(normalizedObservation.getEndedAt());
+        normalizedObservation.setSourceUpdatedAt(updateDate == null ? dataLakeDto.getLoadedAt() : getDateTimeFromMilli(updateDate));
 
         String description = readString(properties, "exp_description");
         normalizedObservation.setDescription(description);

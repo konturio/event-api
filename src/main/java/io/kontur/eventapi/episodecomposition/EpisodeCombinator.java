@@ -12,10 +12,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
 
@@ -110,6 +107,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         return episodeObservations
                 .stream()
                 .map(NormalizedObservation::getStartedAt)
+                .filter(Objects::nonNull)
                 .min(OffsetDateTime::compareTo)
                 .orElse(null);
     }
@@ -118,6 +116,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         return episodeObservations
                 .stream()
                 .map(NormalizedObservation::getEndedAt)
+                .filter(Objects::nonNull)
                 .max(OffsetDateTime::compareTo)
                 .orElse(null);
     }
