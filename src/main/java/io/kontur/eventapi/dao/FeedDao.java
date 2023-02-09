@@ -3,6 +3,7 @@ package io.kontur.eventapi.dao;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.util.CacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -73,8 +74,28 @@ public class FeedDao {
                 null, null, null, null, episodeFilterType);
     }
 
+    public List<EventDto> searchForEventDtos(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
+                                             OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
+                                             List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
+                                             EpisodeFilterType episodeFilterType) {
+        if (bBox != null) {
+            var xMin = bBox.get(0);
+            var yMin = bBox.get(1);
+            var xMax = bBox.get(2);
+            var yMax = bBox.get(3);
+            return mapper.searchForEventDtos(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                    xMin, xMax, yMin, yMax, episodeFilterType);
+        }
+        return mapper.searchForEventDtos(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                null, null, null, null, episodeFilterType);
+    }
+
     public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
         return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
+    }
+
+    public Optional<EventDto> getEventDtoByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
+        return mapper.getEventDtoByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
     }
 
     public Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId) {
