@@ -40,11 +40,6 @@ spring:
     port: 6379
   profiles:
     active: awsSqsDisabled, jwtAuthDisabled, cacheDisabled
-  liquibase:
-    enabled: true
-    drop-first: false
-    change-log: db/changelog/db.changelog-master.yaml
-    default-schema: public
 
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
