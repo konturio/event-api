@@ -21,6 +21,7 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
 import liquibase.repackaged.org.apache.commons.collections4.CollectionUtils;
 import org.bouncycastle.util.Arrays;
 import org.wololo.geojson.Feature;
@@ -29,14 +30,17 @@ import org.wololo.geojson.FeatureCollection;
 public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
 
     protected static final long TIME_RANGE_IN_SEC = 90;
+
     @Override
     public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData,
                                                     Set<NormalizedObservation> eventObservations) {
+        validateEventObservations(eventObservations);
         if (episodeExistsForObservation(feedData.getEpisodes(), observation)) {
             return Optional.empty();
         }
         Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(eventObservations,
                 observation.getSourceUpdatedAt());
+        validateEpisodeObservations(episodeObservations);
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
         Optional<List<FeedEpisode>> episode = createDefaultEpisode(latestObservation);
         if (episode.isPresent() && CollectionUtils.isNotEmpty(episode.get())) {
@@ -52,6 +56,20 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                             .getDescription());
         }
         return episode;
+    }
+
+    private void validateEventObservations(Set<NormalizedObservation> eventObservations) {
+        if (isOnlyPdcMapSrvObservations(eventObservations))
+            throw new FeedCompositionSkipException("Only pdcMapSrv is present for event");
+    }
+
+    private void validateEpisodeObservations(Set<NormalizedObservation> episodeObservations) {
+        if (isOnlyPdcMapSrvObservations(episodeObservations))
+            throw new FeedCompositionSkipException("Only pdcMapSrv is present for episode");
+    }
+
+    private boolean isOnlyPdcMapSrvObservations(Set<NormalizedObservation> observations) {
+        return observations.stream().map(NormalizedObservation::getProvider).allMatch(PDC_MAP_SRV_PROVIDER::equals);
     }
 
     protected boolean episodeExistsForObservation(List<FeedEpisode> eventEpisodes, NormalizedObservation observation) {
