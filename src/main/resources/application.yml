@@ -38,6 +38,11 @@ spring:
   redis:
     host: localhost
     port: 6379
+  liquibase:
+    enabled: true
+    drop-first: false
+    change-log: db/changelog/db.changelog-master.yaml
+    default-schema: public
   profiles:
     active: awsSqsDisabled, jwtAuthDisabled, cacheDisabled
 

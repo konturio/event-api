@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -20,8 +21,9 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Comparator.comparing;
+import static java.util.Comparator.*;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -60,7 +62,7 @@ public class FeedCompositionJob extends AbstractJob {
     protected void updateFeed(Feed feed) {
         Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         if (!CollectionUtils.isEmpty(eventsIds)) {
-            LOG.info(String.format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
+            LOG.info(format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
             eventsIds
                     .forEach(event -> createFeedData(event, feed));
         }
@@ -71,7 +73,7 @@ public class FeedCompositionJob extends AbstractJob {
     protected void createFeedData(UUID eventId, Feed feed) {
         try {
             List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
-            eventObservations.sort(comparing(NormalizedObservation::getStartedAt)
+            eventObservations.sort(comparing(NormalizedObservation::getStartedAt, nullsLast(naturalOrder()))
                     .thenComparing(NormalizedObservation::getLoadedAt));
 
             Optional<Long> lastFeedDataVersion = feedDao.getLastFeedDataVersion(eventId, feed.getFeedId());
@@ -86,9 +88,11 @@ public class FeedCompositionJob extends AbstractJob {
             feedData.setEnriched(feed.getEnrichment().isEmpty());
 
             feedDao.insertFeedData(feedData, feed.getAlias());
+        } catch (FeedCompositionSkipException fe) {
+            LOG.info(format("Skipped processing event: id = '%s', feed = '%s'. Error: %s",
+                    eventId.toString(), feed.getAlias(), fe.getMessage()));
         } catch (Exception e) {
-            LOG.warn(
-                    String.format("Error while processing event with id = '%s', for '%s' feed. Error: %s", eventId.toString(),
+            LOG.error(format("Error while processing event: id = '%s', feed = '%s'. Error: %s", eventId.toString(),
                             feed.getAlias(), e.getMessage()), e);
         }
     }

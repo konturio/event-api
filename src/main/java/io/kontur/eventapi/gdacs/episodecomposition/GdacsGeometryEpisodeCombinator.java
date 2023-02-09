@@ -4,6 +4,7 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
+import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class GdacsGeometryEpisodeCombinator extends EpisodeCombinator {
         if (isAlertObservationPresentForGeometry(observation, eventObservations)) {
             return Optional.empty();
         }
-        throw new RuntimeException("Alert observation not found for geometry: " + observation.getObservationId());
+        throw new FeedCompositionSkipException("Alert observation not found for geometry: " + observation.getObservationId());
     }
 
     private boolean isAlertObservationPresentForGeometry(NormalizedObservation geometryObservation, Set<NormalizedObservation> eventObservations) {
