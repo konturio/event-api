@@ -1,7 +1,6 @@
 package io.kontur.eventapi.typehandler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.resource.dto.EpisodeDto;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.BaseTypeHandler;

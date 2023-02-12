@@ -4,6 +4,7 @@ import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
+import io.kontur.eventapi.dao.mapper.ApiMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
@@ -29,7 +30,6 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 import static io.kontur.eventapi.TestUtil.readFile;
-import static io.kontur.eventapi.entity.SortOrder.ASC;
 import static java.time.OffsetDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -47,6 +47,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private final FeedMapper feedMapper;
     private final KonturEventsDao konturEventsDao;
     private final NormalizedObservationsDao observationsDao;
+    private final ApiMapper apiMapper;
 
     @MockBean
     private FirmsClient firmsClient;
@@ -58,7 +59,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
                                                  FirmsImportSuomiJob firmsImportSuomiJob, NormalizationJob normalizationJob,
                                                  FirmsEventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
                                                  FeedMapper feedMapper, KonturEventsDao konturEventsDao,
-                                                 NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate, FeedDao feedDao) {
+                                                 NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate, FeedDao feedDao, ApiMapper apiMapper) {
         super(jdbcTemplate, feedDao);
         this.firmsImportModisJob = firmsImportModisJob;
         this.firmsImportNoaaJob = firmsImportNoaaJob;
@@ -69,6 +70,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         this.feedMapper = feedMapper;
         this.konturEventsDao = konturEventsDao;
         this.observationsDao = observationsDao;
+        this.apiMapper = apiMapper;
     }
 
     @Test
@@ -228,8 +230,21 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     }
 
     private List<EventDto> searchFeedData() {
-        List<EventDto> firms = feedMapper.searchForEvents("test-feed", List.of(EventType.THERMAL_ANOMALY), null, null,
-                OffsetDateTime.parse("2020-11-02T11:00Z"), 100, List.of(), ASC, null, null, null, null, EpisodeFilterType.ANY);
+        List<EventDto> firms = apiMapper.searchForEvents(
+                "test-feed",
+                List.of(EventType.THERMAL_ANOMALY),
+                null,
+                null,
+                OffsetDateTime.parse("2020-11-02T11:00Z"),
+                100,
+                List.of(),
+                SortOrder.ASC,
+                null,
+                null,
+                null,
+                null,
+                EpisodeFilterType.ANY
+        );
         firms.sort(Comparator.comparing(f -> f.getObservations().size()));
         return firms;
     }

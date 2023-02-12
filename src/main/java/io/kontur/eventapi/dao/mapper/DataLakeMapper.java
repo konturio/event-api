@@ -34,8 +34,6 @@ public interface DataLakeMapper {
     Set<String> getDataLakesIdByExternalIdsAndProvider(@Param("externalIds") Set<String> externalIds,
                                                        @Param("provider") String provider);
 
-    DataLake getDataLakeByObservationId(@Param("observationId") UUID observationId);
-
     Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(@Param("externalId") String externalId,
                                                                 @Param("provider") String provider);
 

@@ -13,10 +13,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
+import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
@@ -35,18 +35,18 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
     private final DataLakeDao dataLakeDao;
-    private final FeedDao feedDao;
+    private final ApiDao apiDao;
 
     @Autowired
     public PdcEpisodeCompositionTest(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob,
                                      FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao,
-                                     JdbcTemplate jdbcTemplate) {
+                                     JdbcTemplate jdbcTemplate, ApiDao apiDao) {
         super(jdbcTemplate, feedDao);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.dataLakeDao = dataLakeDao;
-        this.feedDao = feedDao;
+        this.apiDao = apiDao;
     }
 
     @Test
@@ -66,7 +66,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = apiDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -101,7 +101,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = apiDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -140,7 +140,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = apiDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -179,7 +179,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = apiDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(2, feed.getEpisodes().size());

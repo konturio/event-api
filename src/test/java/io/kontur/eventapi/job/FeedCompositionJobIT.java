@@ -1,11 +1,11 @@
 package io.kontur.eventapi.job;
 
+import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
-import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
@@ -38,18 +38,18 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
     private final DataLakeDao dataLakeDao;
-    private final FeedDao feedDao;
     private final NormalizedObservationsDao observationsDao;
+    private final ApiDao apiDao;
 
     @Autowired
-    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao) {
+    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao, ApiDao apiDao) {
         super(jdbcTemplate, feedDao);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.dataLakeDao = dataLakeDao;
-        this.feedDao = feedDao;
         this.observationsDao = observationsDao;
+        this.apiDao = apiDao;
     }
 
     @Test
@@ -117,7 +117,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        return feedDao.searchForEvents("test-feed", List.of(), null,
+        return apiDao.searchForEvents("test-feed", List.of(), null,
                 null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
     }
 
@@ -156,7 +156,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null, startTimeForSearchingFeed,
+        EventDto feed = apiDao.searchForEvents("test-feed", List.of(), null, null, startTimeForSearchingFeed,
                 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(2, feed.getEpisodes().size());
 
@@ -202,7 +202,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         feedCompositionJob.run();
 
-        EventDto feed = feedDao.searchForEvents("test-feed", List.of(EventType.FLOOD), null, null,
+        EventDto feed = apiDao.searchForEvents("test-feed", List.of(EventType.FLOOD), null, null,
                 loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }

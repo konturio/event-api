@@ -80,12 +80,6 @@
         </foreach>
     </select>
 
-    <select id="getDataLakeByObservationId" resultMap="dataLakeMap">
-        SELECT *
-        FROM data_lake
-        WHERE observation_id = #{observationId}
-    </select>
-
     <select id="getLatestDataLakeByExternalIdAndProvider" resultMap="dataLakeMap">
         SELECT *
         FROM data_lake

@@ -16,13 +16,12 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, proper_name, type, severity_id, description, started_at, ended_at,
-                               updated_at, observations, episodes, enriched, geometries, urls, location)
-        values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{type},
-                (select severity_id from severities where severity = #{severity}),
-                #{description}, #{startedAt}, #{endedAt},
-                #{updatedAt}, #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
-                #{episodes}::jsonb, #{enriched},
+        insert into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id, started_at,
+                               ended_at, updated_at, location, urls, observations, geometries, episodes, enriched)
+        values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{type},
+                (select severity_id from severities where severity = #{severity}), #{startedAt}, #{endedAt}, #{updatedAt},
+                #{location}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 <choose>
                     <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
                         collectcyclonegeometries(#{episodes}::jsonb),
@@ -31,164 +30,56 @@
                         collectEventGeometries(#{episodes}::jsonb),
                     </otherwise>
                 </choose>
-                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{location})
+                #{episodes}::jsonb, #{enriched})
     </insert>
 
     <update id="markOutdatedEventsVersions">
-    <![CDATA[
-        update feed_data set is_latest_version = false
-        where event_id = #{eventId}
-          and feed_id = #{feedId}
-          and version < #{version}
-          and is_latest_version is true
-    ]]>
+        <![CDATA[
+            update feed_data set is_latest_version = false
+            where event_id = #{eventId}
+                and feed_id = #{feedId}
+                and version < #{version}
+                and is_latest_version is true
+        ]]>
     </update>
 
-    <select id="searchForEvents" resultMap="eventDtoMap">
-        with events as (
-            select
-                fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.event_details, fd.observations, fd.geometries,
-                <choose>
-                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        jsonb_build_array((
-                            select episode from jsonb_array_elements(fd.episodes) episode
-                            order by (episode ->> 'updatedAt')::timestamptz desc
-                            limit 1
-                        )) as episodes,
-                    </when>
-                    <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
-                        '[]'::jsonb as episodes,
-                    </when>
-                    <otherwise>
-                        fd.episodes,
-                    </otherwise>
-                </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
-            from feed_data fd
-            left join severities sv on fd.severity_id = sv.severity_id
-            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
-                and fd.is_latest_version and fd.enriched
-                <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
-                    <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
-                        #{eventType}::text
-                    </foreach>
-                </if>
-                <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
-                </if>
-                <if test='from != null'>
-                    <![CDATA[and (fd.ended_at >= #{from})]]>
-                </if>
-                <if test='to != null'>
-                    <![CDATA[and (fd.started_at <= #{to})]]>
-                </if>
-                <if test='updatedAfter != null'>
-                    <if test='"ASC".equalsIgnoreCase(sortOrder)'>
-                        and fd.updated_at > #{updatedAfter}
-                    </if>
-                    <if test='"DESC".equalsIgnoreCase(sortOrder)'>
-                        and fd.updated_at &lt; #{updatedAfter}
-                    </if>
-                </if>
-                <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
-                    and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
-                </if>
-            order by fd.updated_at ${sortOrder}
-            limit #{limit}
-        )
-        select
-            event_id, version, name, proper_name, description, type, severity,
-            started_at, ended_at, updated_at, location, urls, event_details, observations, geometries, episodes,
-            array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
-            array[st_x(centroid), st_y(centroid)] as centroid
-        from events
-    </select>
-
-    <select id="getEventByEventIdAndByVersionOrLast" resultMap="eventDtoMap">
-        with event as (
-            select
-                fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.event_details, fd.observations, fd.geometries,
-                <choose>
-                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        jsonb_build_array((
-                            select episode from jsonb_array_elements(fd.episodes) episode
-                            order by (episode ->> 'updatedAt')::timestamptz desc
-                            limit 1
-                        )) as episodes,
-                    </when>
-                    <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
-                        '[]'::jsonb as episodes,
-                    </when>
-                    <otherwise>
-                        fd.episodes,
-                    </otherwise>
-                </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
-        from feed_data fd
-        left join severities sv on fd.severity_id = sv.severity_id
-        where fd.event_id = #{eventId}
-        and fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
-            <choose>
-                <when test="version != null">
-                    and fd.version = #{version}
-                </when>
-                <otherwise>
-                    and fd.is_latest_version
-                </otherwise>
-            </choose>
-        )
-        select
-            event_id, version, name, proper_name, description, type, severity,
-            started_at, ended_at, updated_at, location, urls, event_details, observations, geometries, episodes,
-            array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
-            array[st_x(centroid), st_y(centroid)] as centroid
-        from event
-    </select>
-
     <select id="getLastFeedDataVersion" resultType="java.lang.Long">
-        SELECT max(version)
-        FROM feed_data
-        WHERE event_id = #{eventId}
-            AND feed_id = #{feedId}
+        select max(version)
+        from feed_data
+        where event_id = #{eventId}
+            and feed_id = #{feedId}
     </select>
 
     <select id="getNotEnrichedEventsForFeed" resultMap="feedDataDtoMap">
-        SELECT event_id, feed_id, version, updated_at, name,
+        select event_id, feed_id, version, updated_at, name,
                enriched, enrichment_attempts, event_details, geometries, episodes, enrichment_skipped
-        FROM feed_data
-        WHERE feed_id = #{feedId} AND NOT enriched
-        ORDER BY enrichment_attempts ASC NULLS FIRST, updated_at ASC
-        LIMIT 1000
+        from feed_data
+        where feed_id = #{feedId} and not enriched
+        order by enrichment_attempts nulls first, updated_at
+        limit 1000
     </select>
 
     <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
-        SELECT event_id, feed_id, version, updated_at, name,
+        select event_id, feed_id, version, updated_at, name,
                enriched, enrichment_attempts, event_details, geometries, episodes, enrichment_skipped
-        FROM feed_data
-        WHERE feed_id = #{feedId} AND enrichment_skipped
-              AND (enrichment_attempts &lt; 5 or enriched_at &lt; now() - '24 hour'::interval)
-        ORDER BY enrichment_attempts, updated_at
-        LIMIT 10
+        from feed_data
+        where feed_id = #{feedId} and enrichment_skipped
+              and (enrichment_attempts &lt; 5 or enriched_at &lt; now() - '24 hour'::interval)
+        order by enrichment_attempts, updated_at
+        limit 10
     </select>
 
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
-        SELECT count(*) FROM feed_data WHERE NOT enriched;
+        select count(*) from feed_data where not enriched;
     </select>
 
     <select id="getEnrichmentSkippedEventsCount" resultType="java.lang.Integer">
-        SELECT count(*) FROM feed_data WHERE enrichment_skipped;
+        select count(*) from feed_data where enrichment_skipped;
     </select>
 
     <update id="addAnalytics">
-        UPDATE feed_data
-        SET
+        update feed_data
+        set
             <if test='eventDetails != null'>
                 event_details = #{eventDetails}::jsonb,
             </if>
@@ -198,7 +89,7 @@
             name = #{name},
             enrichment_attempts = #{enrichmentAttempts},
             enrichment_skipped = #{enrichmentSkipped}
-        WHERE feed_id = #{feedId} AND event_id = #{eventId} AND version = #{version}
+        where feed_id = #{feedId} and event_id = #{eventId} and version = #{version}
     </update>
 
     <insert id="createFeed">
@@ -208,8 +99,9 @@
 
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">
         <result property="feedId" column="feed_id" />
-        <result property="description" column="description"/>
         <result property="alias" column="alias"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
         <result property="providers" column="providers" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="roles" column="roles" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="enrichment" column="enrichment" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
@@ -242,26 +134,5 @@
         <result property="enrichmentSkipped" column="enrichment_skipped" />
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>
-    </resultMap>
-
-    <resultMap id="eventDtoMap" type="io.kontur.eventapi.resource.dto.EventDto">
-        <result property="eventId" column="event_id" />
-        <result property="version" column="version" />
-        <result property="name" column="name" />
-        <result property="properName" column="proper_name"/>
-        <result property="description" column="description" />
-        <result property="type" column="type" />
-        <result property="severity" column="severity" />
-        <result property="startedAt" column="started_at" />
-        <result property="endedAt" column="ended_at" />
-        <result property="updatedAt" column="updated_at" />
-        <result property="location" column="location"/>
-        <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
-        <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
-        <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
-        <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
-        <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.EventEpisodeTypeHandler"/>
-        <result property="bbox" column="bbox" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
-        <result property="centroid" column="centroid" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
     </resultMap>
 </mapper>
