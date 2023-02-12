@@ -28,7 +28,10 @@ import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.LossUtil.INFRASTRUCTURE_REPLACEMENT_VALUE;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 @Component
 public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
@@ -104,7 +107,6 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
     private void convertMagTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props, String uniqueExternalId) {
         normalizedDto.setExternalEpisodeId(uniqueExternalId);
         convertHazardTypeProperties(normalizedDto, (Map<String, Object>) props.get("hazard"));
-        normalizedDto.setActive(readBoolean(props, "isActive"));
         normalizedDto.setGeometries(convertMagGeometry(props));
     }
 
@@ -115,14 +117,16 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         String description = readString((Map<String, Object>) props.get("hazardDescription"), "description");
         normalizedDto.setDescription(description);
         normalizedDto.setEpisodeDescription(description);
-        normalizedDto.setOrigin(contains(description, ORIGIN_NASA) ? ORIGIN_NASA : null);
+        normalizedDto.setOrigin(defineOrigin(description));
         BigDecimal rebuildCost = parseRebuildCost(description);
-        normalizedDto.setLoss(rebuildCost == null ? null : Map.of(INFRASTRUCTURE_REPLACEMENT_VALUE, rebuildCost));
+        if (rebuildCost != null) normalizedDto.setLoss(Map.of(INFRASTRUCTURE_REPLACEMENT_VALUE, rebuildCost));
         normalizedDto.setStartedAt(readDateTime(props, "startDate"));
         normalizedDto.setEndedAt(readDateTime(props, "endDate"));
         normalizedDto.setEventSeverity(
                 defineSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId")));
         normalizedDto.setType(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")));
+        normalizedDto.setActive(defineActive(readString(props, "status")));
+        normalizedDto.setAutoExpire(defineAutoExpire(readString(props, "autoexpire")));
         Map<String, Object> hazardSnc = (Map<String, Object>) props.get("hazardSnc");
         String url = hazardSnc == null ? null : readString(hazardSnc, "sncUrl");
         if (StringUtils.isNotBlank(url)) {
@@ -159,24 +163,36 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         return new FeatureCollection(new Feature[] {feature});
     }
 
-    private BigDecimal parseRebuildCost(String description) {
+    protected BigDecimal parseRebuildCost(String description) {
         if (description != null) {
             if (contains(description, "currently, no major population centers are within the affected area")) {
                 return BigDecimal.ZERO;
             }
-            Matcher lossSubstringMatcher = Pattern.compile("\\$[\\d.,]+\\s(Million|Billion|Trillion)?\\s?of infrastructure").matcher(description);
-            if (lossSubstringMatcher.find()) {
-                String lossSubstring = lossSubstringMatcher.group();
-                String[] parts = lossSubstring.split(" ");
-                BigDecimal loss = new BigDecimal(parts[0].substring(1).replace(',', '.'));
-                switch (parts[1]) {
-                    case "Million" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000.));
-                    case "Billion" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000_000.));
-                    case "Trillion" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000_000_000.));
+            Matcher matcher = Pattern.compile("\\$([\\d.,]+)\\s(Million|Billion|Trillion)?\\s?of infrastructure").matcher(description);
+            if (matcher.find()) {
+                BigDecimal loss = new BigDecimal(matcher.group(1).replace(",", ""));
+                if (matcher.group(2) == null) return loss;
+                switch (matcher.group(2)) {
+                    case "Million": return loss.multiply(BigDecimal.valueOf(1_000_000.));
+                    case "Billion": return loss.multiply(BigDecimal.valueOf(1_000_000_000.));
+                    case "Trillion": return loss.multiply(BigDecimal.valueOf(1_000_000_000_000.));
                 }
-                return loss;
             }
         }
         return null;
+    }
+
+    private Boolean defineActive(String status) {
+        return equalsIgnoreCase(status, "A") ? TRUE : equalsIgnoreCase(status, "E") ? FALSE : null;
+    }
+
+    private String defineOrigin(String description) {
+        if (contains(description, " " + ORIGIN_NASA + " ")) return ORIGIN_NASA;
+        if (contains(description, "(" + ORIGIN_NWS + ")")) return ORIGIN_NWS;
+        return null;
+    }
+
+    private Boolean defineAutoExpire(String autoExpire) {
+        return equalsIgnoreCase(autoExpire, "Y") ? TRUE : equalsIgnoreCase(autoExpire, "N") ? FALSE : null;
     }
 }

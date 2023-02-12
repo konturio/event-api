@@ -16,6 +16,8 @@ public class FeedData {
     private String properName;
     private EventType type;
     private Severity severity;
+    private Boolean active;
+    private Boolean autoExpire;
     private String description;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;

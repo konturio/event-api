@@ -1,6 +1,8 @@
 package io.kontur.eventapi.episodecomposition;
 
 import static java.util.Comparator.comparing;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 import io.kontur.eventapi.entity.FeedData;
@@ -104,6 +106,18 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt));
     }
 
+    protected Map<String, Object> findEpisodeLoss(Set<NormalizedObservation> episodeObservations) {
+        Set<String> lossKeys = episodeObservations.stream()
+                .map(obs -> obs.getLoss().keySet())
+                .flatMap(Collection::stream)
+                .collect(toSet());
+        return lossKeys.stream().collect(toMap(identity(), key -> episodeObservations.stream()
+                .filter(obs -> obs.getLoss() != null && obs.getLoss().containsKey(key) && obs.getLoss().get(key) != null)
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(ep -> ep.getLoss().get(key))
+                .orElseThrow()));
+    }
+
     protected OffsetDateTime findEpisodeStartedAt(Set<NormalizedObservation> episodeObservations) {
         return episodeObservations
                 .stream()
@@ -137,4 +151,9 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .collect(toSet());
     }
 
+    protected Boolean findEpisodeActive(Set<NormalizedObservation> observations) {
+        return observations.stream().filter(obs -> obs.getActive() != null).findAny().isEmpty()
+                ? null
+                : observations.stream().filter(obs -> obs.getActive() != null).allMatch(NormalizedObservation::getActive);
+    }
 }

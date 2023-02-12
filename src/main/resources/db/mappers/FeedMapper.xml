@@ -57,8 +57,8 @@
                 box2d(fd.collected_geometry) as bbox,
                 st_pointonsurface(fd.collected_geometry) as centroid,
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.type, sv.severity, fd.description,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.event_details, fd.urls,
-                fd.location,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.loss, fd.event_details, fd.urls,
+                fd.location, fd.active
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((
@@ -117,7 +117,7 @@
             limit #{limit}
         )
         select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
-                updated_at, observations, geometries, event_details, urls, location, episodes,
+                updated_at, observations, geometries, loss, event_details, urls, location, active, episodes,
                 ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
                 ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from events
@@ -129,8 +129,8 @@
         box2d(fd.collected_geometry) as bbox,
         st_pointonsurface(fd.collected_geometry) as centroid,
         fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.type, sv.severity, fd.description,
-        fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.event_details, fd.urls,
-        fd.location,
+        fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.loss, fd.event_details, fd.urls,
+        fd.location, fd.active
         <choose>
             <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                 jsonb_build_array((
@@ -189,7 +189,7 @@
         limit #{limit}
         )
         select  event_id, version, name, proper_name, type, severity, description, started_at, ended_at,
-        updated_at, observations, geometries, event_details, urls, location, episodes,
+        updated_at, observations, geometries, loss, event_details, urls, location, active, episodes,
         ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
         ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from events
@@ -201,8 +201,8 @@
                 box2d(fd.collected_geometry) as bbox,
                 st_pointonsurface(fd.collected_geometry) as centroid,
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.type, sv.severity, fd.description,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.event_details, fd.urls,
-                fd.location,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.loss, fd.geometries, fd.event_details, fd.urls,
+                fd.location, fd.active
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((
@@ -232,7 +232,7 @@
             </choose>
         )
         select  event_id, feed_id, version, name, proper_name, type, severity, description, started_at, ended_at,
-                updated_at, observations, geometries, event_details, urls, location, episodes,
+                updated_at, observations, geometries, loss, event_details, urls, location, active, episodes,
                 ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
                 ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from event
@@ -244,8 +244,8 @@
         box2d(fd.collected_geometry) as bbox,
         st_pointonsurface(fd.collected_geometry) as centroid,
         fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.type, sv.severity, fd.description,
-        fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.event_details, fd.urls,
-        fd.location,
+        fd.started_at, fd.ended_at, fd.updated_at, fd.observations, fd.geometries, fd.loss, fd.event_details, fd.urls,
+        fd.location, fd.active
         <choose>
             <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                 jsonb_build_array((
@@ -275,7 +275,7 @@
         </choose>
         )
         select  event_id, version, name, proper_name, type, severity, description, started_at, ended_at,
-        updated_at, observations, geometries, event_details, urls, location, episodes,
+        updated_at, observations, geometries, loss, event_details, urls, location, active, episodes,
         ARRAY[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
         ARRAY[st_x(centroid), st_y(centroid)] as centroid
         from event
@@ -353,6 +353,7 @@
         <result property="name" column="name" />
         <result property="type" column="type" />
         <result property="properName" column="proper_name"/>
+        <result property="active" column="active"/>
         <result property="description" column="description" />
         <result property="startedAt" column="started_at" />
         <result property="endedAt" column="ended_at" />
@@ -380,6 +381,7 @@
         <result property="name" column="name" />
         <result property="type" column="type" />
         <result property="properName" column="proper_name"/>
+        <result property="active" column="active"/>
         <result property="description" column="description" />
         <result property="startedAt" column="started_at" />
         <result property="endedAt" column="ended_at" />
@@ -387,6 +389,7 @@
         <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
         <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.EventEpisodeTypeHandler"/>
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
+        <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
         <result property="location" column="location"/>

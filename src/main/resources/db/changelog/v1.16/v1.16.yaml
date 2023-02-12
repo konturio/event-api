@@ -15,3 +15,9 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: add-feed-data-loss-column.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-feed-data-active-column.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-normalized-observations-autoexpire-column.sql

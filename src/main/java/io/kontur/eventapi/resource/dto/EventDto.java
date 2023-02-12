@@ -22,6 +22,7 @@ public class EventDto implements Serializable {
     private String properName;
     private EventType type;
     private Severity severity;
+    private Boolean active;
     private String description;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
@@ -29,6 +30,7 @@ public class EventDto implements Serializable {
     private String location;
     private List<String> urls = new ArrayList<>();
     private Set<UUID> observations = new HashSet<>();
+    private Map<String, Object> loss;
     private Map<String, Object> eventDetails;
     private FeatureCollection geometries;
     private List<EpisodeDto> episodes = new ArrayList<>();
@@ -44,6 +46,7 @@ public class EventDto implements Serializable {
         properName = (String) in.readObject();
         type = (EventType) in.readObject();
         severity = (Severity) in.readObject();
+        active = (Boolean) in.readObject();
         description = (String) in.readObject();
         startedAt = (OffsetDateTime) in.readObject();
         endedAt = (OffsetDateTime) in.readObject();
@@ -51,6 +54,7 @@ public class EventDto implements Serializable {
         location = (String) in.readObject();
         urls = (List<String>) in.readObject();
         observations = (Set<UUID>) in.readObject();
+        loss = (Map<String, Object>) in.readObject();
         eventDetails = (Map<String, Object>) in.readObject();
         Object geometriesObj = in.readObject();
         geometries = geometriesObj == null ? null : (FeatureCollection) GeoJSONFactory.create((String) geometriesObj);
@@ -67,6 +71,7 @@ public class EventDto implements Serializable {
         out.writeObject(properName);
         out.writeObject(type);
         out.writeObject(severity);
+        out.writeObject(active);
         out.writeObject(description);
         out.writeObject(startedAt);
         out.writeObject(endedAt);
@@ -74,6 +79,7 @@ public class EventDto implements Serializable {
         out.writeObject(location);
         out.writeObject(urls);
         out.writeObject(observations);
+        out.writeObject(loss);
         out.writeObject(eventDetails);
         out.writeObject(geometries == null ? null : geometries.toString());
         out.writeObject(episodes);

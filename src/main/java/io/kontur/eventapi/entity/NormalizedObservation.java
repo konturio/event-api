@@ -24,6 +24,7 @@ public class NormalizedObservation {
     private String episodeDescription;
     private EventType type;
     private Boolean active;
+    private Boolean autoExpire;
     private BigDecimal cost;
     private Map<String, Object> loss = new HashMap<>();
     private String region;

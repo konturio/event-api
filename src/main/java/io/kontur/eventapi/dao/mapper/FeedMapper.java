@@ -35,7 +35,8 @@ public interface FeedMapper {
                        @Param("urls") List<String> urls,
                        @Param("location") String location,
                        @Param("geomFuncType") Integer geomFuncType,
-                       @Param("loss") Map<String, Object> loss);
+                       @Param("loss") Map<String, Object> loss,
+                       @Param("active") Boolean active);
 
     /**
      * Mark events below specified version outdated

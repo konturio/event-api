@@ -15,6 +15,7 @@ public abstract class PdcHazardNormalizer extends Normalizer {
     protected final static Map<String, Object> MAG_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, ALERT_AREA, IS_OBSERVED_PROPERTY, true);
     protected final static Map<String, Object> SQS_CYCLONE_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, POSITION, IS_OBSERVED_PROPERTY, true);
     protected final static String ORIGIN_NASA = "NASA";
+    protected final static String ORIGIN_NWS = "NWS";
 
     private static final Map<String, EventType> typeMap = Map.of(
             "FLOOD", EventType.FLOOD,

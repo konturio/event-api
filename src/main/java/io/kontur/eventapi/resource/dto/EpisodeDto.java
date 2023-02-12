@@ -29,6 +29,7 @@ public class EpisodeDto implements Serializable {
     private String location;
     private List<String> urls = new ArrayList<>();
     private Set<UUID> observations = new HashSet<>();
+    private Map<String, Object> loss;
     private Map<String, Object> episodeDetails;
     private FeatureCollection geometries;
 
@@ -48,6 +49,7 @@ public class EpisodeDto implements Serializable {
         location = (String) in.readObject();
         urls = (List<String>) in.readObject();
         observations = (Set<UUID>) in.readObject();
+        loss = (Map<String, Object>) in.readObject();
         episodeDetails = (Map<String, Object>) in.readObject();
         Object geometriesObj = in.readObject();
         geometries = geometriesObj == null ? null : (FeatureCollection) GeoJSONFactory.create((String) geometriesObj);
@@ -68,6 +70,7 @@ public class EpisodeDto implements Serializable {
         out.writeObject(location);
         out.writeObject(urls);
         out.writeObject(observations);
+        out.writeObject(loss);
         out.writeObject(episodeDetails);
         out.writeObject(geometries == null ? null : geometries.toString());
     }
