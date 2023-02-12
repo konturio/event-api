@@ -45,7 +45,7 @@ public interface FeedMapper {
                                     @Param("feedId") UUID feedId,
                                     @Param("version") Long version);
 
-    List<FeedData> searchForEvents(@Param("feedAlias") String feedAlias,
+    List<EventDto> searchForEvents(@Param("feedAlias") String feedAlias,
                                    @Param("eventTypes") List<EventType> eventTypes,
                                    @Param("from") OffsetDateTime from,
                                    @Param("to") OffsetDateTime to,
@@ -59,26 +59,7 @@ public interface FeedMapper {
                                    @Param("yMax") BigDecimal yMax,
                                    @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 
-    List<EventDto> searchForEventDtos(@Param("feedAlias") String feedAlias,
-                                   @Param("eventTypes") List<EventType> eventTypes,
-                                   @Param("from") OffsetDateTime from,
-                                   @Param("to") OffsetDateTime to,
-                                   @Param("updatedAfter") OffsetDateTime updatedAfter,
-                                   @Param("limit") int limit,
-                                   @Param("severities") List<Severity> severities,
-                                   @Param("sortOrder") SortOrder sortOrder,
-                                   @Param("xMin") BigDecimal xMin,
-                                   @Param("xMax") BigDecimal xMax,
-                                   @Param("yMin") BigDecimal yMin,
-                                   @Param("yMax") BigDecimal yMax,
-                                   @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
-
-    Optional<FeedData> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
-                                                           @Param("feedAlias") String feedAlias,
-                                                           @Param("version") Long version,
-                                                           @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
-
-    Optional<EventDto> getEventDtoByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
+    Optional<EventDto> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
                                                            @Param("feedAlias") String feedAlias,
                                                            @Param("version") Long version,
                                                            @Param("episodeFilterType") EpisodeFilterType episodeFilterType);

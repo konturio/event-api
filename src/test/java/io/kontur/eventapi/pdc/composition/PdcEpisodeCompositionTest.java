@@ -22,6 +22,7 @@ import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -100,7 +101,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -139,7 +140,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(1, feed.getEpisodes().size());
@@ -178,7 +179,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
+        EventDto feed = feedDao.searchForEvents("test-feed", List.of(), null, null,
                 null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
         assertNotNull(feed.getEpisodes());
         assertEquals(2, feed.getEpisodes().size());

@@ -20,16 +20,16 @@ public class EpisodeDto implements Serializable {
     private String properName;
     private String description;
     private EventType type;
-    private Boolean active;
     private Severity severity;
+    private Boolean active;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime sourceUpdatedAt;
     private String location;
     private List<String> urls = new ArrayList<>();
-    private Set<UUID> observations = new HashSet<>();
     private Map<String, Object> episodeDetails;
+    private Set<UUID> observations = new HashSet<>();
     private FeatureCollection geometries;
 
     @Serial
@@ -39,16 +39,16 @@ public class EpisodeDto implements Serializable {
         properName = (String) in.readObject();
         description = (String) in.readObject();
         type = (EventType) in.readObject();
-        active = (Boolean) in.readObject();
         severity = (Severity) in.readObject();
+        active = (Boolean) in.readObject();
         startedAt = (OffsetDateTime) in.readObject();
         endedAt = (OffsetDateTime) in.readObject();
         updatedAt = (OffsetDateTime) in.readObject();
         sourceUpdatedAt = (OffsetDateTime) in.readObject();
         location = (String) in.readObject();
         urls = (List<String>) in.readObject();
-        observations = (Set<UUID>) in.readObject();
         episodeDetails = (Map<String, Object>) in.readObject();
+        observations = (Set<UUID>) in.readObject();
         Object geometriesObj = in.readObject();
         geometries = geometriesObj == null ? null : (FeatureCollection) GeoJSONFactory.create((String) geometriesObj);
     }
@@ -59,16 +59,16 @@ public class EpisodeDto implements Serializable {
         out.writeObject(properName);
         out.writeObject(description);
         out.writeObject(type);
-        out.writeObject(active);
         out.writeObject(severity);
+        out.writeObject(active);
         out.writeObject(startedAt);
         out.writeObject(endedAt);
         out.writeObject(updatedAt);
         out.writeObject(sourceUpdatedAt);
         out.writeObject(location);
         out.writeObject(urls);
-        out.writeObject(observations);
         out.writeObject(episodeDetails);
+        out.writeObject(observations);
         out.writeObject(geometries == null ? null : geometries.toString());
     }
 }

@@ -59,7 +59,7 @@ public class FeedDao {
         }
     }
 
-    public List<FeedData> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
+    public List<EventDto> searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
                                           OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                           List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
                                           EpisodeFilterType episodeFilterType) {
@@ -75,28 +75,8 @@ public class FeedDao {
                 null, null, null, null, episodeFilterType);
     }
 
-    public List<EventDto> searchForEventDtos(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
-                                             OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
-                                             List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
-                                             EpisodeFilterType episodeFilterType) {
-        if (bBox != null) {
-            var xMin = bBox.get(0);
-            var yMin = bBox.get(1);
-            var xMax = bBox.get(2);
-            var yMax = bBox.get(3);
-            return mapper.searchForEventDtos(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-                    xMin, xMax, yMin, yMax, episodeFilterType);
-        }
-        return mapper.searchForEventDtos(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-                null, null, null, null, episodeFilterType);
-    }
-
-    public Optional<FeedData> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
+    public Optional<EventDto> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
         return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
-    }
-
-    public Optional<EventDto> getEventDtoByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
-        return mapper.getEventDtoByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
     }
 
     public Optional<Long> getLastFeedDataVersion(UUID eventId, UUID feedId) {
