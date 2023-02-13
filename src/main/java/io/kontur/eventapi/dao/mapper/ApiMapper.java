@@ -2,7 +2,6 @@ package io.kontur.eventapi.dao.mapper;
 
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
-import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.resource.dto.FeedDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,22 +19,36 @@ public interface ApiMapper {
 
 	Optional<String> findDataByObservationId(@Param("observationId") UUID observationId);
 
-	List<EventDto> searchForEvents(@Param("feedAlias") String feedAlias,
-	                               @Param("eventTypes") List<EventType> eventTypes,
-	                               @Param("from") OffsetDateTime from,
-	                               @Param("to") OffsetDateTime to,
-	                               @Param("updatedAfter") OffsetDateTime updatedAfter,
-	                               @Param("limit") int limit,
-	                               @Param("severities") List<Severity> severities,
-	                               @Param("sortOrder") SortOrder sortOrder,
-	                               @Param("xMin") BigDecimal xMin,
-	                               @Param("xMax") BigDecimal xMax,
-	                               @Param("yMin") BigDecimal yMin,
-	                               @Param("yMax") BigDecimal yMax,
-	                               @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+	String searchForEvents(@Param("feedAlias") String feedAlias,
+	                       @Param("eventTypes") List<EventType> eventTypes,
+	                       @Param("from") OffsetDateTime from,
+	                       @Param("to") OffsetDateTime to,
+	                       @Param("updatedAfter") OffsetDateTime updatedAfter,
+	                       @Param("limit") int limit,
+	                       @Param("severities") List<Severity> severities,
+	                       @Param("sortOrder") SortOrder sortOrder,
+	                       @Param("xMin") BigDecimal xMin,
+	                       @Param("xMax") BigDecimal xMax,
+	                       @Param("yMin") BigDecimal yMin,
+	                       @Param("yMax") BigDecimal yMax,
+	                       @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 
-	Optional<EventDto> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
-	                                                       @Param("feedAlias") String feedAlias,
-	                                                       @Param("version") Long version,
-	                                                       @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+	String searchForEventsGeoJson(@Param("feedAlias") String feedAlias,
+	                              @Param("eventTypes") List<EventType> eventTypes,
+	                              @Param("from") OffsetDateTime from,
+	                              @Param("to") OffsetDateTime to,
+	                              @Param("updatedAfter") OffsetDateTime updatedAfter,
+	                              @Param("limit") int limit,
+	                              @Param("severities") List<Severity> severities,
+	                              @Param("sortOrder") SortOrder sortOrder,
+	                              @Param("xMin") BigDecimal xMin,
+	                              @Param("xMax") BigDecimal xMax,
+	                              @Param("yMin") BigDecimal yMin,
+	                              @Param("yMax") BigDecimal yMax,
+	                              @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+
+	Optional<String> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
+	                                                     @Param("feedAlias") String feedAlias,
+	                                                     @Param("version") Long version,
+	                                                     @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 }

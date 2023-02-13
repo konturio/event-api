@@ -2,7 +2,6 @@ package io.kontur.eventapi.resource;
 
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.*;
-import io.kontur.eventapi.resource.dto.EventDto;
 import io.kontur.eventapi.resource.validation.ValidBbox;
 import io.kontur.eventapi.service.EventResourceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,13 +53,13 @@ public class EventResource {
     @ApiResponse(
             responseCode = "200",
             description = "Successful operation",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DataPaginationDTO.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @ApiResponse(
             responseCode = "204",
             description = "No content. Try to check filters values.",
             content = @Content())
     @PreAuthorize("hasAuthority('read:feed:'+#feed)")
-    public ResponseEntity<DataPaginationDTO> searchEvents(
+    public ResponseEntity<String> searchEvents(
             @Parameter(description = "Feed name")
             @RequestParam(value = "feed")
             String feed,
@@ -112,15 +111,16 @@ public class EventResource {
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
             EpisodeFilterType episodeFilterType) {
-        List<EventDto> events = eventResourceService.searchEvents(feed, eventTypes,
+        Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
-        if (events.isEmpty()) {
+        if (dataOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(new DataPaginationDTO(events, events.get(events.size() - 1).getUpdatedAt()));
+        return ResponseEntity.ok(dataOpt.get());
     }
+
 
     @GetMapping(path = "/geojson/events", produces = {APPLICATION_JSON_VALUE})
     @Operation(
@@ -135,13 +135,13 @@ public class EventResource {
     @ApiResponse(
             responseCode = "200",
             description = "Successful operation",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = GeoJsonPaginationDTO.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @ApiResponse(
             responseCode = "204",
             description = "No content. Try to check filters values.",
             content = @Content())
     @PreAuthorize("hasAuthority('read:feed:'+#feed)")
-    public ResponseEntity<GeoJsonPaginationDTO> searchEventsGeoJson(
+    public ResponseEntity<String> searchEventsGeoJson(
             @Parameter(description = "Authentication token")
             @RequestParam(value = "access_token", required = false)
             String accessToken,
@@ -188,8 +188,7 @@ public class EventResource {
                     example = "20",
                     schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000"))
             @RequestParam(value = "limit", defaultValue = "20")
-            @Min(1)
-            @Max(1000)
+            @Min(1) @Max(1000)
             int limit,
             @Parameter(description = "Sort selection. Default value is ASC")
             @RequestParam(value = "sortOrder", defaultValue = "ASC")
@@ -200,14 +199,14 @@ public class EventResource {
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
             EpisodeFilterType episodeFilterType) {
-        Optional<GeoJsonPaginationDTO> paginationDTO = eventResourceService.searchEventsGeoJson(feed, eventTypes,
+        Optional<String> geoJsonOpt = eventResourceService.searchEventsGeoJson(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
-        if (paginationDTO.isEmpty()) {
+        if (geoJsonOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(paginationDTO.get());
+        return ResponseEntity.ok(geoJsonOpt.get());
     }
 
     @GetMapping(path = "/observations/{observationId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -238,7 +237,7 @@ public class EventResource {
             summary = "Returns an event",
             description = "Returns event by its version, id and feed alias. If no version is provided the latest event version is returned.")
     @PreAuthorize("hasAuthority('read:feed:'+#feed)")
-    public ResponseEntity<EventDto> getLastEventById(
+    public ResponseEntity<String> getLastEventById(
             @Parameter(description = "Feed name")
             @RequestParam(value = "feed")
             String feed,

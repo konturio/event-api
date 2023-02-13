@@ -107,22 +107,22 @@ scheduler:
     initialDelay: 10000
     fixedDelay: 600000
   pdcMapSrvSearch:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 60000
   gdacsImport:
-    enable: false
+    enable: true
     cron: 0 1/5 * * * * # every five minutes after hh:01:00
   firmsModisImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 3600000
   firmsNoaaImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 3600000
   firmsSuomiImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 3600000
   emDatImport:
@@ -133,7 +133,7 @@ scheduler:
     enable: false
     initialDelay: 1000
   stormsNoaaImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: P1D # every day
   tornadoJapanMaImport:
@@ -144,11 +144,11 @@ scheduler:
     enable: false
     initialDelay: 1000
   calfireSearch:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 3600000
   nifcImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 300000
   inciwebImport:
@@ -160,15 +160,15 @@ scheduler:
     initialDelay: 1000
     fixedDelay: PT12H # every 12 hours
   nhcAtImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 1800000
   nhcCpImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 1800000
   nhcEpImport:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 1800000
   normalization:
@@ -185,7 +185,7 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: kontur-public, kontur-private
+    alias: kontur-public
   enrichment:
     enable: true
     initialDelay: 1000
@@ -195,7 +195,7 @@ scheduler:
     initialDelay: 1000
     fixedDelay: 10000
   metrics:
-    enable: false
+    enable: true
     initialDelay: 1000
     fixedDelay: 15000
 

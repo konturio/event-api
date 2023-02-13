@@ -13,7 +13,7 @@
         WHERE observation_id = #{observationId}
     </select>
 
-    <select id="searchForEvents" resultMap="eventDtoMap">
+    <select id="searchForEvents" resultType="java.lang.String">
         with events as (
             select
                 fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity,
@@ -59,15 +59,32 @@
             order by fd.updated_at ${sortOrder}
             limit #{limit}
         )
-        select
-            event_id, version, name, proper_name, description, type, severity,
-            started_at, ended_at, updated_at, location, urls, event_details, observations, geometries, episodes,
-            array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
-            array[st_x(centroid), st_y(centroid)] as centroid
+        select case when count(*) > 0 then json_build_object(
+            'pageMetadata', json_build_object('nextAfterValue', (select max(e.updated_at) from events e)),
+            'data', json_agg(json_build_object(
+                'eventId', event_id,
+                'version', version,
+                'name', name,
+                'properName', proper_name,
+                'description', description,
+                'type', type,
+                'severity', severity,
+                'startedAt', started_at,
+                'endedAt', ended_at,
+                'updatedAt', updated_at,
+                'location', location,
+                'urls', urls,
+                'eventDetails', event_details,
+                'observations', observations,
+                'geometries', geometries,
+                'episodes', episodes,
+                'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
+                'centroid', array[st_x(centroid), st_y(centroid)])))
+            end
         from events
     </select>
 
-    <select id="getEventByEventIdAndByVersionOrLast" resultMap="eventDtoMap">
+    <select id="getEventByEventIdAndByVersionOrLast" resultType="java.lang.String">
         with event as (
             select
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity,
@@ -96,11 +113,112 @@
                 </choose>
         )
         select
-            event_id, version, name, proper_name, description, type, severity,
-            started_at, ended_at, updated_at, location, urls, event_details, observations, geometries, episodes,
-            array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)] as bbox,
-            array[st_x(centroid), st_y(centroid)] as centroid
+            json_build_object(
+                'eventId', event_id,
+                'version', version,
+                'name', name,
+                'properName', proper_name,
+                'description', description,
+                'type', type,
+                'severity', severity,
+                'startedAt', started_at,
+                'endedAt', ended_at,
+                'updatedAt', updated_at,
+                'location', location,
+                'urls', urls,
+                'eventDetails', event_details,
+                'observations', observations,
+                'geometries', geometries,
+                'episodes', episodes,
+                'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
+                'centroid', array[st_x(centroid), st_y(centroid)])
         from event
+    </select>
+
+    <select id="searchForEventsGeoJson" resultType="java.lang.String">
+        with events as (
+            select
+                fd.event_id, fd.updated_at,
+                <choose>
+                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                        jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
+                                           order by (episode ->> 'updatedAt')::timestamptz desc
+                                           limit 1)) as episodes
+                    </when>
+                    <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                        '[]'::jsonb as episodes
+                    </when>
+                    <otherwise>fd.episodes</otherwise>
+                </choose>
+            from feed_data fd
+            left join severities sv on fd.severity_id = sv.severity_id
+            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+                and fd.is_latest_version and fd.enriched
+                <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
+                    <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
+                        #{eventType}::text
+                    </foreach>
+                </if>
+                <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
+                        #{severity}::text
+                    </foreach>
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
+                        #{severity}::text
+                    </foreach>
+                </if>
+                <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
+                <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
+                <if test='updatedAfter != null'>
+                    <if test='"ASC".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
+                    <if test='"DESC".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
+                </if>
+                <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
+                    and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
+                </if>
+            order by fd.updated_at ${sortOrder}
+            limit #{limit}
+        ),
+        episodes as (
+            select event_id, jsonb_array_elements(episodes) episode
+            from events
+        ),
+        features as (
+            select event_id, episode, jsonb_array_elements(episode -> 'geometries' -> 'features') feature
+            from episodes
+        ),
+        props as (
+            select
+                event_id,
+                episode -> 'name' episode_name,
+                episode -> 'properName' "episode_properName",
+                episode -> 'description' episode_description,
+                episode -> 'type' episode_type,
+                episode -> 'severity' episode_severity,
+                episode -> 'active' episode_active,
+                episode -> 'startedAt' "episode_startedAt",
+                episode -> 'endedAt' "episode_endedAt",
+                episode -> 'updatedAt' "episode_updatedAt",
+                episode -> 'sourceUpdatedAt' "episode_sourceUpdatedAt",
+                episode -> 'location' episode_location,
+                episode -> 'urls' episode_urls,
+                episode -> 'episodeDetails' "episode_episodeDetails",
+                episode -> 'observations' episode_observations,
+                feature -> 'properties' -> 'isObserved' "feature_isObserved",
+                feature -> 'properties' -> 'forecastHrs' "feature_forecastHrs",
+                feature -> 'properties' -> 'timestamp' feature_timestamp,
+                feature -> 'properties' -> 'areaType' "feature_areaType",
+                feature -> 'properties' -> 'severityData' "feature_severityData",
+                ST_GeomFromGeoJSON(feature -> 'geometry') geom
+            from features
+        )
+        select
+            case when count(*) > 0 then json_build_object(
+                'type', 'FeatureCollection',
+                'pageMetadata', json_build_object('nextAfterValue', (select max(e.updated_at) from events e)),
+                'features', json_agg(ST_AsGeoJSON(props.*)::json))
+            end
+        from props
     </select>
 
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.resource.dto.FeedDto">
@@ -109,24 +227,4 @@
         <result property="description" column="description"/>
     </resultMap>
 
-    <resultMap id="eventDtoMap" type="io.kontur.eventapi.resource.dto.EventDto">
-        <result property="eventId" column="event_id" />
-        <result property="version" column="version" />
-        <result property="name" column="name" />
-        <result property="properName" column="proper_name"/>
-        <result property="description" column="description" />
-        <result property="type" column="type" />
-        <result property="severity" column="severity" />
-        <result property="startedAt" column="started_at" />
-        <result property="endedAt" column="ended_at" />
-        <result property="updatedAt" column="updated_at" />
-        <result property="location" column="location"/>
-        <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
-        <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
-        <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
-        <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
-        <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.EventEpisodeTypeHandler"/>
-        <result property="bbox" column="bbox" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
-        <result property="centroid" column="centroid" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
-    </resultMap>
 </mapper>
