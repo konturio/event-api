@@ -1,11 +1,12 @@
 package io.kontur.eventapi.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
-import io.kontur.eventapi.entity.SortOrder;
-import io.kontur.eventapi.resource.dto.EpisodeFilterType;
-import io.kontur.eventapi.resource.dto.EventDto;
+import io.kontur.eventapi.resource.dto.TestEventDto;
+import io.kontur.eventapi.resource.dto.TestEventListDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
@@ -18,6 +19,8 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -27,6 +30,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static io.kontur.eventapi.entity.SortOrder.ASC;
+import static io.kontur.eventapi.entity.SortOrder.DESC;
+import static io.kontur.eventapi.resource.dto.EpisodeFilterType.ANY;
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,6 +44,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
     private final EventResourceService eventResourceService;
     private final WKTReader wktReader = new WKTReader();
     private final GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String feedAlias = "test-feed";
     private final UUID eventUUID = UUID.randomUUID();
@@ -48,8 +56,13 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         this.eventResourceService = eventResourceService;
     }
 
+    @PostConstruct
+    public void setUp() {
+        objectMapper.registerModule(new JavaTimeModule());
+    }
+
     @Test
-    public void checkFilterByBbox() throws ParseException {
+    public void checkFilterByBbox() throws ParseException, IOException {
         //given
         var feed = feedDao.getFeeds().stream()
                 .filter(f -> f.getAlias().equals(feedAlias))
@@ -77,7 +90,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
     }
 
     @Test
-    public void checkFilterByDates() {
+    public void checkFilterByDates() throws IOException {
         var feed = feedDao.getFeeds().stream()
                 .filter(f -> f.getAlias().equals(feedAlias))
                 .findFirst()
@@ -131,7 +144,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
     }
 
     @Test
-    public void checkPagination() {
+    public void checkPagination() throws IOException {
         //GIVEN
         var feed = feedDao.getFeeds().stream()
                 .filter(f -> f.getAlias().equals(feedAlias))
@@ -154,8 +167,8 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         feedDao.insertFeedData(latestEvent, feedAlias);
 
         //when page 1 ASC
-        List<EventDto> page1Asc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.ASC, null, EpisodeFilterType.ANY);
+        List<TestEventDto> page1Asc = objectMapper.readValue(eventResourceService
+                .searchEvents(feedAlias, null, null, null, null, 2, null, ASC, null, ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(2, page1Asc.size());
@@ -163,16 +176,16 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertEquals(middleEvent.getEventId(), page1Asc.get(1).getEventId());
 
         //when page 2 ASC
-        List<EventDto> page2Asc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.ASC, null, EpisodeFilterType.ANY);
+        List<TestEventDto> page2Asc = objectMapper.readValue(eventResourceService
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, ASC, null, ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(1, page2Asc.size());
         assertEquals(latestEvent.getEventId(), page2Asc.get(0).getEventId());
 
         //when page 1 DESC
-        List<EventDto> page1Desc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, null, 2, null, SortOrder.DESC, null, EpisodeFilterType.ANY);
+        List<TestEventDto> page1Desc = objectMapper.readValue(eventResourceService
+                .searchEvents(feedAlias, null, null, null, null, 2, null, DESC, null, ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(2, page1Desc.size());
@@ -180,8 +193,8 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         assertEquals(middleEvent.getEventId(), page1Desc.get(1).getEventId());
 
         //when page 2 DESC
-        List<EventDto> page2Desc = eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, SortOrder.DESC, null, EpisodeFilterType.ANY);
+        List<TestEventDto> page2Desc = objectMapper.readValue(eventResourceService
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, DESC, null, ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(1, page2Desc.size());
@@ -192,38 +205,26 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         return OffsetDateTime.of(LocalDateTime.of(year, month, day, 0, 0), ZoneOffset.UTC);
     }
 
-    private Optional<EventDto> findEvent(OffsetDateTime after, OffsetDateTime before) {
-        List<EventDto> iterable = fetchEvent(after, before);
+    private Optional<TestEventDto> findEvent(OffsetDateTime after, OffsetDateTime before) throws IOException {
+        List<TestEventDto> iterable = fetchEvent(after, before);
         return iterable.isEmpty() ? Optional.empty() : Optional.of(Iterables.getOnlyElement(iterable));
     }
 
-    private List<EventDto> fetchEvent(OffsetDateTime from, OffsetDateTime to) {
-        return eventResourceService.searchEvents(
-                feedAlias,
-                List.of(),
-                from,
-                to,
-                null,
-                1,
-                List.of(),
-                SortOrder.ASC,
-                null,
-                EpisodeFilterType.ANY
-        );
+    private List<TestEventDto> fetchEvent(OffsetDateTime from, OffsetDateTime to) throws IOException {
+        Optional<String> response = eventResourceService.searchEvents(
+                feedAlias, List.of(), from, to, null, 1, List.of(), ASC, null, ANY);
+        if (response.isPresent()) {
+            return objectMapper.readValue(response.get(), TestEventListDto.class).getData();
+        }
+        return emptyList();
     }
 
-    private List<EventDto> fetchEvent(List<BigDecimal> bbox) {
-        return eventResourceService.searchEvents(
-                feedAlias,
-                List.of(),
-                null,
-                null,
-                null,
-                1,
-                List.of(),
-                SortOrder.ASC,
-                bbox,
-                EpisodeFilterType.ANY
-        );
+    private List<TestEventDto> fetchEvent(List<BigDecimal> bbox) throws IOException {
+        Optional<String> response = eventResourceService.searchEvents(
+                feedAlias, List.of(), null, null, null, 1, List.of(), ASC, bbox, ANY);
+        if (response.isPresent()) {
+            return objectMapper.readValue(response.get(), TestEventListDto.class).getData();
+        }
+        return emptyList();
     }
 }

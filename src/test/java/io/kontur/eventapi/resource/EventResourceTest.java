@@ -1,13 +1,11 @@
 package io.kontur.eventapi.resource;
 
+import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.dao.DataLakeDao;
-import io.kontur.eventapi.dao.FeedDao;
-import io.kontur.eventapi.entity.Feed;
-import io.kontur.eventapi.resource.dto.FeedSummary;
+import io.kontur.eventapi.resource.dto.FeedDto;
 import io.kontur.eventapi.service.EventResourceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,11 +31,11 @@ public class EventResourceTest {
     private static final String SECOND_NAME = "second_name";
     private static final String SECOND_DESCRIPTION = "second description";
 
-    FeedDao feedDao = mock(FeedDao.class);
+    ApiDao apiDao = mock(ApiDao.class);
     DataLakeDao dataLakeDao = mock(DataLakeDao.class);
     Environment environment = mock(Environment.class);
 
-    EventResourceService eventResourceService = new EventResourceService(feedDao, dataLakeDao, environment);
+    EventResourceService eventResourceService = new EventResourceService(apiDao, environment);
     EventResource eventResource;
 
     @BeforeEach
@@ -47,19 +45,19 @@ public class EventResourceTest {
 
     @Test
     public void userFeedNoRolesTest() {
-        when(feedDao.getFeeds()).thenReturn(twoFeeds());
+        when(apiDao.getFeeds()).thenReturn(twoFeeds());
         mockAuthWithRoles(List.of("something random"));
 
-        List<FeedSummary> feeds = eventResource.getUserFeeds().getBody();
+        List<FeedDto> feeds = eventResource.getUserFeeds().getBody();
         assertTrue(feeds.isEmpty());
     }
 
     @Test
     public void userFeedOneRoleTest() {
-        when(feedDao.getFeeds()).thenReturn(twoFeeds());
+        when(apiDao.getFeeds()).thenReturn(twoFeeds());
         mockAuthWithRoles(List.of("read:feed:" + FIRST_ALIAS));
 
-        List<FeedSummary> feeds = eventResource.getUserFeeds().getBody();
+        List<FeedDto> feeds = eventResource.getUserFeeds().getBody();
 
         assertEquals(1, feeds.size());
         assertEquals("first_alias", feeds.get(0).getFeed());
@@ -69,20 +67,20 @@ public class EventResourceTest {
 
     @Test
     public void userFeedBothRolesTest() {
-        when(feedDao.getFeeds()).thenReturn(twoFeeds());
+        when(apiDao.getFeeds()).thenReturn(twoFeeds());
         mockAuthWithRoles(List.of("read:feed:" + FIRST_ALIAS, "read:feed:" + SECOND_ALIAS));
 
-        List<FeedSummary> feeds = eventResource.getUserFeeds().getBody();
+        List<FeedDto> feeds = eventResource.getUserFeeds().getBody();
 
         assertEquals(2, feeds.size());
 
-        Optional<FeedSummary> first = eventResource.getUserFeeds().getBody()
+        Optional<FeedDto> first = eventResource.getUserFeeds().getBody()
                 .stream().filter(it -> FIRST_ALIAS.equals(it.getFeed()))
                 .findAny();
         assertTrue(first.isPresent());
         assertEquals(FIRST_DESCRIPTION, first.get().getDescription());
 
-        Optional<FeedSummary> second = eventResource.getUserFeeds().getBody()
+        Optional<FeedDto> second = eventResource.getUserFeeds().getBody()
                 .stream().filter(it -> SECOND_ALIAS.equals(it.getFeed()))
                 .findAny();
         assertTrue(second.isPresent());
@@ -107,13 +105,13 @@ public class EventResourceTest {
         SecurityContextHolder.setContext(securityContext);
     }
 
-    private List<Feed> twoFeeds() {
-        Feed first = new Feed();
-        first.setAlias(FIRST_ALIAS);
+    private List<FeedDto> twoFeeds() {
+        FeedDto first = new FeedDto();
+        first.setFeed(FIRST_ALIAS);
         first.setName(FIRST_NAME);
         first.setDescription(FIRST_DESCRIPTION);
-        Feed second = new Feed();
-        second.setAlias(SECOND_ALIAS);
+        FeedDto second = new FeedDto();
+        second.setFeed(SECOND_ALIAS);
         second.setName(SECOND_NAME);
         second.setDescription(SECOND_DESCRIPTION);
         return List.of(first, second);

@@ -16,16 +16,16 @@ public class FeedEpisode {
     private String properName;
     private String description;
     private EventType type;
-    private Boolean active;
     private Severity severity;
+    private Boolean active;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime sourceUpdatedAt;
-    private Set<UUID> observations = new HashSet<>();
-    private Map<String, Object> episodeDetails;
-    private List<String> urls = new ArrayList<>();
     private String location;
+    private List<String> urls = new ArrayList<>();
+    private Map<String, Object> episodeDetails;
+    private Set<UUID> observations = new HashSet<>();
     private FeatureCollection geometries;
 
     public void addUrlIfNotExists(String url) {

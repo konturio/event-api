@@ -1,12 +1,9 @@
 package io.kontur.eventapi.dao.mapper;
 
 import io.kontur.eventapi.entity.*;
-import io.kontur.eventapi.resource.dto.EpisodeFilterType;
-import io.kontur.eventapi.resource.dto.EventDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -44,44 +41,6 @@ public interface FeedMapper {
     void markOutdatedEventsVersions(@Param("eventId") UUID eventId,
                                     @Param("feedId") UUID feedId,
                                     @Param("version") Long version);
-
-    List<FeedData> searchForEvents(@Param("feedAlias") String feedAlias,
-                                   @Param("eventTypes") List<EventType> eventTypes,
-                                   @Param("from") OffsetDateTime from,
-                                   @Param("to") OffsetDateTime to,
-                                   @Param("updatedAfter") OffsetDateTime updatedAfter,
-                                   @Param("limit") int limit,
-                                   @Param("severities") List<Severity> severities,
-                                   @Param("sortOrder") SortOrder sortOrder,
-                                   @Param("xMin") BigDecimal xMin,
-                                   @Param("xMax") BigDecimal xMax,
-                                   @Param("yMin") BigDecimal yMin,
-                                   @Param("yMax") BigDecimal yMax,
-                                   @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
-
-    List<EventDto> searchForEventDtos(@Param("feedAlias") String feedAlias,
-                                   @Param("eventTypes") List<EventType> eventTypes,
-                                   @Param("from") OffsetDateTime from,
-                                   @Param("to") OffsetDateTime to,
-                                   @Param("updatedAfter") OffsetDateTime updatedAfter,
-                                   @Param("limit") int limit,
-                                   @Param("severities") List<Severity> severities,
-                                   @Param("sortOrder") SortOrder sortOrder,
-                                   @Param("xMin") BigDecimal xMin,
-                                   @Param("xMax") BigDecimal xMax,
-                                   @Param("yMin") BigDecimal yMin,
-                                   @Param("yMax") BigDecimal yMax,
-                                   @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
-
-    Optional<FeedData> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
-                                                           @Param("feedAlias") String feedAlias,
-                                                           @Param("version") Long version,
-                                                           @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
-
-    Optional<EventDto> getEventDtoByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
-                                                           @Param("feedAlias") String feedAlias,
-                                                           @Param("version") Long version,
-                                                           @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 
     Optional<Long> getLastFeedDataVersion(@Param("eventId") UUID eventId,
                                           @Param("feedId") UUID feedId);

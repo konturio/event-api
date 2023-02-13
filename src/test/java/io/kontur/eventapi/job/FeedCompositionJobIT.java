@@ -1,20 +1,22 @@
 package io.kontur.eventapi.job;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
-import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.entity.EventType;
-import io.kontur.eventapi.entity.FeedData;
-import io.kontur.eventapi.entity.NormalizedObservation;
-import io.kontur.eventapi.entity.SortOrder;
+import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.resource.dto.TestEventDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
+import io.kontur.eventapi.resource.dto.TestEventListDto;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -29,7 +31,6 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARC
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.testcontainers.shaded.com.google.common.collect.Iterables.getOnlyElement;
 
 public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
@@ -38,25 +39,31 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
     private final EventCombinationJob eventCombinationJob;
     private final FeedCompositionJob feedCompositionJob;
     private final DataLakeDao dataLakeDao;
-    private final FeedDao feedDao;
     private final NormalizedObservationsDao observationsDao;
+    private final ApiDao apiDao;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao) {
+    public FeedCompositionJobIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao, JdbcTemplate jdbcTemplate, NormalizedObservationsDao observationsDao, ApiDao apiDao) {
         super(jdbcTemplate, feedDao);
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
         this.dataLakeDao = dataLakeDao;
-        this.feedDao = feedDao;
         this.observationsDao = observationsDao;
+        this.apiDao = apiDao;
+    }
+
+    @PostConstruct
+    public void setUp() {
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
     public void testEpisodesWhenStartDateLaterThenEndedDate() throws IOException {
         //given data_lake with started_at > ended_at
         //when episodes crated
-        FeedData feedV1 = createFeed(UUID.randomUUID().toString(), OffsetDateTime.of(
+        TestEventDto feedV1 = createFeed(UUID.randomUUID().toString(), OffsetDateTime.of(
                 LocalDateTime.of(2020, 1, 1, 1, 1), ZoneOffset.UTC),
                 HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard_with_start_later_then_end.json"));
 
@@ -81,7 +88,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
                 LocalDateTime.of(2020, 1, 1, 1, 1), ZoneOffset.UTC);
 
         //when
-        FeedData feedV1 = createFeed(eventUUID, hazardsLoadTime, HP_SRV_SEARCH_PROVIDER,
+        TestEventDto feedV1 = createFeed(eventUUID, hazardsLoadTime, HP_SRV_SEARCH_PROVIDER,
                 readMessageFromFile("hpsrvhazard01.json"));
 
         //then
@@ -98,7 +105,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
                 LocalDateTime.of(2020, 2, 2, 2, 2), ZoneOffset.UTC);
 
         //when
-        FeedData feedV2 = createFeed(eventUUID, magsLoadTime, HP_SRV_MAG_PROVIDER,
+        TestEventDto feedV2 = createFeed(eventUUID, magsLoadTime, HP_SRV_MAG_PROVIDER,
                 readMessageFromFile("magsdata01.json"));
 
         //then
@@ -112,13 +119,13 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
                 feedV2.getEpisodes().get(1).getSourceUpdatedAt());
     }
 
-    private FeedData createFeed(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {
+    private TestEventDto createFeed(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) throws IOException {
         createNormalizations(externalEventUUId, loadedTime, provider, data);
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        return feedDao.searchForEvents("test-feed", List.of(), null,
-                null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
+        return objectMapper.readValue(apiDao.searchForEvents("test-feed", List.of(), null,
+                null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY), TestEventListDto.class).getData().get(0);
     }
 
     private void createNormalizations(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {
@@ -156,8 +163,8 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         eventCombinationJob.run();
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-feed", List.of(), null, null, startTimeForSearchingFeed,
-                1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
+        TestEventDto feed = objectMapper.readValue(apiDao.searchForEvents("test-feed", List.of(), null, null, startTimeForSearchingFeed,
+                1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY), TestEventListDto.class).getData().get(0);
         assertEquals(2, feed.getEpisodes().size());
 
         boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
@@ -202,8 +209,9 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         feedCompositionJob.run();
 
-        FeedData feed = feedDao.searchForEvents("test-feed", List.of(EventType.FLOOD), null, null,
-                loadHpSrvHazardLoadTime, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY).get(0);
+        TestEventDto feed = objectMapper.readValue(apiDao.searchForEvents(
+                "test-feed", List.of(EventType.FLOOD), null, null, loadHpSrvHazardLoadTime, 1,
+                List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY), TestEventListDto.class).getData().get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }
 
