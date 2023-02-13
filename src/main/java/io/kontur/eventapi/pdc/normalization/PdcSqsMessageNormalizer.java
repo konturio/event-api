@@ -20,18 +20,13 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static io.kontur.eventapi.entity.EventType.CYCLONE;
 import static io.kontur.eventapi.entity.EventType.FLOOD;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.LossUtil.INFRASTRUCTURE_REPLACEMENT_VALUE;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 @Component
 public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
@@ -114,6 +109,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
     private void convertHazardTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props) {
         normalizedDto.setExternalEventId(readString(props, "uuid"));
         normalizedDto.setName(readString(props, "hazardName"));
+        normalizedDto.setRegion(parseLocation(normalizedDto.getName()));
         String description = readString((Map<String, Object>) props.get("hazardDescription"), "description");
         normalizedDto.setDescription(description);
         normalizedDto.setEpisodeDescription(description);
@@ -161,38 +157,5 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         org.wololo.geojson.Geometry geometry = geoJSONWriter.write(wktReader.read(point));
         Feature feature = new Feature(geometry, type == CYCLONE ? SQS_CYCLONE_PROPERTIES : HAZARD_PROPERTIES);
         return new FeatureCollection(new Feature[] {feature});
-    }
-
-    protected BigDecimal parseRebuildCost(String description) {
-        if (description != null) {
-            if (contains(description, "currently, no major population centers are within the affected area")) {
-                return BigDecimal.ZERO;
-            }
-            Matcher matcher = Pattern.compile("\\$([\\d.,]+)\\s(Million|Billion|Trillion)?\\s?of infrastructure").matcher(description);
-            if (matcher.find()) {
-                BigDecimal loss = new BigDecimal(matcher.group(1).replace(",", ""));
-                if (matcher.group(2) == null) return loss;
-                switch (matcher.group(2)) {
-                    case "Million": return loss.multiply(BigDecimal.valueOf(1_000_000.));
-                    case "Billion": return loss.multiply(BigDecimal.valueOf(1_000_000_000.));
-                    case "Trillion": return loss.multiply(BigDecimal.valueOf(1_000_000_000_000.));
-                }
-            }
-        }
-        return null;
-    }
-
-    private Boolean defineActive(String status) {
-        return equalsIgnoreCase(status, "A") ? TRUE : equalsIgnoreCase(status, "E") ? FALSE : null;
-    }
-
-    private String defineOrigin(String description) {
-        if (contains(description, " " + ORIGIN_NASA + " ")) return ORIGIN_NASA;
-        if (contains(description, "(" + ORIGIN_NWS + ")")) return ORIGIN_NWS;
-        return null;
-    }
-
-    private Boolean defineAutoExpire(String autoExpire) {
-        return equalsIgnoreCase(autoExpire, "Y") ? TRUE : equalsIgnoreCase(autoExpire, "N") ? FALSE : null;
     }
 }

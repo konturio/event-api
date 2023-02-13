@@ -4,8 +4,8 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_P
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
+import static java.util.Collections.singletonList;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toSet;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
@@ -41,22 +42,19 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(eventObservations,
                 observation.getSourceUpdatedAt());
         validateEpisodeObservations(episodeObservations);
-        Set<NormalizedObservation> dataEpisodeObservations = getDataObservations(episodeObservations);
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
         Optional<List<FeedEpisode>> episode = createDefaultEpisode(latestObservation);
         if (episode.isPresent() && CollectionUtils.isNotEmpty(episode.get())) {
-            episode.get().get(0).setStartedAt(findEpisodeStartedAt(dataEpisodeObservations));
-            episode.get().get(0).setEndedAt(findEpisodeEndedAt(dataEpisodeObservations));
+            episode.get().get(0).setStartedAt(findEpisodeStartedAt(episodeObservations));
+            episode.get().get(0).setEndedAt(findEpisodeEndedAt(episodeObservations));
             episode.get().get(0).setUpdatedAt(findEpisodeUpdatedAt(episodeObservations));
             episode.get().get(0).setObservations(mapObservationsToIDs(episodeObservations));
             episode.get().get(0).setGeometries(computeEpisodeGeometries(episodeObservations));
-            episode.get().get(0).setName(
-                    findLatestEpisodeObservationWithName(dataEpisodeObservations).orElse(latestObservation).getName());
-            episode.get().get(0).setDescription(
-                    findLatestEpisodeObservationWithDescription(dataEpisodeObservations).orElse(latestObservation)
-                            .getDescription());
-            episode.get().get(0).setLoss(findEpisodeLoss(dataEpisodeObservations));
+            episode.get().get(0).setName(findEpisodeName(episodeObservations));
+            episode.get().get(0).setDescription(findEpisodeDescription(episodeObservations, singletonList(PDC_MAP_SRV_PROVIDER)));
+            episode.get().get(0).setLoss(findEpisodeLoss(episodeObservations));
             episode.get().get(0).setActive(findEpisodeActive(episodeObservations));
+            episode.get().get(0).setLocation(findEpisodeLocation(episodeObservations));
         }
         return episode;
     }
@@ -79,12 +77,6 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         return eventEpisodes
                 .stream()
                 .anyMatch(episode -> episode.getObservations().contains(observation.getObservationId()));
-    }
-
-    private Set<NormalizedObservation> getDataObservations(Set<NormalizedObservation> observations) {
-        return observations.stream()
-                .filter(obs -> !PDC_MAP_SRV_PROVIDER.equals(obs.getProvider()))
-                .collect(toSet());
     }
 
     private FeatureCollection computeEpisodeGeometries(Set<NormalizedObservation> episodeObservations) {
@@ -133,7 +125,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                         return true;
                     }
                     return false;
-                }).collect(toSet()));
+                }).collect(Collectors.toSet()));
         AtomicReference<OffsetDateTime> currentTimeDown = new AtomicReference<>(sourceUpdatedAt);
         foundEvents.addAll(eventObservations.stream()
                 .sorted(comparing(NormalizedObservation::getSourceUpdatedAt))
@@ -144,7 +136,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                         return true;
                     }
                     return false;
-                }).collect(toSet()));
+                }).collect(Collectors.toSet()));
         return foundEvents;
     }
 }

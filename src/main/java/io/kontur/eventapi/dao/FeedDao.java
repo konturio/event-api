@@ -39,12 +39,11 @@ public class FeedDao {
     public void insertFeedData(FeedData feedData, String feed) {
         String episodesJson = writeJson(feedData.getEpisodes());
         int count = mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
-                feedData.getName(), feedData.getProperName(), feedData.getType(), feedData.getSeverity(),
-                feedData.getDescription(), feedData.getStartedAt(), feedData.getEndedAt(), feedData.getUpdatedAt(),
-                feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getUrls(),
-                feedData.getLocation(),
-                feedData.getGeomFuncType(), feedData.getLoss(),
-                feedData.getActive());
+                feedData.getName(), feedData.getProperName(), feedData.getDescription(), feedData.getType(),
+                feedData.getSeverity(), feedData.getActive(), feedData.getStartedAt(), feedData.getEndedAt(),
+                feedData.getUpdatedAt(), feedData.getLocation(), feedData.getUrls(), feedData.getLoss(),
+                feedData.getObservations(), episodesJson, feedData.getEnriched(), feedData.getAutoExpire(),
+                feedData.getGeomFuncType());
 
         if (count > 0) {
             mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
@@ -71,9 +70,8 @@ public class FeedDao {
     @Transactional
     public void addAnalytics(FeedData event, String feed) {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
-                event.getEventDetails(),
-                event.getEnriched(), writeJson(event.getEpisodes()), event.getName(),
-                event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
+                event.getName(), event.getEventDetails(), writeJson(event.getEpisodes()),
+                event.getEnriched(), event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
         if (event.getEnriched()) {
             cacheUtil.evictEventListCache(feed);
             cacheUtil.evictEventCache(event.getEventId(), feed);

@@ -16,12 +16,14 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id, started_at,
-                               ended_at, updated_at, location, urls, <if test='loss != null'>loss,</if> observations, geometries,
-                               episodes, enriched)
+        insert into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id,
+                               active, started_at, ended_at, updated_at, location, urls,
+                               <if test='loss != null'>loss,</if>
+                               observations, geometries, episodes, enriched, auto_expire)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{type},
-                (select severity_id from severities where severity = #{severity}), #{startedAt}, #{endedAt}, #{updatedAt},
-                #{location}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                (select severity_id from severities where severity = #{severity}),
+                #{active}, #{startedAt}, #{endedAt}, #{updatedAt}, #{location},
+                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
                 <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
                 #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 <choose>
@@ -32,7 +34,7 @@
                         collectEventGeometries(#{episodes}::jsonb),
                     </otherwise>
                 </choose>
-                #{episodes}::jsonb, #{enriched})
+                #{episodes}::jsonb, #{enriched}, #{autoExpire})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -117,9 +119,9 @@
         <result property="version" column="version" />
         <result property="name" column="name" />
         <result property="properName" column="proper_name"/>
+        <result property="description" column="description" />
         <result property="type" column="type" />
         <result property="severity" column="severity" />
-        <result property="description" column="description" />
         <result property="active" column="active"/>
         <result property="startedAt" column="started_at" />
         <result property="endedAt" column="ended_at" />
@@ -131,12 +133,11 @@
         <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
         <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
-        <result property="bbox" column="bbox" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
-        <result property="centroid" column="centroid" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
         <result property="enriched" column="enriched"/>
         <result property="enrichmentAttempts" column="enrichment_attempts" />
         <result property="enrichmentSkipped" column="enrichment_skipped" />
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>
+        <result property="autoExpire" column="auto_expire"/>
     </resultMap>
 </mapper>

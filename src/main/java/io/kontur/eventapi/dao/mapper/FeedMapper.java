@@ -20,20 +20,21 @@ public interface FeedMapper {
                        @Param("version") Long version,
                        @Param("name") String name,
                        @Param("properName") String properName,
+                       @Param("description") String description,
                        @Param("type") EventType type,
                        @Param("severity") Severity severity,
-                       @Param("description") String description,
+                       @Param("active") Boolean active,
                        @Param("startedAt") OffsetDateTime startedAt,
                        @Param("endedAt") OffsetDateTime endedAt,
                        @Param("updatedAt") OffsetDateTime updatedAt,
+                       @Param("location") String location,
+                       @Param("urls") List<String> urls,
+                       @Param("loss") Map<String, Object> loss,
                        @Param("observations") Set<UUID> observations,
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,
-                       @Param("urls") List<String> urls,
-                       @Param("location") String location,
-                       @Param("geomFuncType") Integer geomFuncType,
-                       @Param("loss") Map<String, Object> loss,
-                       @Param("active") Boolean active);
+                       @Param("autoExpire") Boolean autoExpire,
+                       @Param("geomFuncType") Integer geomFuncType);
 
     /**
      * Mark events below specified version outdated
@@ -52,10 +53,10 @@ public interface FeedMapper {
     void addAnalytics(@Param("feedId") UUID feedId,
                       @Param("eventId") UUID eventId,
                       @Param("version") Long version,
-                      @Param("eventDetails") Map<String, Object> eventDetails,
-                      @Param("enriched") Boolean enriched,
-                      @Param("episodes") String episodes,
                       @Param("name") String name,
+                      @Param("eventDetails") Map<String, Object> eventDetails,
+                      @Param("episodes") String episodes,
+                      @Param("enriched") Boolean enriched,
                       @Param("enrichmentAttempts") Long enrichmentAttempts,
                       @Param("enrichmentSkipped") Boolean enrichmentSkipped);
 

@@ -18,7 +18,6 @@ public class FeedData {
     private EventType type;
     private Severity severity;
     private Boolean active;
-    private Boolean autoExpire;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
@@ -29,13 +28,12 @@ public class FeedData {
     private Set<UUID> observations = new HashSet<>();
     private FeatureCollection geometries;
     private List<FeedEpisode> episodes = new ArrayList<>();
-    private List<Double> centroid = new ArrayList<>();
-    private List<Double> bbox = new ArrayList<>();
     private Boolean enriched;
     private Long enrichmentAttempts;
     private Boolean enrichmentSkipped;
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
+    private Boolean autoExpire;
     private Integer geomFuncType;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {

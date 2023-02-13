@@ -4,9 +4,16 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
 
+import java.math.BigDecimal;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.kontur.eventapi.util.GeometryUtil.*;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 public abstract class PdcHazardNormalizer extends Normalizer {
 
@@ -46,4 +53,44 @@ public abstract class PdcHazardNormalizer extends Normalizer {
         return typeMap.getOrDefault(typeId, EventType.OTHER);
     }
 
+    protected Boolean defineActive(String status) {
+        return equalsIgnoreCase(status, "A") ? TRUE : equalsIgnoreCase(status, "E") ? FALSE : null;
+    }
+
+    protected Boolean defineAutoExpire(String autoExpire) {
+        return equalsIgnoreCase(autoExpire, "Y") ? TRUE : equalsIgnoreCase(autoExpire, "N") ? FALSE : null;
+    }
+
+    protected String defineOrigin(String description) {
+        if (contains(description, "NASA Global Flood Model")) return ORIGIN_NASA;
+        if (contains(description, "National Weather Service")) return ORIGIN_NWS;
+        return null;
+    }
+
+    protected BigDecimal parseRebuildCost(String description) {
+        if (description != null) {
+            if (contains(description, "no major population centers are within the affected area")) {
+                return BigDecimal.ZERO;
+            }
+            Matcher matcher = Pattern.compile("\\$([\\d.,]+)\\s(Million|Billion|Trillion)?\\s?of infrastructure").matcher(description);
+            if (matcher.find()) {
+                BigDecimal loss = new BigDecimal(matcher.group(1).replace(",", ""));
+                if (matcher.group(2) == null) return loss;
+                switch (matcher.group(2)) {
+                    case "Million": return loss.multiply(BigDecimal.valueOf(1_000_000.));
+                    case "Billion": return loss.multiply(BigDecimal.valueOf(1_000_000_000.));
+                    case "Trillion": return loss.multiply(BigDecimal.valueOf(1_000_000_000_000.));
+                }
+            }
+        }
+        return null;
+    }
+
+    protected String parseLocation(String name) {
+        if (name != null) {
+            Matcher matcher = Pattern.compile("(\\w+)\\s-\\s(.+)").matcher(name);
+            if (matcher.find()) return matcher.group(2);
+        }
+        return null;
+    }
 }
