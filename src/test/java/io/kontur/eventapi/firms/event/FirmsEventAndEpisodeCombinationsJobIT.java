@@ -1,9 +1,12 @@
 package io.kontur.eventapi.firms.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.KonturEventsDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
+import io.kontur.eventapi.dao.mapper.ApiMapper;
 import io.kontur.eventapi.dao.mapper.FeedMapper;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.firms.client.FirmsClient;
@@ -13,8 +16,10 @@ import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.job.NormalizationJob;
-import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.resource.dto.TestEpisodeDto;
+import io.kontur.eventapi.resource.dto.TestEventDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
+import io.kontur.eventapi.resource.dto.TestEventListDto;
 import io.kontur.eventapi.util.JsonUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +27,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.wololo.geojson.FeatureCollection;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
 
 import static io.kontur.eventapi.TestUtil.readFile;
+import static io.kontur.eventapi.entity.EventType.THERMAL_ANOMALY;
+import static io.kontur.eventapi.entity.SortOrder.ASC;
+import static io.kontur.eventapi.resource.dto.EpisodeFilterType.ANY;
 import static java.time.OffsetDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -44,6 +53,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private final FeedMapper feedMapper;
     private final KonturEventsDao konturEventsDao;
     private final NormalizedObservationsDao observationsDao;
+    private final ApiMapper apiMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @MockBean
     private FirmsClient firmsClient;
@@ -55,7 +66,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
                                                  FirmsImportSuomiJob firmsImportSuomiJob, NormalizationJob normalizationJob,
                                                  FirmsEventCombinationJob eventCombinationJob, FeedCompositionJob feedCompositionJob,
                                                  FeedMapper feedMapper, KonturEventsDao konturEventsDao,
-                                                 NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate, FeedDao feedDao) {
+                                                 NormalizedObservationsDao observationsDao, JdbcTemplate jdbcTemplate, FeedDao feedDao,
+                                                 ApiMapper apiMapper) {
         super(jdbcTemplate, feedDao);
         this.firmsImportModisJob = firmsImportModisJob;
         this.firmsImportNoaaJob = firmsImportNoaaJob;
@@ -66,6 +78,12 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         this.feedMapper = feedMapper;
         this.konturEventsDao = konturEventsDao;
         this.observationsDao = observationsDao;
+        this.apiMapper = apiMapper;
+    }
+
+    @PostConstruct
+    public void setUp() {
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -94,7 +112,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
         //WHEN run feed job
         feedCompositionJob.run();
-        List<FeedData> feedData = searchFeedData();
+        List<TestEventDto> feedData = searchFeedData();
 
         //THEN
         assertEquals(2, feedData.size());
@@ -133,7 +151,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         feedCompositionJob.run();
 
         //THEN
-        List<FeedData> firmsUpdated = searchFeedData();
+        List<TestEventDto> firmsUpdated = searchFeedData();
 
         assertEquals(3, firmsUpdated.size());
 
@@ -145,17 +163,17 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(2, firmsUpdated.get(1).getEpisodes().size());
         assertEquals(2, firmsUpdated.get(1).getVersion());
 
-        FeedData someFedData = firmsUpdated.get(2);
+        TestEventDto someFedData = firmsUpdated.get(2);
         assertEquals("Thermal anomaly in an unknown area. Burnt area 2.612 km\u00B2, burning 35 hours.", someFedData.getName());
         assertEquals(5, someFedData.getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"),someFedData.getStartedAt());
         assertEquals(parse("2020-11-03T22:50Z"),someFedData.getEndedAt());
         assertEquals(2, someFedData.getVersion());
 
-        List<FeedEpisode> episodes = someFedData.getEpisodes();
+        List<TestEpisodeDto> episodes = someFedData.getEpisodes();
         assertEquals(4, episodes.size());
 
-        episodes.sort(Comparator.comparing(FeedEpisode::getSourceUpdatedAt));
+        episodes.sort(Comparator.comparing(TestEpisodeDto::getSourceUpdatedAt));
 
         assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 0.871 km\u00B2",
                 episodes.get(0).getName());
@@ -200,10 +218,10 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         feedCompositionJob.run();
 
         //THEN area is calculated from all hexaons that were burning
-        List<FeedData> firmsUpdated2 = searchFeedData();
+        List<TestEventDto> firmsUpdated2 = searchFeedData();
 
         assertEquals(3, firmsUpdated2.size());
-        Optional<FeedData> updatedEvent = firmsUpdated2.stream().filter(event -> event.getVersion() == 3).findFirst();
+        Optional<TestEventDto> updatedEvent = firmsUpdated2.stream().filter(event -> event.getVersion() == 3).findFirst();
         assertTrue(updatedEvent.isPresent());
         assertEquals("Thermal anomaly in an unknown area. Burnt area 3.479 km\u00B2, burning 53 hours.", updatedEvent.get().getEpisodes().get(4).getName());
     }
@@ -224,22 +242,10 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
                 .collect(toList());
     }
 
-    private List<FeedData> searchFeedData() {
-        List<FeedData> firms = feedMapper.searchForEvents(
-                "test-feed",
-                List.of(EventType.THERMAL_ANOMALY),
-                null,
-                null,
-                OffsetDateTime.parse("2020-11-02T11:00Z"),
-                100,
-                List.of(),
-                SortOrder.ASC,
-                null,
-                null,
-                null,
-                null,
-                EpisodeFilterType.ANY
-        );
+    private List<TestEventDto> searchFeedData() throws IOException {
+        List<TestEventDto> firms = objectMapper.readValue(apiMapper.searchForEvents(
+                "test-feed", List.of(THERMAL_ANOMALY), null, null, OffsetDateTime.parse("2020-11-02T11:00Z"), 100,
+                List.of(), ASC, null, null, null, null, ANY), TestEventListDto.class).getData();
         firms.sort(Comparator.comparing(f -> f.getObservations().size()));
         return firms;
     }

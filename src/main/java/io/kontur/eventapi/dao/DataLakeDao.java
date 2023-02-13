@@ -67,10 +67,6 @@ public class DataLakeDao {
         return mapper.getDenormalizedEvents(providers);
     }
 
-    public DataLake getDataLakeByObservationId(UUID observationId) {
-        return mapper.getDataLakeByObservationId(observationId);
-    }
-
     public Optional<DataLake> getLatestDataLakeByExternalIdAndProvider(String externalId, String provider) {
         return mapper.getLatestDataLakeByExternalIdAndProvider(externalId, provider);
     }

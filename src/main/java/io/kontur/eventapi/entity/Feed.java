@@ -7,11 +7,10 @@ import java.util.UUID;
 
 @Data
 public class Feed {
-
     private UUID feedId;
+    private String alias;
     private String name;
     private String description;
-    private String alias;
     private List<String> providers;
     private List<String> roles;
     private List<String> enrichment;
