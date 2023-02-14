@@ -29,6 +29,8 @@ public class EnrichmentConfig {
     public static final String BUILDING_COUNT = "buildingCount";
     public static final String HIGHWAY_LENGTH = "highwayLength";
     public static final String GDP = "gdp";
+    public static final String LOSS = "loss";
+    public static final String LOSS_BOUND = "lossErrorBound";
 
 
     @Bean
