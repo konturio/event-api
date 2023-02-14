@@ -17,7 +17,6 @@ public class FeedEpisode {
     private String description;
     private EventType type;
     private Severity severity;
-    private Boolean active;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;

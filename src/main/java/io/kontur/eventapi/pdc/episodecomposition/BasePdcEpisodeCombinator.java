@@ -53,7 +53,6 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
             episode.get().get(0).setName(findEpisodeName(episodeObservations));
             episode.get().get(0).setDescription(findEpisodeDescription(episodeObservations, singletonList(PDC_MAP_SRV_PROVIDER)));
             episode.get().get(0).setLoss(findEpisodeLoss(episodeObservations));
-            episode.get().get(0).setActive(findEpisodeActive(episodeObservations));
             episode.get().get(0).setLocation(findEpisodeLocation(episodeObservations));
         }
         return episode;

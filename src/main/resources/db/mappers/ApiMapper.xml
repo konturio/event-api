@@ -199,7 +199,6 @@
                 episode -> 'description' as episode_description,
                 episode -> 'type' as episode_type,
                 episode -> 'severity' as episode_severity,
-                episode -> 'active' as episode_active,
                 episode -> 'startedAt' as "episode_startedAt",
                 episode -> 'endedAt' as "episode_endedAt",
                 episode -> 'updatedAt' as "episode_updatedAt",

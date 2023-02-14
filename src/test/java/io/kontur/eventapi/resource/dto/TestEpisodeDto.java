@@ -25,7 +25,6 @@ public class TestEpisodeDto implements Serializable {
 	private String description;
 	private EventType type;
 	private Severity severity;
-	private Boolean active;
 	private OffsetDateTime startedAt;
 	private OffsetDateTime endedAt;
 	private OffsetDateTime updatedAt;
@@ -45,7 +44,6 @@ public class TestEpisodeDto implements Serializable {
 		description = (String) in.readObject();
 		type = (EventType) in.readObject();
 		severity = (Severity) in.readObject();
-		active = (Boolean) in.readObject();
 		startedAt = (OffsetDateTime) in.readObject();
 		endedAt = (OffsetDateTime) in.readObject();
 		updatedAt = (OffsetDateTime) in.readObject();
@@ -66,7 +64,6 @@ public class TestEpisodeDto implements Serializable {
 		out.writeObject(description);
 		out.writeObject(type);
 		out.writeObject(severity);
-		out.writeObject(active);
 		out.writeObject(startedAt);
 		out.writeObject(endedAt);
 		out.writeObject(updatedAt);

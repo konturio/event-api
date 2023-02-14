@@ -160,10 +160,10 @@ public class FeedCompositionJob extends AbstractJob {
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(ep -> ep.getLoss().get(key)).orElseThrow())));
 
-        feedData.setActive(episodes.stream()
+        feedData.setActive(eventObservations.stream()
                 .filter(ep -> ep.getActive() != null)
-                .max(comparing(FeedEpisode::getUpdatedAt))
-                .map(FeedEpisode::getActive).orElse(null));
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(NormalizedObservation::getActive).orElse(null));
 
         feedData.setAutoExpire(eventObservations.stream()
                 .filter(obs -> obs.getAutoExpire() != null)
