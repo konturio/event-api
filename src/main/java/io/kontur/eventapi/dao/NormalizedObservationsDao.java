@@ -27,10 +27,10 @@ public class NormalizedObservationsDao {
         dataLakeDao.markAsNormalized(obs.getObservationId());
         String geometries = writeJson(obs.getGeometries());
         return mapper.insert(obs.getObservationId(), obs.getExternalEventId(), obs.getExternalEpisodeId(),
-                obs.getProvider(), obs.getOrigin(), obs.getPoint(), geometries, obs.getEventSeverity(), obs.getName(),
-                obs.getProperName(), obs.getDescription(), obs.getEpisodeDescription(), obs.getType(), obs.getActive(),
-                obs.getCost(), obs.getLoss(), obs.getRegion(), obs.getLoadedAt(), obs.getStartedAt(), obs.getEndedAt(),
-                obs.getSourceUpdatedAt(), obs.getUrls(), obs.getRecombined());
+                obs.getProvider(), obs.getOrigin(), obs.getName(), obs.getProperName(), obs.getDescription(),
+                obs.getEpisodeDescription(), obs.getType(), obs.getEventSeverity(), obs.getActive(), obs.getLoadedAt(),
+                obs.getStartedAt(), obs.getEndedAt(), obs.getSourceUpdatedAt(), obs.getRegion(), obs.getUrls(),
+                obs.getCost(), obs.getLoss(), obs.getPoint(), geometries, obs.getAutoExpire(), obs.getRecombined());
     }
 
     public void markAsRecombined(UUID observationId) {
@@ -59,10 +59,6 @@ public class NormalizedObservationsDao {
 
     public Optional<NormalizedObservation> getDuplicateObservation(OffsetDateTime loadedAt, String externalEpisodeId, UUID observationId, String provider) {
         return mapper.getDuplicateObservation(loadedAt, externalEpisodeId, observationId, provider);
-    }
-
-    public Optional<NormalizedObservation> getNormalizedObservationByExternalEpisodeIdAndProvider(String externalEpisodeId, String provider) {
-        return mapper.getNormalizedObservationByExternalEpisodeIdAndProvider(externalEpisodeId, provider);
     }
 
     public OffsetDateTime getTimestampAtTimezone(LocalDateTime timestamp, String timezone) {

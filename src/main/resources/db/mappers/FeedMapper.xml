@@ -16,11 +16,15 @@
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id, started_at,
-                               ended_at, updated_at, location, urls, observations, geometries, episodes, enriched)
+        insert into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id,
+                               active, started_at, ended_at, updated_at, location, urls,
+                               <if test='loss != null'>loss,</if>
+                               observations, geometries, episodes, enriched, auto_expire)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{type},
-                (select severity_id from severities where severity = #{severity}), #{startedAt}, #{endedAt}, #{updatedAt},
-                #{location}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                (select severity_id from severities where severity = #{severity}),
+                #{active}, #{startedAt}, #{endedAt}, #{updatedAt}, #{location},
+                #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
                 #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 <choose>
                     <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
@@ -30,7 +34,7 @@
                         collectEventGeometries(#{episodes}::jsonb),
                     </otherwise>
                 </choose>
-                #{episodes}::jsonb, #{enriched})
+                #{episodes}::jsonb, #{enriched}, #{autoExpire})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -81,7 +85,7 @@
         update feed_data
         set
             <if test='eventDetails != null'>
-                event_details = #{eventDetails}::jsonb,
+                event_details = #{eventDetails,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
             </if>
             enriched_at = current_timestamp,
             enriched = #{enriched},
@@ -115,24 +119,25 @@
         <result property="version" column="version" />
         <result property="name" column="name" />
         <result property="properName" column="proper_name"/>
+        <result property="description" column="description" />
         <result property="type" column="type" />
         <result property="severity" column="severity" />
-        <result property="description" column="description" />
+        <result property="active" column="active"/>
         <result property="startedAt" column="started_at" />
         <result property="endedAt" column="ended_at" />
         <result property="updatedAt" column="updated_at" />
         <result property="location" column="location"/>
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
+        <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler" />
         <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
         <result property="episodes" column="episodes" typeHandler="io.kontur.eventapi.typehandler.FeedEpisodeTypeHandler"/>
-        <result property="bbox" column="bbox" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
-        <result property="centroid" column="centroid" typeHandler="io.kontur.eventapi.typehandler.DoubleArrayTypeHandler"/>
         <result property="enriched" column="enriched"/>
         <result property="enrichmentAttempts" column="enrichment_attempts" />
         <result property="enrichmentSkipped" column="enrichment_skipped" />
         <result property="composedAt" column="composed_at"/>
         <result property="enrichedAt" column="enriched_at"/>
+        <result property="autoExpire" column="auto_expire"/>
     </resultMap>
 </mapper>

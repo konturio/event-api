@@ -90,7 +90,6 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
         episode.setDescription(firstNonNull(episode.getDescription(), observation.getEpisodeDescription()));
         episode.setType(firstNonNull(episode.getType(), observation.getType()));
-        episode.setActive(firstNonNull(episode.getActive(), observation.getActive()));
         episode.setStartedAt(firstNonNull(episode.getStartedAt(), observation.getStartedAt()));
         episode.setEndedAt(firstNonNull(episode.getEndedAt(), calculateEndedDate(observation, eventObservations)));
         episode.setUpdatedAt(firstNonNull(episode.getUpdatedAt(), calculateUpdatedDate(episodeObservations)));

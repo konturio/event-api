@@ -17,13 +17,13 @@ public class FeedEpisode {
     private String description;
     private EventType type;
     private Severity severity;
-    private Boolean active;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime sourceUpdatedAt;
     private String location;
     private List<String> urls = new ArrayList<>();
+    private Map<String, Object> loss = new HashMap<>();
     private Map<String, Object> episodeDetails;
     private Set<UUID> observations = new HashSet<>();
     private FeatureCollection geometries;

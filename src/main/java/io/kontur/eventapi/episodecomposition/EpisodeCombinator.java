@@ -1,13 +1,15 @@
 package io.kontur.eventapi.episodecomposition;
 
 import static java.util.Comparator.comparing;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.job.Applicable;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
@@ -29,7 +31,6 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         feedEpisode.setName(observation.getName());
         feedEpisode.setDescription(observation.getEpisodeDescription());
         feedEpisode.setType(observation.getType());
-        feedEpisode.setActive(observation.getActive());
         feedEpisode.setSeverity(observation.getEventSeverity());
         feedEpisode.setStartedAt(observation.getStartedAt());
         feedEpisode.setEndedAt(observation.getEndedAt());
@@ -41,6 +42,7 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
         }
         feedEpisode.setProperName(observation.getProperName());
         feedEpisode.setLocation(observation.getRegion());
+        feedEpisode.setLoss(observation.getLoss());
 
         if (observation.getGeometries() != null) {
             feedEpisode.setGeometries(observation.getGeometries());
@@ -89,18 +91,23 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .orElse(null);
     }
 
-    protected Optional<NormalizedObservation> findLatestEpisodeObservationWithName(Set<NormalizedObservation> episodeObservations) {
+    protected String findEpisodeName(Set<NormalizedObservation> episodeObservations) {
         return episodeObservations
                 .stream()
-                .filter(obs -> StringUtils.isNotBlank(obs.getName()))
-                .max(comparing(NormalizedObservation::getSourceUpdatedAt));
+                .filter(obs -> isNotBlank(obs.getName()))
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(NormalizedObservation::getName)
+                .orElse(null);
     }
 
-    protected Optional<NormalizedObservation> findLatestEpisodeObservationWithDescription(Set<NormalizedObservation> episodeObservations) {
+    protected String findEpisodeDescription(Set<NormalizedObservation> episodeObservations,
+                                                                     List<String> excludeProviders) {
         return episodeObservations
                 .stream()
-                .filter(obs -> StringUtils.isNotBlank(obs.getDescription()))
-                .max(comparing(NormalizedObservation::getSourceUpdatedAt));
+                .filter(obs -> isNotBlank(obs.getDescription()) && !excludeProviders.contains(obs.getProvider()))
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(NormalizedObservation::getDescription)
+                .orElse(null);
     }
 
     protected OffsetDateTime findEpisodeStartedAt(Set<NormalizedObservation> episodeObservations) {
@@ -136,4 +143,31 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .collect(toSet());
     }
 
+    protected Map<String, Object> findEpisodeLoss(Set<NormalizedObservation> episodeObservations) {
+        Set<String> lossKeys = episodeObservations.stream()
+                .map(obs -> obs.getLoss().keySet())
+                .flatMap(Collection::stream)
+                .collect(toSet());
+        return lossKeys.stream().collect(toMap(identity(), key -> episodeObservations.stream()
+                .filter(obs -> obs.getLoss() != null && obs.getLoss().containsKey(key) && obs.getLoss().get(key) != null)
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(ep -> ep.getLoss().get(key))
+                .orElseThrow()));
+    }
+
+    protected Boolean findEpisodeActive(Set<NormalizedObservation> observations) {
+        return observations.stream()
+                .filter(obs -> obs.getActive() != null)
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(NormalizedObservation::getActive)
+                .orElse(null);
+    }
+
+    protected String findEpisodeLocation(Set<NormalizedObservation> observations) {
+        return observations.stream()
+                .filter(obs -> obs.getRegion() != null)
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(NormalizedObservation::getRegion)
+                .orElse(null);
+    }
 }

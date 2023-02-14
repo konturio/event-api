@@ -185,7 +185,7 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: kontur-public
+    alias: kontur-public, kontur-private
   enrichment:
     enable: true
     initialDelay: 1000

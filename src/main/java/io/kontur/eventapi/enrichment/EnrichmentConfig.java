@@ -16,7 +16,7 @@ import java.util.List;
 @Configuration
 public class EnrichmentConfig {
 
-    public static final String WILDFIRE_TYPE_POSTPROCESSOR = "wildfire_type";
+    public static final String WILDFIRE_TYPE_POSTPROCESSOR = "wildfireType";
     public static final String LOSS_POSTPROCESSOR = "loss";
 
     public static final String POPULATION = "population";

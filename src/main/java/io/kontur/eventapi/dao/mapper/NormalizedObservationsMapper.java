@@ -19,23 +19,24 @@ public interface NormalizedObservationsMapper {
                @Param("externalEpisodeId") String externalEpisodeId,
                @Param("provider") String provider,
                @Param("origin") String origin,
-               @Param("point") String point,
-               @Param("geometries") String geometries,
-               @Param("eventSeverity") Severity eventSeverity,
                @Param("name") String name,
                @Param("properName") String properName,
                @Param("description") String description,
                @Param("episodeDescription") String episodeDescription,
                @Param("type") EventType type,
+               @Param("eventSeverity") Severity eventSeverity,
                @Param("active") Boolean active,
-               @Param("cost") BigDecimal cost,
-               @Param("loss") Map<String, Object> loss,
-               @Param("region") String region,
                @Param("loadedAt") OffsetDateTime loadedAt,
                @Param("startedAt") OffsetDateTime startedAt,
                @Param("endedAt") OffsetDateTime endedAt,
                @Param("sourceUpdatedAt") OffsetDateTime sourceUpdatedAt,
+               @Param("region") String region,
                @Param("urls") List<String> urls,
+               @Param("cost") BigDecimal cost,
+               @Param("loss") Map<String, Object> loss,
+               @Param("point") String point,
+               @Param("geometries") String geometries,
+               @Param("autoExpire") Boolean autoExpire,
                @Param("recombined") boolean recombined);
 
     void markAsRecombined(@Param("observationId") UUID observationId);
@@ -54,10 +55,6 @@ public interface NormalizedObservationsMapper {
                                                             @Param("externalEpisodeId") String externalEpisodeId,
                                                             @Param("observationId") UUID observationId,
                                                             @Param("provider") String provider);
-
-    Optional<NormalizedObservation> getNormalizedObservationByExternalEpisodeIdAndProvider(
-            @Param("externalEpisodeId") String externalEpisodeId,
-            @Param("provider") String provider);
 
     OffsetDateTime getTimestampAtTimezone(@Param("timestamp") LocalDateTime timestamp,
                                           @Param("timezone") String timezone);

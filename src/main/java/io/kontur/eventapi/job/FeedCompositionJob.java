@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.*;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -83,7 +85,7 @@ public class FeedCompositionJob extends AbstractJob {
             feedData.setObservations(
                     eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
             fillEpisodes(eventObservations, feedData);
-            fillFeedData(feedData);
+            fillFeedData(feedData, eventObservations);
 
             feedData.setEnriched(feed.getEnrichment().isEmpty());
 
@@ -97,7 +99,7 @@ public class FeedCompositionJob extends AbstractJob {
         }
     }
 
-    private void fillFeedData(FeedData feedData) {
+    private void fillFeedData(FeedData feedData, List<NormalizedObservation> eventObservations) {
         List<FeedEpisode> episodes = feedData.getEpisodes();
 
         feedData.setName(episodes.stream()
@@ -147,6 +149,27 @@ public class FeedCompositionJob extends AbstractJob {
                 .filter(ep -> ep.getType() != null)
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getType).orElse(null));
+
+        Set<String> lossKeys = episodes.stream()
+                .filter(episode -> episode.getLoss() != null)
+                .map(episode -> episode.getLoss().keySet())
+                .flatMap(Collection::stream)
+                .collect(toSet());
+        feedData.setLoss(lossKeys.stream().collect(toMap(identity(), key -> episodes.stream()
+                .filter(ep -> ep.getLoss() != null && ep.getLoss().containsKey(key) && ep.getLoss().get(key) != null)
+                .max(comparing(FeedEpisode::getUpdatedAt))
+                .map(ep -> ep.getLoss().get(key)).orElseThrow())));
+
+        feedData.setActive(eventObservations.stream()
+                .filter(ep -> ep.getActive() != null)
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(NormalizedObservation::getActive).orElse(null));
+
+        feedData.setAutoExpire(eventObservations.stream()
+                .filter(obs -> obs.getAutoExpire() != null)
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(NormalizedObservation::getAutoExpire)
+                .orElse(null));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {

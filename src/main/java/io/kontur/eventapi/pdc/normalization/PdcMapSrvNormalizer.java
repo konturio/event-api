@@ -41,7 +41,6 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
         NormalizedObservation normalizedObservation = new NormalizedObservation();
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());
         normalizedObservation.setProvider(dataLakeDto.getProvider());
-        normalizedObservation.setActive(true);
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         normalizedObservation.setEventSeverity(Severity.UNKNOWN);
         normalizedObservation.setExternalEventId(dataLakeDto.getExternalId());

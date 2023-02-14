@@ -16,8 +16,8 @@
     <select id="searchForEvents" resultType="java.lang.String">
         with events as (
             select
-                fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.event_details, fd.observations, fd.geometries,
+                fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.event_details, fd.observations, fd.geometries,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
@@ -69,11 +69,13 @@
                 'description', description,
                 'type', type,
                 'severity', severity,
+                'active', active,
                 'startedAt', started_at,
                 'endedAt', ended_at,
                 'updatedAt', updated_at,
                 'location', location,
                 'urls', urls,
+                'loss', loss,
                 'eventDetails', event_details,
                 'observations', observations,
                 'geometries', geometries,
@@ -87,8 +89,8 @@
     <select id="getEventByEventIdAndByVersionOrLast" resultType="java.lang.String">
         with event as (
             select
-                fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.event_details, fd.observations, fd.geometries,
+                fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.event_details, fd.observations, fd.geometries,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((
@@ -121,11 +123,13 @@
                 'description', description,
                 'type', type,
                 'severity', severity,
+                'active', active,
                 'startedAt', started_at,
                 'endedAt', ended_at,
                 'updatedAt', updated_at,
                 'location', location,
                 'urls', urls,
+                'loss', loss,
                 'eventDetails', event_details,
                 'observations', observations,
                 'geometries', geometries,
@@ -195,13 +199,13 @@
                 episode -> 'description' as episode_description,
                 episode -> 'type' as episode_type,
                 episode -> 'severity' as episode_severity,
-                episode -> 'active' as episode_active,
                 episode -> 'startedAt' as "episode_startedAt",
                 episode -> 'endedAt' as "episode_endedAt",
                 episode -> 'updatedAt' as "episode_updatedAt",
                 episode -> 'sourceUpdatedAt' as "episode_sourceUpdatedAt",
                 episode -> 'location' as episode_location,
                 episode -> 'urls' as episode_urls,
+                episode -> 'loss' as episode_loss,
                 episode -> 'episodeDetails' as "episode_episodeDetails",
                 episode -> 'observations' as episode_observations,
                 feature -> 'properties' -> 'isObserved' as "feature_isObserved",

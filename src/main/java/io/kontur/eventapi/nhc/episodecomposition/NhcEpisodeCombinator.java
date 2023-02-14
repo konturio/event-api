@@ -120,7 +120,6 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
         FeedEpisode episode = new FeedEpisode();
         episode.setName(obs.getName());
         episode.setType(obs.getType());
-        episode.setActive(obs.getActive());
         episode.setUpdatedAt(obs.getLoadedAt());
         episode.setSourceUpdatedAt(obs.getSourceUpdatedAt());
         episode.setDescription(obs.getEpisodeDescription());

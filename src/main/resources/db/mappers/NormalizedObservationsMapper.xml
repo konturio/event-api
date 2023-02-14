@@ -5,91 +5,34 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.NormalizedObservationsMapper">
     <insert id="insert">
         INSERT INTO normalized_observations (
-            observation_id,
-            provider,
-            origin,
-            external_event_id,
-            external_episode_id,
-            <if test='point != null'>
-                point,
-            </if>
-            <if test='geometries != null'>
-                geometries,
-            </if>
-            event_severity,
-            name,
-            proper_name,
-            description,
-            episode_description,
-            type,
-            active,
-            cost,
-            <if test='loss != null'>
-                loss,
-            </if>
-            region,
-            loaded_at,
-            started_at,
-            ended_at,
-            source_updated_at,
-            urls,
-            recombined
+            observation_id, external_event_id, external_episode_id, provider, origin, name, proper_name,
+            description, episode_description, type, event_severity, active, loaded_at, started_at,
+            ended_at, source_updated_at, region, urls, cost,
+            <if test='loss != null'>loss,</if>
+            <if test='point != null'>point,</if>
+            <if test='geometries != null'>geometries,</if>
+            auto_expire, recombined
         ) VALUES (
-            #{observationId},
-            #{provider},
-            #{origin},
-            #{externalEventId},
-            #{externalEpisodeId},
-            <if test='point != null'>
-                'SRID=4326;${point}'::geometry,
-            </if>
-            <if test='geometries != null'>
-                #{geometries}::jsonb,
-            </if>
-            #{eventSeverity},
-            #{name},
-            #{properName},
-            #{description},
-            #{episodeDescription},
-            #{type},
-            #{active},
+            #{observationId}, #{externalEventId}, #{externalEpisodeId}, #{provider}, #{origin}, #{name}, #{properName},
+            #{description}, #{episodeDescription}, #{type}, #{eventSeverity}, #{active}, #{loadedAt}, #{startedAt},
+            #{endedAt}, #{sourceUpdatedAt}, #{region}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
             #{cost},
-            <if test='loss != null'>
-                #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
-            </if>
-            #{region},
-            #{loadedAt},
-            #{startedAt},
-            #{endedAt},
-            #{sourceUpdatedAt},
-            #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
-            #{recombined}
+            <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
+            <if test='point != null'>'SRID=4326;${point}'::geometry,</if>
+            <if test='geometries != null'>#{geometries}::jsonb,</if>
+            #{autoExpire}, #{recombined}
         )
         on conflict (observation_id) do update
-        set provider = #{provider},
-            external_event_id = #{externalEventId},
-            external_episode_id = #{externalEpisodeId},
-            <if test='point != null'>
-                point = 'SRID=4326;${point}'::geometry,
-            </if>
-            <if test='geometries != null'>
-                geometries = #{geometries}::jsonb,
-            </if>
-            event_severity = #{eventSeverity},
-            name = #{name},
-            proper_name = #{properName},
-            description = #{description},
-            episode_description = #{episodeDescription},
-            type = #{type},
-            active = #{active},
-            cost = #{cost},
-            region = #{region},
-            loaded_at = #{loadedAt},
-            started_at = #{startedAt},
-            ended_at = #{endedAt},
-            source_updated_at = #{sourceUpdatedAt},
-            urls = #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
-            recombined = #{recombined}
+        set external_event_id = #{externalEventId}, external_episode_id = #{externalEpisodeId}, provider = #{provider},
+            origin = #{origin}, name = #{name}, proper_name = #{properName}, description = #{description},
+            episode_description = #{episodeDescription}, type = #{type}, event_severity = #{eventSeverity},
+            active = #{active}, loaded_at = #{loadedAt}, started_at = #{startedAt}, ended_at = #{endedAt},
+            source_updated_at = #{sourceUpdatedAt}, region = #{region},
+            urls = #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, cost = #{cost},
+            <if test='loss != null'>loss = #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
+            <if test='point != null'>point = 'SRID=4326;${point}'::geometry,</if>
+            <if test='geometries != null'>geometries = #{geometries}::jsonb,</if>
+            auto_expire = #{autoExpire}, recombined = #{recombined}
     </insert>
 
     <insert id="markAsRecombined">
@@ -160,13 +103,6 @@
         LIMIT 1
     </select>
 
-    <select id="getNormalizedObservationByExternalEpisodeIdAndProvider" resultMap="normalizedObservationsDtoMap">
-        SELECT *
-        FROM normalized_observations
-        WHERE external_episode_id = #{externalEpisodeId}
-          AND provider = #{provider}
-    </select>
-
     <select id="getTimestampAtTimezone" resultType="java.time.OffsetDateTime">
         SELECT #{timestamp}::TIMESTAMP AT TIME ZONE #{timezone};
     </select>
@@ -180,23 +116,25 @@
         <result property="externalEventId" column="external_event_id"/>
         <result property="externalEpisodeId" column="external_episode_id"/>
         <result property="provider" column="provider"/>
-        <result property="point" column="point"/>
-        <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
-        <result property="eventSeverity" column="event_severity"/>
+        <result property="origin" column="origin"/>
         <result property="name" column="name"/>
         <result property="properName" column="proper_name"/>
         <result property="description" column="description"/>
         <result property="episodeDescription" column="episode_description"/>
         <result property="type" column="type"/>
+        <result property="eventSeverity" column="event_severity"/>
         <result property="active" column="active"/>
-        <result property="cost" column="cost"/>
-        <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
-        <result property="region" column="region"/>
         <result property="loadedAt" column="loaded_at"/>
         <result property="startedAt" column="started_at"/>
         <result property="endedAt" column="ended_at"/>
         <result property="sourceUpdatedAt" column="source_updated_at"/>
+        <result property="region" column="region"/>
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+        <result property="cost" column="cost"/>
+        <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
+        <result property="point" column="point"/>
+        <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
+        <result property="autoExpire" column="auto_expire"/>
         <result property="recombined" column="recombined"/>
         <result property="normalizedAt" column="normalized_at"/>
     </resultMap>

@@ -20,8 +20,6 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static io.kontur.eventapi.entity.EventType.CYCLONE;
 import static io.kontur.eventapi.entity.EventType.FLOOD;
@@ -104,7 +102,6 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
     private void convertMagTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props, String uniqueExternalId) {
         normalizedDto.setExternalEpisodeId(uniqueExternalId);
         convertHazardTypeProperties(normalizedDto, (Map<String, Object>) props.get("hazard"));
-        normalizedDto.setActive(readBoolean(props, "isActive"));
         normalizedDto.setGeometries(convertMagGeometry(props));
     }
 
@@ -112,17 +109,20 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
     private void convertHazardTypeProperties(NormalizedObservation normalizedDto, Map<String, Object> props) {
         normalizedDto.setExternalEventId(readString(props, "uuid"));
         normalizedDto.setName(readString(props, "hazardName"));
+        normalizedDto.setRegion(parseLocation(normalizedDto.getName()));
         String description = readString((Map<String, Object>) props.get("hazardDescription"), "description");
         normalizedDto.setDescription(description);
         normalizedDto.setEpisodeDescription(description);
-        normalizedDto.setOrigin(contains(description, ORIGIN_NASA) ? ORIGIN_NASA : null);
+        normalizedDto.setOrigin(defineOrigin(description));
         BigDecimal rebuildCost = parseRebuildCost(description);
-        normalizedDto.setLoss(rebuildCost == null ? null : Map.of(INFRASTRUCTURE_REPLACEMENT_VALUE, rebuildCost));
+        if (rebuildCost != null) normalizedDto.setLoss(Map.of(INFRASTRUCTURE_REPLACEMENT_VALUE, rebuildCost));
         normalizedDto.setStartedAt(readDateTime(props, "startDate"));
         normalizedDto.setEndedAt(readDateTime(props, "endDate"));
         normalizedDto.setEventSeverity(
                 defineSeverity(readString((Map<String, Object>) props.get("hazardSeverity"), "severityId")));
         normalizedDto.setType(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")));
+        normalizedDto.setActive(defineActive(readString(props, "status")));
+        normalizedDto.setAutoExpire(defineAutoExpire(readString(props, "autoexpire")));
         Map<String, Object> hazardSnc = (Map<String, Object>) props.get("hazardSnc");
         String url = hazardSnc == null ? null : readString(hazardSnc, "sncUrl");
         if (StringUtils.isNotBlank(url)) {
@@ -157,26 +157,5 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         org.wololo.geojson.Geometry geometry = geoJSONWriter.write(wktReader.read(point));
         Feature feature = new Feature(geometry, type == CYCLONE ? SQS_CYCLONE_PROPERTIES : HAZARD_PROPERTIES);
         return new FeatureCollection(new Feature[] {feature});
-    }
-
-    private BigDecimal parseRebuildCost(String description) {
-        if (description != null) {
-            if (contains(description, "currently, no major population centers are within the affected area")) {
-                return BigDecimal.ZERO;
-            }
-            Matcher lossSubstringMatcher = Pattern.compile("\\$[\\d.,]+\\s(Million|Billion|Trillion)?\\s?of infrastructure").matcher(description);
-            if (lossSubstringMatcher.find()) {
-                String lossSubstring = lossSubstringMatcher.group();
-                String[] parts = lossSubstring.split(" ");
-                BigDecimal loss = new BigDecimal(parts[0].substring(1).replace(',', '.'));
-                switch (parts[1]) {
-                    case "Million" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000.));
-                    case "Billion" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000_000.));
-                    case "Trillion" -> loss = loss.multiply(BigDecimal.valueOf(1_000_000_000_000.));
-                }
-                return loss;
-            }
-        }
-        return null;
     }
 }

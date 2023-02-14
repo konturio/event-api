@@ -4,6 +4,7 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_P
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
+import static java.util.Collections.singletonList;
 import static java.util.Comparator.comparing;
 
 import java.time.Duration;
@@ -49,11 +50,10 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
             episode.get().get(0).setUpdatedAt(findEpisodeUpdatedAt(episodeObservations));
             episode.get().get(0).setObservations(mapObservationsToIDs(episodeObservations));
             episode.get().get(0).setGeometries(computeEpisodeGeometries(episodeObservations));
-            episode.get().get(0).setName(
-                    findLatestEpisodeObservationWithName(episodeObservations).orElse(latestObservation).getName());
-            episode.get().get(0).setDescription(
-                    findLatestEpisodeObservationWithDescription(episodeObservations).orElse(latestObservation)
-                            .getDescription());
+            episode.get().get(0).setName(findEpisodeName(episodeObservations));
+            episode.get().get(0).setDescription(findEpisodeDescription(episodeObservations, singletonList(PDC_MAP_SRV_PROVIDER)));
+            episode.get().get(0).setLoss(findEpisodeLoss(episodeObservations));
+            episode.get().get(0).setLocation(findEpisodeLocation(episodeObservations));
         }
         return episode;
     }
