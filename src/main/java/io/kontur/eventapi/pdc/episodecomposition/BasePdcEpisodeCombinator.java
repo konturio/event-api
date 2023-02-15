@@ -4,6 +4,7 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_P
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Comparator.comparing;
 
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -23,7 +23,6 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
-import liquibase.repackaged.org.apache.commons.collections4.CollectionUtils;
 import org.bouncycastle.util.Arrays;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -33,29 +32,27 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
     protected static final long TIME_RANGE_IN_SEC = 90;
 
     @Override
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData,
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
                                                     Set<NormalizedObservation> eventObservations) {
         validateEventObservations(eventObservations);
         if (episodeExistsForObservation(feedData.getEpisodes(), observation)) {
-            return Optional.empty();
+            return emptyList();
         }
         Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(eventObservations,
                 observation.getSourceUpdatedAt());
         validateEpisodeObservations(episodeObservations);
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
-        Optional<List<FeedEpisode>> episode = createDefaultEpisode(latestObservation);
-        if (episode.isPresent() && CollectionUtils.isNotEmpty(episode.get())) {
-            episode.get().get(0).setStartedAt(findEpisodeStartedAt(episodeObservations));
-            episode.get().get(0).setEndedAt(findEpisodeEndedAt(episodeObservations));
-            episode.get().get(0).setUpdatedAt(findEpisodeUpdatedAt(episodeObservations));
-            episode.get().get(0).setObservations(mapObservationsToIDs(episodeObservations));
-            episode.get().get(0).setGeometries(computeEpisodeGeometries(episodeObservations));
-            episode.get().get(0).setName(findEpisodeName(episodeObservations));
-            episode.get().get(0).setDescription(findEpisodeDescription(episodeObservations, singletonList(PDC_MAP_SRV_PROVIDER)));
-            episode.get().get(0).setLoss(findEpisodeLoss(episodeObservations));
-            episode.get().get(0).setLocation(findEpisodeLocation(episodeObservations));
-        }
-        return episode;
+        FeedEpisode episode = createDefaultEpisode(latestObservation);
+        episode.setStartedAt(findEpisodeStartedAt(episodeObservations));
+        episode.setEndedAt(findEpisodeEndedAt(episodeObservations));
+        episode.setUpdatedAt(findEpisodeUpdatedAt(episodeObservations));
+        episode.setObservations(mapObservationsToIDs(episodeObservations));
+        episode.setGeometries(computeEpisodeGeometries(episodeObservations));
+        episode.setName(findEpisodeName(episodeObservations));
+        episode.setDescription(findEpisodeDescription(episodeObservations, singletonList(PDC_MAP_SRV_PROVIDER)));
+        episode.setLoss(findEpisodeLoss(episodeObservations));
+        episode.setLocation(findEpisodeLocation(episodeObservations));
+        return List.of(episode);
     }
 
     private void validateEventObservations(Set<NormalizedObservation> eventObservations) {

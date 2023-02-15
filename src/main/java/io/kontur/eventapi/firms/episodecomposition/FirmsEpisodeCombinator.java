@@ -32,6 +32,7 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 import static io.kontur.eventapi.util.GeometryUtil.calculateAreaKm2;
 import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -61,7 +62,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     @Override
     @Counted(value = "firmsEpisodeCombinator.processObservation.counter")
     @Timed(value = "firmsEpisodeCombinator.processObservation.timer")
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Set<FeedEpisode> existingEpisodeForObservation = feedData.getEpisodes()
                 .stream()
                 .filter(ep -> ep.getSourceUpdatedAt().equals(observation.getSourceUpdatedAt()))
@@ -70,7 +71,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         FeedEpisode feedEpisode = getOnlyElement(existingEpisodeForObservation, new FeedEpisode());
         populateMissedFields(feedEpisode, observation, feedData, eventObservations);
 
-        return existingEpisodeForObservation.isEmpty() ? Optional.of(List.of(feedEpisode)) : Optional.empty();
+        return existingEpisodeForObservation.isEmpty() ? List.of(feedEpisode) : emptyList();
     }
 
     private void populateMissedFields(FeedEpisode episode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {

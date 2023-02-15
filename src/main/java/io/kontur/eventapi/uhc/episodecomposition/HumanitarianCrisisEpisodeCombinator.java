@@ -12,8 +12,8 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 import static io.kontur.eventapi.uhc.converter.UHCDataLakeConverter.UHC_PROVIDER;
+import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
 
 @Component
@@ -27,24 +27,22 @@ public class HumanitarianCrisisEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        if (isObservationLinkedToEpisode(observation.getObservationId(), feedData.getEpisodes())) return empty();
-        if (eventObservations.size() == 1) return createDefaultEpisode(observation);
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+        if (isObservationLinkedToEpisode(observation.getObservationId(), feedData.getEpisodes())) return emptyList();
+        if (eventObservations.size() == 1) return List.of(createDefaultEpisode(observation));
 
         List<NormalizedObservation> observationsNotLinkedToEpisode = findObservationsNotLinkedToEpisode(eventObservations, feedData.getEpisodes());
 
         List<NormalizedObservation> episodeObservations = findEpisodeObservations(observationsNotLinkedToEpisode);
 
         NormalizedObservation latestEpisodeObservation = findLatestEpisodeObservation(new HashSet<>(episodeObservations));
-        Optional<List<FeedEpisode>> episodeOpt = createDefaultEpisode(latestEpisodeObservation);
-        episodeOpt.ifPresent(episode -> {
-            episode.get(0).setStartedAt(findEpisodeStartedAt(feedData.getEpisodes(), episodeObservations));
-            episode.get(0).setEndedAt(latestEpisodeObservation.getSourceUpdatedAt());
-            episode.get(0).setUpdatedAt(latestEpisodeObservation.getSourceUpdatedAt());
-            episode.get(0).setObservations(episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
-        });
+        FeedEpisode episode = createDefaultEpisode(latestEpisodeObservation);
+        episode.setStartedAt(findEpisodeStartedAt(feedData.getEpisodes(), episodeObservations));
+        episode.setEndedAt(latestEpisodeObservation.getSourceUpdatedAt());
+        episode.setUpdatedAt(latestEpisodeObservation.getSourceUpdatedAt());
+        episode.setObservations(episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
 
-        return episodeOpt;
+        return List.of(episode);
     }
 
     private boolean isObservationLinkedToEpisode(UUID observationId, List<FeedEpisode> episodes) {
