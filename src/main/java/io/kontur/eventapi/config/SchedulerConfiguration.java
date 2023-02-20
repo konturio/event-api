@@ -1,6 +1,11 @@
 package io.kontur.eventapi.config;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.kontur.eventapi.dao.DataLakeDao;
+import io.kontur.eventapi.entity.PdcMapSrvSearchJobs;
+import io.kontur.eventapi.pdc.client.PdcMapSrvClient;
+import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -31,6 +36,12 @@ public class SchedulerConfiguration implements SchedulingConfigurer {
                 .setNameFormat("ScheduledJobThread-%d")
                 .build();
         return Executors.newScheduledThreadPool(10, threadFactory);
+    }
+
+    @Bean
+    public PdcMapSrvSearchJobs getPdcMapSrvSearchJobs(MeterRegistry meterRegistry, PdcMapSrvClient pdcMapSrvClient,
+                                                      PdcDataLakeConverter pdcDataLakeConverter, DataLakeDao dataLakeDao) {
+        return new PdcMapSrvSearchJobs(meterRegistry, pdcMapSrvClient, pdcDataLakeConverter, dataLakeDao);
     }
 
 }

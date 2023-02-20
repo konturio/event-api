@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +20,6 @@ import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.entity.DataLake;
-import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.SortOrder;
 import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
@@ -216,7 +216,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
     }
 
     private String readMessageFromFile(String fileName) throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream(fileName));
+        return IOUtils.toString(Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)));
     }
 
 }

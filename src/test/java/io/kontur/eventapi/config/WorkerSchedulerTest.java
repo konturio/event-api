@@ -2,6 +2,7 @@ package io.kontur.eventapi.config;
 
 import io.kontur.eventapi.calfire.job.CalFireSearchJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
+import io.kontur.eventapi.entity.PdcMapSrvSearchJobs;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
@@ -31,7 +32,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static io.kontur.eventapi.entity.PdcMapSrvSearchJobs.PDC_MAP_SRV_IDS;
 import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 class WorkerSchedulerTest {
 
@@ -50,6 +56,7 @@ class WorkerSchedulerTest {
     private final TornadoJapanMaImportJob tornadoJapanMaImportJob = mock(TornadoJapanMaImportJob.class);
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob = mock(HistoricalTornadoJapanMaImportJob.class);
     private final PdcMapSrvSearchJob pdcMapSrvSearchJob = mock(PdcMapSrvSearchJob.class);
+    private final PdcMapSrvSearchJobs pdcMapSrvSearchJobs = mock(PdcMapSrvSearchJobs.class);
     private final EnrichmentJob enrichmentJob = mock(EnrichmentJob.class);
     private final FirmsEventCombinationJob firmsEventCombinationJob = mock(FirmsEventCombinationJob.class);
     private final CalFireSearchJob calFireSearchJob = mock(CalFireSearchJob.class);
@@ -65,7 +72,7 @@ class WorkerSchedulerTest {
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob,
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
-            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJob, enrichmentJob, calFireSearchJob,
+            historicalTornadoJapanMaImportJob, pdcMapSrvSearchJobs, enrichmentJob, calFireSearchJob,
             nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, nhcAtImportJob, nhcCpImportJob, nhcEpImportJob,
             metricsJob, reEnrichmentJob);
 
@@ -84,7 +91,7 @@ class WorkerSchedulerTest {
         Mockito.reset(stormsNoaaImportJob);
         Mockito.reset(tornadoJapanMaImportJob);
         Mockito.reset(historicalTornadoJapanMaImportJob);
-        Mockito.reset(pdcMapSrvSearchJob);
+        Mockito.reset(pdcMapSrvSearchJobs);
         Mockito.reset(calFireSearchJob);
         Mockito.reset(inciWebImportJob);
         Mockito.reset(reEnrichmentJob);
@@ -125,17 +132,29 @@ class WorkerSchedulerTest {
     @Test
     public void startPdcMapSrvSearchJob() {
         ReflectionTestUtils.setField(scheduler, "pdcMapSrvSearchEnabled", "true");
+        PdcMapSrvSearchJob[] jobs = new PdcMapSrvSearchJob[PDC_MAP_SRV_IDS.length];
+        Arrays.fill(jobs, pdcMapSrvSearchJob);
+        List<PdcMapSrvSearchJob> initList = new ArrayList<>(Arrays.asList(jobs));
+        when(pdcMapSrvSearchJobs.getJobs()).thenReturn(initList);
         scheduler.startPdcMapSrvSearch();
-
-        verify(pdcMapSrvSearchJob, times(1)).run();
+        List<PdcMapSrvSearchJob> jobsList = pdcMapSrvSearchJobs.getJobs();
+        for(int i = 0; i < PDC_MAP_SRV_IDS.length; i++) {
+            verify(jobsList.get(i), times(1)).run(PDC_MAP_SRV_IDS[i]);
+        }
     }
 
     @Test
     public void skipPdcMapSrvSearchJob() {
         ReflectionTestUtils.setField(scheduler, "pdcMapSrvSearchEnabled", "false");
+        PdcMapSrvSearchJob[] jobs = new PdcMapSrvSearchJob[PDC_MAP_SRV_IDS.length];
+        Arrays.fill(jobs, pdcMapSrvSearchJob);
+        List<PdcMapSrvSearchJob> initList = new ArrayList<>(Arrays.asList(jobs));
+        when(pdcMapSrvSearchJobs.getJobs()).thenReturn(initList);
         scheduler.startPdcMapSrvSearch();
-
-        verify(pdcMapSrvSearchJob, never()).run();
+        List<PdcMapSrvSearchJob> jobsList = pdcMapSrvSearchJobs.getJobs();
+        for(int i = 0; i < PDC_MAP_SRV_IDS.length; i++) {
+            verify(jobsList.get(i), never()).run(PDC_MAP_SRV_IDS[i]);
+        }
     }
 
     @Test

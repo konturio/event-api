@@ -37,9 +37,9 @@ class PdcMapSrvSearchJobTest {
     public void testPdcMapSrvSearchJob() {
         prepareMocks(10);
 
-        pdcMapSrvSearchJob.run();
+        pdcMapSrvSearchJob.run("0");
 
-        verify(pdcMapSrvClient, times(1)).getExposures();
+        verify(pdcMapSrvClient, times(1)).getTypeSpecificExposures(anyString());
         verify(pdcDataLakeConverter, times(10)).convertExposure(isA(String.class), isA(String.class));
         verify(dataLakeDao, times(1)).getPdcExposureGeohashes(anySet());
         verify(dataLakeDao, times(1)).storeDataLakes(anyList());
@@ -49,9 +49,9 @@ class PdcMapSrvSearchJobTest {
     public void testPdcMapSrvSearchJobWhenNoExposures() {
         prepareMocks(0);
 
-        pdcMapSrvSearchJob.run();
+        pdcMapSrvSearchJob.run("0");
 
-        verify(pdcMapSrvClient, times(1)).getExposures();
+        verify(pdcMapSrvClient, times(1)).getTypeSpecificExposures(anyString());
         verify(pdcDataLakeConverter, times(0)).convertExposure(isA(String.class), isA(String.class));
         verify(dataLakeDao, times(0)).getPdcExposureGeohashes(anySet());
         verify(dataLakeDao, times(0)).storeDataLakes(anyList());
@@ -66,7 +66,7 @@ class PdcMapSrvSearchJobTest {
         }
         String exposures = new FeatureCollection(features).toString();
 
-        when(pdcMapSrvClient.getExposures()).thenReturn(exposures);
+        when(pdcMapSrvClient.getTypeSpecificExposures(anyString())).thenReturn(exposures);
         when(pdcDataLakeConverter.convertExposure(isA(String.class), isA(String.class))).then(i ->
                 new DataLake(null, i.getArgument(1, String.class), null, null));
         when(dataLakeDao.isNewPdcExposure(isA(String.class), isA(String.class))).thenReturn(true);
