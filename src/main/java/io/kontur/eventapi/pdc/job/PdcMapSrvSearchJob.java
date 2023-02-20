@@ -6,7 +6,9 @@ import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.client.PdcMapSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.entity.ExposureGeohash;
+import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,8 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class PdcMapSrvSearchJob extends AbstractJob {
@@ -34,15 +38,55 @@ public class PdcMapSrvSearchJob extends AbstractJob {
         this.dataLakeDao = dataLakeDao;
     }
 
+    public Boolean run(String serviceId) {
+        String jobName = this.getClass().getName() + serviceId;
+
+        getLocks().putIfAbsent(jobName, new ReentrantLock());
+        Lock lock = getLocks().get(jobName);
+
+        if (!lock.tryLock()) {
+            printThreadDump();
+            throw new IllegalStateException("Parallel execution of same job is not supported, job" + jobName);
+        }
+
+        LOG.debug("PDC MapSrv {} job has started", serviceId);
+        io.micrometer.core.instrument.Timer.Sample regularTimer = Timer.start(getMeterRegistry());
+        LongTaskTimer.Sample longTaskTimer = LongTaskTimer.builder("job." + getName() + serviceId + ".current")
+                .register(getMeterRegistry()).start();
+
+        try {
+            execute(serviceId);
+        } catch (Exception e) {
+            long duration = stopTimer(regularTimer);
+            longTaskTimer.stop();
+            LOG.error("PDC MapSrv {} job has failed after {} seconds", serviceId, duration, e);
+            throw new RuntimeException("failed job " + jobName, e);
+        } finally {
+            lock.unlock();
+        }
+
+        long duration = stopTimer(regularTimer);
+        longTaskTimer.stop();
+        LOG.debug("PDC MapSrv {} job has finished in {} seconds", serviceId, duration);
+        if (duration > 60) {
+            LOG.warn("[slow_job] {} seconds (PDC MapSrv {})", duration, serviceId);
+        }
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public void execute() throws Exception {
+        throw new RuntimeException("PDC MapSrv used wrong execution function");
+    }
+
     @Override
     public String getName() {
         return "pdcMapSrvImport";
     }
 
-    @Override
-    public void execute() throws Exception {
+    public void execute(String serviceId) throws Exception {
         try {
-            String geoJson = pdcMapSrvClient.getExposures();
+            String geoJson = pdcMapSrvClient.getTypeSpecificExposures(serviceId);
             FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
             Map<String, String> ids = new HashMap<>();
@@ -71,7 +115,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                 }
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error("Exposures wasn't received from PDC MapSrv {}. Error: {}", serviceId, e.getMessage());
         }
     }
 }

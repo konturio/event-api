@@ -59,12 +59,12 @@ public abstract class AbstractJob implements Runnable {
         }
     }
 
-    private long stopTimer(Timer.Sample timer) {
+    protected long stopTimer(Timer.Sample timer) {
         long durationInNS = timer.stop(Timer.builder("job." + getName()).register(meterRegistry));
         return durationInNS / 1_000_000_000;
     }
 
-    private void printThreadDump() {
+    protected void printThreadDump() {
         ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
         for (ThreadInfo info : threads) {
             System.out.print(info);
@@ -74,4 +74,12 @@ public abstract class AbstractJob implements Runnable {
     public abstract void execute() throws Exception;
 
     public abstract String getName();
+
+    protected MeterRegistry getMeterRegistry() {
+        return meterRegistry;
+    }
+
+    protected static Map<String, Lock> getLocks() {
+        return locks;
+    }
 }

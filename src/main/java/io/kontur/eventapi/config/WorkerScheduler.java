@@ -1,6 +1,11 @@
 package io.kontur.eventapi.config;
 
+import static io.kontur.eventapi.entity.PdcMapSrvSearchJobs.PDC_MAP_SRV_IDS;
+
+import java.util.concurrent.CompletableFuture;
+
 import io.kontur.eventapi.calfire.job.CalFireSearchJob;
+import io.kontur.eventapi.entity.PdcMapSrvSearchJobs;
 import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
@@ -43,7 +48,7 @@ public class WorkerScheduler {
     private final StormsNoaaImportJob stormsNoaaImportJob;
     private final TornadoJapanMaImportJob tornadoJapanMaImportJob;
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob;
-    private final PdcMapSrvSearchJob pdcMapSrvSearchJob;
+    private final PdcMapSrvSearchJobs pdcMapSrvSearchJobs;
     private final EnrichmentJob enrichmentJob;
     private final CalFireSearchJob calFireSearchJob;
     private final NifcImportJob nifcImportJob;
@@ -115,7 +120,7 @@ public class WorkerScheduler {
                            EmDatImportJob emDatImportJob, StaticImportJob staticImportJob,
                            StormsNoaaImportJob stormsNoaaImportJob, TornadoJapanMaImportJob tornadoJapanMaImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
-                           PdcMapSrvSearchJob pdcMapSrvSearchJob,
+                           PdcMapSrvSearchJobs pdcMapSrvSearchJobs,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
@@ -135,7 +140,7 @@ public class WorkerScheduler {
         this.stormsNoaaImportJob = stormsNoaaImportJob;
         this.tornadoJapanMaImportJob = tornadoJapanMaImportJob;
         this.historicalTornadoJapanMaImportJob = historicalTornadoJapanMaImportJob;
-        this.pdcMapSrvSearchJob = pdcMapSrvSearchJob;
+        this.pdcMapSrvSearchJobs = pdcMapSrvSearchJobs;
         this.enrichmentJob = enrichmentJob;
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
@@ -165,7 +170,13 @@ public class WorkerScheduler {
     @Scheduled(initialDelayString = "${scheduler.pdcMapSrvSearch.initialDelay}", fixedDelayString = "${scheduler.pdcMapSrvSearch.fixedDelay}")
     public void startPdcMapSrvSearch() {
         if (Boolean.parseBoolean(pdcMapSrvSearchEnabled)) {
-            pdcMapSrvSearchJob.run();
+            PdcMapSrvSearchJob[] jobs = new PdcMapSrvSearchJob[26];
+            jobs = pdcMapSrvSearchJobs.getJobs().toArray(jobs);
+            for (int i = 0; i < PDC_MAP_SRV_IDS.length; i++) {
+                PdcMapSrvSearchJob job = jobs[i];
+                String key = PDC_MAP_SRV_IDS[i];
+                CompletableFuture.supplyAsync(() -> job.run(key));
+            }
         }
     }
 
