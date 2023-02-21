@@ -60,7 +60,17 @@
             limit #{limit}
         )
         select case when count(*) > 0 then json_build_object(
-            'pageMetadata', json_build_object('nextAfterValue', (select max(e.updated_at) from events e)),
+            'pageMetadata', json_build_object('nextAfterValue',
+                (select
+                    <choose>
+                        <when test='"DESC".equalsIgnoreCase(sortOrder)'>
+                            min(e.updated_at)
+                        </when>
+                        <otherwise>
+                            max(e.updated_at)
+                        </otherwise>
+                    </choose>
+                from events e)),
             'data', json_agg(json_build_object(
                 'eventId', event_id,
                 'version', version,
@@ -219,7 +229,17 @@
         select
             case when count(*) > 0 then json_build_object(
                 'type', 'FeatureCollection',
-                'pageMetadata', json_build_object('nextAfterValue', (select max(e.updated_at) from events e)),
+                'pageMetadata', json_build_object('nextAfterValue',
+                    (select
+                    <choose>
+                        <when test='"DESC".equalsIgnoreCase(sortOrder)'>
+                            min(e.updated_at)
+                        </when>
+                        <otherwise>
+                            max(e.updated_at)
+                        </otherwise>
+                    </choose>
+                    from events e)),
                 'features', json_agg(ST_AsGeoJSON(props.*)::json))
             end
         from props
