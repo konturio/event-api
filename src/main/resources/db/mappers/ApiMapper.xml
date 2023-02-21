@@ -63,12 +63,8 @@
             'pageMetadata', json_build_object('nextAfterValue',
                 (select
                     <choose>
-                        <when test='"DESC".equalsIgnoreCase(sortOrder)'>
-                            min(e.updated_at)
-                        </when>
-                        <otherwise>
-                            max(e.updated_at)
-                        </otherwise>
+                        <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
+                        <otherwise>max(e.updated_at)</otherwise>
                     </choose>
                 from events e)),
             'data', json_agg(json_build_object(
@@ -231,14 +227,10 @@
                 'type', 'FeatureCollection',
                 'pageMetadata', json_build_object('nextAfterValue',
                     (select
-                    <choose>
-                        <when test='"DESC".equalsIgnoreCase(sortOrder)'>
-                            min(e.updated_at)
-                        </when>
-                        <otherwise>
-                            max(e.updated_at)
-                        </otherwise>
-                    </choose>
+                        <choose>
+                            <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
+                            <otherwise>max(e.updated_at)</otherwise>
+                        </choose>
                     from events e)),
                 'features', json_agg(ST_AsGeoJSON(props.*)::json))
             end
