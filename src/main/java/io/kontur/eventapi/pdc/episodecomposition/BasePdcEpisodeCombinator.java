@@ -31,10 +31,10 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
     @Override
     public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
                                                 Set<NormalizedObservation> eventObservations) {
+        if (!feedData.getEpisodes().isEmpty()) return emptyList();
         if (isOnlyPdcMapSrvObservations(eventObservations)) {
             return collectExposureEpisodes(eventObservations);
         }
-        if (!feedData.getEpisodes().isEmpty()) return emptyList();
         Map<Boolean, List<NormalizedObservation>> observationsByProvider = eventObservations.stream()
                 .collect(partitioningBy(obs -> PDC_MAP_SRV_PROVIDER.equals(obs.getProvider())));
         List<FeedEpisode> episodes = collectInitialEpisodes(observationsByProvider.getOrDefault(false, emptyList()));
