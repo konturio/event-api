@@ -150,15 +150,13 @@ public class FeedCompositionJob extends AbstractJob {
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getType).orElse(null));
 
-        Set<String> lossKeys = episodes.stream()
-                .filter(episode -> episode.getLoss() != null)
-                .map(episode -> episode.getLoss().keySet())
-                .flatMap(Collection::stream)
-                .collect(toSet());
-        feedData.setLoss(lossKeys.stream().collect(toMap(identity(), key -> episodes.stream()
-                .filter(ep -> ep.getLoss() != null && ep.getLoss().containsKey(key) && ep.getLoss().get(key) != null)
-                .max(comparing(FeedEpisode::getUpdatedAt))
-                .map(ep -> ep.getLoss().get(key)).orElseThrow())));
+        Map<String, Object> loss = new HashMap<>();
+        episodes.stream()
+                .sorted(comparing(FeedEpisode::getSourceUpdatedAt))
+                .forEachOrdered(obs -> obs.getLoss().entrySet().stream()
+                        .filter(e -> e.getValue() != null)
+                        .forEach(e -> loss.put(e.getKey(), e.getValue())));
+        feedData.setLoss(loss);
 
         feedData.setActive(eventObservations.stream()
                 .filter(ep -> ep.getActive() != null)
@@ -175,25 +173,23 @@ public class FeedCompositionJob extends AbstractJob {
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
-            Optional<List<FeedEpisode>> feedEpisode = episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations));
-            feedEpisode.ifPresent(episodes -> {
-                for (FeedEpisode episode : episodes) {
-                    if (episode.getStartedAt() != null && episode.getEndedAt() != null
-                            && episode.getStartedAt().isAfter(episode.getEndedAt())) {
-                        OffsetDateTime startedAt = episode.getStartedAt();
-                        episode.setStartedAt(episode.getEndedAt());
-                        addEpisode(feedData, episode);
+            episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations))
+                    .forEach(episode -> {
+                        if (episode.getStartedAt() != null && episode.getEndedAt() != null
+                                && episode.getStartedAt().isAfter(episode.getEndedAt())) {
+                            OffsetDateTime startedAt = episode.getStartedAt();
+                            episode.setStartedAt(episode.getEndedAt());
+                            addEpisode(feedData, episode);
 
-                        FeedEpisode newEpisode = new FeedEpisode();
-                        BeanUtils.copyProperties(episode, newEpisode);
-                        newEpisode.setStartedAt(startedAt);
-                        newEpisode.setEndedAt(startedAt);
-                        addEpisode(feedData, newEpisode);
-                    } else {
-                        addEpisode(feedData, episode);
-                    }
-                }
-            });
+                            FeedEpisode newEpisode = new FeedEpisode();
+                            BeanUtils.copyProperties(episode, newEpisode);
+                            newEpisode.setStartedAt(startedAt);
+                            newEpisode.setEndedAt(startedAt);
+                            addEpisode(feedData, newEpisode);
+                        } else {
+                            addEpisode(feedData, episode);
+                        }
+                    });
         });
         if (!CollectionUtils.isEmpty(feedData.getEpisodes())) {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observations.get(0));

@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
+import static java.util.Collections.emptyList;
 
 @Component
 public class HpSrvMagEpisodeCombinator extends BasePdcEpisodeCombinator {
@@ -28,11 +29,11 @@ public class HpSrvMagEpisodeCombinator extends BasePdcEpisodeCombinator {
     }
 
     @Override
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         var savedDuplicateObservationId = getSavedDuplicateSqsObservationId(observation);
         if (savedDuplicateObservationId.isPresent()) {
             addObservationIdIfDuplicate(observation, feedData, savedDuplicateObservationId.get());
-            return Optional.empty();
+            return emptyList();
         }
         return super.processObservation(observation, feedData, eventObservations);
     }

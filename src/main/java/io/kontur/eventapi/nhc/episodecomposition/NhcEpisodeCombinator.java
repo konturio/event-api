@@ -5,6 +5,7 @@ import static io.kontur.eventapi.nhc.NhcUtil.SEVERITY_MINOR_MAX_WIND_SPEED;
 import static io.kontur.eventapi.nhc.NhcUtil.SEVERITY_MODERATE_MAX_WIND_SPEED;
 import static io.kontur.eventapi.nhc.NhcUtil.SEVERITY_SEVERE_MAX_WIND_SPEED;
 import static io.kontur.eventapi.util.GeometryUtil.*;
+import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 
 import java.util.ArrayList;
@@ -62,10 +63,10 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData,
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
                                                     Set<NormalizedObservation> eventObservations) {
         if (episodeExistsForObservation(feedData.getEpisodes(), observation)) {
-            return Optional.empty();
+            return emptyList();
         }
         feedData.setGeomFuncType(NHC_GEOMETRY_FUNCTION);
         NormalizedObservation latestObservation = findLatestEpisodeObservation(eventObservations);
@@ -80,7 +81,7 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
                             .findFirst()
                             .orElse(null);
                     FeedEpisode episode = createFeedEpisodeAndFill(observation, pointFeature);
-                    return episode != null ? Optional.of(List.of(episode)) : Optional.empty();
+                    return episode != null ? List.of(episode) : emptyList();
                 }
             } else {
                 // latest - get point with isObserved=true as current episode and other points as forecast episodes
@@ -109,11 +110,11 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
                             }
                         });
                     }
-                    return !CollectionUtils.isEmpty(episodes) ? Optional.of(episodes) : Optional.empty();
+                    return episodes;
                 }
             }
         }
-        return Optional.empty();
+        return emptyList();
     }
 
     private FeedEpisode createFeedEpisodeAndFill(NormalizedObservation obs, Feature pointFeature) {

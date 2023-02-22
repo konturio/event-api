@@ -5,6 +5,7 @@ import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,19 +66,19 @@ public abstract class PdcHazardNormalizer extends Normalizer {
         return null;
     }
 
-    protected BigDecimal parseRebuildCost(String description) {
+    protected BigInteger parseRebuildCost(String description) {
         if (description != null) {
             if (contains(description, "no major population centers are within the affected area")) {
-                return BigDecimal.ZERO;
+                return BigInteger.ZERO;
             }
             Matcher matcher = Pattern.compile("\\$([\\d.,]+)\\s(Million|Billion|Trillion)?\\s?of infrastructure").matcher(description);
             if (matcher.find()) {
                 BigDecimal loss = new BigDecimal(matcher.group(1).replace(",", ""));
-                if (matcher.group(2) == null) return loss;
+                if (matcher.group(2) == null) return loss.toBigInteger();
                 switch (matcher.group(2)) {
-                    case "Million": return loss.multiply(BigDecimal.valueOf(1_000_000.));
-                    case "Billion": return loss.multiply(BigDecimal.valueOf(1_000_000_000.));
-                    case "Trillion": return loss.multiply(BigDecimal.valueOf(1_000_000_000_000.));
+                    case "Million": return loss.multiply(BigDecimal.valueOf(1_000_000.)).toBigInteger();
+                    case "Billion": return loss.multiply(BigDecimal.valueOf(1_000_000_000.)).toBigInteger();
+                    case "Trillion": return loss.multiply(BigDecimal.valueOf(1_000_000_000_000.)).toBigInteger();
                 }
             }
         }

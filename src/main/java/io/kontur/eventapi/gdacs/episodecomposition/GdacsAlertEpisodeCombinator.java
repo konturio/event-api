@@ -13,6 +13,7 @@ import java.util.*;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_GEOMETRY_PROVIDER;
 import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_ALERT_PROVIDER;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -31,31 +32,27 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
     }
 
     @Override
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData event, Set<NormalizedObservation> eventObservations) {
-        if (event.getEpisodes().size() > 0) return Optional.empty();
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData event, Set<NormalizedObservation> eventObservations) {
+        if (event.getEpisodes().size() > 0) return emptyList();
 
         Map.Entry<NormalizedObservation, NormalizedObservation> observations = checkObservationsAndGetLatest(eventObservations, event);
 
         NormalizedObservation alertObservation = observations.getKey();
         NormalizedObservation geometryObservation = observations.getValue();
 
-        Optional<List<FeedEpisode>> episode = createDefaultEpisode(alertObservation);
-        episode.ifPresent(ep -> {
-            if (!CollectionUtils.isEmpty(ep)) {
-                ep.get(0).setObservations(findObservationsForEpisode(eventObservations));
-                ep.get(0).setGeometries(geometryObservation.getGeometries());
-                if (!CollectionUtils.isEmpty(geometryObservation.getUrls())) {
-                    ep.get(0).addUrlIfNotExists(geometryObservation.getUrls());
-                }
-                if (isBlank(ep.get(0).getProperName())) {
-                    ep.get(0).setProperName(geometryObservation.getProperName());
-                }
-                if (isBlank(ep.get(0).getLocation())) {
-                    ep.get(0).setLocation(geometryObservation.getRegion());
-                }
-            }
-        });
-        return episode;
+        FeedEpisode episode = createDefaultEpisode(alertObservation);
+        episode.setObservations(findObservationsForEpisode(eventObservations));
+        episode.setGeometries(geometryObservation.getGeometries());
+        if (!CollectionUtils.isEmpty(geometryObservation.getUrls())) {
+            episode.addUrlIfNotExists(geometryObservation.getUrls());
+        }
+        if (isBlank(episode.getProperName())) {
+            episode.setProperName(geometryObservation.getProperName());
+        }
+        if (isBlank(episode.getLocation())) {
+            episode.setLocation(geometryObservation.getRegion());
+        }
+        return List.of(episode);
     }
 
     private Map.Entry<NormalizedObservation, NormalizedObservation> checkObservationsAndGetLatest(Set<NormalizedObservation> eventObservations, FeedData event) {

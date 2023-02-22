@@ -33,10 +33,10 @@ class GdacsGeometryEpisodeCombinatorTest {
         NormalizedObservation geometryObservation = createObservation(GDACS_ALERT_GEOMETRY_PROVIDER);
         FeedData feedData = new FeedData(UUID.randomUUID(), UUID.randomUUID(), 1L);
 
-        Optional<List<FeedEpisode>> feedEpisodeOpt = episodeCombinator.processObservation(geometryObservation,
+        List<FeedEpisode> feedEpisodes = episodeCombinator.processObservation(geometryObservation,
                 feedData, Set.of(alertObservation, geometryObservation));
 
-        assertTrue(feedEpisodeOpt.isEmpty());
+        assertTrue(feedEpisodes.isEmpty());
     }
 
     @Test

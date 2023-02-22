@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static io.kontur.eventapi.emdat.jobs.EmDatImportJob.EM_DAT_PROVIDER;
+import static java.util.Collections.emptyList;
 
 /**
  * This class creates episode only for the latest observation of the event.
@@ -21,13 +22,13 @@ import static io.kontur.eventapi.emdat.jobs.EmDatImportJob.EM_DAT_PROVIDER;
 public class EmDatEpisodeCombinator extends EpisodeCombinator {
 
     @Override
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
         Optional<OffsetDateTime> latestLoadedAt = eventObservations
                 .stream()
                 .map(NormalizedObservation::getLoadedAt)
                 .max(OffsetDateTime::compareTo);
         return (latestLoadedAt.isPresent() && observation.getLoadedAt().equals(latestLoadedAt.get()))
-                ? createDefaultEpisode(observation) : Optional.empty();
+                ? List.of(createDefaultEpisode(observation)) : emptyList();
     }
 
     @Override

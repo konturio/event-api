@@ -21,8 +21,8 @@ public class InciWebEpisodeCombinator extends WildfireEpisodeCombinator {
     }
 
     @Override
-    public Optional<List<FeedEpisode>> processObservation(NormalizedObservation observation, FeedData feedData,
+    public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
                                                           Set<NormalizedObservation> eventObservations) {
-        return createDefaultEpisode(observation);
+        return List.of(createDefaultEpisode(observation));
     }
 }
