@@ -18,6 +18,7 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -114,7 +115,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         normalizedDto.setDescription(description);
         normalizedDto.setEpisodeDescription(description);
         normalizedDto.setOrigin(defineOrigin(description));
-        BigDecimal rebuildCost = parseRebuildCost(description);
+        BigInteger rebuildCost = parseRebuildCost(description);
         if (rebuildCost != null) normalizedDto.setLoss(Map.of(INFRASTRUCTURE_REPLACEMENT_VALUE, rebuildCost));
         normalizedDto.setStartedAt(readDateTime(props, "startDate"));
         normalizedDto.setEndedAt(readDateTime(props, "endDate"));
