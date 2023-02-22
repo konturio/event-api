@@ -1,6 +1,7 @@
 package io.kontur.eventapi.episodecomposition;
 
 import static io.kontur.eventapi.entity.Severity.UNKNOWN;
+import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -10,6 +11,7 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.job.Applicable;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
@@ -167,5 +169,15 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt))
                 .map(NormalizedObservation::getRegion)
                 .orElse(null);
+    }
+
+    protected List<String> findEpisodeUrls(Set<NormalizedObservation> observations) {
+        return observations.stream()
+                .map(NormalizedObservation::getUrls)
+                .filter(urls -> urls != null && !urls.isEmpty())
+                .flatMap(List::stream)
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                .toList();
     }
 }

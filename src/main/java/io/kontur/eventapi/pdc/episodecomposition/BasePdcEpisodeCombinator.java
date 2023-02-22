@@ -84,6 +84,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         episode.setLoss(findEpisodeLoss(episodeObservations));
         episode.setObservations(mapObservationsToIDs(episodeObservations));
         episode.setGeometries(computeEpisodeGeometries(episodeObservations));
+        episode.setUrls(findEpisodeUrls(episodeObservations));
         return episode;
     }
 
