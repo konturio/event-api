@@ -124,7 +124,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
 
     private boolean sameEpisodes(FeedEpisode episode1, FeedEpisode episode2) {
         return equalsIgnoreCase(episode1.getName(), episode2.getName())
-                && equalsIgnoreCase(episode1.getDescription(), episode2.getDescription())
+                && episode1.getLoss().equals(episode2.getLoss())
                 && episode1.getSeverity() == episode2.getSeverity()
                 && equalsIgnoreCase(episode1.getLocation(), episode2.getLocation())
                 && isEqualGeometries(episode1.getGeometries(), episode2.getGeometries());
@@ -148,6 +148,12 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                 episodeExposures.addAll(exposureObservations.stream()
                         .filter(obs -> (obs.getSourceUpdatedAt().isAfter(episode.getEndedAt())))
                         .toList());
+            }
+            if (episodeExposures.isEmpty()) {
+                exposureObservations.stream()
+                        .filter(obs -> (obs.getSourceUpdatedAt().isBefore(episode.getStartedAt())))
+                        .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                        .ifPresent(episodeExposures::add);
             }
             addExposuresToEpisode(episode, episodeExposures);
         }
