@@ -18,7 +18,6 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
-import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
 import org.bouncycastle.util.Arrays;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -31,7 +30,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
     public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
                                                 Set<NormalizedObservation> eventObservations) {
         if (isOnlyPdcMapSrvObservations(eventObservations)) {
-            throw new FeedCompositionSkipException("Only pdcMapSrv is present for event");
+            return collectExposureEpisodes(eventObservations);
         }
         if (!feedData.getEpisodes().isEmpty()) return emptyList();
         Map<Boolean, List<NormalizedObservation>> observationsByProvider = eventObservations.stream()
@@ -45,6 +44,18 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         return eventObservations.stream()
                 .map(NormalizedObservation::getProvider)
                 .allMatch(PDC_MAP_SRV_PROVIDER::equals);
+    }
+
+    private List<FeedEpisode> collectExposureEpisodes(Set<NormalizedObservation> observations) {
+        return observations.stream()
+                .sorted(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .map(obs -> {
+                    FeedEpisode episode = createDefaultEpisode(obs);
+                    episode.setStartedAt(obs.getSourceUpdatedAt());
+                    episode.setEndedAt(obs.getSourceUpdatedAt());
+                    return episode;
+                })
+                .toList();
     }
 
     protected List<FeedEpisode> collectInitialEpisodes(List<NormalizedObservation> observations) {
