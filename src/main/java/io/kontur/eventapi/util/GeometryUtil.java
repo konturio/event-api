@@ -74,4 +74,15 @@ public class GeometryUtil {
     protected static String makeWktPoint(Double lon, Double lat) {
         return lon == null || lat == null ? null : String.format("POINT(%s %s)", lon, lat);
     }
+
+    public static boolean isEqualGeometries(FeatureCollection fc1, FeatureCollection fc2) {
+        if (fc1.getFeatures().length != fc2.getFeatures().length) return false;
+        for (int i = 0; i < fc1.getFeatures().length; i++) {
+            Feature feature1 = fc1.getFeatures()[i];
+            Feature feature2 = fc2.getFeatures()[i];
+            if (!feature1.getProperties().equals(feature2.getProperties())) return false;
+            if (!reader.read(feature1.getGeometry()).equals(reader.read(feature2.getGeometry()))) return false;
+        }
+        return true;
+    }
 }
