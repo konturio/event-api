@@ -40,7 +40,7 @@ public class FeedEpisode {
         }
     }
 
-    public void addObservation(UUID observations) {
-        this.observations.add(observations);
+    public void addObservation(UUID observationId) {
+        observations.add(observationId);
     }
 }

@@ -1,14 +1,14 @@
 package io.kontur.eventapi.episodecomposition;
 
+import static io.kontur.eventapi.entity.Severity.UNKNOWN;
 import static java.util.Comparator.comparing;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.job.Applicable;
 import org.springframework.util.CollectionUtils;
 
@@ -100,11 +100,10 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .orElse(null);
     }
 
-    protected String findEpisodeDescription(Set<NormalizedObservation> episodeObservations,
-                                                                     List<String> excludeProviders) {
+    protected String findEpisodeDescription(Set<NormalizedObservation> episodeObservations) {
         return episodeObservations
                 .stream()
-                .filter(obs -> isNotBlank(obs.getDescription()) && !excludeProviders.contains(obs.getProvider()))
+                .filter(obs -> isNotBlank(obs.getDescription()))
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt))
                 .map(NormalizedObservation::getDescription)
                 .orElse(null);
@@ -144,28 +143,27 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
     }
 
     protected Map<String, Object> findEpisodeLoss(Set<NormalizedObservation> episodeObservations) {
-        Set<String> lossKeys = episodeObservations.stream()
-                .map(obs -> obs.getLoss().keySet())
-                .flatMap(Collection::stream)
-                .collect(toSet());
-        return lossKeys.stream().collect(toMap(identity(), key -> episodeObservations.stream()
-                .filter(obs -> obs.getLoss() != null && obs.getLoss().containsKey(key) && obs.getLoss().get(key) != null)
-                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
-                .map(ep -> ep.getLoss().get(key))
-                .orElseThrow()));
+        Map<String, Object> loss = new HashMap<>();
+        episodeObservations
+                .stream()
+                .sorted(comparing(NormalizedObservation::getSourceUpdatedAt))
+                .forEachOrdered(obs -> obs.getLoss().entrySet().stream()
+                        .filter(e -> e.getValue() != null)
+                        .forEach(e -> loss.put(e.getKey(), e.getValue())));
+        return loss;
     }
 
-    protected Boolean findEpisodeActive(Set<NormalizedObservation> observations) {
+    protected Severity findEpisodeSeverity(Set<NormalizedObservation> observations) {
         return observations.stream()
-                .filter(obs -> obs.getActive() != null)
-                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
-                .map(NormalizedObservation::getActive)
-                .orElse(null);
+                .map(NormalizedObservation::getEventSeverity)
+                .filter(Objects::nonNull)
+                .max(comparing(Severity::getValue))
+                .orElse(UNKNOWN);
     }
 
     protected String findEpisodeLocation(Set<NormalizedObservation> observations) {
         return observations.stream()
-                .filter(obs -> obs.getRegion() != null)
+                .filter(obs -> isNotBlank(obs.getRegion()))
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt))
                 .map(NormalizedObservation::getRegion)
                 .orElse(null);

@@ -150,15 +150,13 @@ public class FeedCompositionJob extends AbstractJob {
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getType).orElse(null));
 
-        Set<String> lossKeys = episodes.stream()
-                .filter(episode -> episode.getLoss() != null)
-                .map(episode -> episode.getLoss().keySet())
-                .flatMap(Collection::stream)
-                .collect(toSet());
-        feedData.setLoss(lossKeys.stream().collect(toMap(identity(), key -> episodes.stream()
-                .filter(ep -> ep.getLoss() != null && ep.getLoss().containsKey(key) && ep.getLoss().get(key) != null)
-                .max(comparing(FeedEpisode::getUpdatedAt))
-                .map(ep -> ep.getLoss().get(key)).orElseThrow())));
+        Map<String, Object> loss = new HashMap<>();
+        episodes.stream()
+                .sorted(comparing(FeedEpisode::getSourceUpdatedAt))
+                .forEachOrdered(obs -> obs.getLoss().entrySet().stream()
+                        .filter(e -> e.getValue() != null)
+                        .forEach(e -> loss.put(e.getKey(), e.getValue())));
+        feedData.setLoss(loss);
 
         feedData.setActive(eventObservations.stream()
                 .filter(ep -> ep.getActive() != null)
