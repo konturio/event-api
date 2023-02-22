@@ -43,4 +43,8 @@ public class FeedEpisode {
     public void addObservation(UUID observationId) {
         observations.add(observationId);
     }
+
+    public void addObservations(Set<UUID> observationIds) {
+        observations.addAll(observationIds);
+    }
 }

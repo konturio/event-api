@@ -5,11 +5,13 @@ import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_P
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
+import static io.kontur.eventapi.util.GeometryUtil.isEqualGeometries;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import java.time.Duration;
 import java.util.*;
@@ -36,8 +38,9 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         Map<Boolean, List<NormalizedObservation>> observationsByProvider = eventObservations.stream()
                 .collect(partitioningBy(obs -> PDC_MAP_SRV_PROVIDER.equals(obs.getProvider())));
         List<FeedEpisode> episodes = collectInitialEpisodes(observationsByProvider.getOrDefault(false, emptyList()));
-        addExposuresToEpisodes(episodes, new HashSet<>(observationsByProvider.getOrDefault(true, emptyList())));
-        return episodes;
+        List<FeedEpisode> episodesWithoutDuplicates = mergeDuplicatedEpisodes(episodes);
+        addExposuresToEpisodes(episodesWithoutDuplicates, new HashSet<>(observationsByProvider.getOrDefault(true, emptyList())));
+        return episodesWithoutDuplicates;
     }
 
     private boolean isOnlyPdcMapSrvObservations(Set<NormalizedObservation> eventObservations) {
@@ -97,6 +100,34 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         episode.setGeometries(computeEpisodeGeometries(episodeObservations));
         episode.setUrls(findEpisodeUrls(episodeObservations));
         return episode;
+    }
+
+    private List<FeedEpisode> mergeDuplicatedEpisodes(List<FeedEpisode> episodes) {
+        if (episodes.size() < 2) return episodes;
+        List<FeedEpisode> episodesWithoutDuplicates = new ArrayList<>();
+        episodes.stream()
+                .sorted(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getEndedAt))
+                .forEachOrdered(episode -> {
+                    FeedEpisode lastEpisode = getLast(episodesWithoutDuplicates.iterator(), null);
+                    if (lastEpisode == null || !sameEpisodes(lastEpisode, episode)) {
+                        episodesWithoutDuplicates.add(episode);
+                    } else {
+                        lastEpisode.setEndedAt(episode.getEndedAt());
+                        lastEpisode.setSourceUpdatedAt(episode.getSourceUpdatedAt());
+                        lastEpisode.setUpdatedAt(episode.getUpdatedAt());
+                        lastEpisode.addObservations(episode.getObservations());
+                        lastEpisode.addUrlIfNotExists(episode.getUrls());
+                    }
+                });
+        return episodesWithoutDuplicates;
+    }
+
+    private boolean sameEpisodes(FeedEpisode episode1, FeedEpisode episode2) {
+        return equalsIgnoreCase(episode1.getName(), episode2.getName())
+                && equalsIgnoreCase(episode1.getDescription(), episode2.getDescription())
+                && episode1.getSeverity() == episode2.getSeverity()
+                && equalsIgnoreCase(episode1.getLocation(), episode2.getLocation())
+                && isEqualGeometries(episode1.getGeometries(), episode2.getGeometries());
     }
 
     private void addExposuresToEpisodes(List<FeedEpisode> episodes, Set<NormalizedObservation> exposureObservations) {

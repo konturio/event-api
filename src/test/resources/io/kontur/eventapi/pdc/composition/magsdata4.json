@@ -44,7 +44,7 @@
         "hazard.hazardType.typeDisplayOrder": 0,
         "hazard.hazardType.typeIcon": "flood.png",
         "hazard.hazardId": 2950,
-        "hazard.hazardName": "Flood - Boston, MA--NH--RI Region, United States",
+        "hazard.hazardName": "Flood - Boston, MA--NH Region, United States",
         "hazard.commentText": "FLOODIPAWS-WARNING-2020-Boston, MA--NH--RI",
         "hazard.createDate": "2020-07-14T21:04:39.818+0000",
         "hazard.creator": "DisasterAWARE (Automated)",
