@@ -31,10 +31,10 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
     @Override
     public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
                                                 Set<NormalizedObservation> eventObservations) {
+        if (!feedData.getEpisodes().isEmpty()) return emptyList();
         if (isOnlyPdcMapSrvObservations(eventObservations)) {
             return collectExposureEpisodes(eventObservations);
         }
-        if (!feedData.getEpisodes().isEmpty()) return emptyList();
         Map<Boolean, List<NormalizedObservation>> observationsByProvider = eventObservations.stream()
                 .collect(partitioningBy(obs -> PDC_MAP_SRV_PROVIDER.equals(obs.getProvider())));
         List<FeedEpisode> episodes = collectInitialEpisodes(observationsByProvider.getOrDefault(false, emptyList()));
@@ -124,7 +124,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
 
     private boolean sameEpisodes(FeedEpisode episode1, FeedEpisode episode2) {
         return equalsIgnoreCase(episode1.getName(), episode2.getName())
-                && equalsIgnoreCase(episode1.getDescription(), episode2.getDescription())
+                && episode1.getLoss().equals(episode2.getLoss())
                 && episode1.getSeverity() == episode2.getSeverity()
                 && equalsIgnoreCase(episode1.getLocation(), episode2.getLocation())
                 && isEqualGeometries(episode1.getGeometries(), episode2.getGeometries());
@@ -148,6 +148,12 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                 episodeExposures.addAll(exposureObservations.stream()
                         .filter(obs -> (obs.getSourceUpdatedAt().isAfter(episode.getEndedAt())))
                         .toList());
+            }
+            if (episodeExposures.isEmpty()) {
+                exposureObservations.stream()
+                        .filter(obs -> (obs.getSourceUpdatedAt().isBefore(episode.getStartedAt())))
+                        .max(comparing(NormalizedObservation::getSourceUpdatedAt))
+                        .ifPresent(episodeExposures::add);
             }
             addExposuresToEpisode(episode, episodeExposures);
         }
