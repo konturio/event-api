@@ -1,8 +1,8 @@
 package io.kontur.eventapi.episodecomposition;
 
 import static io.kontur.eventapi.entity.Severity.UNKNOWN;
-import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -178,6 +178,6 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 .flatMap(List::stream)
                 .filter(StringUtils::isNotBlank)
                 .distinct()
-                .toList();
+                .collect(toList());
     }
 }
