@@ -159,6 +159,10 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
+  eventExpiration:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
 
 spring:
   datasource:

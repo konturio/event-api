@@ -21,11 +21,10 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static io.kontur.eventapi.entity.Severity.UNKNOWN;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.*;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -143,7 +142,7 @@ public class FeedCompositionJob extends AbstractJob {
                 .map(FeedEpisode::getSeverity)
                 .filter(Objects::nonNull)
                 .max(comparing(Severity::getValue))
-                .orElse(null));
+                .orElse(UNKNOWN));
 
         feedData.setType(episodes.stream()
                 .filter(ep -> ep.getType() != null)

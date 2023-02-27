@@ -198,6 +198,11 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 15000
+  eventExpiration:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: PT3H
+
 
 feign:
   client:

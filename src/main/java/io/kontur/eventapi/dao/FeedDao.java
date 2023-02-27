@@ -89,4 +89,12 @@ public class FeedDao {
     public void createFeed(UUID feedId, String alias, String name, List<String> providers) {
         mapper.createFeed(feedId, alias, name, providers);
     }
+
+    public void autoExpireEvents() {
+        mapper.autoExpireEvents();
+    }
+
+    public Optional<FeedData> getFeedDataByFeedIdAndEventId(UUID feedId, UUID eventId) {
+        return mapper.getFeedDataByFeedIdAndEventId(feedId, eventId);
+    }
 }
