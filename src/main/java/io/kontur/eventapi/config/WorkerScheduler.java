@@ -59,6 +59,7 @@ public class WorkerScheduler {
     private final NhcAtImportJob nhcAtImportJob;
     private final NhcCpImportJob nhcCpImportJob;
     private final NhcEpImportJob nhcEpImportJob;
+    private final EventExpirationJob eventExpirationJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -110,6 +111,8 @@ public class WorkerScheduler {
     private String metricsEnabled;
     @Value("${scheduler.reEnrichment.enable}")
     private String reEnrichmentEnabled;
+    @Value("${scheduler.eventExpiration.enable}")
+    private String eventExpirationEnabled;
 
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
@@ -124,7 +127,7 @@ public class WorkerScheduler {
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
-                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob) {
+                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -151,6 +154,7 @@ public class WorkerScheduler {
         this.metricsJob = metricsJob;
         this.reEnrichmentJob = reEnrichmentJob;
         this.humanitarianCrisisImportJob = humanitarianCrisisImportJob;
+        this.eventExpirationJob = eventExpirationJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -339,6 +343,13 @@ public class WorkerScheduler {
     public void startMetricsJob() {
         if (Boolean.parseBoolean(metricsEnabled)) {
             metricsJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.eventExpiration.initialDelay}", fixedDelayString = "${scheduler.eventExpiration.fixedDelay}")
+    public void startExpirationJob() {
+        if (Boolean.parseBoolean(eventExpirationEnabled)) {
+            eventExpirationJob.run();
         }
     }
 }

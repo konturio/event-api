@@ -65,4 +65,9 @@ public interface FeedMapper {
     Integer getEnrichmentSkippedEventsCount();
 
     void createFeed(@Param("feedId") UUID feedId, @Param("alias") String alias, @Param("name") String name, @Param("providers") List<String> providers);
+
+    void autoExpireEvents();
+
+    Optional<FeedData> getFeedDataByFeedIdAndEventId(@Param("feedId") UUID feedId,
+                                                     @Param("eventId") UUID eventId);
 }

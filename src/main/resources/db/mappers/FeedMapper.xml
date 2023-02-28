@@ -101,6 +101,19 @@
         values (#{feedId}, #{alias}, #{name}, #{providers, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
     </insert>
 
+    <update id="autoExpireEvents">
+        update feed_data
+        set active = false
+        where active and auto_expire and ended_at + interval '24 hour' &lt; now()
+    </update>
+
+    <select id="getFeedDataByFeedIdAndEventId" resultMap="feedDataDtoMap">
+        select fd.*, sv.severity
+        from feed_data fd
+        left join severities sv on fd.severity_id = sv.severity_id
+        where feed_id = #{feedId} and event_id = #{eventId} and is_latest_version
+    </select>
+
     <resultMap id="feedDtoMap" type="io.kontur.eventapi.entity.Feed">
         <result property="feedId" column="feed_id" />
         <result property="alias" column="alias"/>
