@@ -51,19 +51,27 @@ public class NifcImportJob extends AbstractJob {
 
     private void processLocations() {
         try {
-            processFeatureCollection(client.getNifcLocations(), NIFC_LOCATIONS_PROVIDER,
-                    "ModifiedOnDateTime_dt", "UniqueFireIdentifier");
+            String data = client.getNifcLocations();
+            try {
+                processFeatureCollection(data, NIFC_LOCATIONS_PROVIDER, "ModifiedOnDateTime_dt", "UniqueFireIdentifier");
+            } catch (Exception e) {
+                LOG.error("Failed to process NIFC locations", e);
+            }
         } catch (Exception e) {
-            LOG.error("Failed to obtain NIFC locations");
+            LOG.warn("Failed to obtain NIFC locations");
         }
     }
 
     private void processPerimeters() {
         try {
-            processFeatureCollection(client.getNifcPerimeters(), NIFC_PERIMETERS_PROVIDER,
-                    "irwin_ModifiedOnDateTime_dt", "irwin_UniqueFireIdentifier");
+            String data = client.getNifcPerimeters();
+            try {
+                processFeatureCollection(data, NIFC_PERIMETERS_PROVIDER, "attr_ModifiedOnDateTime_dt", "attr_UniqueFireIdentifier");
+            } catch (Exception e) {
+                LOG.error("Failed to process NIFC perimeters");
+            }
         } catch (Exception e) {
-            LOG.error("Failed to obtain NIFC perimeters");
+            LOG.warn("Failed to obtain NIFC perimeters");
         }
     }
 

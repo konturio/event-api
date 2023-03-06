@@ -115,7 +115,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Exposures wasn't received from PDC MapSrv {}. Error: {}", serviceId, e.getMessage());
+            LOG.warn("Exposures wasn't received from PDC MapSrv {}. Error: {}", serviceId, e.getMessage());
         }
     }
 }

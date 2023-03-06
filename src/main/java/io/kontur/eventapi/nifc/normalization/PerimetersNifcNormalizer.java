@@ -30,18 +30,18 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         Map<String, Object> props = feature.getProperties();
 
         observation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), PERIMETERS_PROPERTIES));
-        observation.setDescription(readString(props, "irwin_IncidentShortDescription"));
+        observation.setDescription(readString(props, "attr_IncidentShortDescription"));
 
-        long startedAtMilli = readLong(props, "irwin_CreatedOnDateTime_dt");
+        long startedAtMilli = readLong(props, "attr_CreatedOnDateTime_dt");
         observation.setStartedAt(getDateTimeFromMilli(startedAtMilli).truncatedTo(SECONDS));
 
-        String name = readString(props, "poly_IncidentName");
-        String type = readString(props, "irwin_IncidentTypeCategory");
+        String name = readString(props, "attr_IncidentName");
+        String type = readString(props, "attr_IncidentTypeCategory");
         observation.setName(composeName(name, type));
         observation.setProperName(name);
 
-        Double lon = readDouble(props, "irwin_InitialLongitude");
-        Double lat = readDouble(props, "irwin_InitialLatitude");
+        Double lon = readDouble(props, "attr_InitialLongitude");
+        Double lat = readDouble(props, "attr_InitialLatitude");
         observation.setPoint(makeWktPoint(lon, lat));
 
         double areaSqKm2 = convertAcresToSqKm(readDouble(props, "poly_GISAcres"));
