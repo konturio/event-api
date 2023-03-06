@@ -84,7 +84,7 @@ calfire:
   host: 'https://www.fire.ca.gov/'
 
 nifc:
-  host: 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services'
+  host: 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services'
 
 inciweb:
   host: 'https://inciweb.nwcg.gov'

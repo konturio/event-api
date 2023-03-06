@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(value = "nifcFeignClient", url = "${nifc.host}")
 public interface NifcClient {
 
-    @GetMapping("/Current_WildlandFire_Perimeters/FeatureServer/0/query?outFields=*&where=1%3D1&f=pgeojson")
+    @GetMapping("/WFIGS_Interagency_Perimeters_Current/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
     String getNifcPerimeters();
 
-    @GetMapping("/Current_WildlandFire_Locations/FeatureServer/0/query?where=1%3D1&outFields=*&f=pgeojson")
+    @GetMapping("/WFIGS_Incident_Locations_Current/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
     String getNifcLocations();
 }
