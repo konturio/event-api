@@ -87,7 +87,9 @@
                 'geometries', geometries,
                 'episodes', episodes,
                 'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
-                'centroid', array[st_x(centroid), st_y(centroid)])))
+                'centroid', array[st_x(centroid), st_y(centroid)],
+                'episodeCount', jsonb_array_length(episodes)
+              )))
             end
         from events
     </select>
@@ -141,7 +143,9 @@
                 'geometries', geometries,
                 'episodes', episodes,
                 'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
-                'centroid', array[st_x(centroid), st_y(centroid)])
+                'centroid', array[st_x(centroid), st_y(centroid)],
+                'episodeCount', jsonb_array_length(episodes)
+              )
         from event
     </select>
 
