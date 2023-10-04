@@ -18,6 +18,7 @@
             select
                 fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
                 fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.event_details, fd.observations, fd.geometries,
+                jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
@@ -86,9 +87,9 @@
                 'observations', observations,
                 'geometries', geometries,
                 'episodes', episodes,
+                'episodeCount', episode_count,
                 'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
-                'centroid', array[st_x(centroid), st_y(centroid)],
-                'episodeCount', jsonb_array_length(episodes)
+                'centroid', array[st_x(centroid), st_y(centroid)]
               )))
             end
         from events
@@ -99,6 +100,7 @@
             select
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
                 fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.event_details, fd.observations, fd.geometries,
+                jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((
@@ -142,9 +144,9 @@
                 'observations', observations,
                 'geometries', geometries,
                 'episodes', episodes,
+                'episodeCount', episode_count,
                 'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
-                'centroid', array[st_x(centroid), st_y(centroid)],
-                'episodeCount', jsonb_array_length(episodes)
+                'centroid', array[st_x(centroid), st_y(centroid)]
               )
         from event
     </select>
