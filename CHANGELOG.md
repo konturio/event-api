@@ -8,6 +8,12 @@
 
 #### Removed
 
+## 1.17 - 2023-10-09
+
+#### Added
+
+- add `episodeCount` to the `Event`
+
 
 ## 1.14.5 - 2023-01-06
 
