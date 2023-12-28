@@ -107,22 +107,22 @@ scheduler:
     initialDelay: 10000
     fixedDelay: 600000
   pdcMapSrvSearch:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 60000
   gdacsImport:
     enable: true
     cron: 0 1/5 * * * * # every five minutes after hh:01:00
   firmsModisImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 3600000
   firmsNoaaImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 3600000
   firmsSuomiImport:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 3600000
   emDatImport:
@@ -175,23 +175,29 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv, em-dat, tornado.canada-gov,
+      tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
+      wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
+      wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa
   eventCombination:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv, em-dat, tornado.canada-gov,
+      tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
+      wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
+      wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa
   feedComposition:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
     alias: kontur-public, kontur-private
   enrichment:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 1000
   reEnrichment:
-    enable: true
+    enable: false
     initialDelay: 1000
     fixedDelay: 10000
   metrics:
