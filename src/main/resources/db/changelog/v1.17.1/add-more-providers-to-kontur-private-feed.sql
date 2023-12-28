@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset event-api-migrations:v1.16.1/add-more-providers-to-kontur-private-feed.sql runOnChange:true
+--changeset event-api-migrations:v1.17.1/add-more-providers-to-kontur-private-feed.sql runOnChange:true
 
 update feeds
 set providers = '{"pdcSqs", "pdcMapSrv", "em-dat", "tornado.canada-gov", "tornado.australian-bm",
