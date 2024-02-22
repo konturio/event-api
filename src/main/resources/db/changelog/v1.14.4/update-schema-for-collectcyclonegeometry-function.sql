@@ -36,7 +36,7 @@ as
         from
             (
                 select
-                    public.ST_Segmentize(
+                    public.ST_MakeValid(public.ST_Segmentize(
                         public.ST_ConvexHull(
                             public.ST_Collect(
                                 public.ST_Buffer(geom::geography, public.ST_M(geom))::geometry,
@@ -44,7 +44,7 @@ as
                                 )
                             )::geography,
                         10000
-                        )::geometry as geom
+                        )::geometry) as geom
                 from
                     (
                         select
@@ -69,7 +69,7 @@ as
         from
             (
                 select
-                    public.ST_Segmentize(
+                    public.ST_MakeValid(public.ST_Segmentize(
                         public.ST_ConvexHull(
                             public.ST_Collect(
                                 public.ST_Buffer(geom::geography, public.ST_M(geom))::geometry,
@@ -77,7 +77,7 @@ as
                                 )
                             )::geography,
                         10000
-                        )::geometry as geom
+                        )::geometry) as geom
                 from
                     (
                         select
@@ -102,7 +102,7 @@ as
         from
             (
                 select
-                    public.ST_Segmentize(
+                    public.ST_MakeValid(public.ST_Segmentize(
                         public.ST_ConvexHull(
                             public.ST_Collect(
                                 public.ST_Buffer(geom::geography, public.ST_M(geom))::geometry,
@@ -110,7 +110,7 @@ as
                                 )
                             )::geography,
                         10000
-                        )::geometry as geom
+                        )::geometry) as geom
                 from
                     (
                         select
