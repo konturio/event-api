@@ -18,7 +18,7 @@ public class EnrichmentExecutorConfig {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(5000);
+        executor.setQueueCapacity(10000);
         executor.setThreadNamePrefix("EnrichmentThread-");
         executor.initialize();
         return executor;

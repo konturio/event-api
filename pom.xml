@@ -429,7 +429,7 @@
 							<jvmFlag>-XX:MaxRAMPercentage=65</jvmFlag>
 							<jvmFlag>-XX:InitialRAMPercentage=50</jvmFlag>
 							<jvmFlag>-XX:+HeapDumpOnOutOfMemoryError</jvmFlag>
-							<jvmFalg>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFalg>
+							<jvmFlag>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFlag>
 							<!--<jvmFlag>-Xlog:gc*:file=%h/log/event-api.GC.log</jvmFlag>-->
 						</jvmFlags>
 					</container>

@@ -67,8 +67,10 @@
         select event_id, feed_id, version, updated_at, name,
                enriched, enrichment_attempts, event_details, geometries, episodes, enrichment_skipped
         from feed_data
-        where feed_id = #{feedId} and enrichment_skipped
-              and (enrichment_attempts &lt; 5 or enriched_at &lt; now() - '24 hour'::interval)
+        where feed_id = #{feedId}
+              and enrichment_skipped
+              and enrichment_attempts &lt; 5
+              and enriched_at &lt; now() - '48 hour'::interval
         order by enrichment_attempts, updated_at
         limit 10
     </select>

@@ -7,6 +7,7 @@ import io.kontur.eventapi.util.JsonUtil;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
+import org.wololo.geojson.GeoJSONFactory;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -14,7 +15,15 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static io.kontur.eventapi.entity.EventType.FLOOD;
+import static io.kontur.eventapi.normalization.Normalizer.readString;
+import static io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer.ORIGIN_NASA;
+import static io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer.defineType;
+import static io.kontur.eventapi.pdc.normalization.PdcSqsMessageNormalizer.*;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 @Component
 public class PdcDataLakeConverter {
@@ -23,6 +32,8 @@ public class PdcDataLakeConverter {
     public final static String HP_SRV_MAG_PROVIDER = "hpSrvMag";
     public final static String PDC_SQS_PROVIDER = "pdcSqs";
     public final static String PDC_MAP_SRV_PROVIDER = "pdcMapSrv";
+    public final static String PDC_SQS_NASA_PROVIDER = "pdcSqsNasa";
+    public final static String PDC_MAP_SRV_NASA_PROVIDER = "pdcMapSrvNasa";
     public final static DateTimeFormatter magsDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public DataLake convertHpSrvHazardData(JsonNode node) {
@@ -60,7 +71,7 @@ public class PdcDataLakeConverter {
 
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
-        dataLake.setProvider(PDC_SQS_PROVIDER);
+        dataLake.setProvider(definePdcSqsProvider(messageJson));
         dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setData(messageJson);
         dataLake.setExternalId(messageId);
@@ -71,7 +82,7 @@ public class PdcDataLakeConverter {
     public DataLake convertExposure(String data, String externalId) {
         DataLake dataLake = new DataLake();
         dataLake.setObservationId(UUID.randomUUID());
-        dataLake.setProvider(PDC_MAP_SRV_PROVIDER);
+        dataLake.setProvider(definePdcMapSrvProvider(data));
         dataLake.setData(data);
         dataLake.setExternalId(externalId);
 
@@ -85,4 +96,24 @@ public class PdcDataLakeConverter {
     private OffsetDateTime getDateTimeFromMillis(JsonNode node) {
         return OffsetDateTime.ofInstant(Instant.ofEpochMilli(node.asLong()), ZoneOffset.UTC);
     }
+
+    private String definePdcSqsProvider(String data) {
+        JsonNode event = parseEvent(data);
+        Map<String, Object> props = parseProps(event);
+        return "HAZARD".equals(getType(event))
+                && FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
+                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA)
+                || "MAG".equals(getType(event))
+                && FLOOD.equals(defineType(readString((Map<String, Object>) ((Map<String, Object>) props.get("hazard")).get("hazardType"), "typeId")))
+                && contains(readString((Map<String, Object>) ((Map<String, Object>) props.get("hazard")).get("hazardDescription"), "description"), ORIGIN_NASA)
+                ? PDC_SQS_NASA_PROVIDER : PDC_SQS_PROVIDER;
+    }
+
+    private String definePdcMapSrvProvider(String data) {
+        Feature feature = (Feature) GeoJSONFactory.create(data);
+        return FLOOD.equals(defineType(readString(feature.getProperties(), "type_id")))
+                && contains(readString(feature.getProperties(), "exp_description"), ORIGIN_NASA)
+                ? PDC_MAP_SRV_NASA_PROVIDER : PDC_MAP_SRV_PROVIDER;
+    }
+
 }

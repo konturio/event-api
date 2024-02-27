@@ -87,9 +87,8 @@ public class EventEnrichmentTask {
     private void markEventStatus(FeedData event) {
         event.setEnrichmentAttempts(event.getEnrichmentAttempts() == null ? 1L : event.getEnrichmentAttempts() + 1L);
         boolean enriched = enriched(event);
-        boolean reachedMaxEnrichmentAttempts = event.getEnrichmentAttempts() > 1;
-        event.setEnriched(reachedMaxEnrichmentAttempts || enriched);
-        event.setEnrichmentSkipped(reachedMaxEnrichmentAttempts && !enriched);
+        event.setEnriched(true);
+        event.setEnrichmentSkipped(!enriched);
     }
 
     private void updateMetrics(FeedData event) {

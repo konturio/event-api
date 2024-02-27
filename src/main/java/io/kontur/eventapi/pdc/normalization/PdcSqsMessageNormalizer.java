@@ -17,17 +17,15 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
 import static io.kontur.eventapi.entity.EventType.CYCLONE;
-import static io.kontur.eventapi.entity.EventType.FLOOD;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_NASA_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
 import static io.kontur.eventapi.util.JsonUtil.readJson;
 import static io.kontur.eventapi.util.LossUtil.INFRASTRUCTURE_REPLACEMENT_VALUE;
-import static org.apache.commons.lang3.StringUtils.contains;
 
 @Component
 public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
@@ -39,23 +37,7 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return PDC_SQS_PROVIDER.equals(dataLakeDto.getProvider()) && !isNasaFlood(dataLakeDto);
-    }
-
-    protected boolean isNasaFlood(DataLake dataLake) {
-        JsonNode event = parseEvent(dataLake.getData());
-        Map<String, Object> props = parseProps(event);
-        return "HAZARD".equals(getType(event))
-                && FLOOD.equals(defineType(readString((Map<String, Object>) props.get("hazardType"), "typeId")))
-                && contains(readString((Map<String, Object>) props.get("hazardDescription"), "description"), ORIGIN_NASA)
-                || "MAG".equals(getType(event))
-                && FLOOD.equals(defineType(readString((Map<String, Object>) ((Map<String, Object>) props.get("hazard")).get("hazardType"), "typeId")))
-                && contains(readString((Map<String, Object>) ((Map<String, Object>) props.get("hazard")).get("hazardDescription"), "description"), ORIGIN_NASA);
-    }
-
-    @Override
-    public boolean isSkipped() {
-        return true;
+        return List.of(PDC_SQS_PROVIDER, PDC_SQS_NASA_PROVIDER).contains(dataLakeDto.getProvider());
     }
 
     @Override
@@ -85,17 +67,17 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
         return normalizedDto;
     }
 
-    protected JsonNode parseEvent(String data) {
+    public static JsonNode parseEvent(String data) {
         JsonNode sns = JsonUtil.readTree(data).get("Sns");
         JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
         return JsonUtil.readTree(message.get("event").asText());
     }
 
-    protected Map<String, Object> parseProps(JsonNode event) {
+    public static Map<String, Object> parseProps(JsonNode event) {
         return readJson(event.get("json").asText(), new TypeReference<>() {});
     }
 
-    protected String getType(JsonNode event) {
+    public static String getType(JsonNode event) {
         return event.get("syncDa").get("masterSyncEvents").get("type").asText();
     }
 

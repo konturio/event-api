@@ -29,30 +29,31 @@ public class EnrichmentJob extends AbstractJob {
 
     @Override
     public void execute() throws Exception {
-        feedDao.getFeeds().stream()
+        try {
+            List<CompletableFuture<FeedData>> eventEnrichmentTasks = new ArrayList<>();
+            for (Feed feed : getFeeds()) {
+                List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
+                if (!CollectionUtils.isEmpty(events)) {
+                    eventEnrichmentTasks.addAll(events.stream()
+                            .map(event -> eventEnrichmentTask.enrichEvent(event, feed))
+                            .toList());
+                }
+            }
+            CompletableFuture.allOf(eventEnrichmentTasks.toArray(CompletableFuture[]::new)).join();
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+        }
+    }
+
+    private List<Feed> getFeeds() {
+        return feedDao.getFeeds()
+                .stream()
                 .filter(feed -> !feed.getEnrichment().isEmpty())
-                .forEach(this::enrichFeed);
+                .toList();
     }
 
     @Override
     public String getName() {
         return "enrichmentJob";
-    }
-
-    protected void enrichFeed(Feed feed) {
-        try {
-            List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
-            if (!CollectionUtils.isEmpty(events)) {
-                LOG.info(String.format("%s feed. %s events to enrich", feed.getAlias(), events.size()));
-
-                var eventEnrichmentTasks = events
-                        .stream()
-                        .map(event -> eventEnrichmentTask.enrichEvent(event, feed))
-                        .toArray(CompletableFuture[]::new);
-                CompletableFuture.allOf(eventEnrichmentTasks).join();
-            }
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-        }
     }
 }

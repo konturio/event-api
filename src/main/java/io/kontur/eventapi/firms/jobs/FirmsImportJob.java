@@ -1,5 +1,6 @@
 package io.kontur.eventapi.firms.jobs;
 
+import feign.FeignException;
 import io.kontur.eventapi.dao.DataLakeDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.firms.client.FirmsClient;
@@ -52,14 +53,17 @@ public abstract class FirmsImportJob extends AbstractJob {
 
     @Override
     public void execute() {
-        List<DataLake> dataLakes = loadData();
+        try {
+            List<DataLake> dataLakes = loadData();
+            List<DataLake> sortedDataLakes = dataLakes.stream()
+                    .sorted(Comparator.comparing(DataLake::getUpdatedAt, Comparator.nullsFirst(Comparator.naturalOrder())))
+                    .peek(dataLake -> dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime()))
+                    .collect(Collectors.toList());
 
-        List<DataLake> sortedDataLakes = dataLakes.stream()
-                .sorted(Comparator.comparing(DataLake::getUpdatedAt, Comparator.nullsFirst(Comparator.naturalOrder())))
-                .peek(dataLake -> dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime()))
-                .collect(Collectors.toList());
-
-        dataLakeDao.storeDataLakes(sortedDataLakes);
+            dataLakeDao.storeDataLakes(sortedDataLakes);
+        } catch (FeignException e) {
+            LOG.warn("Failed to load FIRMS data: " + e.getMessage(), e);
+        }
     }
 
     @Override

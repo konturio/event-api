@@ -45,28 +45,28 @@ public abstract class PdcHazardNormalizer extends Normalizer {
             "TERMINATION", Severity.TERMINATION
     );
 
-    protected Severity defineSeverity(String severityId) {
+    public static Severity defineSeverity(String severityId) {
         return severityMap.getOrDefault(severityId, Severity.UNKNOWN);
     }
 
-    protected EventType defineType(String typeId) {
+    public static EventType defineType(String typeId) {
         return typeMap.getOrDefault(typeId, EventType.OTHER);
     }
 
-    protected Boolean defineActive(String status) {
+    public static Boolean defineActive(String status) {
         return equalsIgnoreCase(status, "A") ? TRUE : equalsIgnoreCase(status, "E") ? FALSE : null;
     }
 
-    protected Boolean defineAutoExpire(String autoExpire) {
+    public static Boolean defineAutoExpire(String autoExpire) {
         return equalsIgnoreCase(autoExpire, "Y") ? TRUE : equalsIgnoreCase(autoExpire, "N") ? FALSE : null;
     }
 
-    protected String defineOrigin(String description) {
+    public static String defineOrigin(String description) {
         if (contains(description, "NASA")) return ORIGIN_NASA;
         return null;
     }
 
-    protected BigInteger parseRebuildCost(String description) {
+    public static BigInteger parseRebuildCost(String description) {
         if (description != null) {
             if (contains(description, "no major population centers are within the affected area")) {
                 return BigInteger.ZERO;
@@ -85,7 +85,7 @@ public abstract class PdcHazardNormalizer extends Normalizer {
         return null;
     }
 
-    protected String parseLocation(String name) {
+    public static String parseLocation(String name) {
         if (name != null) {
             Matcher matcher = Pattern.compile("(\\w+)\\s-\\s(.+)").matcher(name);
             if (matcher.find()) return matcher.group(2);

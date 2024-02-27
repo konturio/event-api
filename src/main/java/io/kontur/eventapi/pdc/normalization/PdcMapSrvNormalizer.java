@@ -10,9 +10,10 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
 
+import java.util.List;
 import java.util.Map;
 
-import static io.kontur.eventapi.entity.EventType.FLOOD;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_NASA_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static org.apache.commons.lang3.StringUtils.contains;
@@ -22,18 +23,7 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
-        return PDC_MAP_SRV_PROVIDER.equals(dataLakeDto.getProvider()) && !isNasaFlood(dataLakeDto);
-    }
-
-    protected boolean isNasaFlood(DataLake dataLake) {
-        Feature feature = (Feature) GeoJSONFactory.create(dataLake.getData());
-        return FLOOD.equals(defineType(readString(feature.getProperties(), "type_id")))
-                && contains(readString(feature.getProperties(), "exp_description"), ORIGIN_NASA);
-    }
-
-    @Override
-    public boolean isSkipped() {
-        return true;
+        return List.of(PDC_MAP_SRV_PROVIDER, PDC_MAP_SRV_NASA_PROVIDER).contains(dataLakeDto.getProvider());
     }
 
     @Override
