@@ -14,7 +14,7 @@ where alias = 'kontur-private';
 insert into feeds (feed_id, alias, name, description, providers, enrichment_postprocessors, enrichment, enrichment_request)
 values (
     uuid_generate_v4(), 'pdc', 'PDC', 'Pacific Disaster Center feed', '{"pdcSqs", "pdcMapSrv", "pdcSqsNasa", "pdcMapSrvNasa"}',
-    '{"loss"}', '{"population", "populatedAreaKm2", "gdp", "buildingCount", "highwayLength", "osmGapsPercentage"}',
+    '{"loss"}', '{"population", "populatedAreaKm2", "gdp", "buildingCount", "highwayLength", "osmGapsPercentage", "industrialAreaKm2"}',
     '{
         polygonStatistic (
             polygonStatisticRequest: {
@@ -29,6 +29,7 @@ values (
                     {name:"percentageXWhereNoY", id:"osmGapsPercentage", x:"populated_area_km2", y:"count"},
                     {name:"sumX", id:"buildingCount", x:"building_count"},
                     {name:"sumX", id:"highwayLength", x:"highway_length"},
+                    {name:"sumX", id:"industrialAreaKm2", x:"industrial_area"}
                 ]) {
                     id,
                     result
