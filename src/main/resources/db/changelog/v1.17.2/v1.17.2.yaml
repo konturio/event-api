@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: refactor-feeds.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-pdc-feed-enrichment-config.sql
