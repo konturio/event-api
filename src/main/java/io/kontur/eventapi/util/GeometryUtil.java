@@ -4,6 +4,7 @@ import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.operation.valid.IsValidOp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
@@ -81,7 +82,15 @@ public class GeometryUtil {
             Feature feature1 = fc1.getFeatures()[i];
             Feature feature2 = fc2.getFeatures()[i];
             if (!feature1.getProperties().equals(feature2.getProperties())) return false;
-            if (!reader.read(feature1.getGeometry()).equals(reader.read(feature2.getGeometry()))) return false;
+
+            Geometry geom1 = reader.read(feature1.getGeometry());
+            Geometry geom2 = reader.read(feature2.getGeometry());
+
+            if (!IsValidOp.isValid(geom1) || !IsValidOp.isValid(geom2)) {
+                geom1 = geom1.buffer(0);
+                geom2 = geom2.buffer(0);
+            }
+            if (!geom1.equalsExact(geom2, 0.0001)) return false;
         }
         return true;
     }
