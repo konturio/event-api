@@ -12,8 +12,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-import static java.lang.String.format;
-
 @Component
 public class ReEnrichmentJob extends AbstractJob {
 
@@ -37,13 +35,12 @@ public class ReEnrichmentJob extends AbstractJob {
     private void reEnrichFeed(Feed feed) {
         List<FeedData> events = feedDao.getEnrichmentSkippedEventsForFeed(feed.getFeedId());
         if (!CollectionUtils.isEmpty(events)) {
-            LOG.info(format("%s feed. %s events to re-enrich", feed.getAlias(), events.size()));
 ;
             events.forEach(event -> {
                 try {
                     longEventEnrichmentTask.enrichEvent(event, feed).get();
                 } catch (Exception e) {
-                    LOG.error(e.getMessage(), e);
+                    LOG.warn(e.getMessage(), e);
                 }
             });
         }

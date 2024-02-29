@@ -1,10 +1,7 @@
 package io.kontur.eventapi.pdc.episodecomposition;
 
 import static com.google.common.collect.Iterators.getLast;
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_MAP_SRV_PROVIDER;
-import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
+import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
 import static io.kontur.eventapi.util.GeometryUtil.isEqualGeometries;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
@@ -36,7 +33,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
             return collectExposureEpisodes(eventObservations);
         }
         Map<Boolean, List<NormalizedObservation>> observationsByProvider = eventObservations.stream()
-                .collect(partitioningBy(obs -> PDC_MAP_SRV_PROVIDER.equals(obs.getProvider())));
+                .collect(partitioningBy(obs -> List.of(PDC_MAP_SRV_PROVIDER, PDC_MAP_SRV_NASA_PROVIDER).contains(obs.getProvider())));
         List<FeedEpisode> episodes = collectInitialEpisodes(observationsByProvider.getOrDefault(false, emptyList()));
         List<FeedEpisode> episodesWithoutDuplicates = mergeDuplicatedEpisodes(episodes);
         addExposuresToEpisodes(episodesWithoutDuplicates, new HashSet<>(observationsByProvider.getOrDefault(true, emptyList())));
@@ -46,7 +43,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
     private boolean isOnlyPdcMapSrvObservations(Set<NormalizedObservation> eventObservations) {
         return eventObservations.stream()
                 .map(NormalizedObservation::getProvider)
-                .allMatch(PDC_MAP_SRV_PROVIDER::equals);
+                .allMatch(List.of(PDC_MAP_SRV_PROVIDER, PDC_MAP_SRV_NASA_PROVIDER)::contains);
     }
 
     private List<FeedEpisode> collectExposureEpisodes(Set<NormalizedObservation> observations) {
@@ -172,7 +169,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         List<Feature> features = new ArrayList<>();
         episodeObservations.stream()
                 .filter(obs -> HP_SRV_SEARCH_PROVIDER.equalsIgnoreCase(obs.getProvider())
-                        || (PDC_SQS_PROVIDER.equalsIgnoreCase(obs.getProvider())
+                        || (List.of(PDC_SQS_PROVIDER, PDC_SQS_NASA_PROVIDER).contains(obs.getProvider())
                         && obs.getGeometries() != null && !Arrays.isNullOrEmpty(obs.getGeometries().getFeatures())
                         && obs.getGeometries().getFeatures()[0].getGeometry() != null
                         && "Point".equalsIgnoreCase(obs.getGeometries().getFeatures()[0].getGeometry().getType())))
@@ -181,7 +178,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                 .ifPresent(features::add);
         episodeObservations.stream()
                 .filter(obs -> HP_SRV_MAG_PROVIDER.equalsIgnoreCase(obs.getProvider())
-                        || (PDC_SQS_PROVIDER.equalsIgnoreCase(obs.getProvider())
+                        || (List.of(PDC_SQS_PROVIDER, PDC_SQS_NASA_PROVIDER).contains(obs.getProvider())
                         && obs.getGeometries() != null && !Arrays.isNullOrEmpty(obs.getGeometries().getFeatures())
                         && obs.getGeometries().getFeatures()[0].getGeometry() != null
                         && ("Polygon".equalsIgnoreCase(obs.getGeometries().getFeatures()[0].getGeometry().getType())

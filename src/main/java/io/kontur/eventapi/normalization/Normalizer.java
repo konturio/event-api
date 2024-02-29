@@ -20,7 +20,7 @@ public abstract class Normalizer implements Applicable<DataLake> {
 
     protected final static ObjectMapper mapper = new ObjectMapper();
 
-    protected String readString(Map<String, Object> map, String key) {
+    public static String readString(Map<String, Object> map, String key) {
         Object value = map.get(key);
         return value == null ? null : String.valueOf(value);
     }

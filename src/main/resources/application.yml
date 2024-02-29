@@ -174,23 +174,25 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv, em-dat, tornado.canada-gov,
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, em-dat, tornado.canada-gov,
       tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
       wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
-      wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa
+      wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa,
+      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
   eventCombination:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, pdcSqs, pdcMapSrv, em-dat, tornado.canada-gov,
+    providers: gdacsAlert, gdacsAlertGeometry, kontur.events, em-dat, tornado.canada-gov,
       tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
       wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
-      wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa
+      wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa,
+      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
   feedComposition:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: kontur-public, kontur-private
+    alias: kontur-public, kontur-private, pdc
   enrichment:
     enable: false
     initialDelay: 1000

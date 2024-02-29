@@ -29,8 +29,7 @@ import java.util.UUID;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_SEARCH_PROVIDER;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.PDC_SQS_PROVIDER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.testcontainers.shaded.com.google.common.collect.Iterables.getOnlyElement;
 
 public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
@@ -170,7 +169,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
                 .anyMatch(episode -> episode.getObservations().size() > 1);
         // TODO: assertTrue when MAGS are not skipped
-        assertFalse(oneEpisodeForTwoObservation);
+        assertTrue(oneEpisodeForTwoObservation);
     }
 
     @Test
