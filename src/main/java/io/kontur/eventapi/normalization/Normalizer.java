@@ -21,13 +21,14 @@ public abstract class Normalizer implements Applicable<DataLake> {
     protected final static ObjectMapper mapper = new ObjectMapper();
 
     public static String readString(Map<String, Object> map, String key) {
+        if (map == null) return null;
         Object value = map.get(key);
         return value == null ? null : String.valueOf(value);
     }
 
     protected Boolean readBoolean(Map<String, Object> map, String key) {
-        Object value = map.get(key);
-        return value == null ? null : Boolean.valueOf(readString(map, key));
+        String value = readString(map, key);
+        return value == null ? null : Boolean.valueOf(value);
     }
 
     protected Long readLong(Map<String, Object> map, String key) {
@@ -52,6 +53,7 @@ public abstract class Normalizer implements Applicable<DataLake> {
 
     @SuppressWarnings("unchecked")
     protected Map<String, Object> readMap(Map<String, Object> map, String key) {
+        if (map == null) return null;
         Object value = map.get(key);
         return value == null ? null : mapper.convertValue(value, Map.class);
     }
