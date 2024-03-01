@@ -55,7 +55,7 @@
                     <if test='"DESC".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
                 </if>
                 <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
-                    and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
+                    and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
                 </if>
             order by fd.updated_at ${sortOrder}
             limit #{limit}
