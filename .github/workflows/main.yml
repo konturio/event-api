@@ -46,7 +46,7 @@ jobs:
           echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8084 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
           echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8085 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
 
-          IMAGE_TAG="$TAG" mvn $MAVEN_CLI_OPTS clean install jib:build -U -Prelease
+          IMAGE_TAG="$TAG" mvn -T 1C $MAVEN_CLI_OPTS clean install jib:build -U -Prelease 
           echo "<h3>Docker image tag</h3> $TAG <br><br>" >> $GITHUB_STEP_SUMMARY
           mv -v target/*.zip .
 
