@@ -60,7 +60,7 @@
         from feed_data
         where feed_id = #{feedId} and not enriched
         order by enrichment_attempts nulls first, updated_at
-        limit 1000
+        limit 100
     </select>
 
     <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
