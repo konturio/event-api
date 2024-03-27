@@ -29,7 +29,7 @@
 		<gt-geojson.version>26-SNAPSHOT</gt-geojson.version>
 		<spatial4j.version>0.8</spatial4j.version>
 		<jts-core.version>1.18.1</jts-core.version>
-		<jib.source.image>openjdk:16-alpine</jib.source.image>
+        <jib.source.image>amazoncorretto:21.0.0-alpine</jib.source.image>
 		<image.tag>${IMAGE_TAG}</image.tag>
 	</properties>
 
@@ -232,6 +232,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.32</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
