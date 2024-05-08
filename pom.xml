@@ -431,6 +431,9 @@
 							<jvmFlag>-XX:+HeapDumpOnOutOfMemoryError</jvmFlag>
 							<jvmFlag>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFlag>
 							<jvmFlag>-XX:+UseG1GC</jvmFlag>
+							<jvmFlag>-XX:ConcGCThreads=2</jvmFlag>
+							<jvmFlag>-XX:G1HeapRegionSize=8388608</jvmFlag>
+							<jvmFlag>-XX:+UseAdaptiveSizePolicy</jvmFlag>
 							<!--<jvmFlag>-Xlog:gc*:file=%h/log/event-api.GC.log</jvmFlag>-->
 						</jvmFlags>
 					</container>
