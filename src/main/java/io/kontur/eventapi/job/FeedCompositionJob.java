@@ -170,9 +170,10 @@ public class FeedCompositionJob extends AbstractJob {
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
+        final Set<NormalizedObservation> observationSet = new HashSet<>(observations);
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
-            episodeCombinator.processObservation(observation, feedData, Set.copyOf(observations))
+            episodeCombinator.processObservation(observation, feedData, observationSet)
                     .forEach(episode -> {
                         if (episode.getStartedAt() != null && episode.getEndedAt() != null
                                 && episode.getStartedAt().isAfter(episode.getEndedAt())) {
