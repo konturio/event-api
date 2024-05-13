@@ -427,7 +427,7 @@
 							<jvmFlag>-Dlogging.config=classpath:logback-stdout-json.xml</jvmFlag>
 							<jvmFlag>-server</jvmFlag>
 							<jvmFlag>-XX:MaxRAMPercentage=65</jvmFlag>
-							<jvmFlag>-XX:InitialRAMPercentage=50</jvmFlag>
+							<jvmFlag>-XX:InitialRAMPercentage=20</jvmFlag>
 							<jvmFlag>-XX:+HeapDumpOnOutOfMemoryError</jvmFlag>
 							<jvmFlag>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFlag>
 							<jvmFlag>-XX:+UseZGC</jvmFlag>
