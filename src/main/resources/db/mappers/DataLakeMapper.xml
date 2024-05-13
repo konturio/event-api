@@ -42,7 +42,7 @@
             #{provider}
         </foreach>
         ORDER BY loaded_at
-        LIMIT 100000
+        LIMIT 1000
     </select>
 
     <select id="getDataLakesByExternalId" resultMap="dataLakeMap">
