@@ -64,7 +64,7 @@
         FROM feed_event_status
         WHERE feed_id = #{feedId}
             AND actual is false
-        LIMIT 100;
+        LIMIT 50;
     </select>
 
     <select id="getNotComposedEventsCount" resultType="java.lang.Integer">
