@@ -19,14 +19,14 @@ jobs:
     # runs-on: '${{ matrix.os }}'
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Extracting metadata from a cloned repository
         id: get-cloned
         run: |-
           echo "::set-output name=SHA::$(git log -1 --format='%h')"
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           java-version: 16
           distribution: corretto
