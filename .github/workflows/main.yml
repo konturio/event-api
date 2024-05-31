@@ -39,7 +39,7 @@ jobs:
           path: |
             ~/.m2
             ~/repository
-            key: ${{ github.job }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ github.job }}-${{ hashFiles('**/pom.xml') }}
 
       - name: Building with Maven
         env:
