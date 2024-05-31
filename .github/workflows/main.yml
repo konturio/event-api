@@ -32,14 +32,14 @@ jobs:
           distribution: corretto
           cache: maven
 
-    - name: Restore Maven cache
-      id: maven-cache-restore
-      uses: actions/cache/restore@v4
-      with:
-        path: |
-          ~/.m2
-          ~/repository
-        key: ${{ github.job }}-${{ hashFiles('**/pom.xml') }}
+      - name: Restore Maven cache
+        id: maven-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.m2
+            ~/repository
+            key: ${{ github.job }}-${{ hashFiles('**/pom.xml') }}
 
       - name: Building with Maven
         env:
