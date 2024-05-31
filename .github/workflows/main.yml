@@ -32,6 +32,15 @@ jobs:
           distribution: corretto
           cache: maven
 
+    - name: Restore Maven cache
+      id: maven-cache-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ~/.m2
+          ~/repository
+        key: ${{ github.job }}-${{ hashFiles('**/pom.xml') }}
+
       - name: Building with Maven
         env:
           MAVEN_CLI_OPTS: '--batch-mode'
@@ -57,6 +66,15 @@ jobs:
           name: 'event-api-${{needs.helper.outputs.CI_COMMIT_REF_SLUG}}'
           path: '*.zip'
           retention-days: 10
+
+    - name: Store Maven Cache
+      id: maven-cache-store
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ~/.m2
+          ~/repository
+        key: ${{ github.job }}-${{ hashFiles('**/pom.xml') }}
 
       - name: Publishing JUnit Test result report
         uses: konturio/action-junit-report@v3
