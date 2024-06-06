@@ -73,6 +73,7 @@ public class FeedCompositionJob extends AbstractJob {
     @Counted(value = "feedComposition.event.counter")
     protected void createFeedData(UUID eventId, Feed feed) {
         try {
+            LOG.info(format("%s feed. Processing event %s", feed.getAlias(), eventId));
             List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
             eventObservations.sort(comparing(NormalizedObservation::getStartedAt, nullsLast(naturalOrder()))
                     .thenComparing(NormalizedObservation::getLoadedAt));
