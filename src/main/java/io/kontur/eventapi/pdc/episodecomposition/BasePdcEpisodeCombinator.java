@@ -3,6 +3,7 @@ package io.kontur.eventapi.pdc.episodecomposition;
 import static com.google.common.collect.Iterators.getLast;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
 import static io.kontur.eventapi.util.GeometryUtil.isEqualGeometries;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.partitioningBy;
@@ -18,25 +19,34 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import org.bouncycastle.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
 public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
 
     protected static final Duration TIME_RANGE_SEC = Duration.ofSeconds(90);
+    private static final Logger LOG = LoggerFactory.getLogger(BasePdcEpisodeCombinator.class);
 
     @Override
     public List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData,
                                                 Set<NormalizedObservation> eventObservations) {
         if (!feedData.getEpisodes().isEmpty()) return emptyList();
+        LOG.info(format("Started PDC observation processing for event: %s", feedData.getEventId()));
         if (isOnlyPdcMapSrvObservations(eventObservations)) {
             return collectExposureEpisodes(eventObservations);
         }
+        LOG.info(format("PDC event has pdcSqs observations: %s", feedData.getEventId()));
         Map<Boolean, List<NormalizedObservation>> observationsByProvider = eventObservations.stream()
                 .collect(partitioningBy(obs -> List.of(PDC_MAP_SRV_PROVIDER, PDC_MAP_SRV_NASA_PROVIDER).contains(obs.getProvider())));
+        LOG.info(format("Grouped PDC event observations by provider: %s", feedData.getEventId()));
         List<FeedEpisode> episodes = collectInitialEpisodes(observationsByProvider.getOrDefault(false, emptyList()));
+        LOG.info(format("Collected initial episodes for PDC event: %s", feedData.getEventId()));
         List<FeedEpisode> episodesWithoutDuplicates = mergeDuplicatedEpisodes(episodes);
+        LOG.info(format("Removed duplicated episodes from PDC event: %s", feedData.getEventId()));
         addExposuresToEpisodes(episodesWithoutDuplicates, new HashSet<>(observationsByProvider.getOrDefault(true, emptyList())));
+        LOG.info(format("Added exposures to PDC event: %s", feedData.getEventId()));
         return episodesWithoutDuplicates;
     }
 

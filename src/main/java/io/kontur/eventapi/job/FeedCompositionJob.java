@@ -171,7 +171,9 @@ public class FeedCompositionJob extends AbstractJob {
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
+        LOG.info(format("Episodes processing for event %s", feedData.getEventId()));
         final Set<NormalizedObservation> observationSet = new HashSet<>(observations);
+        LOG.info(format("Copied observations for event %s", feedData.getEventId()));
         observations.forEach(observation -> {
             EpisodeCombinator episodeCombinator = Applicable.get(episodeCombinators, observation);
             episodeCombinator.processObservation(observation, feedData, observationSet)
