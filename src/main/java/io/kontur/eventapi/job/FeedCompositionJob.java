@@ -75,18 +75,21 @@ public class FeedCompositionJob extends AbstractJob {
         try {
             LOG.info(format("%s feed. Processing event %s", feed.getAlias(), eventId));
             List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
+            LOG.info(format("%s feed. Got observations for event %s", feed.getAlias(), eventId));
             eventObservations.sort(comparing(NormalizedObservation::getStartedAt, nullsLast(naturalOrder()))
                     .thenComparing(NormalizedObservation::getLoadedAt));
-
+            LOG.info(format("%s feed. Sorted observations for event %s", feed.getAlias(), eventId));
             Optional<Long> lastFeedDataVersion = feedDao.getLastFeedDataVersion(eventId, feed.getFeedId());
             FeedData feedData = new FeedData(eventId, feed.getFeedId(),
                     lastFeedDataVersion.map(v -> v + 1).orElse(1L));
 
             feedData.setObservations(
                     eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
+            LOG.info(format("%s feed. Set observation IDs for event %s", feed.getAlias(), eventId));
             fillEpisodes(eventObservations, feedData);
+            LOG.info(format("%s feed. Filled episodes for event %s", feed.getAlias(), eventId));
             fillFeedData(feedData, eventObservations);
-
+            LOG.info(format("%s feed. Filled feed data for event %s", feed.getAlias(), eventId));
             feedData.setEnriched(feed.getEnrichment().isEmpty());
 
             feedDao.insertFeedData(feedData, feed.getAlias());
