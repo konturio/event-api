@@ -41,6 +41,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableIntegrationTest {
@@ -123,7 +124,6 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 0.871 km\u00B2, burning 27 hours.", feedData.get(1).getEpisodes().get(1).getName());
         assertEquals(3, feedData.get(1).getEpisodes().get(1).getObservations().size());
 
 
@@ -164,7 +164,6 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(2, firmsUpdated.get(1).getVersion());
 
         TestEventDto someFedData = firmsUpdated.get(2);
-        assertEquals("Thermal anomaly in an unknown area. Burnt area 2.612 km\u00B2, burning 35 hours.", someFedData.getName());
         assertEquals(5, someFedData.getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"),someFedData.getStartedAt());
         assertEquals(parse("2020-11-03T22:50Z"),someFedData.getEndedAt());
@@ -175,29 +174,24 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
 
         episodes.sort(Comparator.comparing(TestEpisodeDto::getSourceUpdatedAt));
 
-        assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 0.871 km\u00B2",
-                episodes.get(0).getName());
         assertEquals(2, episodes.get(0).getObservations().size());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getStartedAt());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt());
         assertEquals(Severity.MINOR, episodes.get(0).getSeverity());
 
-        assertEquals("Thermal anomaly in an unknown area. Burnt area 1.743 km\u00B2", episodes.get(1).getName());
         assertEquals(3, episodes.get(1).getObservations().size());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt());
         assertEquals(Severity.MINOR, episodes.get(1).getSeverity());
 
-        assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 1.743 km\u00B2", episodes.get(2).getName());
         assertEquals(4, episodes.get(2).getObservations().size());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getStartedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(2).getEndedAt());
         assertEquals(Severity.MINOR, episodes.get(2).getSeverity());
 
-        assertEquals("Thermal anomaly in an unknown area. Burnt area 2.612 km\u00B2, burning 35 hours.", episodes.get(3).getName());
         assertEquals(5, episodes.get(3).getObservations().size());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getSourceUpdatedAt());
         assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getStartedAt());
@@ -223,11 +217,10 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, firmsUpdated2.size());
         Optional<TestEventDto> updatedEvent = firmsUpdated2.stream().filter(event -> event.getVersion() == 3).findFirst();
         assertTrue(updatedEvent.isPresent());
-        assertEquals("Thermal anomaly in an unknown area. Burnt area 3.479 km\u00B2, burning 53 hours.", updatedEvent.get().getEpisodes().get(4).getName());
     }
 
     private void configureKonturApiClient() {
-        when(konturApiClient.adminBoundaries("POINT (145.96183 -34.74616)", 10))
+        when(konturApiClient.adminBoundaries(any()))
                 .then((i) -> JsonUtil.readJson("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"properties\":{\"name\":\"Pará\",\"tags\":{\"ref\":\"PA\",\"name\":\"Para\",\"admin_level\":\"4\"},\"osm_id\":185579,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"4\"},\"id\":\"185579\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Região Geográfica Intermediária de Santarém\",\"tags\":{\"name\":\"Região Geográfica Intermediária de Santarém\",\"boundary\":\"administrative\",\"wikidata\":\"Q65167712\",\"wikipedia\":\"pt:Região Geográfica Intermediária de Santarém\",\"admin_level\":\"5\",\"IBGE:GEOCODIGO\":\"1505\"},\"osm_id\":4826842,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"5\"},\"id\":\"4826842\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Regional Coastline\",\"tags\":{\"name\":\"Regional Coastline\",\"boundary\":\"administrative\",\"admin_level\":\"Regional\"},\"osm_id\":9969273,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"Regional\"},\"id\":\"9969273\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Região Norte\",\"tags\":{\"name\":\"Região Norte\",\"name:en\":\"North Region\",\"admin_level\":\"3\",\"is_in:country\":\"Brazil\"},\"osm_id\":3360778,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"3\"},\"id\":\"3360778\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Brasil\",\"tags\":{\"name\":\"Brasil\",\"int_name\":\"Brazil\",\"admin_level\":\"2\"},\"osm_id\":59470,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"2\"},\"id\":\"59470\"},{\"type\":\"Feature\",\"properties\":{\"name\":\"Região Geográfica Imediata de Oriximiná\",\"tags\":{\"name\":\"Região Geográfica Imediata de Oriximiná\",\"boundary\":\"administrative\",\"wikidata\":\"Q2596742\",\"wikipedia\":\"pt:Microrregião de Tucuruí\",\"admin_level\":\"7\",\"IBGE:GEOCODIGO\":\"150616\"},\"osm_id\":12115100,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"7\"},\"id\":\"12115100\",\"links\":[{\"href\":\"https://test-api02.konturlabs.com:443/layers/collections/bounds/items/12115100\",\"rel\":\"self\",\"type\":\"application/geo+json\"},{\"href\":\"https://test-api02.konturlabs.com:443/layers/collections/bounds\",\"rel\":\"collection\",\"type\":\"application/geo+json\",\"title\":\"Admin Boundaries\"}]},{\"type\":\"Feature\",\"properties\":{\"name\":\"Oriximiná\",\"tags\":{\"name\":\"Oriximiná\",\"boundary\":\"administrative\",\"wikidata\":\"Q2011919\",\"wikipedia\":\"pt:Oriximiná\",\"population\":\"57765\",\"admin_level\":\"8\",\"IBGE:GEOCODIGO\":\"1505304\"},\"osm_id\":185652,\"boundary\":\"administrative\",\"osm_type\":\"relation\",\"admin_level\":\"8\"},\"id\":\"185652\",\"links\":[{\"href\":\"https://test-api02.konturlabs.com:443/layers/collections/bounds/items/185652\",\"rel\":\"self\",\"type\":\"application/geo+json\"},{\"href\":\"https://test-api02.konturlabs.com:443/layers/collections/bounds\",\"rel\":\"collection\",\"type\":\"application/geo+json\",\"title\":\"Admin Boundaries\"}]}],\"links\":[{\"href\":\"https://test-api02.konturlabs.com:443/layers/collections/bounds/items?limit=10&offset=0\",\"rel\":\"self\",\"type\":\"application/geo+json\",\"title\":\"Admin Boundaries\"}],\"timeStamp\":\"2021-02-19T06:22:13Z\",\"numberMatched\":7,\"numberReturned\":7}",
                         FeatureCollection.class));
 

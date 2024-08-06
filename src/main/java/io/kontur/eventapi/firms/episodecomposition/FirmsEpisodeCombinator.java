@@ -157,8 +157,10 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
 
     private String getBurntAreaName(Set<NormalizedObservation> episodeObservations) {
         Geometry centroid = calculateH3Centroid(calculateCentroid(episodeObservations));
-
-        FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(centroid.toText(), 10);
+        Map<String, Object> params = new HashMap<>();
+        params.put("geometry", geoJSONWriter.write(centroid));
+        params.put("limit", 10);
+        FeatureCollection adminBoundaries = konturApiClient.adminBoundaries(params);
         if (adminBoundaries == null || adminBoundaries.getFeatures() == null) {
             return "";
         }
