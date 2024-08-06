@@ -124,7 +124,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(3, feedData.get(1).getObservations().size());//3 observations within 1 km
         assertEquals(2, feedData.get(1).getEpisodes().size());//2 observations have same date
 
-        assertEquals("Thermal anomaly in an unknown area. Burnt area 0.871 km\u00B2, burning 27 hours.", feedData.get(1).getEpisodes().get(1).getName());
+        assertEquals("Thermal anomaly in Brazil, North Region, Para. Burnt area 0.871 km\u00B2, burning 27 hours.", feedData.get(1).getEpisodes().get(1).getName());
         assertEquals(3, feedData.get(1).getEpisodes().get(1).getObservations().size());
 
 
