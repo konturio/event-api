@@ -192,7 +192,7 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 1000
-    alias: kontur-public, kontur-private, pdc
+    alias: kontur-public, kontur-private, pdc, wildfires
   enrichment:
     enable: false
     initialDelay: 1000
