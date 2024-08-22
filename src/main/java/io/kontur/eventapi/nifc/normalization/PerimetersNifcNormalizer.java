@@ -30,18 +30,23 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         Map<String, Object> props = feature.getProperties();
 
         observation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), PERIMETERS_PROPERTIES));
-        observation.setDescription(readString(props, "attr_IncidentShortDescription"));
+        observation.setDescription(selectFirstNotNull(
+                readString(props, "attr_IncidentShortDescription"),
+                readString(props, "irwin_IncidentShortDescription")
+        ));
 
-        long startedAtMilli = readLong(props, "attr_CreatedOnDateTime_dt");
+        long startedAtMilli = selectFirstNotNull(
+                readLong(props, "attr_CreatedOnDateTime_dt"),
+                readLong(props, "irwin_CreatedOnDateTime_dt"));
         observation.setStartedAt(getDateTimeFromMilli(startedAtMilli).truncatedTo(SECONDS));
 
-        String name = readString(props, "attr_IncidentName");
-        String type = readString(props, "attr_IncidentTypeCategory");
+        String name = selectFirstNotNull(readString(props, "attr_IncidentName"), readString(props, "irwin_IncidentName"));
+        String type = selectFirstNotNull(readString(props, "attr_IncidentTypeCategory"), readString(props, "irwin_IncidentTypeCategory"));
         observation.setName(composeName(name, type));
         observation.setProperName(name);
 
-        Double lon = readDouble(props, "attr_InitialLongitude");
-        Double lat = readDouble(props, "attr_InitialLatitude");
+        Double lon = selectFirstNotNull(readDouble(props, "attr_InitialLongitude"), readDouble(props, "irwin_InitialLongitude"));
+        Double lat = selectFirstNotNull(readDouble(props, "attr_InitialLatitude"), readDouble(props, "irwin_InitialLatitude"));
         observation.setPoint(makeWktPoint(lon, lat));
 
         double areaSqKm2 = convertAcresToSqKm(readDouble(props, "poly_GISAcres"));
@@ -49,5 +54,9 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         observation.setEventSeverity(calculateSeverity(areaSqKm2, durationHours));
 
         return observation;
+    }
+
+    private <T> T selectFirstNotNull(T a, T b) {
+        return a != null ? a : b;
     }
 }
