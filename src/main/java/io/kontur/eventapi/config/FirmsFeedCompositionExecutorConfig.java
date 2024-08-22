@@ -16,6 +16,6 @@ public class FirmsFeedCompositionExecutorConfig {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("FirmsFeedCompositionThread-%d")
                 .build();
-        return Executors.newFixedThreadPool(5, threadFactory);
+        return Executors.newFixedThreadPool(10, threadFactory);
     }
 }
