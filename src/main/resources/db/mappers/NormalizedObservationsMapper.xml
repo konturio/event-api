@@ -47,7 +47,7 @@
             #{provider}
         </foreach>
         ORDER BY loaded_at
-        LIMIT 1000
+        LIMIT 100000
     </select>
 
     <select id="getFirmsObservationsNotLinkedToEventFor24Hours" resultMap="normalizedObservationsDtoMap">

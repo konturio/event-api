@@ -60,7 +60,7 @@
         from feed_data
         where feed_id = #{feedId} and not enriched
         order by enrichment_attempts nulls first, updated_at
-        limit 100
+        limit 1000
     </select>
 
     <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
@@ -72,7 +72,7 @@
               and enrichment_attempts &lt; 5
               and enriched_at &lt; now() - '48 hour'::interval
         order by enrichment_attempts, updated_at
-        limit 10
+        limit 100
     </select>
 
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
