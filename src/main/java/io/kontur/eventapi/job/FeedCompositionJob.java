@@ -157,6 +157,14 @@ public class FeedCompositionJob extends AbstractJob {
                         .forEach(e -> loss.put(e.getKey(), e.getValue())));
         feedData.setLoss(loss);
 
+        Map<String, Object> severityData = new HashMap<>();
+        episodes.stream()
+                .sorted(comparing(FeedEpisode::getSourceUpdatedAt))
+                .forEachOrdered(obs -> obs.getSeverityData().entrySet().stream()
+                        .filter(e -> e.getValue() != null)
+                        .forEach(e -> loss.put(e.getKey(), e.getValue())));
+        feedData.setSeverityData(severityData);
+
         feedData.setActive(eventObservations.stream()
                 .filter(ep -> ep.getActive() != null)
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt))

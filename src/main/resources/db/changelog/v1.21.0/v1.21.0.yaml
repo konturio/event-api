@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: create-mic-global-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-severity-data-column.sql

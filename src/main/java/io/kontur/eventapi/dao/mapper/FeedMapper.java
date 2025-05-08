@@ -29,6 +29,7 @@ public interface FeedMapper {
                        @Param("updatedAt") OffsetDateTime updatedAt,
                        @Param("location") String location,
                        @Param("urls") List<String> urls,
+                       @Param("severityData") Map<String, Object> severityData,
                        @Param("loss") Map<String, Object> loss,
                        @Param("observations") Set<UUID> observations,
                        @Param("episodes") String episodes,

@@ -40,7 +40,7 @@ public class TestEventDto implements Serializable {
 	private List<TestEpisodeDto> episodes = new ArrayList<>();
 	private List<Double> bbox = new ArrayList<>();
 	private List<Double> centroid = new ArrayList<>();
-  private int episodeCount;
+	private int episodeCount;
 
 	@Serial
 	@SuppressWarnings("unchecked")

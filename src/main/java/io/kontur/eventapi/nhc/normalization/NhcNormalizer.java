@@ -2,6 +2,8 @@ package io.kontur.eventapi.nhc.normalization;
 
 import static io.kontur.eventapi.nhc.NhcUtil.*;
 import static io.kontur.eventapi.util.GeometryUtil.*;
+import static io.kontur.eventapi.util.SeverityUtil.*;
+import static io.kontur.eventapi.util.SeverityUtil.WIND_SPEED_KPH;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -20,6 +22,7 @@ import io.kontur.eventapi.nhc.NhcUtil;
 import io.kontur.eventapi.nhc.converter.NhcXmlParser;
 import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.util.DateTimeUtil;
+import io.kontur.eventapi.util.SeverityUtil;
 import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -114,11 +117,14 @@ public class NhcNormalizer extends Normalizer {
                         if (MapUtils.isNotEmpty(maxSustainedWind) && MapUtils.isNotEmpty(maxSustainedWind.get(1))) {
                             try {
                                 int maxWind = Integer.parseInt(maxSustainedWind.get(1).get(MAX_WIND_POS));
-                                if (maxWind <= SEVERITY_MINOR_MAX_WIND_SPEED) {
+                                Double maxWindKph = NhcUtil.convertKnotsToKph((double) maxWind, 2);
+                                String category = SeverityUtil.getCycloneCategory(maxWindKph);
+                                normalizedObservation.setSeverityData(Map.of(WIND_SPEED_KPH, maxWindKph, CATEGORY_SAFFIR_SIMPSON, category));
+                                if (category.equals(CATEGORY_TD)) {
                                     normalizedObservation.setEventSeverity(Severity.MINOR);
-                                } else if (maxWind <= SEVERITY_MODERATE_MAX_WIND_SPEED) {
+                                } else if (category.equals(CATEGORY_TS)) {
                                     normalizedObservation.setEventSeverity(Severity.MODERATE);
-                                } else if (maxWind <= SEVERITY_SEVERE_MAX_WIND_SPEED) {
+                                } else if (category.equals(CATEGORY_1)) {
                                     normalizedObservation.setEventSeverity(Severity.SEVERE);
                                 } else {
                                     normalizedObservation.setEventSeverity(Severity.EXTREME);

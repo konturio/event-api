@@ -10,7 +10,7 @@ import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIM
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureCollection;
 import static io.kontur.eventapi.util.GeometryUtil.readFeature;
-import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
+import static io.kontur.eventapi.util.SeverityUtil.*;
 import static java.time.Duration.between;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -53,6 +53,12 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         long durationHours = between(observation.getStartedAt(), observation.getEndedAt()).toHours();
         observation.setEventSeverity(calculateSeverity(areaSqKm2, durationHours));
 
+        observation.getSeverityData().put(BURNED_AREA_KM2, areaSqKm2);
+
+        Double percentContained = readDouble(props, "attr_PercentContained");
+        if (percentContained != null) {
+            observation.getSeverityData().put(CONTAINED_AREA_PCT, percentContained);
+        }
         return observation;
     }
 
