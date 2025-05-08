@@ -32,6 +32,7 @@ public class TestEpisodeDto implements Serializable {
 	private String location;
 	private List<String> urls = new ArrayList<>();
 	private Map<String, Object> loss = new HashMap<>();
+	private Map<String, Object> severityData = new HashMap<>();
 	private Map<String, Object> episodeDetails;
 	private Set<UUID> observations = new HashSet<>();
 	private FeatureCollection geometries;
@@ -51,6 +52,7 @@ public class TestEpisodeDto implements Serializable {
 		location = (String) in.readObject();
 		urls = (List<String>) in.readObject();
 		loss = (Map<String, Object>) in.readObject();
+		severityData = (Map<String, Object>) in.readObject();
 		episodeDetails = (Map<String, Object>) in.readObject();
 		observations = (Set<UUID>) in.readObject();
 		Object geometriesObj = in.readObject();
@@ -71,6 +73,7 @@ public class TestEpisodeDto implements Serializable {
 		out.writeObject(location);
 		out.writeObject(urls);
 		out.writeObject(loss);
+		out.writeObject(severityData);
 		out.writeObject(episodeDetails);
 		out.writeObject(observations);
 		out.writeObject(geometries == null ? null : geometries.toString());
