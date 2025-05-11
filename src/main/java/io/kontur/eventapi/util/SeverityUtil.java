@@ -16,7 +16,7 @@ public class SeverityUtil {
     public final static String DROUGHT_AREA_KM2 = "droughtAreaKm2";
     public final static String HAIL_SIZE_MM = "hailSizeMm";
     public final static String CAUSE = "cause";
-    public final static String FUJITA_SCALE = "cause";
+    public final static String FUJITA_SCALE = "fujitaScale";
     public final static String TORNADO_LENGTH_KM = "tornadoLengthKm";
     public final static String TORNADO_WIDTH_M = "tornadoWidthM";
 

@@ -22,6 +22,8 @@ import java.util.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.kontur.eventapi.entity.Severity.UNKNOWN;
+import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
+import static io.kontur.eventapi.util.SeverityUtil.*;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.*;
@@ -149,6 +151,10 @@ public class FeedCompositionJob extends AbstractJob {
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getType).orElse(null));
 
+        if (eventObservations.stream().anyMatch(obs -> obs.getProvider().equals(STORMS_NOAA_PROVIDER))) {
+            feedData.setType(EventType.STORM);
+        }
+
         Map<String, Object> loss = new HashMap<>();
         episodes.stream()
                 .sorted(comparing(FeedEpisode::getSourceUpdatedAt))
@@ -163,6 +169,7 @@ public class FeedCompositionJob extends AbstractJob {
                 .forEachOrdered(obs -> obs.getSeverityData().entrySet().stream()
                         .filter(e -> e.getValue() != null)
                         .forEach(e -> severityData.put(e.getKey(), e.getValue())));
+        setMaxSeverityDataValues(episodes, severityData);
         feedData.setSeverityData(severityData);
 
         feedData.setActive(eventObservations.stream()
@@ -211,5 +218,28 @@ public class FeedCompositionJob extends AbstractJob {
         checkState(!episode.getStartedAt().isAfter(episode.getEndedAt()));
 
         feedData.addEpisode(episode);
+    }
+
+    private void setMaxSeverityDataValues(List<FeedEpisode> episodes, Map<String, Object> severityData) {
+        if (severityData.containsKey(WIND_SPEED_KPH)) {
+            getMaxSeverityDataValue(episodes, WIND_SPEED_KPH)
+                    .ifPresent(maxWindSpeed -> {
+                        severityData.put(WIND_SPEED_KPH, maxWindSpeed);
+                        severityData.put(CATEGORY_SAFFIR_SIMPSON, getCycloneCategory(maxWindSpeed));
+                    });
+        }
+
+        if (severityData.containsKey(WIND_GUST_KPH)) {
+            getMaxSeverityDataValue(episodes, WIND_GUST_KPH)
+                    .ifPresent(maxWindGust -> severityData.put(WIND_GUST_KPH, maxWindGust));
+        }
+    }
+
+    private Optional<Double> getMaxSeverityDataValue(List<FeedEpisode> episodes, String key) {
+        return episodes.stream()
+                .map(FeedEpisode::getSeverityData)
+                .filter(sd -> sd.containsKey(key))
+                .map(sd -> (Double) sd.get(key))
+                .max(Double::compareTo);
     }
 }
