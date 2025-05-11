@@ -1,7 +1,7 @@
 package io.kontur.eventapi.firms.episodecomposition;
 
 import com.uber.h3core.H3Core;
-import com.uber.h3core.util.GeoCoord;
+import com.uber.h3core.util.LatLng;
 import io.kontur.eventapi.client.KonturApiClient;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
@@ -191,7 +191,7 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private Point calculateH3Centroid(Point geometry) {
-        GeoCoord geoCoord = h3.h3ToGeo(h3.geoToH3(geometry.getY(), geometry.getX(), 8));
+        LatLng geoCoord = h3.cellToLatLng(h3.latLngToCell(geometry.getY(), geometry.getX(), 8));
         return geometryFactory.createPoint(new Coordinate(geoCoord.lng, geoCoord.lat));
     }
 

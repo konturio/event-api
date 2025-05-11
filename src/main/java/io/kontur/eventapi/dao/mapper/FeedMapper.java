@@ -30,6 +30,7 @@ public interface FeedMapper {
                        @Param("location") String location,
                        @Param("urls") List<String> urls,
                        @Param("loss") Map<String, Object> loss,
+                       @Param("severityData") Map<String, Object> severityData,
                        @Param("observations") Set<UUID> observations,
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,

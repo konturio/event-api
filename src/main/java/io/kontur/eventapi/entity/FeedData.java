@@ -24,6 +24,7 @@ public class FeedData {
     private String location;
     private List<String> urls = new ArrayList<>();
     private Map<String, Object> loss = new HashMap<>();
+    private Map<String, Object> severityData = new HashMap<>();
     private Map<String, Object> eventDetails;
     private Set<UUID> observations = new HashSet<>();
     private FeatureCollection geometries;

@@ -3,6 +3,7 @@ package io.kontur.eventapi.gdacs.normalization;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.gdacs.converter.GdacsPropertiesConverter;
+import io.kontur.eventapi.gdacs.converter.GdacsSeverityConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -20,9 +21,11 @@ import static io.kontur.eventapi.gdacs.converter.GdacsDataLakeConverter.GDACS_AL
 public class GdacsGeometryNormalizer extends GdacsNormalizer {
 
     private final GdacsPropertiesConverter propertiesConverter;
+    private final GdacsSeverityConverter severityConverter;
 
-    public GdacsGeometryNormalizer(GdacsPropertiesConverter propertiesConverter) {
+    public GdacsGeometryNormalizer(GdacsPropertiesConverter propertiesConverter, GdacsSeverityConverter severityConverter) {
         this.propertiesConverter = propertiesConverter;
+        this.severityConverter = severityConverter;
     }
 
     @Override
@@ -60,6 +63,13 @@ public class GdacsGeometryNormalizer extends GdacsNormalizer {
         if (StringUtils.isNotBlank(url)) {
             normalizedObservation.setUrls(List.of(url));
         }
+
+        Map<String, Object> severityData = readMap(properties, "severitydata");
+        Double severity = readDouble(severityData, "severity");
+        String severityUnit = readString(severityData, "severityunit");
+        String severityText = readString(severityData, "severitytext");
+
+        normalizedObservation.setSeverityData(severityConverter.getSeverityData(severity, severityUnit, severityText, normalizedObservation.getType()));
 
         return normalizedObservation;
     }

@@ -43,7 +43,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
         FeedEpisode episode = createDefaultEpisode(alertObservation);
         episode.setObservations(findObservationsForEpisode(eventObservations));
         episode.setGeometries(geometryObservation.getGeometries());
-        if (!CollectionUtils.isEmpty(geometryObservation.getUrls())) {
+        if (CollectionUtils.isEmpty(episode.getUrls()) && !CollectionUtils.isEmpty(geometryObservation.getUrls())) {
             episode.addUrlIfNotExists(geometryObservation.getUrls());
         }
         if (isBlank(episode.getProperName())) {
@@ -52,6 +52,7 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
         if (isBlank(episode.getLocation())) {
             episode.setLocation(geometryObservation.getRegion());
         }
+        episode.setSeverityData(geometryObservation.getSeverityData());
         return List.of(episode);
     }
 

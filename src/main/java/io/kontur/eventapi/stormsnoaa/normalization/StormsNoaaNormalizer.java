@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
 import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 import static io.kontur.eventapi.util.GeometryUtil.*;
-import static io.kontur.eventapi.util.SeverityUtil.convertFujitaScale;
+import static io.kontur.eventapi.util.SeverityUtil.*;
+import static io.kontur.eventapi.util.SeverityUtil.WIND_SPEED_KPH;
 
 @Component
 public class StormsNoaaNormalizer extends Normalizer {
@@ -61,36 +62,49 @@ public class StormsNoaaNormalizer extends Normalizer {
     private static final Pattern zoneOffsetPattern = Pattern.compile("(-|\\+)?\\d+");
 
     private static final Map<String, EventType> EVENT_TYPES_MAPPER = Map.ofEntries(
-            Map.entry("Drought", EventType.DROUGHT),
+            Map.entry("Thunderstorm Wind", EventType.STORM),
+            Map.entry("Hail", EventType.STORM),
             Map.entry("Flash Flood", EventType.FLOOD),
-            Map.entry("Flood", EventType.FLOOD),
-            Map.entry("HAIL FLOODING", EventType.FLOOD),
-            Map.entry("Lakeshore Flood", EventType.FLOOD),
-            Map.entry("THUNDERSTORM WINDS/ FLOOD", EventType.FLOOD),
-            Map.entry("THUNDERSTORM WINDS/FLASH FLOOD", EventType.FLOOD),
-            Map.entry("THUNDERSTORM WINDS/FLOODING", EventType.FLOOD),
-            Map.entry("Coastal Flood", EventType.FLOOD),
-            Map.entry("Dust Storm", EventType.STORM),
+            Map.entry("High Wind", EventType.STORM),
             Map.entry("Tornado", EventType.TORNADO),
-            Map.entry("TORNADO/WATERSPOUT", EventType.TORNADO),
-            Map.entry("TORNADOES, TSTM WIND, HAIL", EventType.TORNADO),
-            Map.entry("Dust Devil", EventType.TORNADO),
-            Map.entry("Funnel Cloud", EventType.TORNADO),
-            Map.entry("Waterspout", EventType.TORNADO),
-            Map.entry("THUNDERSTORM WINDS FUNNEL CLOU", EventType.TORNADO),
-            Map.entry("Hurricane", EventType.CYCLONE),
-            Map.entry("Hurricane (Typhoon)", EventType.CYCLONE),
-            Map.entry("Marine Hurricane/Typhoon", EventType.CYCLONE),
-            Map.entry("Marine Tropical Storm", EventType.CYCLONE),
-            Map.entry("Tropical Storm", EventType.CYCLONE),
-            Map.entry("Marine Tropical Depression", EventType.CYCLONE),
-            Map.entry("Tropical Depression", EventType.CYCLONE),
-            Map.entry("Tsunami", EventType.TSUNAMI),
-            Map.entry("Volcanic Ash", EventType.VOLCANO),
-            Map.entry("Volcanic Ashfall", EventType.VOLCANO),
-            Map.entry("Wildfire", EventType.WILDFIRE),
             Map.entry("Winter Storm", EventType.WINTER_STORM),
-            Map.entry("Blizzard", EventType.WINTER_STORM));
+            Map.entry("Drought", EventType.DROUGHT),
+            Map.entry("Winter Weather", EventType.WINTER_STORM),
+            Map.entry("Heavy Snow", EventType.WINTER_STORM),
+            Map.entry("Flood", EventType.FLOOD),
+            Map.entry("Marine Thunderstorm Wind", EventType.STORM),
+            Map.entry("Heavy Rain", EventType.FLOOD),
+            Map.entry("Strong Wind", EventType.STORM),
+            Map.entry("Lightning", EventType.STORM),
+            Map.entry("Blizzard", EventType.WINTER_STORM),
+            Map.entry("Ice Storm", EventType.WINTER_STORM),
+            Map.entry("High Surf", EventType.FLOOD),
+            Map.entry("Funnel Cloud", EventType.TORNADO),
+            Map.entry("Wildfire", EventType.WILDFIRE),
+            Map.entry("Tropical Storm", EventType.CYCLONE),
+            Map.entry("Waterspout", EventType.TORNADO),
+            Map.entry("Coastal Flood", EventType.FLOOD),
+            Map.entry("Lake-Effect Snow", EventType.WINTER_STORM),
+            Map.entry("Hurricane (Typhoon)", EventType.CYCLONE),
+            Map.entry("Dust Storm", EventType.STORM),
+            Map.entry("Storm Surge/Tide", EventType.FLOOD),
+            Map.entry("Marine Hail", EventType.STORM),
+            Map.entry("Marine High Wind", EventType.STORM),
+            Map.entry("Sleet", EventType.WINTER_STORM),
+            Map.entry("Marine Tropical Storm", EventType.CYCLONE),
+            Map.entry("Tropical Depression", EventType.CYCLONE),
+            Map.entry("Freezing Fog", EventType.WINTER_STORM),
+            Map.entry("Hurricane", EventType.CYCLONE),
+            Map.entry("Lakeshore Flood", EventType.FLOOD),
+            Map.entry("Marine Strong Wind", EventType.STORM),
+            Map.entry("Dense Smoke", EventType.WILDFIRE),
+            Map.entry("Marine Hurricane/Typhoon", EventType.CYCLONE),
+            Map.entry("Volcanic Ashfall", EventType.VOLCANO),
+            Map.entry("Seiche", EventType.FLOOD),
+            Map.entry("Volcanic Ash", EventType.VOLCANO),
+            Map.entry("Sneakerwave", EventType.FLOOD),
+            Map.entry("Tsunami", EventType.TSUNAMI),
+            Map.entry("Marine Tropical Depression", EventType.CYCLONE));
 
     public StormsNoaaNormalizer(NormalizedObservationsDao normalizedObservationsDao) {
         this.normalizedObservationsDao = normalizedObservationsDao;
@@ -134,6 +148,8 @@ public class StormsNoaaNormalizer extends Normalizer {
         String zone = parseString(data, "CZ_NAME");
         String state = parseString(data, "STATE");
         normalizedObservation.setName(createName(eventType, zone, state, "USA"));
+
+        normalizedObservation.setSeverityData(getSeverityData(data, normalizedObservation.getType()));
 
         return normalizedObservation;
     }
@@ -180,6 +196,51 @@ public class StormsNoaaNormalizer extends Normalizer {
             LOG.warn("Couldn't parse cost from DAMAGE_PROPERTY: " + damageProperty);
             return null;
         }
+    }
+
+    private Map<String, Object> getSeverityData(Map<String, String> map, EventType type) {
+        Map<String, Object> severityData = new HashMap<>();
+        Double magnitude = parseDouble(map, "MAGNITUDE");
+        if (magnitude != null && magnitude > 0) {
+            String magnitudeType = parseString(map, "MAGNITUDE_TYPE");
+            if (magnitudeType == null) {
+                // Inches to mm
+                severityData.put(HAIL_SIZE_MM, magnitude * 25.4);
+            } else if ("ES".equals(magnitudeType) || "MS".equals(magnitudeType)) {
+                // Knots to km/h
+                double windSpeedKph = magnitude * 1.852;
+                severityData.put(WIND_SPEED_KPH, windSpeedKph);
+                if (EventType.CYCLONE == type) {
+                    severityData.put(CATEGORY_SAFFIR_SIMPSON, getCycloneCategory(windSpeedKph));
+                }
+            } else if ("EG".equals(magnitudeType) || "MG".equals(magnitudeType)
+                    || "E".equals(magnitudeType) || "M".equals(magnitudeType)) {
+                severityData.put(WIND_GUST_KPH, magnitude * 1.852);
+            } else {
+                LOG.warn("Unknown magnitude type from noaa: {}", magnitudeType);
+            }
+        }
+        String cause = parseString(map, "FLOOD_CAUSE");
+        if (cause != null) {
+            severityData.put(CAUSE, cause);
+        }
+        String fujitaScale = parseString(map, "TOR_F_SCALE");
+        if (fujitaScale != null) {
+            severityData.put(FUJITA_SCALE, fujitaScale);
+        }
+
+        Double tornadoLength = parseDouble(map, "TOR_LENGTH");
+        if (tornadoLength != null) {
+            // miles to km
+            severityData.put(TORNADO_LENGTH_KM, tornadoLength * 1.60934);
+        }
+
+        Double tornadoWidth = parseDouble(map, "TOR_WIDTH");
+        if (tornadoWidth != null) {
+            // yards to m
+            severityData.put(TORNADO_WIDTH_M, tornadoWidth * 0.9144);
+        }
+        return severityData;
     }
 
     private String parseString(Map<String, String> map, String key) {

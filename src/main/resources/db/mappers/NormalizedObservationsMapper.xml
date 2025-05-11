@@ -9,6 +9,7 @@
             description, episode_description, type, event_severity, active, loaded_at, started_at,
             ended_at, source_updated_at, region, urls, cost,
             <if test='loss != null'>loss,</if>
+            <if test='severityData != null'>severity_data,</if>
             <if test='point != null'>point,</if>
             <if test='geometries != null'>geometries,</if>
             auto_expire, recombined
@@ -18,6 +19,7 @@
             #{endedAt}, #{sourceUpdatedAt}, #{region}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
             #{cost},
             <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
+            <if test='severityData != null'>#{severityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
             <if test='point != null'>'SRID=4326;${point}'::geometry,</if>
             <if test='geometries != null'>#{geometries}::jsonb,</if>
             #{autoExpire}, #{recombined}
@@ -30,6 +32,7 @@
             source_updated_at = #{sourceUpdatedAt}, region = #{region},
             urls = #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, cost = #{cost},
             <if test='loss != null'>loss = #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
+            <if test='severityData != null'>severity_data = #{severityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
             <if test='point != null'>point = 'SRID=4326;${point}'::geometry,</if>
             <if test='geometries != null'>geometries = #{geometries}::jsonb,</if>
             auto_expire = #{autoExpire}, recombined = #{recombined}
@@ -132,6 +135,7 @@
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
         <result property="cost" column="cost"/>
         <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
+        <result property="severityData" column="severity_data" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="point" column="point"/>
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>
         <result property="autoExpire" column="auto_expire"/>

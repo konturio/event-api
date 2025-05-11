@@ -11,7 +11,7 @@ import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCAT
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static io.kontur.eventapi.util.GeometryUtil.convertGeometryToFeatureCollection;
 import static io.kontur.eventapi.util.GeometryUtil.readFeature;
-import static io.kontur.eventapi.util.SeverityUtil.calculateSeverity;
+import static io.kontur.eventapi.util.SeverityUtil.*;
 import static java.time.Duration.between;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -45,9 +45,21 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
         Double lat = readDouble(props, "InitialLatitude");
         observation.setPoint(makeWktPoint(lon, lat));
 
-        double areaSqKm2 = convertAcresToSqKm(readDouble(props, "CalculatedAcres"));
+        Double calculatedAcres = readDouble(props, "CalculatedAcres");
+        Double incidentSize = readDouble(props, "IncidentSize");
+        Double finalAcres = calculatedAcres == null ? incidentSize : calculatedAcres;
+        double areaSqKm2 = convertAcresToSqKm(finalAcres);
         long durationHours = between(observation.getStartedAt(), observation.getEndedAt()).toHours();
         observation.setEventSeverity(calculateSeverity(areaSqKm2, durationHours));
+
+        if (finalAcres != null) {
+            observation.getSeverityData().put(BURNED_AREA_KM2, areaSqKm2);
+        }
+
+        Double percentContained = readDouble(props, "PercentContained");
+        if (percentContained != null) {
+            observation.getSeverityData().put(CONTAINED_AREA_PCT, percentContained);
+        }
 
         return observation;
     }

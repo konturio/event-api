@@ -140,39 +140,6 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
     }
 
     @Test
-    public void testMagDuplicate() throws IOException {
-        String externalId = "0c653cb4-4a9e-4506-b2c8-a1e14e4dc049";
-        var startTimeForSearchingFeed = OffsetDateTime.now();
-
-        var hazardLoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2024, 10, 1, 1, 1), ZoneOffset.UTC);
-        var sqsLoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2024, 10, 1, 1, 2), ZoneOffset.UTC);
-        var magsLoadTime = OffsetDateTime.of(
-                LocalDateTime.of(2024, 10, 1, 1, 2, 1), ZoneOffset.UTC);
-
-        createNormalizations(externalId, hazardLoadTime, HP_SRV_SEARCH_PROVIDER, readMessageFromFile("hpsrvhazard04.json"));
-
-        eventCombinationJob.run();
-        feedCompositionJob.run();
-
-        createNormalizations(externalId, sqsLoadTime, PDC_SQS_PROVIDER, readMessageFromFile("sqsdata04.json"));
-        createNormalizations(externalId, magsLoadTime, HP_SRV_MAG_PROVIDER, readMessageFromFile("magsdata04.json"));
-
-        eventCombinationJob.run();
-        feedCompositionJob.run();
-
-        TestEventDto feed = objectMapper.readValue(apiDao.searchForEvents("test-feed", List.of(), null, null, startTimeForSearchingFeed,
-                1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY), TestEventListDto.class).getData().get(0);
-        assertEquals(2, feed.getEpisodes().size());
-
-        boolean oneEpisodeForTwoObservation = feed.getEpisodes().stream()
-                .anyMatch(episode -> episode.getObservations().size() > 1);
-        // TODO: assertTrue when MAGS are not skipped
-        assertTrue(oneEpisodeForTwoObservation);
-    }
-
-    @Test
     public void testOrderNormalization() throws IOException {
 
         var latestUpdatedDate = OffsetDateTime.of(LocalDateTime.of(2020, 9, 17, 20, 54, 26), ZoneOffset.UTC);

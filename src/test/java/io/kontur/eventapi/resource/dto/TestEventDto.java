@@ -34,13 +34,14 @@ public class TestEventDto implements Serializable {
 	private String location;
 	private List<String> urls = new ArrayList<>();
 	private Map<String, Object> loss = new HashMap<>();
+	private Map<String, Object> severityData = new HashMap<>();
 	private Map<String, Object> eventDetails;
 	private Set<UUID> observations = new HashSet<>();
 	private FeatureCollection geometries;
 	private List<TestEpisodeDto> episodes = new ArrayList<>();
 	private List<Double> bbox = new ArrayList<>();
 	private List<Double> centroid = new ArrayList<>();
-  private int episodeCount;
+	private int episodeCount;
 
 	@Serial
 	@SuppressWarnings("unchecked")
@@ -59,6 +60,7 @@ public class TestEventDto implements Serializable {
 		location = (String) in.readObject();
 		urls = (List<String>) in.readObject();
 		loss = (Map<String, Object>) in.readObject();
+		severityData = (Map<String, Object>) in.readObject();
 		eventDetails = (Map<String, Object>) in.readObject();
 		observations = (Set<UUID>) in.readObject();
 		Object geometriesObj = in.readObject();
@@ -84,6 +86,7 @@ public class TestEventDto implements Serializable {
 		out.writeObject(location);
 		out.writeObject(urls);
 		out.writeObject(loss);
+		out.writeObject(severityData);
 		out.writeObject(eventDetails);
 		out.writeObject(observations);
 		out.writeObject(geometries == null ? null : geometries.toString());

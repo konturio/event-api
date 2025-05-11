@@ -1,7 +1,7 @@
 package io.kontur.eventapi.firms.normalization;
 
 import com.uber.h3core.H3Core;
-import com.uber.h3core.util.GeoCoord;
+import com.uber.h3core.util.LatLng;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -73,13 +73,13 @@ public class FirmsNormalizer extends Normalizer {
     }
 
     private String createWktPolygon(Double longitude, Double latitude) {
-        long h3Index = h3.geoToH3(latitude, longitude, 8);
-        List<GeoCoord> h3Polygon = h3.h3ToGeoBoundary(h3Index);
+        long h3Index = h3.latLngToCell(latitude, longitude, 8);
+        List<LatLng> h3Polygon = h3.cellToBoundary(h3Index);
 
-        h3Polygon.add(h3Polygon.get(0));//wkt polygon must be closed
+        h3Polygon.add(h3Polygon.get(0)); // WKT polygon must be closed
 
         return h3Polygon.stream()
-                .map(geoCoord -> geoCoord.lng + " " + geoCoord.lat)
+                .map(latLng -> latLng.lng + " " + latLng.lat)
                 .collect(Collectors.joining(",", "POLYGON ((", "))"));
     }
 

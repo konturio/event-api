@@ -22,6 +22,8 @@ import java.util.Map;
 
 import static io.kontur.eventapi.calfire.converter.CalFireDataLakeConverter.CALFIRE_PROVIDER;
 import static io.kontur.eventapi.util.GeometryUtil.*;
+import static io.kontur.eventapi.util.SeverityUtil.BURNED_AREA_KM2;
+import static io.kontur.eventapi.util.SeverityUtil.CONTAINED_AREA_PCT;
 
 @Component
 public class CalFireNormalizer extends Normalizer {
@@ -76,22 +78,29 @@ public class CalFireNormalizer extends Normalizer {
             normalizedObservation.setEndedAt(dataLakeDto.getUpdatedAt());
             duration = Duration.between(normalizedObservation.getStartedAt(), OffsetDateTime.now());
         }
-        double acresBurned;
+        double burnedAreaKm2;
         try {
-            acresBurned = Double.parseDouble(readString(properties, "AcresBurned"));
+            burnedAreaKm2 = Double.parseDouble(readString(properties, "AcresBurned")) / ACRES_IN_SQ_KM;
+            normalizedObservation.getSeverityData().put(BURNED_AREA_KM2, burnedAreaKm2);
         } catch (Exception e) {
-            LOG.warn("Can't find burned acres value. Observation ID: {}", normalizedObservation.getObservationId());
-            acresBurned = 0d;
+            LOG.warn("Can't find burned acres value. Observation ID: {}, value: {}", normalizedObservation.getObservationId(), readString(properties, "AcresBurned"));
+            burnedAreaKm2 = 0d;
+        }
+
+        try {
+            normalizedObservation.getSeverityData().put(CONTAINED_AREA_PCT, Double.parseDouble(readString(properties, "PercentContained")));
+        } catch (Exception e) {
+            LOG.warn("Can't find contained area percent value. Observation ID: {}, value: {}", normalizedObservation.getObservationId(), readString(properties, "PercentContained"));
         }
 
         if (duration.compareTo(Duration.ofHours(24L)) < 0) {
             normalizedObservation.setEventSeverity(Severity.MINOR);
         } else {
-            if (acresBurned / ACRES_IN_SQ_KM < 10) {
+            if (burnedAreaKm2 < 10) {
                 normalizedObservation.setEventSeverity(Severity.MINOR);
-            } else if (acresBurned / ACRES_IN_SQ_KM < 50) {
+            } else if (burnedAreaKm2 < 50) {
                 normalizedObservation.setEventSeverity(Severity.MODERATE);
-            } else if (acresBurned / ACRES_IN_SQ_KM < 100) {
+            } else if (burnedAreaKm2 < 100) {
                 normalizedObservation.setEventSeverity(Severity.SEVERE);
             } else {
                 normalizedObservation.setEventSeverity(Severity.EXTREME);

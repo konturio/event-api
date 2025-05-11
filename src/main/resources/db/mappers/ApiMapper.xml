@@ -17,7 +17,7 @@
         with events as (
             select
                 fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.event_details, fd.observations, fd.geometries,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
@@ -83,6 +83,7 @@
                 'location', location,
                 'urls', urls,
                 'loss', loss,
+                'severityData', severity_data,
                 'eventDetails', event_details,
                 'observations', observations,
                 'geometries', geometries,
@@ -99,7 +100,7 @@
         with event as (
             select
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.event_details, fd.observations, fd.geometries,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
@@ -140,6 +141,7 @@
                 'location', location,
                 'urls', urls,
                 'loss', loss,
+                'severityData', severity_data,
                 'eventDetails', event_details,
                 'observations', observations,
                 'geometries', geometries,
@@ -218,6 +220,7 @@
                 episode -> 'location' as episode_location,
                 episode -> 'urls' as episode_urls,
                 episode -> 'loss' as episode_loss,
+                episode -> 'severityData' as "episode_severityData",
                 episode -> 'episodeDetails' as "episode_episodeDetails",
                 episode -> 'observations' as episode_observations,
                 feature -> 'properties' -> 'isObserved' as "feature_isObserved",

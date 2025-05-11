@@ -127,6 +127,7 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
         episode.addObservation(obs.getObservationId());
         episode.setProperName(obs.getProperName());
         episode.setLocation(obs.getRegion());
+        episode.setSeverityData(obs.getSeverityData());
         if (!CollectionUtils.isEmpty(obs.getUrls())) {
             episode.addUrlIfNotExists(obs.getUrls());
         }
