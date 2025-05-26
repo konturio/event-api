@@ -90,8 +90,9 @@
                 </choose>
                 box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
+            join feeds f on fd.feed_id = f.feed_id
             left join severities sv on fd.severity_id = sv.severity_id
-            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+            where f.alias = #{feedAlias}
                 and fd.is_latest_version and fd.enriched
                 <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
                     <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
@@ -175,9 +176,10 @@
                 </choose>
                 box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
+            join feeds f on fd.feed_id = f.feed_id
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.event_id = #{eventId}
-                and fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+                and f.alias = #{feedAlias}
                 <choose>
                     <when test="version != null">and fd.version = #{version}</when>
                     <otherwise>and fd.is_latest_version</otherwise>
@@ -227,8 +229,9 @@
                     <otherwise>fd.episodes</otherwise>
                 </choose>
             from feed_data fd
+            join feeds f on fd.feed_id = f.feed_id
             left join severities sv on fd.severity_id = sv.severity_id
-            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+            where f.alias = #{feedAlias}
                 and fd.is_latest_version and fd.enriched
                 <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
                     <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
