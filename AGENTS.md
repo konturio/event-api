@@ -33,6 +33,7 @@ SQL:
  - values in layers should be absolute as much as possible: store "birthday" or "construction date" instead of "age".
  - SQL files should to be idempotent: drop table if exists; add some comments to make people grasp quereies faster.
  - Format queries in a way so it's easy to copy them out of the codebase and debug standalone.
+ - Do not rewrite old migrations, not for style changes, not for logic changes, always create new migrations for any changes in DB
 
 Make:
  - Makefile: If you need intermediate result from other target, split it into two and depend on the intermediate result.
