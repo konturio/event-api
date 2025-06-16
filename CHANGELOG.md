@@ -3,6 +3,8 @@
 ## UNRELEASED
 
 #### Added
+- `merged_groups` table for storing merged event groups
+- background job `mergeRecalculationJob` for processing merge operations
 
 #### Changed
 

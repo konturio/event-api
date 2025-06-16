@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.MergedGroupsMapper">
+
+    <select id="findGroupIdByEvent" resultType="java.util.UUID">
+        select merge_group_id from merged_groups where event_id = #{eventId}
+    </select>
+
+    <select id="getMinPrimaryIdx" resultType="java.math.BigDecimal">
+        select min(primary_idx) from merged_groups where merge_group_id = #{mergeGroupId}
+    </select>
+
+    <select id="getGroup" resultMap="mergedGroupMap">
+        select merge_group_id, event_id, primary_idx
+        from merged_groups
+        where merge_group_id = #{mergeGroupId}
+        order by primary_idx
+    </select>
+
+    <insert id="insert">
+        insert into merged_groups(merge_group_id, event_id, primary_idx)
+        values(#{mergeGroupId}, #{eventId}, #{primaryIdx})
+        on conflict (event_id) do nothing
+    </insert>
+
+    <update id="updateGroupId">
+        update merged_groups set merge_group_id = #{toGroup} where merge_group_id = #{fromGroup}
+    </update>
+
+    <update id="updatePrimaryIdx">
+        update merged_groups set primary_idx = #{idx}
+        where merge_group_id = #{mergeGroupId} and event_id = #{eventId}
+    </update>
+
+    <resultMap id="mergedGroupMap" type="io.kontur.eventapi.entity.MergedGroup">
+        <result property="mergeGroupId" column="merge_group_id" />
+        <result property="eventId" column="event_id" />
+        <result property="primaryIdx" column="primary_idx" />
+    </resultMap>
+</mapper>

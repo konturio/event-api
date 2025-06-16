@@ -209,6 +209,10 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: PT3H
+  mergeRecalculation:
+    enable: false
+    initialDelay: 1000
+    fixedDelay: 10000
 
 
 feign:

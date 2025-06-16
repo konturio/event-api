@@ -60,6 +60,7 @@ public class WorkerScheduler {
     private final NhcCpImportJob nhcCpImportJob;
     private final NhcEpImportJob nhcEpImportJob;
     private final EventExpirationJob eventExpirationJob;
+    private final MergeRecalculationJob mergeRecalculationJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
     private String hpSrvImportEnabled;
@@ -113,6 +114,8 @@ public class WorkerScheduler {
     private String reEnrichmentEnabled;
     @Value("${scheduler.eventExpiration.enable}")
     private String eventExpirationEnabled;
+    @Value("${scheduler.mergeRecalculation.enable}")
+    private String mergeRecalculationEnabled;
 
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
@@ -127,7 +130,8 @@ public class WorkerScheduler {
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
-                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
+                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob,
+                           EventExpirationJob eventExpirationJob, MergeRecalculationJob mergeRecalculationJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -155,6 +159,7 @@ public class WorkerScheduler {
         this.reEnrichmentJob = reEnrichmentJob;
         this.humanitarianCrisisImportJob = humanitarianCrisisImportJob;
         this.eventExpirationJob = eventExpirationJob;
+        this.mergeRecalculationJob = mergeRecalculationJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -350,6 +355,14 @@ public class WorkerScheduler {
     public void startExpirationJob() {
         if (Boolean.parseBoolean(eventExpirationEnabled)) {
             eventExpirationJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.mergeRecalculation.initialDelay}",
+            fixedDelayString = "${scheduler.mergeRecalculation.fixedDelay}")
+    public void startMergeRecalculationJob() {
+        if (Boolean.parseBoolean(mergeRecalculationEnabled)) {
+            mergeRecalculationJob.run();
         }
     }
 }

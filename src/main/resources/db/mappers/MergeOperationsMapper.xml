@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.MergeOperationsMapper">
+
+    <select id="getPendingOperations" resultMap="mergeOperationMap">
+        select operation_id,
+               event_id_1,
+               event_id_2,
+               approved,
+               executed
+        from merge_operations
+        where approved is not null
+          and executed = false
+    </select>
+
+    <update id="markExecuted">
+        update merge_operations
+        set executed = true
+        where operation_id = #{operationId}
+    </update>
+
+    <resultMap id="mergeOperationMap" type="io.kontur.eventapi.entity.MergeOperation">
+        <result property="operationId" column="operation_id" />
+        <result property="eventId1" column="event_id_1" />
+        <result property="eventId2" column="event_id_2" />
+        <result property="approved" column="approved" />
+        <result property="executed" column="executed" />
+    </resultMap>
+</mapper>
