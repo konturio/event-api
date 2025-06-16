@@ -22,6 +22,9 @@ staticdata:
 humanitarianCrisis:
   s3Folder: 'kontur_events/PROD/'
 
+mergeDecisions:
+  s3Folder: 'merge_decisions/PROD/'
+
 aws:
   sqs:
     enabled: true

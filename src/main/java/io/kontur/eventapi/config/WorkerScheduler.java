@@ -26,6 +26,7 @@ import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
 import io.kontur.eventapi.uhc.job.HumanitarianCrisisImportJob;
+import io.kontur.eventapi.merge.job.MergeDecisionsImportJob;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,7 @@ public class WorkerScheduler {
     private final NifcImportJob nifcImportJob;
     private final InciWebImportJob inciWebImportJob;
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob;
+    private final MergeDecisionsImportJob mergeDecisionsImportJob;
     private final MetricsJob metricsJob;
     private final ReEnrichmentJob reEnrichmentJob;
     private final NhcAtImportJob nhcAtImportJob;
@@ -101,6 +103,8 @@ public class WorkerScheduler {
     private String inciwebEnabled;
     @Value("${scheduler.humanitarianCrisisImport.enable}")
     private String humanitarianCrisisEnabled;
+    @Value("${scheduler.mergeDecisionsImport.enable}")
+    private String mergeDecisionsEnabled;
     @Value("${scheduler.nhcAtImport.enable}")
     private String nhcAtEnabled;
     @Value("${scheduler.nhcCpImport.enable}")
@@ -126,6 +130,7 @@ public class WorkerScheduler {
                            PdcMapSrvSearchJobs pdcMapSrvSearchJobs,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
+                           MergeDecisionsImportJob mergeDecisionsImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
                            MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
@@ -148,6 +153,7 @@ public class WorkerScheduler {
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
         this.inciWebImportJob = inciWebImportJob;
+        this.mergeDecisionsImportJob = mergeDecisionsImportJob;
         this.nhcAtImportJob = nhcAtImportJob;
         this.nhcCpImportJob = nhcCpImportJob;
         this.nhcEpImportJob = nhcEpImportJob;
@@ -273,6 +279,14 @@ public class WorkerScheduler {
     public void startHumanitarianCrisisImport() {
         if (Boolean.parseBoolean(humanitarianCrisisEnabled)) {
             humanitarianCrisisImportJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.mergeDecisionsImport.initialDelay}",
+            fixedDelayString = "${scheduler.mergeDecisionsImport.fixedDelay}")
+    public void startMergeDecisionsImport() {
+        if (Boolean.parseBoolean(mergeDecisionsEnabled)) {
+            mergeDecisionsImportJob.run();
         }
     }
 

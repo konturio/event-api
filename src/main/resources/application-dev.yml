@@ -19,6 +19,9 @@ pdc:
 humanitarianCrisis:
   s3Folder: 'kontur_events/TEST DEV/'
 
+mergeDecisions:
+  s3Folder: 'merge_decisions/TEST DEV/'
+
 staticdata:
   s3Folder: 'TEST DEV/'
 

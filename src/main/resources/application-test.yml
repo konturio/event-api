@@ -22,6 +22,9 @@ staticdata:
 humanitarianCrisis:
   s3Folder: 'kontur_events/TEST QA/'
 
+mergeDecisions:
+  s3Folder: 'merge_decisions/TEST QA/'
+
 aws:
   sqs:
     enabled: true

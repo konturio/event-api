@@ -28,6 +28,7 @@ import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
 import io.kontur.eventapi.uhc.job.HumanitarianCrisisImportJob;
+import io.kontur.eventapi.merge.job.MergeDecisionsImportJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -64,6 +65,7 @@ class WorkerSchedulerTest {
     private final NifcImportJob nifcImportJob = mock(NifcImportJob.class);
     private final InciWebImportJob inciWebImportJob = mock(InciWebImportJob.class);
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob = mock(HumanitarianCrisisImportJob.class);
+    private final MergeDecisionsImportJob mergeDecisionsImportJob = mock(MergeDecisionsImportJob.class);
     private final NhcAtImportJob nhcAtImportJob = mock(NhcAtImportJob.class);
     private final NhcCpImportJob nhcCpImportJob = mock(NhcCpImportJob.class);
     private final NhcEpImportJob nhcEpImportJob = mock(NhcEpImportJob.class);
@@ -75,7 +77,8 @@ class WorkerSchedulerTest {
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
             historicalTornadoJapanMaImportJob, pdcMapSrvSearchJobs, enrichmentJob, calFireSearchJob,
-            nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, nhcAtImportJob, nhcCpImportJob, nhcEpImportJob,
+            nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, mergeDecisionsImportJob,
+            nhcAtImportJob, nhcCpImportJob, nhcEpImportJob,
             metricsJob, reEnrichmentJob, eventExpirationJob);
 
     @AfterEach
@@ -96,6 +99,7 @@ class WorkerSchedulerTest {
         Mockito.reset(pdcMapSrvSearchJobs);
         Mockito.reset(calFireSearchJob);
         Mockito.reset(inciWebImportJob);
+        Mockito.reset(mergeDecisionsImportJob);
         Mockito.reset(reEnrichmentJob);
         Mockito.reset(eventExpirationJob);
     }
@@ -338,5 +342,21 @@ class WorkerSchedulerTest {
         scheduler.startInciWebImport();
 
         verify(inciWebImportJob, never()).run();
+    }
+
+    @Test
+    public void startMergeDecisionsImportJob() {
+        ReflectionTestUtils.setField(scheduler, "mergeDecisionsEnabled", "true");
+        scheduler.startMergeDecisionsImport();
+
+        verify(mergeDecisionsImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipMergeDecisionsImportJob() {
+        ReflectionTestUtils.setField(scheduler, "mergeDecisionsEnabled", "false");
+        scheduler.startMergeDecisionsImport();
+
+        verify(mergeDecisionsImportJob, never()).run();
     }
 }

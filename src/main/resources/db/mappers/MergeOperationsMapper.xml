@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.MergeOperationsMapper">
+
+    <select id="getLastApprovedAt" resultType="java.time.OffsetDateTime">
+        SELECT max(approved_at) FROM merge_operations
+    </select>
+
+    <update id="updateMergeDecision">
+        UPDATE merge_operations
+        SET approved = #{approved},
+            decision_made_by = #{decisionMadeBy},
+            decision_made_at = #{decisionMadeAt},
+            executed = false
+        WHERE event_id_1 = #{eventId1} AND event_id_2 = #{eventId2}
+    </update>
+</mapper>

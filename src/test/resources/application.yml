@@ -29,6 +29,10 @@ humanitarianCrisis:
   s3Bucket: 'event-api-locker01'
   s3Folder: 'kontur_events/EXP/'
 
+mergeDecisions:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'merge_decisions/EXP/'
+
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
@@ -108,6 +112,10 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
   humanitarianCrisisImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  mergeDecisionsImport:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
