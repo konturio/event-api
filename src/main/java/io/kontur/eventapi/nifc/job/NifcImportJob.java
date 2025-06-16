@@ -77,6 +77,10 @@ public class NifcImportJob extends AbstractJob {
 
     private void processFeatureCollection(String geoJson, String provider, String updatedAtProp, String externalIdProp) {
         try {
+            if (StringUtils.isBlank(geoJson) || !geoJson.trim().startsWith("{\"type\"")) {
+                LOG.warn("Skip processing {} due to invalid response", provider);
+                return;
+            }
             FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(geoJson);
             Map<Tuple2<String, OffsetDateTime>, DataLake> dataLakes = new HashMap<>();
             Set<String> ids = Arrays.stream(fc.getFeatures())

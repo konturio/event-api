@@ -48,6 +48,18 @@ class NifcImportJobTest {
         verify(dataLakeDao, times(2)).storeDataLakes(any());
     }
 
+    @Test
+    void skipInvalidResponses() throws Exception {
+        when(nifcClient.getNifcLocations()).thenReturn("null");
+        when(nifcClient.getNifcPerimeters()).thenReturn("{\"error\":{}}");
+
+        nifcImportJob.execute();
+
+        verify(dataLakeDao, never()).getDataLakesByExternalIdsAndProvider(any(), any());
+        verify(nifcDataLakeConverter, never()).convertDataLake(any(), any(), any(), any());
+        verify(dataLakeDao, never()).storeDataLakes(any());
+    }
+
     private String readFile(String fileName) throws IOException {
         return IOUtils.toString(Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
     }
