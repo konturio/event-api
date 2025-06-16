@@ -6,7 +6,6 @@ import io.kontur.eventapi.entity.Severity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -32,7 +31,7 @@ public interface NormalizedObservationsMapper {
                @Param("sourceUpdatedAt") OffsetDateTime sourceUpdatedAt,
                @Param("region") String region,
                @Param("urls") List<String> urls,
-               @Param("cost") BigDecimal cost,
+               @Param("cost") Map<String, Object> cost,
                @Param("loss") Map<String, Object> loss,
                @Param("severityData") Map<String, Object> severityData,
                @Param("point") String point,

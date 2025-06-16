@@ -48,7 +48,7 @@ class CommonStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(dataLake.getProvider(), normalizedObservation.getProvider());
         assertFalse(normalizedObservation.getActive());
         assertEquals("Tornado - Stratford, Canada", normalizedObservation.getName());
-        assertEquals(BigDecimal.valueOf(100), normalizedObservation.getCost());
+        assertEquals(BigDecimal.valueOf(100), normalizedObservation.getCost().get("damage_property_cost"));
         assertEquals(Severity.MINOR, normalizedObservation.getEventSeverity());
         assertEquals("tornado", normalizedObservation.getDescription());
         assertEquals(EventType.TORNADO, normalizedObservation.getType());

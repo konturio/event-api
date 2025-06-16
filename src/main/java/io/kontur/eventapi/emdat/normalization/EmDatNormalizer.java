@@ -25,6 +25,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
@@ -85,13 +86,25 @@ public class EmDatNormalizer extends Normalizer {
         obs.setName(makeName(csvData));
         obs.setProperName(csvData.get("Event Name"));
         obs.setRegion(csvData.get("ISO") + " " + csvData.get("Location"));
-        if (!StringUtils.isEmpty(csvData.get("Total Damages ('000 US$)"))) {
-            try {
-                obs.setCost(new BigDecimal(csvData.get("Total Damages ('000 US$)")).multiply(BigDecimal.valueOf(1000)));
-            } catch (NumberFormatException e) {
-                LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
+
+        Map<String, Object> cost = new HashMap<>();
+        try {
+            String recon = csvData.get("Reconstruction Costs ('000 US$)");
+            if (!StringUtils.isEmpty(recon)) {
+                cost.put("reconstruction_cost", new BigDecimal(recon).multiply(BigDecimal.valueOf(1000)));
             }
+            String insured = csvData.get("Insured Damages ('000 US$)");
+            if (!StringUtils.isEmpty(insured)) {
+                cost.put("insured_damages_cost", new BigDecimal(insured).multiply(BigDecimal.valueOf(1000)));
+            }
+            String total = csvData.get("Total Damages ('000 US$)");
+            if (!StringUtils.isEmpty(total)) {
+                cost.put("total_damage_cost", new BigDecimal(total).multiply(BigDecimal.valueOf(1000)));
+            }
+        } catch (NumberFormatException e) {
+            LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
         }
+        obs.setCost(cost);
 
         Point point = null;
         if (!StringUtils.isEmpty(csvData.get("Latitude")) && !StringUtils.isEmpty(csvData.get("Longitude"))) {

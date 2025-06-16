@@ -58,7 +58,7 @@ class PdcSqsMessageNormalizerTest {
 
         assertNull(observation.getActive());
         assertTrue(observation.getUrls().isEmpty());
-        assertNull(observation.getCost());
+        assertTrue(observation.getCost().isEmpty());
         assertNull(observation.getRegion());
         assertNull(observation.getProperName());
         assertNull(observation.getNormalizedAt());
@@ -96,7 +96,7 @@ class PdcSqsMessageNormalizerTest {
 
         assertNull(observation.getActive());
         assertTrue(observation.getUrls().isEmpty());
-        assertNull(observation.getCost());
+        assertTrue(observation.getCost().isEmpty());
         assertNull(observation.getRegion());
         assertNull(observation.getProperName());
         assertNull(observation.getNormalizedAt());
@@ -134,7 +134,7 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(observation.getUrls(), List.of("snc url"));
         assertTrue(observation.getActive());
 
-        assertNull(observation.getCost());
+        assertTrue(observation.getCost().isEmpty());
         assertNull(observation.getRegion());
         assertNull(observation.getProperName());
         assertNull(observation.getNormalizedAt());

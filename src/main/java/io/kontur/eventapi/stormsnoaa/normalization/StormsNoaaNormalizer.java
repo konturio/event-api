@@ -131,7 +131,17 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setExternalEpisodeId(parseString(data, "EVENT_ID"));
         normalizedObservation.setDescription(parseString(data, "EPISODE_NARRATIVE"));
         normalizedObservation.setEpisodeDescription(parseString(data, "EVENT_NARRATIVE"));
-        normalizedObservation.setCost(getCost(parseString(data, "DAMAGE_PROPERTY")));
+
+        Map<String, Object> cost = new HashMap<>();
+        BigDecimal damageCrops = getCost(parseString(data, "DAMAGE_CROPS"));
+        if (damageCrops != null) {
+            cost.put("damage_crops_cost", damageCrops);
+        }
+        BigDecimal damageProperty = getCost(parseString(data, "DAMAGE_PROPERTY"));
+        if (damageProperty != null) {
+            cost.put("damage_property_cost", damageProperty);
+        }
+        normalizedObservation.setCost(cost);
         normalizedObservation.setEventSeverity(convertFujitaScale(parseString(data, "TOR_F_SCALE")));
 
         setGeometry(data, normalizedObservation);

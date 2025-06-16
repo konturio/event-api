@@ -125,8 +125,8 @@ public class EventExpirationJobIT extends AbstractCleanableIntegrationTest {
 		assertEquals(pastEvent ? pastDate : futureDate, observation.getEndedAt());
 		assertEquals(pastEvent ? pastDate : futureDate, observation.getSourceUpdatedAt());
 		assertEquals(region, observation.getRegion());
-		assertEquals(urls, observation.getUrls());
-		assertNull(observation.getCost());
+                assertEquals(urls, observation.getUrls());
+                assertTrue(observation.getCost().isEmpty());
 		assertEquals(loss, observation.getLoss().get(INFRASTRUCTURE_REPLACEMENT_VALUE));
 		assertEquals(autoExpire, observation.getAutoExpire());
 		assertEquals(1, observation.getGeometries().getFeatures().length);

@@ -47,7 +47,7 @@ class TornadoJapanMaNormalizerIT extends AbstractCleanableIntegrationTest {
         assertNull(normalizedObservation.getGeometries());
         assertNull(normalizedObservation.getDescription());
         assertNull(normalizedObservation.getEpisodeDescription());
-        assertNull(normalizedObservation.getCost());
+        assertTrue(normalizedObservation.getCost().isEmpty());
         assertNull(normalizedObservation.getRegion());
         assertNull(normalizedObservation.getSourceUpdatedAt());
         assertNull(normalizedObservation.getExternalEpisodeId());

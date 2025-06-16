@@ -4,6 +4,8 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
@@ -48,6 +50,14 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         Double lon = selectFirstNotNull(readDouble(props, "attr_InitialLongitude"), readDouble(props, "irwin_InitialLongitude"));
         Double lat = selectFirstNotNull(readDouble(props, "attr_InitialLatitude"), readDouble(props, "irwin_InitialLatitude"));
         observation.setPoint(makeWktPoint(lon, lat));
+
+        Map<String, Object> cost = new HashMap<>();
+        Double supCost = selectFirstNotNull(readDouble(props, "attr_EstimatedCostToDate"),
+                readDouble(props, "irwin_EstimatedCostToDate"));
+        if (supCost != null) {
+            cost.put("suppression_cost", BigDecimal.valueOf(supCost));
+        }
+        observation.setCost(cost);
 
         double areaSqKm2 = convertAcresToSqKm(readDouble(props, "poly_GISAcres"));
         long durationHours = between(observation.getStartedAt(), observation.getEndedAt()).toHours();

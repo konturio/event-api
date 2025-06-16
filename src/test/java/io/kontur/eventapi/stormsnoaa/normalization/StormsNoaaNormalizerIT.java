@@ -50,7 +50,7 @@ class StormsNoaaNormalizerIT extends AbstractCleanableIntegrationTest {
         assertNull(normalizedObservation.getExternalEventId());
         assertNull(normalizedObservation.getEpisodeDescription());
         assertNull(normalizedObservation.getDescription());
-        assertEquals(BigDecimal.valueOf(250000), normalizedObservation.getCost());
+        assertEquals(BigDecimal.valueOf(250000), normalizedObservation.getCost().get("damage_property_cost"));
         assertEquals(OffsetDateTime.parse("1950-04-28T13:20:00Z"), normalizedObservation.getStartedAt());
         assertEquals(OffsetDateTime.parse("1950-04-29T14:45:00Z"), normalizedObservation.getEndedAt());
         assertEquals(Severity.SEVERE, normalizedObservation.getEventSeverity());

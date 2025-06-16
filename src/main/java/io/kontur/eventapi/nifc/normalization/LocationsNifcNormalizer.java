@@ -5,6 +5,8 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCATIONS_PROVIDER;
@@ -44,6 +46,13 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
         Double lon = readDouble(props, "InitialLongitude");
         Double lat = readDouble(props, "InitialLatitude");
         observation.setPoint(makeWktPoint(lon, lat));
+
+        Map<String, Object> cost = new HashMap<>();
+        Double supCost = readDouble(props, "EstimatedCostToDate");
+        if (supCost != null) {
+            cost.put("suppression_cost", BigDecimal.valueOf(supCost));
+        }
+        observation.setCost(cost);
 
         Double calculatedAcres = readDouble(props, "CalculatedAcres");
         Double incidentSize = readDouble(props, "IncidentSize");

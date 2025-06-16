@@ -42,7 +42,7 @@ class PdcMapSrvNormalizerTest {
         assertNull(observation.getEpisodeDescription());
         assertEquals(EventType.CYCLONE, observation.getType());
         assertNull(observation.getActive());
-        assertNull(observation.getCost());
+        assertTrue(observation.getCost().isEmpty());
         assertNull(observation.getRegion());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertNull(observation.getStartedAt());
