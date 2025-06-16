@@ -96,23 +96,24 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setUpdatedAt(firstNonNull(episode.getUpdatedAt(), calculateUpdatedDate(episodeObservations)));
         episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
 
-        if (episode.getSeverity() == null || episode.getName() == null) {
-            Set<NormalizedObservation> observationsUpToCurrentEpisode = eventObservations
-                    .stream()
-                    .filter(ob -> ob.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt())
-                            || ob.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
-                    .collect(toSet());
-            long burningTime = observationsUpToCurrentEpisode.stream()
-                    .map(NormalizedObservation::getStartedAt)
-                    .min(OffsetDateTime::compareTo)
-                    .get()
-                    .until(episode.getEndedAt(), ChronoUnit.HOURS);
-            Double area = calculateBurntAreaUpToCurrentEpisode(observation, observationsUpToCurrentEpisode);
-            String areaName = getBurntAreaName(episodeObservations);
-            episode.setLocation(areaName);
-            episode.setSeverity(calculateSeverity(area, burningTime));
-            episode.setName(calculateName(areaName, area, burningTime));
-        }
+        Set<NormalizedObservation> observationsUpToCurrentEpisode = eventObservations
+                .stream()
+                .filter(ob -> ob.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt())
+                        || ob.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
+                .collect(toSet());
+
+        long burningTime = observationsUpToCurrentEpisode.stream()
+                .map(NormalizedObservation::getStartedAt)
+                .min(OffsetDateTime::compareTo)
+                .get()
+                .until(episode.getEndedAt(), ChronoUnit.HOURS);
+
+        Double area = calculateBurntAreaUpToCurrentEpisode(observation, observationsUpToCurrentEpisode);
+        String areaName = getBurntAreaName(episodeObservations);
+
+        episode.setLocation(areaName);
+        episode.setSeverity(calculateSeverity(area, burningTime));
+        episode.setName(calculateName(areaName, area, burningTime));
 
     }
 
