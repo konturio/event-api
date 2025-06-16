@@ -6,16 +6,16 @@
 
     <insert id="markAsActual" >
         INSERT INTO feed_event_status (feed_id, event_id, actual)
-        VALUES (#{feedId}, #{eventId}, #{actual})
-        ON CONFLICT (feed_id, event_id) DO UPDATE SET actual = #{actual}
+        values (#{feedId}, #{eventId}, #{actual})
+        on CONFLICT (feed_id, event_id) DO UPDATE set actual = #{actual}
     </insert>
 
     <insert id="markAsNonActual" >
         INSERT INTO feed_event_status (feed_id, event_id, actual)
-        select feed_id, #{eventId}, false
+        SELECT feed_id, #{eventId}, false
         from feeds
         where providers &amp;&amp; array[#{provider}::text]
-        ON CONFLICT (feed_id, event_id) DO UPDATE SET actual = false
+        on CONFLICT (feed_id, event_id) DO UPDATE set actual = false
     </insert>
 
 </mapper>

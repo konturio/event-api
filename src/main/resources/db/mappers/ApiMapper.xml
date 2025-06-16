@@ -3,25 +3,25 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.ApiMapper">
 
     <select id="getFeeds" resultMap="feedDtoMap">
-        select alias, name, description
+        SELECT alias, name, description
         from feeds
     </select>
 
     <select id="findDataByObservationId" resultType="java.lang.String">
         SELECT data
-        FROM data_lake
-        WHERE observation_id = #{observationId}
+        from data_lake
+        where observation_id = #{observationId}
     </select>
 
     <select id="searchForEvents" resultType="java.lang.String">
         with events as (
-            select
+            SELECT
                 fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
                 fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
+                        jsonb_build_array((SELECT episode from jsonb_array_elements(fd.episodes) episode
                                            order by (episode ->> 'updatedAt')::timestamptz desc
                                            limit 1)) as episodes,
                     </when>
@@ -33,7 +33,7 @@
                 box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
-            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+            where fd.feed_id = ( SELECT feed_id from feeds where alias = #{feedAlias} )
                 and fd.is_latest_version and fd.enriched
                 <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
                     <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
@@ -41,10 +41,10 @@
                     </foreach>
                 </if>
                 <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (SELECT min(severity_id) from severities where severity in (" close="))">
                         #{severity}::text
                     </foreach>
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (SELECT max(severity_id) from severities where severity in (" close="))">
                         #{severity}::text
                     </foreach>
                 </if>
@@ -60,9 +60,9 @@
             order by fd.updated_at ${sortOrder}
             limit #{limit}
         )
-        select case when count(*) > 0 then json_build_object(
+        SELECT case when count(*) > 0 then json_build_object(
             'pageMetadata', json_build_object('nextAfterValue',
-                (select
+                (SELECT
                     <choose>
                         <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
                         <otherwise>max(e.updated_at)</otherwise>
@@ -98,14 +98,14 @@
 
     <select id="getEventByEventIdAndByVersionOrLast" resultType="java.lang.String">
         with event as (
-            select
+            SELECT
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
                 fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((
-                        select episode from jsonb_array_elements(fd.episodes) episode
+                        SELECT episode from jsonb_array_elements(fd.episodes) episode
                         order by (episode ->> 'updatedAt')::timestamptz desc
                         limit 1
                         )) as episodes,
@@ -119,13 +119,13 @@
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.event_id = #{eventId}
-                and fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+                and fd.feed_id = ( SELECT feed_id from feeds where alias = #{feedAlias} )
                 <choose>
                     <when test="version != null">and fd.version = #{version}</when>
                     <otherwise>and fd.is_latest_version</otherwise>
                 </choose>
         )
-        select
+        SELECT
             json_build_object(
                 'eventId', event_id,
                 'version', version,
@@ -155,11 +155,11 @@
 
     <select id="searchForEventsGeoJson" resultType="java.lang.String">
         with events as (
-            select
+            SELECT
                 fd.event_id, fd.updated_at,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
+                        jsonb_build_array((SELECT episode from jsonb_array_elements(fd.episodes) episode
                                            order by (episode ->> 'updatedAt')::timestamptz desc
                                            limit 1)) as episodes
                     </when>
@@ -170,7 +170,7 @@
                 </choose>
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
-            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+            where fd.feed_id = ( SELECT feed_id from feeds where alias = #{feedAlias} )
                 and fd.is_latest_version and fd.enriched
                 <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
                     <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
@@ -178,10 +178,10 @@
                     </foreach>
                 </if>
                 <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (SELECT min(severity_id) from severities where severity in (" close="))">
                         #{severity}::text
                     </foreach>
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
+                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (SELECT max(severity_id) from severities where severity in (" close="))">
                         #{severity}::text
                     </foreach>
                 </if>
@@ -198,15 +198,15 @@
             limit #{limit}
         ),
         episodes as (
-            select event_id, jsonb_array_elements(episodes) episode
+            SELECT event_id, jsonb_array_elements(episodes) episode
             from events
         ),
         features as (
-            select event_id, episode, jsonb_array_elements(episode -> 'geometries' -> 'features') feature
+            SELECT event_id, episode, jsonb_array_elements(episode -> 'geometries' -> 'features') feature
             from episodes
         ),
         props as (
-            select
+            SELECT
                 event_id as "eventId",
                 episode -> 'name' as episode_name,
                 episode -> 'properName' as "episode_properName",
@@ -231,11 +231,11 @@
                 ST_GeomFromGeoJSON(feature -> 'geometry') as geom
             from features
         )
-        select
+        SELECT
             case when count(*) > 0 then json_build_object(
                 'type', 'FeatureCollection',
                 'pageMetadata', json_build_object('nextAfterValue',
-                    (select
+                    (SELECT
                         <choose>
                             <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
                             <otherwise>max(e.updated_at)</otherwise>

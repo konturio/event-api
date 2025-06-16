@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.kontur.eventapi.dao.mapper.NormalizedObservationsMapper">
-    <insert id="insert">
+    <insert id="INSERT">
         INSERT INTO normalized_observations (
             observation_id, external_event_id, external_episode_id, provider, origin, name, proper_name,
             description, episode_description, type, event_severity, active, loaded_at, started_at,
@@ -13,7 +13,7 @@
             <if test='point != null'>point,</if>
             <if test='geometries != null'>geometries,</if>
             auto_expire, recombined
-        ) VALUES (
+        ) values (
             #{observationId}, #{externalEventId}, #{externalEpisodeId}, #{provider}, #{origin}, #{name}, #{properName},
             #{description}, #{episodeDescription}, #{type}, #{eventSeverity}, #{active}, #{loadedAt}, #{startedAt},
             #{endedAt}, #{sourceUpdatedAt}, #{region}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
@@ -24,7 +24,7 @@
             <if test='geometries != null'>#{geometries}::jsonb,</if>
             #{autoExpire}, #{recombined}
         )
-        on conflict (observation_id) do update
+        on conflict (observation_id) do UPDATE
         set external_event_id = #{externalEventId}, external_episode_id = #{externalEpisodeId}, provider = #{provider},
             origin = #{origin}, name = #{name}, proper_name = #{properName}, description = #{description},
             episode_description = #{episodeDescription}, type = #{type}, event_severity = #{eventSeverity},
@@ -39,42 +39,42 @@
     </insert>
 
     <insert id="markAsRecombined">
-        UPDATE normalized_observations SET recombined = 'true' WHERE observation_id = #{observationId}
+        UPDATE normalized_observations set recombined = 'true' where observation_id = #{observationId}
     </insert>
 
     <select id="getObservationsNotLinkedToEvent" resultMap="normalizedObservationsDtoMap">
         SELECT *
-        FROM normalized_observations
-        WHERE recombined is false
+        from normalized_observations
+        where recombined is false
         <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
             #{provider}
         </foreach>
-        ORDER BY loaded_at
-        LIMIT 100000
+        order by loaded_at
+        limit 100000
     </select>
 
     <select id="getFirmsObservationsNotLinkedToEventFor24Hours" resultMap="normalizedObservationsDtoMap">
-        WITH obs AS (
+        WITH obs as (
             SELECT min(source_updated_at) as min_sua
-            FROM normalized_observations
-            WHERE recombined IS FALSE
+            from normalized_observations
+            where recombined IS FALSE
                 and provider in ('firms.modis-c6', 'firms.suomi-npp-viirs-c2', 'firms.noaa-20-viirs-c2')
         )
-        SELECT * FROM normalized_observations
-        WHERE recombined IS FALSE
+        SELECT * from normalized_observations
+        where recombined IS FALSE
             and provider in ('firms.modis-c6', 'firms.suomi-npp-viirs-c2', 'firms.noaa-20-viirs-c2')
-            and source_updated_at between (select min_sua from obs) - interval '1s' and (select min_sua from obs) + interval '24 hours'
-        ORDER BY source_updated_at
-        LIMIT 30000
+            and source_updated_at between (SELECT min_sua from obs) - interval '1s' and (SELECT min_sua from obs) + interval '24 hours'
+        order by source_updated_at
+        limit 30000
     </select>
 
     <select id="clusterObservationsByGeography" resultType="java.util.Set">
-        select array_agg(observation_id)::uuid[] from (
+        SELECT array_agg(observation_id)::uuid[] from (
             SELECT
                 ST_ClusterDBSCAN(ST_Transform(collected_geography::geometry, 54032), 2000, 1) over() as cid,
                 observation_id
-            FROM normalized_observations
-            <foreach item="observationId" collection="observationIds" separator="," open="WHERE observation_id in (" close=")">
+            from normalized_observations
+            <foreach item="observationId" collection="observationIds" separator="," open="where observation_id in (" close=")">
                   #{observationId}
             </foreach>
         ) as clusters
@@ -83,13 +83,13 @@
 
     <select id="getObservationsByEventId" resultMap="normalizedObservationsDtoMap">
         SELECT *
-        FROM normalized_observations
-        WHERE observation_id IN (SELECT observation_id FROM kontur_events WHERE event_id = #{eventId});
+        from normalized_observations
+        where observation_id IN (SELECT observation_id from kontur_events where event_id = #{eventId});
     </select>
 
     <select id="getObservations" resultMap="normalizedObservationsDtoMap">
         SELECT *
-        FROM normalized_observations
+        from normalized_observations
         <foreach item="obsId" collection="observationIds" separator="," open="where observation_id in (" close=")">
             #{obsId}
         </foreach>
@@ -97,13 +97,13 @@
 
     <select id="getDuplicateObservation" resultMap="normalizedObservationsDtoMap">
         SELECT *
-        FROM normalized_observations
-        WHERE external_episode_id = #{externalEpisodeId}
-          AND loaded_at &lt;= #{loadedAt}
-          AND observation_id != #{observationId}
-          AND provider = #{provider}
-        ORDER BY loaded_at DESC
-        LIMIT 1
+        from normalized_observations
+        where external_episode_id = #{externalEpisodeId}
+          and loaded_at &lt;= #{loadedAt}
+          and observation_id != #{observationId}
+          and provider = #{provider}
+        order by loaded_at DESC
+        limit 1
     </select>
 
     <select id="getTimestampAtTimezone" resultType="java.time.OffsetDateTime">
@@ -111,7 +111,7 @@
     </select>
 
     <select id="getNotRecombinedObservationsCount" resultType="java.lang.Integer">
-        select count(*) from normalized_observations where not recombined;
+        SELECT count(*) from normalized_observations where not recombined;
     </select>
 
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">

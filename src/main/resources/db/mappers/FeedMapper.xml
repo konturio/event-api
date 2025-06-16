@@ -5,24 +5,24 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.FeedMapper">
 
     <select id="getFeeds" resultMap="feedDtoMap">
-        select *
+        SELECT *
         from feeds
     </select>
 
     <select id="getFeedsByAliases" resultMap="feedDtoMap">
-        select *
+        SELECT *
         from feeds
         where (#{aliases, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})::text[] @> ('{}'::text[] || alias)
     </select>
 
     <insert id="insertFeedData" useGeneratedKeys="false">
-        insert into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id,
+        INSERT into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id,
                                active, started_at, ended_at, updated_at, location, urls,
                                <if test='loss != null'>loss,</if>
                                <if test='severityData != null'>severity_data,</if>
                                observations, geometries, episodes, enriched, auto_expire)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{type},
-                (select severity_id from severities where severity = #{severity}),
+                (SELECT severity_id from severities where severity = #{severity}),
                 #{active}, #{startedAt}, #{endedAt}, #{updatedAt}, #{location},
                 #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
                 <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
@@ -41,7 +41,7 @@
 
     <update id="markOutdatedEventsVersions">
         <![CDATA[
-            update feed_data set is_latest_version = false
+            UPDATE feed_data set is_latest_version = false
             where event_id = #{eventId}
                 and feed_id = #{feedId}
                 and version < #{version}
@@ -50,14 +50,14 @@
     </update>
 
     <select id="getLastFeedDataVersion" resultType="java.lang.Long">
-        select max(version)
+        SELECT max(version)
         from feed_data
         where event_id = #{eventId}
             and feed_id = #{feedId}
     </select>
 
     <select id="getNotEnrichedEventsForFeed" resultMap="feedDataDtoMap">
-        select event_id, feed_id, version, updated_at, name,
+        SELECT event_id, feed_id, version, updated_at, name,
                enriched, enrichment_attempts, event_details, geometries, episodes, enrichment_skipped
         from feed_data
         where feed_id = #{feedId} and not enriched
@@ -66,7 +66,7 @@
     </select>
 
     <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
-        select event_id, feed_id, version, updated_at, name,
+        SELECT event_id, feed_id, version, updated_at, name,
                enriched, enrichment_attempts, event_details, geometries, episodes, enrichment_skipped
         from feed_data
         where feed_id = #{feedId}
@@ -78,15 +78,15 @@
     </select>
 
     <select id="getNotEnrichedEventsCount" resultType="java.lang.Integer">
-        select count(*) from feed_data where not enriched;
+        SELECT count(*) from feed_data where not enriched;
     </select>
 
     <select id="getEnrichmentSkippedEventsCount" resultType="java.lang.Integer">
-        select count(*) from feed_data where enrichment_skipped;
+        SELECT count(*) from feed_data where enrichment_skipped;
     </select>
 
     <update id="addAnalytics">
-        update feed_data
+        UPDATE feed_data
         set
             <if test='eventDetails != null'>
                 event_details = #{eventDetails,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
@@ -101,18 +101,18 @@
     </update>
 
     <insert id="createFeed">
-        insert into feeds (feed_id, alias, name, providers)
+        INSERT into feeds (feed_id, alias, name, providers)
         values (#{feedId}, #{alias}, #{name}, #{providers, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler})
     </insert>
 
     <update id="autoExpireEvents">
-        update feed_data
+        UPDATE feed_data
         set active = false
         where active and auto_expire and ended_at + interval '24 hour' &lt; now()
     </update>
 
     <select id="getFeedDataByFeedIdAndEventId" resultMap="feedDataDtoMap">
-        select fd.*, sv.severity
+        SELECT fd.*, sv.severity
         from feed_data fd
         left join severities sv on fd.severity_id = sv.severity_id
         where feed_id = #{feedId} and event_id = #{eventId} and is_latest_version
