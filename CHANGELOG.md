@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 #### Added
+- JTWC cyclones feed composition documentation
 
 #### Changed
 
