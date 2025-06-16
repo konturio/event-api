@@ -24,7 +24,7 @@ Same as the root `/v1/` endpoint but returns results as GeoJSON `FeatureCollecti
 Additional optional parameter `access_token` can be passed for geojson visualisation services.
 
 ## `GET /v1/observations/{observationId}`
-Return raw observation data by its UUID. Content type is JSON or XML depending on the stored data.
+Return raw observation data by its UUID. Content type can be JSON, XML, CSV, or another one depending on the source.
 
 Requires `read:raw-data` permission.
 
