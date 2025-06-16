@@ -5,6 +5,7 @@
 #### Added
 
 #### Changed
+ - Sorted `observations` arrays in `feed_data` table and inside episodes
 
 #### Removed
 

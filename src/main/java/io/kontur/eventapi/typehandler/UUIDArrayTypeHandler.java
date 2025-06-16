@@ -11,7 +11,11 @@ public class UUIDArrayTypeHandler extends BaseTypeHandler<Set<UUID>> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Set<UUID> parameter,
                                     JdbcType jdbcType) throws SQLException {
-        Array array = ps.getConnection().createArrayOf("uuid", parameter.toArray());
+        List<UUID> sorted = parameter.stream()
+                .filter(Objects::nonNull)
+                .sorted()
+                .toList();
+        Array array = ps.getConnection().createArrayOf("uuid", sorted.toArray());
         ps.setArray(i, array);
     }
 
@@ -34,7 +38,14 @@ public class UUIDArrayTypeHandler extends BaseTypeHandler<Set<UUID>> {
         if (pgArray == null) return Collections.emptySet();
 
         UUID[] uuids = (UUID[]) pgArray.getArray();
-        return containsOnlyNulls(uuids) ? Collections.emptySet() : new HashSet<>(List.of(uuids));
+        if (containsOnlyNulls(uuids)) {
+            return Collections.emptySet();
+        }
+        List<UUID> sorted = Arrays.stream(uuids)
+                .filter(Objects::nonNull)
+                .sorted()
+                .toList();
+        return new LinkedHashSet<>(sorted);
     }
 
     private boolean containsOnlyNulls(UUID[] uuids) {
