@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>JTWC TROPICAL CYCLONE INFORMATION FEED</title>
+    <item>
+      <title>Current Central/Eastern Pacific Tropical Systems</title>
+      <description><![CDATA[<ul><li><a href='https://www.metoc.navy.mil/jtwc/products/ep0425web.txt'>TC Warning Text </a></li></ul>]]></description>
+      <pubDate>Mon, 16 Jun 25 12:52:02 +0000</pubDate>
+    </item>
+    <item>
+      <title>Current Northwest Pacific/North Indian Ocean* Tropical Systems</title>
+      <description><![CDATA[<ul><li><font color='red'>No Current Tropical Cyclone Warnings.</font></li></ul>]]></description>
+      <pubDate>Mon, 16 Jun 25 12:52:02 +0000</pubDate>
+    </item>
+  </channel>
+</rss>

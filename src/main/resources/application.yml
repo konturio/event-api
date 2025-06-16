@@ -91,6 +91,9 @@ inciweb:
 nhc:
   host: 'https://www.nhc.noaa.gov'
 
+jtwc:
+  host: 'https://www.metoc.navy.mil'
+
 firms:
   host: 'https://firms.modaps.eosdis.nasa.gov/data/active_fire'
   modis: '/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv'
@@ -168,6 +171,10 @@ scheduler:
     fixedDelay: 1800000
   nhcEpImport:
     enable: true
+    initialDelay: 1000
+    fixedDelay: 1800000
+  jtwcImport:
+    enable: false
     initialDelay: 1000
     fixedDelay: 1800000
   normalization:

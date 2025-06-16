@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 #### Added
+ - JTWC cyclones import job (disabled by default)
 
 #### Changed
 
