@@ -40,7 +40,7 @@ Make:
  - trivial oneliner SQLs are okay to keep in Makefile.
 
 Pull requests:
- - Use Conventional Commits convention when formatting the pull request and commits, e.g. `type(scope): TICKETNUMBER title ...`. Skip ticket number if not provided.
- - Branch names should match branch name recorded by Fibery if provided (e.g. "21648-switch-page-after-login-to-map").
- - Reference Fibery ticket in the PR description and headline.
+ - Use Conventional Commits convention when formatting the pull request and commits, e.g. `type(scope): TICKETNUMBER title ...`. Skip ticket number if not provided. Field: Public Id.
+ - Branch names should match branch name recorded by Fibery if provided (e.g. "21648-switch-page-after-login-to-map"). Field: Branch Name.
+ - Reference Fibery task in the PR description. Field: Task URL.
  - Github Actions is used as CI. Update it as necessary.
