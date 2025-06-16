@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -110,12 +112,19 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
+            EpisodeFilterType episodeFilterType,
+            @RequestHeader(value = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            OffsetDateTime ifModifiedSince) {
+        OffsetDateTime effectiveAfter = updatedAfter != null ? updatedAfter : ifModifiedSince;
         Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                effectiveAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         if (dataOpt.isEmpty()) {
+            if (effectiveAfter != null) {
+                return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            }
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(dataOpt.get());
@@ -198,12 +207,19 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
-            EpisodeFilterType episodeFilterType) {
+            EpisodeFilterType episodeFilterType,
+            @RequestHeader(value = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            OffsetDateTime ifModifiedSince) {
+        OffsetDateTime effectiveAfter = updatedAfter != null ? updatedAfter : ifModifiedSince;
         Optional<String> geoJsonOpt = eventResourceService.searchEventsGeoJson(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                effectiveAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         if (geoJsonOpt.isEmpty()) {
+            if (effectiveAfter != null) {
+                return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            }
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(geoJsonOpt.get());
