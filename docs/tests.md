@@ -14,8 +14,8 @@ The default configuration sets it to `true`, so no extra flags are needed for lo
 ### Networking through a proxy
 
 Maven and the Java runtime read standard `HTTP_PROXY` and `HTTPS_PROXY`
-environment variables. The project ships a `.mvn` directory that configures
-Maven to forward those settings automatically. If your network requires a
+environment variables. The repository provides `.mvn/jvm.config` so Maven
+automatically enables system proxy settings. If your network requires a
 proxy, export the variables before running the build:
 
 ```bash

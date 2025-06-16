@@ -395,7 +395,6 @@
           <tarLongFileMode>posix</tarLongFileMode>
         </configuration>
       </plugin>
-      <!-- Gitlab CI -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
