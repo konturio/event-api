@@ -30,7 +30,16 @@
                     </when>
                     <otherwise>fd.episodes,</otherwise>
                 </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
+                (case
+                    when ST_Distance(ST_Centroid(st_envelope(fd.collected_geometry)),
+                                     ST_Centroid(fd.collected_geometry::geography)::geometry) >
+                         ST_Distance(ST_Centroid(st_envelope(ST_ShiftLongitude(fd.collected_geometry))),
+                                     ST_Union(ST_Centroid(fd.collected_geometry::geography)::geometry,
+                                              ST_ShiftLongitude(ST_Centroid(fd.collected_geometry::geography)::geometry)))
+                    then box2d(ST_ShiftLongitude(fd.collected_geometry))
+                    else box2d(fd.collected_geometry)
+                end) as bbox,
+                st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
@@ -115,7 +124,16 @@
                     </when>
                     <otherwise>fd.episodes,</otherwise>
                 </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
+                (case
+                    when ST_Distance(ST_Centroid(st_envelope(fd.collected_geometry)),
+                                     ST_Centroid(fd.collected_geometry::geography)::geometry) >
+                         ST_Distance(ST_Centroid(st_envelope(ST_ShiftLongitude(fd.collected_geometry))),
+                                     ST_Union(ST_Centroid(fd.collected_geometry::geography)::geometry,
+                                              ST_ShiftLongitude(ST_Centroid(fd.collected_geometry::geography)::geometry)))
+                    then box2d(ST_ShiftLongitude(fd.collected_geometry))
+                    else box2d(fd.collected_geometry)
+                end) as bbox,
+                st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.event_id = #{eventId}
