@@ -66,7 +66,7 @@ public class NifcImportJob extends AbstractJob {
         try {
             String data = client.getNifcPerimeters();
             try {
-                processFeatureCollection(data, NIFC_PERIMETERS_PROVIDER, "attr_ModifiedOnDateTime_dt", "attr_UniqueFireIdentifier");
+                processFeatureCollection(data, NIFC_PERIMETERS_PROVIDER, "irwin_ModifiedOnDateTime_dt", "irwin_UniqueFireIdentifier");
             } catch (Exception e) {
                 LOG.error("Failed to process NIFC perimeters");
             }

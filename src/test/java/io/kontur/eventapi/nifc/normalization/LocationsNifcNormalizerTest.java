@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import java.math.BigDecimal;
 
 import static io.kontur.eventapi.TestUtil.readFile;
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCATIONS_PROVIDER;
@@ -40,10 +41,10 @@ class LocationsNifcNormalizerTest {
         assertEquals("Stateline Complex", observation.getProperName());
         assertEquals("6.5 miles SW of St. Regis, MT", observation.getDescription());
         assertEquals(EventType.WILDFIRE, observation.getType());
-        assertEquals(getDateTimeFromMilli(1626488389000L), observation.getStartedAt());
-        assertNull(observation.getEpisodeDescription());
-        assertNull(observation.getActive());
-        assertNull(observation.getCost());
+        assertEquals(getDateTimeFromMilli(1626488348000L), observation.getStartedAt());
+        assertEquals("6.5 miles SW of St. Regis, MT", observation.getEpisodeDescription());
+        assertTrue(observation.getActive());
+        assertEquals(new BigDecimal("23000000"), observation.getCost());
         assertNull(observation.getRegion());
         assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());

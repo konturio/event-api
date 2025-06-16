@@ -2,6 +2,8 @@ package io.kontur.eventapi.nifc.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 
@@ -18,6 +20,8 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 @Component
 public class LocationsNifcNormalizer extends NifcNormalizer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(LocationsNifcNormalizer.class);
+
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
         return dataLakeDto.getProvider().equals(NIFC_LOCATIONS_PROVIDER);
@@ -32,9 +36,26 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
 
         observation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), LOCATIONS_PROPERTIES));
         observation.setDescription(readString(props, "IncidentShortDescription"));
+        observation.setEpisodeDescription(readString(props, "IncidentShortDescription"));
 
-        long startedAtMilli = readLong(props, "CreatedOnDateTime_dt");
-        observation.setStartedAt(getDateTimeFromMilli(startedAtMilli).truncatedTo(SECONDS));
+        Long startedAtMilli = tryReadLong(props, "FireDiscoveryDateTime");
+        if (startedAtMilli == null) {
+            LOG.warn("Couldn't parse FireDiscoveryDateTime for {}", observation.getObservationId());
+            startedAtMilli = tryReadLong(props, "CreatedOnDateTime_dt");
+        }
+        if (startedAtMilli != null) {
+            observation.setStartedAt(getDateTimeFromMilli(startedAtMilli).truncatedTo(SECONDS));
+        }
+
+        Long fireOutMilli = tryReadLong(props, "FireOutDateTime");
+        if (fireOutMilli != null) {
+            observation.setEndedAt(getDateTimeFromMilli(fireOutMilli).truncatedTo(SECONDS));
+            observation.setActive(false);
+        } else {
+            observation.setActive(true);
+        }
+
+        observation.setCost(tryReadBigDecimal(props, "EstimatedCostToDate"));
 
         String name = readString(props, "IncidentName");
         String type = readString(props, "IncidentTypeCategory");

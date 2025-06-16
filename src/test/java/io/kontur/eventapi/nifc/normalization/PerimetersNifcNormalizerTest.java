@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import java.math.BigDecimal;
 
 import static io.kontur.eventapi.TestUtil.readFile;
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
@@ -40,10 +41,10 @@ class PerimetersNifcNormalizerTest {
         assertEquals("TL DUCK NEST", observation.getProperName());
         assertEquals("9 MILES S/SE OF OXFORD, AL", observation.getDescription());
         assertEquals(EventType.WILDFIRE, observation.getType());
-        assertEquals(getDateTimeFromMilli(1637450954000L), observation.getStartedAt());
-        assertNull(observation.getEpisodeDescription());
-        assertNull(observation.getActive());
-        assertNull(observation.getCost());
+        assertEquals(getDateTimeFromMilli(1637450820000L), observation.getStartedAt());
+        assertEquals("9 MILES S/SE OF OXFORD, AL", observation.getEpisodeDescription());
+        assertTrue(observation.getActive());
+        assertEquals(new BigDecimal("35000"), observation.getCost());
         assertNull(observation.getRegion());
         assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());

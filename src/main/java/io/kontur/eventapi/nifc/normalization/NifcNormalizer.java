@@ -4,6 +4,9 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import java.math.BigDecimal;
 
 import java.util.Map;
 
@@ -41,5 +44,22 @@ public abstract class NifcNormalizer extends Normalizer {
             return "Prescribed Fire" + wildfireName;
         }
         return "Wildfire" + wildfireName;
+    }
+
+    protected Long tryReadLong(Map<String, Object> props, String key) {
+        try {
+            return readLong(props, key);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    protected BigDecimal tryReadBigDecimal(Map<String, Object> props, String key) {
+        try {
+            String value = readString(props, key);
+            return value == null ? null : NumberUtils.createBigDecimal(value);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
