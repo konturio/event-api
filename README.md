@@ -141,3 +141,7 @@ For debugging could be used levels ERROR, WARN, INFO, DEBUG, TRACE
         </encoder>
     </appender>
 ```
+
+### Rate limiting
+
+The API applies a simple concurrency limit. Configure the limit via `ratelimit.concurrent` in `application.yml`. When the number of parallel requests exceeds this value the service responds with `429 Too Many Requests`.

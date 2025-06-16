@@ -5,6 +5,8 @@ server:
   shutdown: graceful
   jetty:
     connection-idle-timeout: 3600000
+ratelimit:
+  concurrent: 1000
 
 spring:
   lifecycle:
