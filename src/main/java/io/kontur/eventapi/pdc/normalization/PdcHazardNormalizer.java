@@ -24,17 +24,27 @@ public abstract class PdcHazardNormalizer extends Normalizer {
     protected final static Map<String, Object> SQS_CYCLONE_PROPERTIES = Map.of(AREA_TYPE_PROPERTY, POSITION, IS_OBSERVED_PROPERTY, true);
     public final static String ORIGIN_NASA = "NASA";
 
-    private static final Map<String, EventType> typeMap = Map.of(
-            "FLOOD", EventType.FLOOD,
-            "TSUNAMI", EventType.TSUNAMI,
-            "TORNADO", EventType.TORNADO,
-            "WILDFIRE", EventType.WILDFIRE,
-            "WINTERSTORM", EventType.WINTER_STORM,
-            "EARTHQUAKE", EventType.EARTHQUAKE,
-            "STORM", EventType.STORM,
-            "CYCLONE", EventType.CYCLONE,
-            "DROUGHT", EventType.DROUGHT,
-            "VOLCANO", EventType.VOLCANO
+    private static final Map<String, EventType> typeMap = Map.ofEntries(
+            Map.entry("FLOOD", EventType.FLOOD),
+            Map.entry("TSUNAMI", EventType.TSUNAMI),
+            Map.entry("TORNADO", EventType.TORNADO),
+            Map.entry("WILDFIRE", EventType.WILDFIRE),
+            Map.entry("WINTERSTORM", EventType.WINTER_STORM),
+            Map.entry("EARTHQUAKE", EventType.EARTHQUAKE),
+            Map.entry("STORM", EventType.STORM),
+            Map.entry("CYCLONE", EventType.CYCLONE),
+            Map.entry("DROUGHT", EventType.DROUGHT),
+            Map.entry("VOLCANO", EventType.VOLCANO),
+            Map.entry("HIGHWIND", EventType.STORM),
+            Map.entry("SEVEREWEATHER", EventType.STORM),
+            Map.entry("HIGHSURF", EventType.STORM),
+            Map.entry("MARINE", EventType.STORM),
+            Map.entry("COMBAT", EventType.SITUATION),
+            Map.entry("TERRORISM", EventType.SITUATION),
+            Map.entry("CIVILUNREST", EventType.SITUATION),
+            Map.entry("ACTIVESHOOTER", EventType.SITUATION),
+            Map.entry("POLITICALCONFLICT", EventType.SITUATION),
+            Map.entry("CYBER", EventType.SITUATION)
     );
 
     private static final Map<String, Severity> severityMap = Map.of(
