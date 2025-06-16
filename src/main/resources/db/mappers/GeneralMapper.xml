@@ -12,7 +12,7 @@
     </select>
 
     <select id="getPgStatTables" resultMap="pgStatTableMap">
-        SELECT
+        select
                relname,
                last_vacuum,
                last_autovacuum,
@@ -24,7 +24,7 @@
                autoanalyze_count,
                vacuum_count,
                autovacuum_count
-        FROM pg_stat_user_tables;
+        from pg_stat_user_tables;
     </select>
 
     <select id="getObservationNormalizationDuration" resultMap="processingDuration">
