@@ -1,4 +1,4 @@
-package io.kontur.eventapi.config;
+package io.kontur.eventapi.metrics.config;
 
 import io.micrometer.core.aop.CountedAspect;
 import io.micrometer.core.aop.TimedAspect;

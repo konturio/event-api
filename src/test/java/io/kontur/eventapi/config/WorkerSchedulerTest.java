@@ -15,7 +15,7 @@ import io.kontur.eventapi.job.EventCombinationJob;
 import io.kontur.eventapi.job.FeedCompositionJob;
 import io.kontur.eventapi.job.NormalizationJob;
 import io.kontur.eventapi.job.EventExpirationJob;
-import io.kontur.eventapi.job.MetricsJob;
+import io.kontur.eventapi.metrics.job.MetricsJob;
 import io.kontur.eventapi.nhc.job.NhcAtImportJob;
 import io.kontur.eventapi.nhc.job.NhcCpImportJob;
 import io.kontur.eventapi.nhc.job.NhcEpImportJob;

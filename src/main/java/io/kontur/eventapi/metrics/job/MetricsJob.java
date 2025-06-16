@@ -1,6 +1,7 @@
-package io.kontur.eventapi.job;
+package io.kontur.eventapi.metrics.job;
 
 import io.kontur.eventapi.metrics.MetricCollector;
+import io.kontur.eventapi.job.AbstractJob;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

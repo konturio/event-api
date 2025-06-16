@@ -12,6 +12,7 @@ import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.*;
+import io.kontur.eventapi.metrics.job.MetricsJob;
 import io.kontur.eventapi.nhc.job.NhcAtImportJob;
 import io.kontur.eventapi.nhc.job.NhcCpImportJob;
 import io.kontur.eventapi.nhc.job.NhcEpImportJob;
