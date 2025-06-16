@@ -75,19 +75,14 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
     }
 
     private void populateMissedFields(FeedEpisode episode, NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations) {
-        Set<NormalizedObservation> episodeObservations;
-        if (episode.getObservations().isEmpty()) {
-            episodeObservations = findObservationsForEpisode(eventObservations, observation.getSourceUpdatedAt(),
-                    24L, 0L, ChronoUnit.HOURS);
-            episode.getObservations().addAll(episodeObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
-        } else {
-            episodeObservations = readObservations(episode.getObservations(), eventObservations);
-        }
+        Set<NormalizedObservation> episodeObservations = findObservationsForEpisode(
+                eventObservations, observation.getSourceUpdatedAt(), 24L, 0L, ChronoUnit.HOURS);
+        episode.setObservations(episodeObservations.stream()
+                .map(NormalizedObservation::getObservationId)
+                .collect(toSet()));
 
-        if (episode.getGeometries() == null) {
-            Geometry episodeGeometry = calculateGeometry(episodeObservations);
-            episode.setGeometries(createEpisodeGeometryFeatureCollection(observation, episodeGeometry));
-        }
+        Geometry episodeGeometry = calculateGeometry(episodeObservations);
+        episode.setGeometries(createEpisodeGeometryFeatureCollection(observation, episodeGeometry));
 
         episode.setDescription(firstNonNull(episode.getDescription(), observation.getEpisodeDescription()));
         episode.setType(firstNonNull(episode.getType(), observation.getType()));
@@ -96,23 +91,21 @@ public class FirmsEpisodeCombinator extends EpisodeCombinator {
         episode.setUpdatedAt(firstNonNull(episode.getUpdatedAt(), calculateUpdatedDate(episodeObservations)));
         episode.setSourceUpdatedAt(firstNonNull(episode.getSourceUpdatedAt(), observation.getSourceUpdatedAt()));
 
-        if (episode.getSeverity() == null || episode.getName() == null) {
-            Set<NormalizedObservation> observationsUpToCurrentEpisode = eventObservations
-                    .stream()
-                    .filter(ob -> ob.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt())
-                            || ob.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
-                    .collect(toSet());
-            long burningTime = observationsUpToCurrentEpisode.stream()
-                    .map(NormalizedObservation::getStartedAt)
-                    .min(OffsetDateTime::compareTo)
-                    .get()
-                    .until(episode.getEndedAt(), ChronoUnit.HOURS);
-            Double area = calculateBurntAreaUpToCurrentEpisode(observation, observationsUpToCurrentEpisode);
-            String areaName = getBurntAreaName(episodeObservations);
-            episode.setLocation(areaName);
-            episode.setSeverity(calculateSeverity(area, burningTime));
-            episode.setName(calculateName(areaName, area, burningTime));
-        }
+        Set<NormalizedObservation> observationsUpToCurrentEpisode = eventObservations
+                .stream()
+                .filter(ob -> ob.getSourceUpdatedAt().isBefore(observation.getSourceUpdatedAt())
+                        || ob.getSourceUpdatedAt().isEqual(observation.getSourceUpdatedAt()))
+                .collect(toSet());
+        long burningTime = observationsUpToCurrentEpisode.stream()
+                .map(NormalizedObservation::getStartedAt)
+                .min(OffsetDateTime::compareTo)
+                .get()
+                .until(episode.getEndedAt(), ChronoUnit.HOURS);
+        Double area = calculateBurntAreaUpToCurrentEpisode(observation, observationsUpToCurrentEpisode);
+        String areaName = getBurntAreaName(episodeObservations);
+        episode.setLocation(areaName);
+        episode.setSeverity(calculateSeverity(area, burningTime));
+        episode.setName(calculateName(areaName, area, burningTime));
 
     }
 
