@@ -64,3 +64,9 @@ jobs:
         with:
           report_paths: target/*-reports/*.xml
           retention-days: 10
+
+      - name: Uploading coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          files: target/site/jacoco/jacoco.xml

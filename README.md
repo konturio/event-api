@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/konturio/event-api/branch/main/graph/badge.svg)](https://app.codecov.io/gh/konturio/event-api)
 ## Profiles
 
 Available profiles:
