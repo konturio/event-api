@@ -20,15 +20,22 @@
                 fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
-                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
-                                           order by (episode ->> 'updatedAt')::timestamptz desc
-                                           limit 1)) as episodes,
-                    </when>
                     <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
                         '[]'::jsonb as episodes,
                     </when>
-                    <otherwise>fd.episodes,</otherwise>
+                    <otherwise>
+                        (select coalesce(jsonb_agg(ep), '[]'::jsonb)
+                         from (
+                             select episode as ep
+                             from jsonb_array_elements(fd.episodes) episode
+                             <if test='episodeUpdatedAfter != null'>
+                                 where (episode ->> 'updatedAt')::timestamptz > #{episodeUpdatedAfter}
+                             </if>
+                             <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                                 order by (episode ->> 'updatedAt')::timestamptz desc limit 1
+                             </if>
+                         ) t) as episodes,
+                    </otherwise>
                 </choose>
                 box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
@@ -103,17 +110,22 @@
                 fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
-                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        jsonb_build_array((
-                        select episode from jsonb_array_elements(fd.episodes) episode
-                        order by (episode ->> 'updatedAt')::timestamptz desc
-                        limit 1
-                        )) as episodes,
-                    </when>
                     <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
                         '[]'::jsonb as episodes,
                     </when>
-                    <otherwise>fd.episodes,</otherwise>
+                    <otherwise>
+                        (select coalesce(jsonb_agg(ep), '[]'::jsonb)
+                         from (
+                             select episode as ep
+                             from jsonb_array_elements(fd.episodes) episode
+                             <if test='episodeUpdatedAfter != null'>
+                                 where (episode ->> 'updatedAt')::timestamptz > #{episodeUpdatedAfter}
+                             </if>
+                             <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                                 order by (episode ->> 'updatedAt')::timestamptz desc limit 1
+                             </if>
+                         ) t) as episodes,
+                    </otherwise>
                 </choose>
                 box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
@@ -158,15 +170,22 @@
             select
                 fd.event_id, fd.updated_at,
                 <choose>
-                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
-                        jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
-                                           order by (episode ->> 'updatedAt')::timestamptz desc
-                                           limit 1)) as episodes
-                    </when>
                     <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
                         '[]'::jsonb as episodes
                     </when>
-                    <otherwise>fd.episodes</otherwise>
+                    <otherwise>
+                        (select coalesce(jsonb_agg(ep), '[]'::jsonb)
+                         from (
+                             select episode as ep
+                             from jsonb_array_elements(fd.episodes) episode
+                             <if test='episodeUpdatedAfter != null'>
+                                 where (episode ->> 'updatedAt')::timestamptz > #{episodeUpdatedAfter}
+                             </if>
+                             <if test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                                 order by (episode ->> 'updatedAt')::timestamptz desc limit 1
+                             </if>
+                         ) t) as episodes
+                    </otherwise>
                 </choose>
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
@@ -198,8 +217,12 @@
             limit #{limit}
         ),
         episodes as (
-            select event_id, jsonb_array_elements(episodes) episode
-            from events
+            select event_id, episode
+            from events,
+                 jsonb_array_elements(episodes) episode
+            <if test='episodeUpdatedAfter != null'>
+                where (episode ->> 'updatedAt')::timestamptz > #{episodeUpdatedAfter}
+            </if>
         ),
         features as (
             select event_id, episode, jsonb_array_elements(episode -> 'geometries' -> 'features') feature

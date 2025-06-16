@@ -30,39 +30,39 @@ public class ApiDao {
 		return mapper.findDataByObservationId(observationId);
 	}
 
-	public String searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
-	                                      OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
-	                                      List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
-	                                      EpisodeFilterType episodeFilterType) {
+        public String searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
+                                              OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
+                                              List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
+                                              EpisodeFilterType episodeFilterType, OffsetDateTime episodeUpdatedAfter) {
 		if (bBox != null) {
 			var xMin = bBox.get(0);
 			var yMin = bBox.get(1);
 			var xMax = bBox.get(2);
 			var yMax = bBox.get(3);
-			return mapper.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-					xMin, xMax, yMin, yMax, episodeFilterType);
-		}
-		return mapper.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-				null, null, null, null, episodeFilterType);
-	}
+                        return mapper.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                                        xMin, xMax, yMin, yMax, episodeFilterType, episodeUpdatedAfter);
+                }
+                return mapper.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                                null, null, null, null, episodeFilterType, episodeUpdatedAfter);
+        }
 
-	public String searchForEventsGeoJson(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
-	                                            OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
-	                                            List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
-	                                            EpisodeFilterType episodeFilterType) {
+        public String searchForEventsGeoJson(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
+                                                    OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
+                                                    List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
+                                                    EpisodeFilterType episodeFilterType, OffsetDateTime episodeUpdatedAfter) {
 		if (bBox != null) {
 			var xMin = bBox.get(0);
 			var yMin = bBox.get(1);
 			var xMax = bBox.get(2);
 			var yMax = bBox.get(3);
-			return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-					xMin, xMax, yMin, yMax, episodeFilterType);
-		}
-		return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-				null, null, null, null, episodeFilterType);
-	}
+                        return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                                        xMin, xMax, yMin, yMax, episodeFilterType, episodeUpdatedAfter);
+                }
+                return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                                null, null, null, null, episodeFilterType, episodeUpdatedAfter);
+        }
 
-	public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
-		return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
-	}
+        public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType, OffsetDateTime episodeUpdatedAfter) {
+                return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, episodeUpdatedAfter);
+        }
 }

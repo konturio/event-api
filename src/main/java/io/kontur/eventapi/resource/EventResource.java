@@ -96,6 +96,10 @@ public class EventResource {
             @RequestParam(value = "bbox", required = false)
             @ValidBbox
             List<BigDecimal> bbox,
+            @Parameter(description = "Includes only episodes updated after this time. A date-time in ISO8601 format")
+            @RequestParam(value = "episodeAfter", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            OffsetDateTime episodeUpdatedAfter,
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000",
                     example = "20",
                     schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000"))
@@ -115,7 +119,7 @@ public class EventResource {
         Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, episodeUpdatedAfter);
         if (dataOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -186,6 +190,10 @@ public class EventResource {
             @RequestParam(value = "bbox", required = false)
             @ValidBbox
             List<BigDecimal> bbox,
+            @Parameter(description = "Includes only episodes updated after this time. A date-time in ISO8601 format")
+            @RequestParam(value = "episodeAfter", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            OffsetDateTime episodeUpdatedAfter,
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000",
                     example = "20",
                     schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000"))
@@ -204,7 +212,7 @@ public class EventResource {
         Optional<String> geoJsonOpt = eventResourceService.searchEventsGeoJson(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, episodeUpdatedAfter);
         if (geoJsonOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -254,8 +262,12 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
-        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType)
+            EpisodeFilterType episodeFilterType,
+            @Parameter(description = "Includes only episodes updated after this time. A date-time in ISO8601 format")
+            @RequestParam(value = "episodeAfter", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            OffsetDateTime episodeUpdatedAfter) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, episodeUpdatedAfter)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
