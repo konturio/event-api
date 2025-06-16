@@ -97,6 +97,10 @@ public abstract class CapBaseXmlParser {
     public abstract Optional<CapParsedEvent> getParsedItemForDataLake(String xml, String provider);
 
     protected Document getXmlDocument(String xml) throws ParserConfigurationException, IOException, SAXException {
+        if (StringUtils.isBlank(xml) || !xml.contains("</rss>")) {
+            throw new SAXException("Malformed XML: closing </rss> tag not found");
+        }
+
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setNamespaceAware(true);
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
