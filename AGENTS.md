@@ -25,6 +25,7 @@ Style:
 
 Java:
  - Write enough comments so that people proficient in Python, PostGIS can grasp the Java code.
+ - Just ignoring exceptions is not the best fix, handle in a better way
 
 SQL:
  - prefer indexed operators when dealing with jsonb ( `tags @> '{"key": "value"}` instead of `tags ->> 'key' = 'value'` ).
