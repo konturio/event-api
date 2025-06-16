@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.annotation.PostConstruct;
 
-public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest {
+public class PdcEpisodeCompositionIT extends AbstractCleanableIntegrationTest {
 
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
@@ -45,7 +45,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public PdcEpisodeCompositionTest(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob,
+    public PdcEpisodeCompositionIT(NormalizationJob normalizationJob, EventCombinationJob eventCombinationJob,
                                      FeedCompositionJob feedCompositionJob, DataLakeDao dataLakeDao, FeedDao feedDao,
                                      JdbcTemplate jdbcTemplate, ApiDao apiDao) {
         super(jdbcTemplate, feedDao);

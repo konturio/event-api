@@ -141,7 +141,7 @@ class WorkerSchedulerTest {
         when(pdcMapSrvSearchJobs.getJobs()).thenReturn(initList);
         scheduler.startPdcMapSrvSearch();
         try {
-            Thread.sleep(2);
+            Thread.sleep(50);
         } catch (InterruptedException ignored) {
         }
         List<PdcMapSrvSearchJob> jobsList = pdcMapSrvSearchJobs.getJobs();

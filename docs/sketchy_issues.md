@@ -15,4 +15,6 @@ Liquibase scripts reference helper functions such as `collectgeometryfromepisode
 The table `feed_event_status` tracks the latest events per feed, but there are no services referencing it directly in the codebase. It is unclear how the table is maintained.
 
 ## External dependencies
-The project depends on a private Maven repository (`nexus.kontur.io`). Without access to it the build and tests cannot be executed.
+Earlier versions required a private Maven repository (`nexus.kontur.io`).
+The build now fetches all artifacts from Maven Central and OSGeo, so
+no private access is needed.
