@@ -139,3 +139,6 @@ For debugging could be used levels ERROR, WARN, INFO, DEBUG, TRACE
         </encoder>
     </appender>
 ```
+
+## Layer IDs
+For context-dependent layers (e.g., event shapes) the layer ID includes the context identifier. See [design/layer-id-structure.md](design/layer-id-structure.md) for details.
