@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: feed-data-merge-columns.sql
+  - include:
+      relativeToChangelogFile: true
+      file: create-merge-operations-table.sql

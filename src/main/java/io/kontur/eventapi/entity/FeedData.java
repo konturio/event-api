@@ -23,6 +23,9 @@ public class FeedData {
     private OffsetDateTime updatedAt;
     private String location;
     private List<String> urls = new ArrayList<>();
+    private List<String> externalEventIds = new ArrayList<>();
+    private List<String> providers = new ArrayList<>();
+    private Boolean mergeDone;
     private Map<String, Object> loss = new HashMap<>();
     private Map<String, Object> severityData = new HashMap<>();
     private Map<String, Object> eventDetails;

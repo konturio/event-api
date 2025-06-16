@@ -73,6 +73,7 @@
 
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">
         <result property="eventId" column="event_id"/>
+        <result property="externalEventId" column="external_event_id"/>
         <result property="observationIds" column="observation_ids" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler"/>
         <result property="recombinedAt" column="recombined_at"/>
     </resultMap>

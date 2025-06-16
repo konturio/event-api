@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.MergeOperationsMapper">
+
+    <insert id="insert" parameterType="io.kontur.eventapi.entity.MergeOperation">
+        insert into merge_operations (event_ids, confidence, approved, decision_made_by,
+                                      executed, decision_made_at, taken_to_merge_at)
+        values (#{eventIds, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                #{confidence}, #{approved}, #{decisionMadeBy},
+                #{executed}, #{decisionMadeAt}, #{takenToMergeAt})
+    </insert>
+
+    <select id="getPending" resultType="io.kontur.eventapi.entity.MergeOperation">
+        select * from merge_operations where approved and not executed
+        order by decision_made_at asc nulls first
+    </select>
+
+</mapper>

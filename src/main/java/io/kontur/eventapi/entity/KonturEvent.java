@@ -8,6 +8,7 @@ import java.util.*;
 @Data
 public class KonturEvent {
     private UUID eventId;
+    private String externalEventId;
     private Set<UUID> observationIds = new HashSet<>();
     private OffsetDateTime recombinedAt;
 

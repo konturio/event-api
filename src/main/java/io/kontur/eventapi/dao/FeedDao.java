@@ -41,9 +41,10 @@ public class FeedDao {
         int count = mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getProperName(), feedData.getDescription(), feedData.getType(),
                 feedData.getSeverity(), feedData.getActive(), feedData.getStartedAt(), feedData.getEndedAt(),
-                feedData.getUpdatedAt(), feedData.getLocation(), feedData.getUrls(), feedData.getLoss(),
-                feedData.getSeverityData(), feedData.getObservations(), episodesJson, feedData.getEnriched(),
-                feedData.getAutoExpire(), feedData.getGeomFuncType());
+                feedData.getUpdatedAt(), feedData.getLocation(), feedData.getUrls(),
+                feedData.getExternalEventIds(), feedData.getProviders(), feedData.getMergeDone(),
+                feedData.getLoss(), feedData.getSeverityData(), feedData.getObservations(),
+                episodesJson, feedData.getEnriched(), feedData.getAutoExpire(), feedData.getGeomFuncType());
 
         if (count > 0) {
             mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());

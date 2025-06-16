@@ -18,6 +18,7 @@
     <insert id="insertFeedData" useGeneratedKeys="false">
         insert into feed_data (event_id, feed_id, version, name, proper_name, description, type, severity_id,
                                active, started_at, ended_at, updated_at, location, urls,
+                               external_event_ids, providers, merge_done,
                                <if test='loss != null'>loss,</if>
                                <if test='severityData != null'>severity_data,</if>
                                observations, geometries, episodes, enriched, auto_expire)
@@ -25,6 +26,9 @@
                 (select severity_id from severities where severity = #{severity}),
                 #{active}, #{startedAt}, #{endedAt}, #{updatedAt}, #{location},
                 #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                #{externalEventIds, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                #{providers, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
+                #{mergeDone},
                 <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
                 <if test='severityData != null'>#{severityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
                 #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
@@ -145,6 +149,9 @@
         <result property="updatedAt" column="updated_at" />
         <result property="location" column="location"/>
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
+        <result property="externalEventIds" column="external_event_ids" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+        <result property="providers" column="providers" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+        <result property="mergeDone" column="merge_done"/>
         <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler" />
         <result property="severityData" column="severity_data" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler" />
         <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
