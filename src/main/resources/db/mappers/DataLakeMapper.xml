@@ -90,7 +90,7 @@
     </select>
 
     <select id="getPdcExposureGeohashes" resultMap="exposureGeohash">
-        SELECT external_id, jsonb_object_field_text((data::jsonb)->'properties', 'geohash') as geohash
+        SELECT external_id, (data::json -> 'properties' ->> 'geohash') as geohash
         FROM data_lake
         WHERE provider = 'pdcMapSrv' AND
         <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
@@ -106,7 +106,7 @@
         SELECT
             CASE WHEN EXISTS (
                 SELECT * FROM datalakes
-                WHERE jsonb_object_field_text((data::jsonb)->'properties', 'geohash') = #{geoHash}
+                WHERE (data::json -> 'properties' ->> 'geohash') = #{geoHash}
             ) THEN FALSE ELSE TRUE
             END
     </select>
