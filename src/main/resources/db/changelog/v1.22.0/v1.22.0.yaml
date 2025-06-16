@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: add-jtwc-provider-to-feeds.sql

@@ -178,7 +178,7 @@ scheduler:
       tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
       wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
       wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa,
-      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
+      cyclones.jtwc.mil, pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
   eventCombination:
     enable: true
     initialDelay: 1000
@@ -187,7 +187,7 @@ scheduler:
       tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
       wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
       wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa,
-      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
+      cyclones.jtwc.mil, pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
   feedComposition:
     enable: true
     initialDelay: 1000
