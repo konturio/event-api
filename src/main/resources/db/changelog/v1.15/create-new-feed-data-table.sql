@@ -2,13 +2,13 @@
 
 --changeset event-api-migrations:v1.15/create-new-feed-data-table.sql runOnChange:true
 
-drop table if exists public.severities CASCADE;
+drop table if exists public.severities cascade;
 
 create table public.severities
 (
     severity_id smallserial not null,
     severity    text,
-    UNIQUE (severity_id)
+    unique (severity_id)
 );
 
 insert into public.severities(severity_id, severity)
@@ -33,7 +33,7 @@ create table public.feed_data_upd
     updated_at          timestamp with time zone,                           --8
     started_at          timestamp with time zone,                           --8
     ended_at            timestamp with time zone,                           --8
-    composed_at         timestamp with time zone default CURRENT_TIMESTAMP, --8
+    composed_at         timestamp with time zone default current_timestamp, --8
     enriched_at         timestamp with time zone,                           --8
     enrichment_skipped  boolean                  default false,             --1
     type                text,
@@ -41,17 +41,17 @@ create table public.feed_data_upd
     description         text,
     episodes            jsonb,
     observations        uuid[],
-    collected_geometry  public.geometry GENERATED ALWAYS AS (public.collectgeometryfromepisodes(episodes)) STORED,
+    collected_geometry  public.geometry generated always as (public.collectgeometryfromepisodes(episodes)) stored,
     event_details       jsonb                    default '{}'::jsonb,
     geometries          jsonb,
     urls                text[]                   default '{}'::text[],
     proper_name         text,
     location            text,
-    FOREIGN KEY (feed_id)
-        REFERENCES public.feeds (feed_id),
-    FOREIGN KEY (severity_id)
-        REFERENCES public.severities (severity_id),
-    UNIQUE (event_id, version, feed_id)
+    foreign key (feed_id)
+        references public.feeds (feed_id),
+    foreign key (severity_id)
+        references public.severities (severity_id),
+    unique (event_id, version, feed_id)
 );
 
 insert into public.feed_data_upd
@@ -113,7 +113,7 @@ from feed_data;
 create index feed_data_collected_geometry_gist_idx
     on feed_data_upd
     using gist (collected_geometry)
-    where (is_latest_version AND enriched);
+    where (is_latest_version and enriched);
 
 create index feed_data_composed_at_btree_idx
     on feed_data_upd
@@ -143,10 +143,10 @@ create index feed_data_updated_at_btree_idx
 
 create index feed_data_updated_at_is_not_enriched_btree_idx
     on feed_data_upd
-    using btree (enrichment_attempts NULLS FIRST, updated_at)
+    using btree (enrichment_attempts nulls first, updated_at)
     where not enriched;
 
 create index feed_data_updated_at_latest_version_enriched_btree_idx
     on feed_data_upd
     using btree (updated_at)
-    where not is_latest_version AND enriched;
+    where not is_latest_version and enriched;

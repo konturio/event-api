@@ -2,4 +2,4 @@
 
 --changeset event-api-migrations:v0/add-feeds-providers-index.sql runOnChange:false
 
-CREATE INDEX if not exists feeds_providers ON feeds USING GIN (providers);
+create index if not exists feeds_providers on feeds using gin (providers);

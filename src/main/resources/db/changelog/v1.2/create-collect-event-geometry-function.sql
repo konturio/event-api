@@ -4,12 +4,12 @@
 
 drop function if exists collectEventGeometries;
 
-CREATE OR REPLACE FUNCTION collectEventGeometries(jsonb) RETURNS JSONB
-AS $$
+create or replace function collectEventGeometries(jsonb) returns jsonb
+as $$
     with features as (
         select
             f.feature -> 'properties' as props,
-            st_makevalid(st_geomfromgeojson(NULLIF(f.feature -> 'geometry', 'null'::jsonb))) as geom
+            ST_MakeValid(ST_GeomFromGeoJSON(nullif(f.feature -> 'geometry', 'null'::jsonb))) as geom
         from (
             select jsonb_array_elements(e -> 'geometries' -> 'features') as feature
             from jsonb_array_elements($1) e
@@ -18,7 +18,7 @@ AS $$
         where f.feature -> 'geometry' != 'null'::jsonb
     ),
     areas as (
-        select f.props as props, st_setsrid(st_union(f.geom), 4326) as geom
+        select f.props as props, ST_SetSRID(ST_Union(f.geom), 4326) as geom
         from features f
         where f.props ->> 'areaType' in ('exposure', 'alertArea', 'globalArea')
         group by f.props
@@ -38,7 +38,7 @@ AS $$
         select jsonb_build_object('areaType', 'centerPoint') as props, (
             case
                 when exists(select * from areas) or exists(select * from startPoint) or exists(select * from other) then (
-                    select st_centroid(st_collect(f.geom)) as geom
+                    select ST_Centroid(ST_Collect(f.geom)) as geom
                     from (
                         select * from areas
                         union select * from startPoint
@@ -67,6 +67,6 @@ AS $$
     ) f(props, geom)
     where geom is not null
 $$
-LANGUAGE SQL
-STRICT
-IMMUTABLE PARALLEL SAFE;
+language sql
+strict
+immutable parallel safe;

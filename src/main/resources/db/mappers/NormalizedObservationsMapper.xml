@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.kontur.eventapi.dao.mapper.NormalizedObservationsMapper">
     <insert id="insert">
-        INSERT INTO normalized_observations (
+        insert into normalized_observations (
             observation_id, external_event_id, external_episode_id, provider, origin, name, proper_name,
             description, episode_description, type, event_severity, active, loaded_at, started_at,
             ended_at, source_updated_at, region, urls, cost,
@@ -13,7 +13,7 @@
             <if test='point != null'>point,</if>
             <if test='geometries != null'>geometries,</if>
             auto_expire, recombined
-        ) VALUES (
+        ) values (
             #{observationId}, #{externalEventId}, #{externalEpisodeId}, #{provider}, #{origin}, #{name}, #{properName},
             #{description}, #{episodeDescription}, #{type}, #{eventSeverity}, #{active}, #{loadedAt}, #{startedAt},
             #{endedAt}, #{sourceUpdatedAt}, #{region}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
@@ -39,42 +39,42 @@
     </insert>
 
     <insert id="markAsRecombined">
-        UPDATE normalized_observations SET recombined = 'true' WHERE observation_id = #{observationId}
+        update normalized_observations set recombined = 'true' where observation_id = #{observationId}
     </insert>
 
     <select id="getObservationsNotLinkedToEvent" resultMap="normalizedObservationsDtoMap">
-        SELECT *
-        FROM normalized_observations
-        WHERE recombined is false
+        select *
+        from normalized_observations
+        where recombined is false
         <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
             #{provider}
         </foreach>
-        ORDER BY loaded_at
-        LIMIT 100000
+        order by loaded_at
+        limit 100000
     </select>
 
     <select id="getFirmsObservationsNotLinkedToEventFor24Hours" resultMap="normalizedObservationsDtoMap">
-        WITH obs AS (
-            SELECT min(source_updated_at) as min_sua
-            FROM normalized_observations
-            WHERE recombined IS FALSE
+        with obs as (
+            select min(source_updated_at) as min_sua
+            from normalized_observations
+            where recombined is false
                 and provider in ('firms.modis-c6', 'firms.suomi-npp-viirs-c2', 'firms.noaa-20-viirs-c2')
         )
-        SELECT * FROM normalized_observations
-        WHERE recombined IS FALSE
+        select * from normalized_observations
+        where recombined is false
             and provider in ('firms.modis-c6', 'firms.suomi-npp-viirs-c2', 'firms.noaa-20-viirs-c2')
             and source_updated_at between (select min_sua from obs) - interval '1s' and (select min_sua from obs) + interval '24 hours'
-        ORDER BY source_updated_at
-        LIMIT 30000
+        order by source_updated_at
+        limit 30000
     </select>
 
     <select id="clusterObservationsByGeography" resultType="java.util.Set">
         select array_agg(observation_id)::uuid[] from (
-            SELECT
+            select
                 ST_ClusterDBSCAN(ST_Transform(collected_geography::geometry, 54032), 2000, 1) over() as cid,
                 observation_id
-            FROM normalized_observations
-            <foreach item="observationId" collection="observationIds" separator="," open="WHERE observation_id in (" close=")">
+            from normalized_observations
+            <foreach item="observationId" collection="observationIds" separator="," open="where observation_id in (" close=")">
                   #{observationId}
             </foreach>
         ) as clusters
@@ -82,32 +82,32 @@
     </select>
 
     <select id="getObservationsByEventId" resultMap="normalizedObservationsDtoMap">
-        SELECT *
-        FROM normalized_observations
-        WHERE observation_id IN (SELECT observation_id FROM kontur_events WHERE event_id = #{eventId});
+        select *
+        from normalized_observations
+        where observation_id IN (select observation_id from kontur_events where event_id = #{eventId});
     </select>
 
     <select id="getObservations" resultMap="normalizedObservationsDtoMap">
-        SELECT *
-        FROM normalized_observations
+        select *
+        from normalized_observations
         <foreach item="obsId" collection="observationIds" separator="," open="where observation_id in (" close=")">
             #{obsId}
         </foreach>
     </select>
 
     <select id="getDuplicateObservation" resultMap="normalizedObservationsDtoMap">
-        SELECT *
-        FROM normalized_observations
-        WHERE external_episode_id = #{externalEpisodeId}
-          AND loaded_at &lt;= #{loadedAt}
-          AND observation_id != #{observationId}
-          AND provider = #{provider}
-        ORDER BY loaded_at DESC
-        LIMIT 1
+        select *
+        from normalized_observations
+        where external_episode_id = #{externalEpisodeId}
+          and loaded_at &lt;= #{loadedAt}
+          and observation_id != #{observationId}
+          and provider = #{provider}
+        order by loaded_at desc
+        limit 1
     </select>
 
     <select id="getTimestampAtTimezone" resultType="java.time.OffsetDateTime">
-        SELECT #{timestamp}::TIMESTAMP AT TIME ZONE #{timezone};
+        select #{timestamp}::timestamp at time zone #{timezone};
     </select>
 
     <select id="getNotRecombinedObservationsCount" resultType="java.lang.Integer">

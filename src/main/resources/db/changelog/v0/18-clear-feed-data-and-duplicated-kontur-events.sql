@@ -4,7 +4,7 @@
 
 delete from feed_data;
 
-WITH latest_events AS (select event_id, observation_id, max(version) as max_version
+WITH latest_events as (select event_id, observation_id, max(version) as max_version
                           from kontur_events
                           group by event_id, observation_id)
 delete from kontur_events e using latest_events

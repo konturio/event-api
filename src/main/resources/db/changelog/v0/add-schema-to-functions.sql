@@ -2,16 +2,16 @@
 
 --changeset event-api-migrations:v0/add-schema-to-functions runOnChange:false
 
-ALTER TABLE normalized_observations DROP COLUMN collected_geography;
+alter table normalized_observations drop column collected_geography;
 
-DROP FUNCTION collectGeomFromGeoJSON;
+drop function collectGeomFromGeoJSON;
 
-CREATE FUNCTION collectGeomFromGeoJSON(jsonb) RETURNS geometry
-    AS 'select public.ST_Collect( public.ST_GeomFromGeoJSON(feature->''geometry'')) from jsonb_array_elements($1->''features'') feature;'
-    LANGUAGE SQL
-    IMMUTABLE
-    RETURNS NULL ON NULL INPUT;
+create function collectGeomFromGeoJSON(jsonb) returns geometry
+    as 'select public.ST_Collect(public.ST_GeomFromGeoJSON(feature->''geometry'')) from jsonb_array_elements($1->''features'') feature;'
+    language sql
+    immutable
+    strict;
 
-ALTER TABLE normalized_observations ADD COLUMN collected_geography geography GENERATED ALWAYS AS (collectGeomFromGeoJSON(geometries)::geography) STORED;
+alter table normalized_observations add column collected_geography geography generated always as (collectGeomFromGeoJSON(geometries)::geography) stored;
 
-CREATE INDEX ON normalized_observations USING GIST (collected_geography);
+create index on normalized_observations using gist (collected_geography);

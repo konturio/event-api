@@ -7,7 +7,7 @@ create or replace function collectGeometryFromEpisodes(jsonb) returns geometry
     strict
     immutable parallel safe
 as '
-select public.ST_Collect(public.ST_GeomFromGeoJSON(NULLIF(feature.geometries, ''null''::jsonb)))
+select public.ST_Collect(public.ST_GeomFromGeoJSON(nullif(feature.geometries, ''null''::jsonb)))
 from (select jsonb_array_elements(e -> ''geometries'' -> ''features'') -> ''geometry'' as geometries
       from jsonb_array_elements($1) e) feature;
 ';

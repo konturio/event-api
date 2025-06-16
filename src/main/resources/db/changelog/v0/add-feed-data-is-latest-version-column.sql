@@ -2,7 +2,7 @@
 
 --changeset event-api-migrations:v0/add-feed-data-is-latest-version-column.sql runOnChange:false
 --preconditions onFail:MARK_RAN
---precondition-sql-check expectedResult:0 SELECT count(*) FROM information_schema.columns WHERE table_name = 'feed_data' AND column_name = 'is_latest_version';
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where table_name = 'feed_data' AND column_name = 'is_latest_version';
 
 alter table feed_data
     add is_latest_version bool default true;
@@ -21,4 +21,4 @@ where fd.feed_id = e.feed_id
 
 drop index if exists feed_data_updated_at_idx;
 
-CREATE INDEX if not exists feed_data_updated_at_feed_id_is_latest_version_idx ON public.feed_data USING btree (updated_at, feed_id) where is_latest_version;
+create index if not exists feed_data_updated_at_feed_id_is_latest_version_idx on public.feed_data using btree (updated_at, feed_id) where is_latest_version;

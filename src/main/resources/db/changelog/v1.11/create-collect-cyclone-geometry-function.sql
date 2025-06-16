@@ -14,7 +14,7 @@ $$
     with features as (
         select
             f.feature -> 'properties' as props,
-            st_makevalid(st_geomfromgeojson(NULLIF(f.feature -> 'geometry', 'null'::jsonb))) as geom
+            ST_MakeValid(ST_GeomFromGeoJSON(nullif(f.feature -> 'geometry', 'null'::jsonb))) as geom
         from (
             select jsonb_array_elements(e -> 'geometries' -> 'features') as feature
             from jsonb_array_elements($1) e
@@ -29,8 +29,8 @@ $$
     ),
     trackline as (
         select jsonb_build_object('areaType', 'track', 'windSpeedKph', (p.props ->> 'windSpeedKph')::numeric, 'isObserved',
-            ((LEAD(p.props) OVER(ORDER BY (p.props ->> 'timestamp'))) ->> 'isObserved')::boolean),
-               ST_MakeLine(p.geom, LEAD(p.geom) OVER(ORDER BY (p.props ->> 'timestamp'))) AS geom
+            ((lead(p.props) over(order by (p.props ->> 'timestamp'))) ->> 'isObserved')::boolean),
+               ST_MakeLine(p.geom, lead(p.geom) over(order by (p.props ->> 'timestamp'))) as geom
         from positions p
     ),
     alerts34 as (

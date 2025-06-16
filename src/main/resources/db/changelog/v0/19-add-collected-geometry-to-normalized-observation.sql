@@ -2,12 +2,12 @@
 
 --changeset event-api-migrations:18-add-collected-geometry-to-normalized-observation runOnChange:false
 
-CREATE FUNCTION collectGeomFromGeoJSON(jsonb) RETURNS geometry
-    AS 'select ST_Collect( ST_GeomFromGeoJSON(feature->''geometry'')) from jsonb_array_elements($1->''features'') feature;'
-    LANGUAGE SQL
-    IMMUTABLE
-    RETURNS NULL ON NULL INPUT;
+create function collectGeomFromGeoJSON(jsonb) returns geometry
+    as 'select ST_Collect(ST_GeomFromGeoJSON(feature->''geometry'')) from jsonb_array_elements($1->''features'') feature;'
+    language sql
+    immutable
+    strict;
 
-ALTER TABLE normalized_observations ADD COLUMN collected_geometry geometry GENERATED ALWAYS AS (collectGeomFromGeoJSON(geometries)) STORED;
+alter table normalized_observations add column collected_geometry geometry generated always as (collectGeomFromGeoJSON(geometries)) stored;
 
-CREATE INDEX ON normalized_observations USING GIST (collected_geometry);
+create index on normalized_observations using gist (collected_geometry);

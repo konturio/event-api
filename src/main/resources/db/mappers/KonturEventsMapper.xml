@@ -5,28 +5,28 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.KonturEventsMapper">
 
     <insert id="insert" useGeneratedKeys="false">
-        INSERT INTO kontur_events (event_id, provider, observation_id)
-        VALUES (#{eventId}, #{provider}, #{observationId})
-        ON CONFLICT (event_id, observation_id) DO UPDATE
-        SET provider = #{provider}
+        insert into kontur_events (event_id, provider, observation_id)
+        values (#{eventId}, #{provider}, #{observationId})
+        on conflict (event_id, observation_id) do update
+        set provider = #{provider}
     </insert>
 
     <select id="getEventByExternalId" resultMap="konturEventDtoMap" >
-        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids, min(recombined_at) as recombined_at
-        FROM kontur_events
-        WHERE observation_id IN (
-            SELECT observation_id
-            FROM normalized_observations
-            WHERE external_event_id = #{externalId}
+        select event_id, array_agg(observation_id)::uuid[] as observation_ids, min(recombined_at) as recombined_at
+        from kontur_events
+        where observation_id IN (
+            select observation_id
+            from normalized_observations
+            where external_event_id = #{externalId}
             )
-        GROUP BY event_id
+        group by event_id
     </select>
 
     <select id="getEventById" resultMap="konturEventDtoMap" >
-        SELECT event_id, array_agg(observation_id)::uuid[] AS observation_ids, min(recombined_at) as recombined_at
-        FROM kontur_events
-        WHERE event_id = #{eventId}
-        GROUP BY event_id
+        select event_id, array_agg(observation_id)::uuid[] as observation_ids, min(recombined_at) as recombined_at
+        from kontur_events
+        where event_id = #{eventId}
+        group by event_id
     </select>
 
     <select id="findClosestEventsToObservations" resultMap="konturEventDtoMap">
@@ -51,7 +51,7 @@
                     and no.source_updated_at between obs.source_updated_at - interval '24 hours'
                         and obs.source_updated_at + interval '24 hours'
                     and ST_DWithin(obs.collected_geography, no.collected_geography, 2000)
-                order by st_distance(obs.collected_geography, no.collected_geography)
+                order by ST_Distance(obs.collected_geography, no.collected_geography)
                 limit 1)) as event_id, array_agg(obs.observation_id)::uuid[] as observation_ids
             from observations obs
             group by event_id
@@ -60,15 +60,15 @@
     </select>
 
     <select id="getEventsForRolloutEpisodes" resultType="java.util.UUID">
-        SELECT event_id
-        FROM feed_event_status
-        WHERE feed_id = #{feedId}
-            AND actual is false
-        LIMIT 100000;
+        select event_id
+        from feed_event_status
+        where feed_id = #{feedId}
+            and actual is false
+        limit 100000;
     </select>
 
     <select id="getNotComposedEventsCount" resultType="java.lang.Integer">
-        SELECT count(*) FROM feed_event_status WHERE NOT actual;
+        select count(*) from feed_event_status where not actual;
     </select>
 
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">

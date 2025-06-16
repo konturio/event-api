@@ -3,7 +3,7 @@
 --changeset event-api-migrations:15-separate-data-lake-mags runOnChange:false
 
 
-create table data_lake_temp AS
+create table data_lake_temp as
 select uuid_generate_v4() as observation_id,
        external_id,
        updated_at,
@@ -23,10 +23,10 @@ from (
                   where provider = 'hpSrvMag') t
      ) t2;
 
-CREATE UNIQUE INDEX ON data_lake_temp (loaded_at);
+create unique index on data_lake_temp (loaded_at);
 
 delete from data_lake where provider = 'hpSrvMag';
 
-insert into data_lake SELECT * from data_lake_temp;
+insert into data_lake select * from data_lake_temp;
 
 drop table data_lake_temp;

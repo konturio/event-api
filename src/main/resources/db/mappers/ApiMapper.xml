@@ -8,9 +8,9 @@
     </select>
 
     <select id="findDataByObservationId" resultType="java.lang.String">
-        SELECT data
-        FROM data_lake
-        WHERE observation_id = #{observationId}
+        select data
+        from data_lake
+        where observation_id = #{observationId}
     </select>
 
     <select id="searchForEvents" resultType="java.lang.String">
@@ -30,10 +30,10 @@
                     </when>
                     <otherwise>fd.episodes,</otherwise>
                 </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
+                box2d(fd.collected_geometry) as bbox, ST_PointOnSurface(fd.collected_geometry) as centroid
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
-            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+            where fd.feed_id = (select feed_id from feeds where alias = #{feedAlias})
                 and fd.is_latest_version and fd.enriched
                 <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
                     <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
@@ -51,20 +51,20 @@
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
                 <if test='updatedAfter != null'>
-                    <if test='"ASC".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
-                    <if test='"DESC".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
+                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
+                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
                 </if>
                 <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                     and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
                 </if>
             order by fd.updated_at ${sortOrder}
             limit #{limit}
-        )
+       )
         select case when count(*) > 0 then json_build_object(
             'pageMetadata', json_build_object('nextAfterValue',
                 (select
                     <choose>
-                        <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
+                        <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
                         <otherwise>max(e.updated_at)</otherwise>
                     </choose>
                 from events e)),
@@ -89,9 +89,9 @@
                 'geometries', geometries,
                 'episodes', episodes,
                 'episodeCount', episode_count,
-                'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
-                'centroid', array[st_x(centroid), st_y(centroid)]
-              )))
+                'bbox', array[ST_XMin(bbox), ST_YMin(bbox), ST_XMax(bbox), ST_YMax(bbox)],
+                'centroid', array[ST_X(centroid), ST_Y(centroid)]
+             )))
             end
         from events
     </select>
@@ -108,23 +108,23 @@
                         select episode from jsonb_array_elements(fd.episodes) episode
                         order by (episode ->> 'updatedAt')::timestamptz desc
                         limit 1
-                        )) as episodes,
+                       )) as episodes,
                     </when>
                     <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
                         '[]'::jsonb as episodes,
                     </when>
                     <otherwise>fd.episodes,</otherwise>
                 </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
+                box2d(fd.collected_geometry) as bbox, ST_PointOnSurface(fd.collected_geometry) as centroid
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.event_id = #{eventId}
-                and fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+                and fd.feed_id = (select feed_id from feeds where alias = #{feedAlias})
                 <choose>
                     <when test="version != null">and fd.version = #{version}</when>
                     <otherwise>and fd.is_latest_version</otherwise>
                 </choose>
-        )
+       )
         select
             json_build_object(
                 'eventId', event_id,
@@ -147,9 +147,9 @@
                 'geometries', geometries,
                 'episodes', episodes,
                 'episodeCount', episode_count,
-                'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
-                'centroid', array[st_x(centroid), st_y(centroid)]
-              )
+                'bbox', array[ST_XMin(bbox), ST_YMin(bbox), ST_XMax(bbox), ST_YMax(bbox)],
+                'centroid', array[ST_X(centroid), ST_Y(centroid)]
+             )
         from event
     </select>
 
@@ -170,7 +170,7 @@
                 </choose>
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
-            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+            where fd.feed_id = (select feed_id from feeds where alias = #{feedAlias})
                 and fd.is_latest_version and fd.enriched
                 <if test="eventTypes!=null &amp;&amp; !eventTypes.isEmpty" >
                     <foreach item="eventType" collection="eventTypes" separator="," open="and fd.type in (" close=")">
@@ -188,23 +188,23 @@
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
                 <if test='updatedAfter != null'>
-                    <if test='"ASC".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
-                    <if test='"DESC".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
+                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
+                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
                 </if>
                 <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                     and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
                 </if>
             order by fd.updated_at ${sortOrder}
             limit #{limit}
-        ),
+       ),
         episodes as (
             select event_id, jsonb_array_elements(episodes) episode
             from events
-        ),
+       ),
         features as (
             select event_id, episode, jsonb_array_elements(episode -> 'geometries' -> 'features') feature
             from episodes
-        ),
+       ),
         props as (
             select
                 event_id as "eventId",
@@ -230,14 +230,14 @@
                 feature -> 'properties' -> 'severityData' as "feature_severityData",
                 ST_GeomFromGeoJSON(feature -> 'geometry') as geom
             from features
-        )
+       )
         select
             case when count(*) > 0 then json_build_object(
                 'type', 'FeatureCollection',
                 'pageMetadata', json_build_object('nextAfterValue',
                     (select
                         <choose>
-                            <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
+                            <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
                             <otherwise>max(e.updated_at)</otherwise>
                         </choose>
                     from events e)),

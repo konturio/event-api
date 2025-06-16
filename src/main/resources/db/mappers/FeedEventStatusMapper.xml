@@ -5,17 +5,17 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.FeedEventStatusMapper">
 
     <insert id="markAsActual" >
-        INSERT INTO feed_event_status (feed_id, event_id, actual)
-        VALUES (#{feedId}, #{eventId}, #{actual})
-        ON CONFLICT (feed_id, event_id) DO UPDATE SET actual = #{actual}
+        insert into feed_event_status (feed_id, event_id, actual)
+        values (#{feedId}, #{eventId}, #{actual})
+        on conflict (feed_id, event_id) do update set actual = #{actual}
     </insert>
 
     <insert id="markAsNonActual" >
-        INSERT INTO feed_event_status (feed_id, event_id, actual)
+        insert into feed_event_status (feed_id, event_id, actual)
         select feed_id, #{eventId}, false
         from feeds
         where providers &amp;&amp; array[#{provider}::text]
-        ON CONFLICT (feed_id, event_id) DO UPDATE SET actual = false
+        on conflict (feed_id, event_id) do update set actual = false
     </insert>
 
 </mapper>

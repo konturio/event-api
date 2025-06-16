@@ -1,7 +1,7 @@
 --liquibase formatted sql
 
 --changeset event-api-migrations:01-create-schema runOnChange:false
-CREATE TABLE IF NOT EXISTS data_lake
+create table if not exists data_lake
 (
     observation_id uuid unique,
     external_id    text,
@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS data_lake
     provider       text,
     data           text,
 
-    UNIQUE (external_id, provider, updated_at)
+    unique (external_id, provider, updated_at)
 );
 
-CREATE TABLE IF NOT EXISTS normalized_observations
+create table if not exists normalized_observations
 (
     observation_id      uuid unique references data_lake (observation_id),
     external_id         text,
@@ -35,18 +35,18 @@ CREATE TABLE IF NOT EXISTS normalized_observations
     source_uri          text
 );
 
-CREATE INDEX ON normalized_observations (external_id);
+create index on normalized_observations (external_id);
 
-CREATE TABLE IF NOT EXISTS kontur_events
+create table if not exists kontur_events
 (
     event_id       uuid,
     version        bigint,
     observation_id uuid,
 
-    UNIQUE (event_id, version, observation_id)
+    unique (event_id, version, observation_id)
 );
 
-CREATE TABLE IF NOT EXISTS feeds
+create table if not exists feeds
 (
     feed_id     uuid primary key,
     description text,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS feeds
     roles       text[]
 );
 
-CREATE TABLE IF NOT EXISTS feed_data
+create table if not exists feed_data
 (
     event_id     uuid,
     feed_id      uuid,
@@ -68,8 +68,8 @@ CREATE TABLE IF NOT EXISTS feed_data
     observations uuid[],
     episodes     jsonb,
 
-    UNIQUE (event_id, feed_id, version)
+    unique (event_id, feed_id, version)
 );
 
-CREATE INDEX ON feed_data (event_id, version);
-CREATE INDEX on feed_data (feed_id);
+create index on feed_data (event_id, version);
+create index on feed_data (feed_id);

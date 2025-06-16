@@ -10,7 +10,7 @@ as '
     with features as (
         select
             f.feature -> ''properties'' as props,
-            public.st_makevalid(public.st_geomfromgeojson(NULLIF(f.feature -> ''geometry'', ''null''::jsonb))) as geom
+            public.ST_MakeValid(public.ST_GeomFromGeoJSON(nullif(f.feature -> ''geometry'', ''null''::jsonb))) as geom
         from (
             select jsonb_array_elements(e -> ''geometries'' -> ''features'') as feature
             from jsonb_array_elements($1) e
@@ -19,7 +19,7 @@ as '
         where f.feature -> ''geometry'' != ''null''::jsonb
     ),
     areas as (
-        select f.props as props, public.st_setsrid(public.st_union(f.geom), 4326) as geom
+        select f.props as props, public.ST_SetSRID(public.ST_Union(f.geom), 4326) as geom
         from features f
         where f.props ->> ''areaType'' in (''exposure'', ''alertArea'', ''globalArea'')
         group by f.props
@@ -39,7 +39,7 @@ as '
         select jsonb_build_object(''areaType'', ''centerPoint'') as props, (
             case
                 when exists(select * from areas) or exists(select * from startPoint) or exists(select * from other) then (
-                    select public.st_centroid(public.st_collect(f.geom)) as geom
+                    select public.ST_Centroid(public.ST_Collect(f.geom)) as geom
                     from (
                         select * from areas
                         union select * from startPoint

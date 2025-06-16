@@ -2,10 +2,10 @@
 
 --changeset event-api-migrations:20-alter-kontur_events-drop-version.sql runOnChange:false
 
-ALTER TABLE kontur_events DROP CONSTRAINT kontur_events_event_id_version_observation_id_key;
-ALTER TABLE kontur_events DROP COLUMN version;
-ALTER TABLE kontur_events ADD CONSTRAINT kontur_events_event_id_observation_id_key UNIQUE (event_id, observation_id);
+alter table kontur_events drop constraint kontur_events_event_id_version_observation_id_key;
+alter table kontur_events drop column version;
+alter table kontur_events add constraint kontur_events_event_id_observation_id_key unique (event_id, observation_id);
 
-DROP INDEX feed_data_updated_at_unique;
-CREATE UNIQUE INDEX feed_data_updated_at_version_unique ON feed_data (updated_at, version);
-CREATE INDEX feed_data_observations ON feed_data USING GIN(observations);
+drop index feed_data_updated_at_unique;
+create unique index feed_data_updated_at_version_unique on feed_data (updated_at, version);
+create index feed_data_observations on feed_data using gin(observations);
