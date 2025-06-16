@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.MergePairMapper">
+
+    <resultMap id="mergePairMap" type="io.kontur.eventapi.resource.dto.MergeCandidatePairDTO">
+        <result property="eventId1" column="event_id1"/>
+        <result property="eventId2" column="event_id2"/>
+        <result property="confidence" column="confidence"/>
+        <result property="approved" column="approved"/>
+        <result property="decisionMadeBy" column="decision_made_by"/>
+        <result property="decisionMadeAt" column="decision_made_at"/>
+        <result property="event1" column="event1" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
+        <result property="event2" column="event2" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
+    </resultMap>
+
+    <select id="takeNextPair" resultMap="mergePairMap">
+        SELECT * FROM merge_operations
+        ORDER BY taken_to_merge_at NULLS FIRST
+        LIMIT 1
+        FOR UPDATE SKIP LOCKED
+    </select>
+
+    <select id="getPairByIds" resultMap="mergePairMap">
+        SELECT * FROM merge_operations
+        WHERE event_id1 = #{eventId1} AND event_id2 = #{eventId2}
+    </select>
+
+    <update id="markAsTaken">
+        UPDATE merge_operations SET taken_to_merge_at = now()
+        WHERE event_id1 = #{eventId1} AND event_id2 = #{eventId2}
+    </update>
+</mapper>
