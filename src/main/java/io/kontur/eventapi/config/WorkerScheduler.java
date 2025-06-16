@@ -174,7 +174,7 @@ public class WorkerScheduler {
     @Scheduled(initialDelayString = "${scheduler.pdcMapSrvSearch.initialDelay}", fixedDelayString = "${scheduler.pdcMapSrvSearch.fixedDelay}")
     public void startPdcMapSrvSearch() {
         if (Boolean.parseBoolean(pdcMapSrvSearchEnabled)) {
-            PdcMapSrvSearchJob[] jobs = new PdcMapSrvSearchJob[26];
+            PdcMapSrvSearchJob[] jobs = new PdcMapSrvSearchJob[PDC_MAP_SRV_IDS.length];
             jobs = pdcMapSrvSearchJobs.getJobs().toArray(jobs);
             for (int i = 0; i < PDC_MAP_SRV_IDS.length; i++) {
                 PdcMapSrvSearchJob job = jobs[i];
