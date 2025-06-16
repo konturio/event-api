@@ -14,8 +14,8 @@ The default configuration sets it to `true`, so no extra flags are needed for lo
 ### Networking through a proxy
 
 Maven and the Java runtime read standard `HTTP_PROXY` and `HTTPS_PROXY`
-environment variables. The project ships a `.mvn/jvm.config` file
-that enables system proxy usage, so Maven honors those variables
+environment variables. The `pom.xml` configures `maven.config` to pass
+`-Djava.net.useSystemProxies=true`, so Maven honours those variables
 without extra flags.
 If your network requires a proxy, export the variables before running
 the build:

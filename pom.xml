@@ -32,6 +32,7 @@
     <lombok.version>1.18.38</lombok.version>
     <jib.source.image>openjdk:16-alpine</jib.source.image>
     <image.tag>${IMAGE_TAG}</image.tag>
+    <maven.config>-Djava.net.useSystemProxies=true</maven.config>
   </properties>
   <dependencies>
     <!-- Web -->
@@ -246,12 +247,6 @@
       <artifactId>lombok</artifactId>
       <version>1.18.38</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.38</version>
-      <scope>annotationProcessor</scope>
     </dependency>
     <dependency>
       <groupId>org.jpmml</groupId>
