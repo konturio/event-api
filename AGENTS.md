@@ -16,7 +16,7 @@ Debugging:
 
 Style:
  - Add empty lines between logical blocks as in the rest of the codebase.
- - Clean stuff up if you can: fix typos, make lexics more correct in Enghish.
+ - Clean stuff up if you can: fix typos, make lexics more correct in English.
  - Write enough comments so you can deduce what was a requirement in the future.
  - Write insightful code comments.
  - Do not break indentation.
