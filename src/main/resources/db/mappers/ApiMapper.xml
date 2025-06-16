@@ -30,7 +30,23 @@
                     </when>
                     <otherwise>fd.episodes,</otherwise>
                 </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
+                (case
+                    when st_intersects(st_shiftlongitude(fd.collected_geometry),
+                                        st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                        then st_centroid(st_shiftlongitude(fd.collected_geometry))
+                        else st_centroid(fd.collected_geometry)
+                end) as centroid,
+                (case
+                    when st_geometrytype(st_envelope(fd.collected_geometry)) not in ('ST_Point', 'ST_MultiPoint', 'ST_LineString')
+                        then (case when st_intersects(st_shiftlongitude(fd.collected_geometry),
+                                                     st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                   then box2d(st_shiftlongitude(fd.collected_geometry))
+                                   else box2d(fd.collected_geometry) end)
+                        else (case when st_intersects(st_shiftlongitude(st_buffer(fd.collected_geometry, 1)),
+                                                     st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                   then box2d(st_shiftlongitude(st_buffer(fd.collected_geometry, 1)))
+                                   else box2d(st_buffer(fd.collected_geometry, 1)) end)
+                end) as bbox
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
@@ -115,7 +131,23 @@
                     </when>
                     <otherwise>fd.episodes,</otherwise>
                 </choose>
-                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
+                (case
+                    when st_intersects(st_shiftlongitude(fd.collected_geometry),
+                                        st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                        then st_centroid(st_shiftlongitude(fd.collected_geometry))
+                        else st_centroid(fd.collected_geometry)
+                end) as centroid,
+                (case
+                    when st_geometrytype(st_envelope(fd.collected_geometry)) not in ('ST_Point', 'ST_MultiPoint', 'ST_LineString')
+                        then (case when st_intersects(st_shiftlongitude(fd.collected_geometry),
+                                                     st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                   then box2d(st_shiftlongitude(fd.collected_geometry))
+                                   else box2d(fd.collected_geometry) end)
+                        else (case when st_intersects(st_shiftlongitude(st_buffer(fd.collected_geometry, 1)),
+                                                     st_setsrid(st_geomfromewkt('LINESTRING(180 -90, 180 90)'), 4326))
+                                   then box2d(st_shiftlongitude(st_buffer(fd.collected_geometry, 1)))
+                                   else box2d(st_buffer(fd.collected_geometry, 1)) end)
+                end) as bbox
             from feed_data fd
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.event_id = #{eventId}
