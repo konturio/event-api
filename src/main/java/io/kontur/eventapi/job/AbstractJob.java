@@ -2,6 +2,7 @@ package io.kontur.eventapi.job;
 
 import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class AbstractJob implements Runnable {
     private final static Map<String, Lock> locks = new ConcurrentHashMap<>();
     private final MeterRegistry meterRegistry;
+    private java.util.concurrent.atomic.AtomicInteger observationsGauge;
 
     protected AbstractJob(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
@@ -81,5 +83,16 @@ public abstract class AbstractJob implements Runnable {
 
     protected static Map<String, Lock> getLocks() {
         return locks;
+    }
+
+    protected void updateObservationsMetric(int count) {
+        if (observationsGauge == null) {
+            observationsGauge = meterRegistry.gauge(
+                    "job.observations.to.process",
+                    java.util.List.of(Tag.of("job", getName())),
+                    new java.util.concurrent.atomic.AtomicInteger(count));
+        } else {
+            observationsGauge.set(count);
+        }
     }
 }

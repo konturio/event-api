@@ -54,7 +54,13 @@ public class FeedCompositionJob extends AbstractJob {
     @Override
     public void execute() {
         List<Feed> feeds = feedDao.getFeedsByAliases(Arrays.asList(alias));
-        feeds.forEach(this::updateFeed);
+        int count = 0;
+        for (Feed feed : feeds) {
+            Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
+            count += eventsIds.size();
+            updateFeed(feed, eventsIds);
+        }
+        updateObservationsMetric(count);
     }
 
     @Override
@@ -62,12 +68,10 @@ public class FeedCompositionJob extends AbstractJob {
         return "feedComposition";
     }
 
-    protected void updateFeed(Feed feed) {
-        Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
+    protected void updateFeed(Feed feed, Set<UUID> eventsIds) {
         if (!CollectionUtils.isEmpty(eventsIds)) {
             LOG.info(format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
-            eventsIds
-                    .forEach(event -> createFeedData(event, feed));
+            eventsIds.forEach(event -> createFeedData(event, feed));
         }
     }
 

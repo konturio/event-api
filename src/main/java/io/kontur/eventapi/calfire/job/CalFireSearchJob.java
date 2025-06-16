@@ -66,6 +66,7 @@ public class CalFireSearchJob extends AbstractJob {
                     LOG.error("Error while processing calfire feature. {}", e1.getMessage());
                 }
             }
+            updateObservationsMetric(dataLakes.size());
             if (!CollectionUtils.isEmpty(dataLakes)) {
                 dataLakeDao.storeDataLakes(dataLakes);
             }

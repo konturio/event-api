@@ -27,15 +27,18 @@ public class ReEnrichmentJob extends AbstractJob {
 
     @Override
     public void execute() throws Exception {
-        feedDao.getFeeds().stream()
-                .filter(feed -> !feed.getEnrichment().isEmpty())
-                .forEach(this::reEnrichFeed);
+        int count = 0;
+        for (Feed feed : feedDao.getFeeds()) {
+            if (!feed.getEnrichment().isEmpty()) {
+                count += reEnrichFeed(feed);
+            }
+        }
+        updateObservationsMetric(count);
     }
 
-    private void reEnrichFeed(Feed feed) {
+    private int reEnrichFeed(Feed feed) {
         List<FeedData> events = feedDao.getEnrichmentSkippedEventsForFeed(feed.getFeedId());
         if (!CollectionUtils.isEmpty(events)) {
-;
             events.forEach(event -> {
                 try {
                     longEventEnrichmentTask.enrichEvent(event, feed).get();
@@ -43,7 +46,9 @@ public class ReEnrichmentJob extends AbstractJob {
                     LOG.warn(e.getMessage(), e);
                 }
             });
+            return events.size();
         }
+        return 0;
     }
 
     @Override

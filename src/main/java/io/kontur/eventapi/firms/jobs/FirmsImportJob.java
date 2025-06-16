@@ -55,6 +55,7 @@ public abstract class FirmsImportJob extends AbstractJob {
     public void execute() {
         try {
             List<DataLake> dataLakes = loadData();
+            updateObservationsMetric(dataLakes.size());
             List<DataLake> sortedDataLakes = dataLakes.stream()
                     .sorted(Comparator.comparing(DataLake::getUpdatedAt, Comparator.nullsFirst(Comparator.naturalOrder())))
                     .peek(dataLake -> dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime()))

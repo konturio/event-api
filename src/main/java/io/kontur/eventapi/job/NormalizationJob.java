@@ -42,6 +42,7 @@ public class NormalizationJob extends AbstractJob {
     @Override
     public void execute() {
         List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(Arrays.asList(providers));
+        updateObservationsMetric(dataLakes.size());
         if (!CollectionUtils.isEmpty(dataLakes)) {
             LOG.info("Normalization processing: {} data lakes", dataLakes.size());
 

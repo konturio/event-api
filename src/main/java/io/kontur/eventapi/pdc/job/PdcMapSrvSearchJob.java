@@ -114,6 +114,7 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                         dataLakes.add(pdcDataLakeConverter.convertExposure(features.get(id), id));
                     }
                 }
+                updateObservationsMetric(dataLakes.size());
                 if (!CollectionUtils.isEmpty(dataLakes)) {
                     dataLakeDao.storeDataLakes(dataLakes);
                 }

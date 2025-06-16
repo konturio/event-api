@@ -37,6 +37,7 @@ public class FirmsEventCombinationJob extends EventCombinationJob {
     public void execute() {
         List<NormalizedObservation> observations = observationsDao
                 .getFirmsObservationsNotLinkedToEventFor24Hours();
+        updateObservationsMetric(observations.size());
 
         if (!CollectionUtils.isEmpty(observations)) {
             LOG.info("Firms Combination processing: {} events", observations.size());

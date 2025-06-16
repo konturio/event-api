@@ -31,14 +31,17 @@ public class EnrichmentJob extends AbstractJob {
     public void execute() throws Exception {
         try {
             List<CompletableFuture<FeedData>> eventEnrichmentTasks = new ArrayList<>();
+            int count = 0;
             for (Feed feed : getFeeds()) {
                 List<FeedData> events = feedDao.getNotEnrichedEventsForFeed(feed.getFeedId());
+                count += events.size();
                 if (!CollectionUtils.isEmpty(events)) {
                     eventEnrichmentTasks.addAll(events.stream()
                             .map(event -> eventEnrichmentTask.enrichEvent(event, feed))
                             .toList());
                 }
             }
+            updateObservationsMetric(count);
             CompletableFuture.allOf(eventEnrichmentTasks.toArray(CompletableFuture[]::new)).join();
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);

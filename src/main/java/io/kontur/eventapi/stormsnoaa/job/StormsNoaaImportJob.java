@@ -50,11 +50,12 @@ public class StormsNoaaImportJob extends AbstractJob {
                 .filter(file -> isNewOrUpdatedFile(latestHazardUpdatedAt, file.getUpdatedAt()))
                 .sorted(Comparator.comparing(FileInfo::getUpdatedAt))
                 .collect(Collectors.toList());
+        int count = 0;
         for (FileInfo file : files) {
             String tmpPath = importService.getFilePath(file.getFilename());
             try {
                importService.downloadFile(file.getFilename(), tmpPath);
-               processFile(tmpPath, file.getUpdatedAt());
+               count += processFile(tmpPath, file.getUpdatedAt());
             } catch (Exception e) {
                 LOG.error(e.getMessage());
                 break;
@@ -62,9 +63,10 @@ public class StormsNoaaImportJob extends AbstractJob {
                 importService.deleteFile(tmpPath);
             }
         }
+        updateObservationsMetric(count);
     }
 
-    private void processFile(String filePath, OffsetDateTime updatedAt) throws Exception {
+    private int processFile(String filePath, OffsetDateTime updatedAt) throws Exception {
         try (FileInputStream fileInputStream = new FileInputStream(filePath);
              GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
              InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream);
@@ -76,6 +78,7 @@ public class StormsNoaaImportJob extends AbstractJob {
                 processRow(header, row, updatedAt).ifPresent(dataLakes::add);
             }
             dataLakeDao.storeDataLakes(dataLakes);
+            return dataLakes.size();
         }
     }
 

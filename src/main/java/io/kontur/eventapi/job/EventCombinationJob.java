@@ -41,6 +41,7 @@ public class EventCombinationJob extends AbstractJob  {
     public void execute() {
         List<NormalizedObservation> observations = observationsDao
                 .getObservationsNotLinkedToEvent(Arrays.asList(sequentialProviders));
+        updateObservationsMetric(observations.size());
 
         if (!CollectionUtils.isEmpty(observations)) {
             LOG.info("Combination processing: {} events", observations.size());

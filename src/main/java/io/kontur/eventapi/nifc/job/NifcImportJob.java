@@ -45,37 +45,41 @@ public class NifcImportJob extends AbstractJob {
 
     @Override
     public void execute() throws Exception {
-        processLocations();
-        processPerimeters();
+        int count = 0;
+        count += processLocations();
+        count += processPerimeters();
+        updateObservationsMetric(count);
     }
 
-    private void processLocations() {
+    private int processLocations() {
         try {
             String data = client.getNifcLocations();
             try {
-                processFeatureCollection(data, NIFC_LOCATIONS_PROVIDER, "ModifiedOnDateTime_dt", "UniqueFireIdentifier");
+                return processFeatureCollection(data, NIFC_LOCATIONS_PROVIDER, "ModifiedOnDateTime_dt", "UniqueFireIdentifier");
             } catch (Exception e) {
                 LOG.error("Failed to process NIFC locations", e);
             }
         } catch (Exception e) {
             LOG.warn("Failed to obtain NIFC locations");
         }
+        return 0;
     }
 
-    private void processPerimeters() {
+    private int processPerimeters() {
         try {
             String data = client.getNifcPerimeters();
             try {
-                processFeatureCollection(data, NIFC_PERIMETERS_PROVIDER, "attr_ModifiedOnDateTime_dt", "attr_UniqueFireIdentifier");
+                return processFeatureCollection(data, NIFC_PERIMETERS_PROVIDER, "attr_ModifiedOnDateTime_dt", "attr_UniqueFireIdentifier");
             } catch (Exception e) {
                 LOG.error("Failed to process NIFC perimeters");
             }
         } catch (Exception e) {
             LOG.warn("Failed to obtain NIFC perimeters");
         }
+        return 0;
     }
 
-    private void processFeatureCollection(String geoJson, String provider, String updatedAtProp, String externalIdProp) {
+    private int processFeatureCollection(String geoJson, String provider, String updatedAtProp, String externalIdProp) {
         try {
             FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(geoJson);
             Map<Tuple2<String, OffsetDateTime>, DataLake> dataLakes = new HashMap<>();
@@ -105,10 +109,12 @@ public class NifcImportJob extends AbstractJob {
             }
             if (MapUtils.isNotEmpty(dataLakes)) {
                 dataLakeDao.storeDataLakes(dataLakes.values().stream().toList());
+                return dataLakes.size();
             }
         } catch (Exception e) {
             LOG.error("Failed to process feature collection from " + provider, e);
         }
+        return 0;
     }
 
     @Override
