@@ -35,7 +35,8 @@ public interface FeedMapper {
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,
                        @Param("autoExpire") Boolean autoExpire,
-                       @Param("geomFuncType") Integer geomFuncType);
+                       @Param("geomFuncType") Integer geomFuncType,
+                       @Param("revoked") Boolean revoked);
 
     /**
      * Mark events below specified version outdated
