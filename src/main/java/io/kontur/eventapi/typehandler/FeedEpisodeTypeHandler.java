@@ -21,6 +21,15 @@ public class FeedEpisodeTypeHandler extends BaseTypeHandler<List<FeedEpisode>> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, List<FeedEpisode> parameter,
                                     JdbcType jdbcType) throws SQLException {
+        // sort observations ids inside episodes and order episodes chronologically
+        if (parameter != null) {
+            parameter.sort(java.util.Comparator.comparing(FeedEpisode::getStartedAt));
+            parameter.forEach(ep -> {
+                if (ep.getObservations() != null) {
+                    ep.setObservations(new java.util.TreeSet<>(ep.getObservations()));
+                }
+            });
+        }
         ps.setObject(i, writeJson(parameter));
     }
 

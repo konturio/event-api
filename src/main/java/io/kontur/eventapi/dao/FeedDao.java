@@ -37,6 +37,11 @@ public class FeedDao {
 
     @Transactional
     public void insertFeedData(FeedData feedData, String feed) {
+        // sort ids for deterministic array representation in DB
+        feedData.setObservations(new java.util.TreeSet<>(feedData.getObservations()));
+        // keep episodes ordered chronologically for stable JSON
+        feedData.getEpisodes().sort(java.util.Comparator.comparing(FeedEpisode::getStartedAt));
+        feedData.getEpisodes().forEach(ep -> ep.setObservations(new java.util.TreeSet<>(ep.getObservations())));
         String episodesJson = writeJson(feedData.getEpisodes());
         int count = mapper.insertFeedData(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion(),
                 feedData.getName(), feedData.getProperName(), feedData.getDescription(), feedData.getType(),
@@ -69,6 +74,9 @@ public class FeedDao {
 
     @Transactional
     public void addAnalytics(FeedData event, String feed) {
+        // keep episodes ordered by time so JSON comparisons stay stable
+        event.getEpisodes().sort(java.util.Comparator.comparing(FeedEpisode::getStartedAt));
+        event.getEpisodes().forEach(ep -> ep.setObservations(new java.util.TreeSet<>(ep.getObservations())));
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
                 event.getName(), event.getEventDetails(), writeJson(event.getEpisodes()),
                 event.getEnriched(), event.getEnrichmentAttempts(), event.getEnrichmentSkipped());

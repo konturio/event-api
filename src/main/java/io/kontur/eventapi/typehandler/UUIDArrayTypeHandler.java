@@ -11,7 +11,9 @@ public class UUIDArrayTypeHandler extends BaseTypeHandler<Set<UUID>> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Set<UUID> parameter,
                                     JdbcType jdbcType) throws SQLException {
-        Array array = ps.getConnection().createArrayOf("uuid", parameter.toArray());
+        // sort for deterministic representation so arrays can be compared directly
+        UUID[] sorted = parameter.stream().sorted().toArray(UUID[]::new);
+        Array array = ps.getConnection().createArrayOf("uuid", sorted);
         ps.setArray(i, array);
     }
 
