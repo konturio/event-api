@@ -3,6 +3,8 @@ package io.kontur.eventapi.metrics.collector;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.GetQueueAttributesRequest;
 import com.amazonaws.services.sqs.model.GetQueueAttributesResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kontur.eventapi.metrics.MetricCollector;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -16,6 +18,7 @@ import static org.apache.commons.lang3.math.NumberUtils.toInt;
 @Profile("!awsSqsDisabled")
 public class AwsSqsMetricsCollector implements MetricCollector {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AwsSqsMetricsCollector.class);
     @Value("${aws.sqs.enabled:true}")
     private Boolean awsEnable;
 
@@ -39,8 +42,17 @@ public class AwsSqsMetricsCollector implements MetricCollector {
     @Override
     public void collect() {
         if (awsEnable) {
-            sqsQueueSize.set(getSqsQueueSize(awsUrl));
-            sqsDLQueueSize.set(getSqsQueueSize(awsDLQUrl));
+            sqsQueueSize.set(safeGetSqsQueueSize(awsUrl, sqsQueueSize.get()));
+            sqsDLQueueSize.set(safeGetSqsQueueSize(awsDLQUrl, sqsDLQueueSize.get()));
+        }
+    }
+
+    private int safeGetSqsQueueSize(String url, int defaultValue) {
+        try {
+            return getSqsQueueSize(url);
+        } catch (Exception e) {
+            LOG.warn("Unable to retrieve SQS queue size from {}: {}", url, e.getMessage());
+            return defaultValue;
         }
     }
 
