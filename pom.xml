@@ -32,6 +32,8 @@
     <lombok.version>1.18.38</lombok.version>
     <jib.source.image>openjdk:16-alpine</jib.source.image>
     <image.tag>${IMAGE_TAG}</image.tag>
+    <!-- Make Maven read HTTP(S)_PROXY env variables for dependency downloads -->
+    <maven.config>-Djava.net.useSystemProxies=true</maven.config>
   </properties>
   <dependencies>
     <!-- Web -->
