@@ -9,6 +9,9 @@ spring:
 konturApi:
   host: 'https://test-api.konturlabs.com/'
 
+eventApi:
+  host: 'https://test-api.konturlabs.com/events'
+
 konturApps:
   host: 'https://test-apps.konturlabs.com/'
 
@@ -21,6 +24,10 @@ staticdata:
 
 humanitarianCrisis:
   s3Folder: 'kontur_events/TEST QA/'
+
+crossProviderMerge:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'cross-provider-merge'
 
 aws:
   sqs:

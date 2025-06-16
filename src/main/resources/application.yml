@@ -48,6 +48,9 @@ spring:
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
 
+eventApi:
+  host: 'http://localhost:8624/events'
+
 konturApps:
   host: 'https://test-apps02.konturlabs.com/'
 
@@ -75,6 +78,10 @@ staticdata:
 humanitarianCrisis:
   s3Bucket: 'event-api-locker01'
   s3Folder: 'kontur_events/EXP/'
+
+crossProviderMerge:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'cross-provider-merge'
 
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
