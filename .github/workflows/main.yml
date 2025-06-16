@@ -3,8 +3,13 @@
 name: 01 Building with Maven
 
 'on':
-  - push
-  - fork
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   helper:
@@ -20,6 +25,8 @@ jobs:
     steps:
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Extracting metadata from a cloned repository
         id: get-cloned
