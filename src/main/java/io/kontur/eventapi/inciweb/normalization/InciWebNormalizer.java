@@ -43,7 +43,9 @@ public class InciWebNormalizer extends Normalizer {
             normalizedObservation.setProvider(dataLakeDto.getProvider());
             normalizedObservation.setEventSeverity(Severity.UNKNOWN);
             normalizedObservation.setName(parsedItem.get().getTitle());
+            normalizedObservation.setProperName(parsedItem.get().getTitle());
             normalizedObservation.setDescription(parsedItem.get().getDescription());
+            normalizedObservation.setEpisodeDescription(parsedItem.get().getDescription());
             normalizedObservation.setType(EventType.WILDFIRE);
             normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
             normalizedObservation.setStartedAt(dataLakeDto.getUpdatedAt());

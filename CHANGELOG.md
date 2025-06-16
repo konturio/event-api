@@ -5,6 +5,7 @@
 #### Added
 
 #### Changed
+- fix InciWeb provider import to set proper name and episode description
 
 #### Removed
 

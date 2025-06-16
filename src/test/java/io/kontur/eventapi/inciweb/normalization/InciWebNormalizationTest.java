@@ -48,7 +48,9 @@ class InciWebNormalizationTest {
         assertNull(observation.getExternalEpisodeId());
         assertEquals(Severity.UNKNOWN, observation.getEventSeverity());
         assertEquals("Title 1", observation.getName());
+        assertEquals("Title 1", observation.getProperName());
         assertEquals("Description 1", observation.getDescription());
+        assertEquals("Description 1", observation.getEpisodeDescription());
         assertEquals(EventType.WILDFIRE, observation.getType());
         assertEquals(dataLake.getUpdatedAt(), observation.getStartedAt());
         assertEquals(dataLake.getUpdatedAt(), observation.getEndedAt());
