@@ -82,6 +82,7 @@ pdc:
 
 Jobs for data import:
 - `hpSrvImport` - collects the raw data from PDC's Hazard and Product service (HpSrv)
+- `hpSrvProductsImport` - collects product information from HpSrv
 - `gdacsImport` - collects the raw data from Gdacs
 - ...
 
@@ -96,6 +97,9 @@ scheduler:
   hpSrvImport:
     enable: true
     initialDelay: 1000
+  hpSrvProductsImport:
+    enable: true
+    initialDelay: 15000
   gdacsImport:
     enable: true
     cron: 0 1/5 * * * *

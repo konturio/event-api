@@ -22,6 +22,7 @@ import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
+import io.kontur.eventapi.pdc.job.HpSrvProductsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
@@ -35,6 +36,7 @@ public class WorkerScheduler {
 
     private final HpSrvSearchJob hpSrvSearchJob;
     private final HpSrvMagsJob hpSrvMagsJob;
+    private final HpSrvProductsJob hpSrvProductsJob;
     private final GdacsSearchJob gdacsSearchJob;
     private final FirmsImportModisJob firmsImportModisJob;
     private final FirmsImportNoaaJob firmsImportNoaaJob;
@@ -65,6 +67,8 @@ public class WorkerScheduler {
     private String hpSrvImportEnabled;
     @Value("${scheduler.hpSrvMagsImport.enable}")
     private String hpSrvMagsImportEnabled;
+    @Value("${scheduler.hpSrvProductsImport.enable}")
+    private String hpSrvProductsImportEnabled;
     @Value("${scheduler.gdacsImport.enable}")
     private String gdacsImportEnabled;
     @Value("${scheduler.firmsModisImport.enable}")
@@ -116,6 +120,7 @@ public class WorkerScheduler {
 
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
+                           HpSrvProductsJob hpSrvProductsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FirmsEventCombinationJob firmsEventCombinationJob,
                            FeedCompositionJob feedCompositionJob, FirmsImportModisJob firmsImportModisJob,
@@ -130,6 +135,7 @@ public class WorkerScheduler {
                            MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
+        this.hpSrvProductsJob = hpSrvProductsJob;
         this.gdacsSearchJob = gdacsSearchJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
@@ -168,6 +174,13 @@ public class WorkerScheduler {
     public void startPdcMagsImport() {
         if (Boolean.parseBoolean(hpSrvMagsImportEnabled)) {
             hpSrvMagsJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.hpSrvProductsImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
+    public void startPdcProductsImport() {
+        if (Boolean.parseBoolean(hpSrvProductsImportEnabled)) {
+            hpSrvProductsJob.run();
         }
     }
 

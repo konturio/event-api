@@ -60,6 +60,20 @@ public class HpSrvService {
         }
     }
 
+    public JsonNode obtainProducts(HpSrvSearchBody searchBody) {
+        try {
+            return obtainProductsScheduled(searchBody);
+        } catch (RetryableException e) {
+            LOG.warn(e.getMessage());
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException interruptedException) {
+                throw new RuntimeException(e);
+            }
+            return obtainProductsScheduled(searchBody);
+        }
+    }
+
     public void saveHazard(JsonNode node) {
         DataLake dataLake = pdcDataLakeConverter.convertHpSrvHazardData(node);
         dataLakeDao.storeEventData(dataLake);
@@ -69,6 +83,15 @@ public class HpSrvService {
         if (json != null && !json.isEmpty() && !json.get("features").isEmpty()) {
             pdcDataLakeConverter.convertHpSrvMagData(json, externalId)
                     .forEach(dataLakeDao::storeEventData);
+        }
+    }
+
+    public void saveProduct(JsonNode node) {
+        DataLake dataLake = pdcDataLakeConverter.convertHpSrvProductData(node);
+        if (dataLake.getUpdatedAt() == null || Boolean.TRUE.equals(dataLakeDao.isNewEvent(
+                dataLake.getExternalId(), PdcDataLakeConverter.HP_SRV_PRODUCT_PROVIDER,
+                dataLake.getUpdatedAt().toInstant().toString()))) {
+            dataLakeDao.storeEventData(dataLake);
         }
     }
 
@@ -85,6 +108,15 @@ public class HpSrvService {
         try {
             bucket.asScheduler().consume(1);
             return hpSrvClient.getMags(hazardId);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private JsonNode obtainProductsScheduled(HpSrvSearchBody searchBody) {
+        try {
+            bucket.asScheduler().consume(1);
+            return hpSrvClient.searchProducts(searchBody);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

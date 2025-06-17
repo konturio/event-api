@@ -105,6 +105,9 @@ scheduler:
     enable: false
     initialDelay: 10000
     fixedDelay: 600000
+  hpSrvProductsImport:
+    enable: false
+    initialDelay: 15000
   pdcMapSrvSearch:
     enable: false
     initialDelay: 1000

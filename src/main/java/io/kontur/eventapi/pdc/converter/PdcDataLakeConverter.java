@@ -30,6 +30,7 @@ public class PdcDataLakeConverter {
 
     public final static String HP_SRV_SEARCH_PROVIDER = "hpSrvSearch";
     public final static String HP_SRV_MAG_PROVIDER = "hpSrvMag";
+    public final static String HP_SRV_PRODUCT_PROVIDER = "hpSrvProduct";
     public final static String PDC_SQS_PROVIDER = "pdcSqs";
     public final static String PDC_MAP_SRV_PROVIDER = "pdcMapSrv";
     public final static String PDC_SQS_NASA_PROVIDER = "pdcSqsNasa";
@@ -62,6 +63,19 @@ public class PdcDataLakeConverter {
         }
 
         return result;
+    }
+
+    public DataLake convertHpSrvProductData(JsonNode node) {
+        DataLake dataLake = new DataLake();
+        dataLake.setObservationId(UUID.randomUUID());
+        dataLake.setExternalId(node.get("uuid").asText());
+        if (node.has("updateDate")) {
+            dataLake.setUpdatedAt(getDateTimeFromMillis(node.get("updateDate")));
+        }
+        dataLake.setProvider(HP_SRV_PRODUCT_PROVIDER);
+        dataLake.setLoadedAt(DateTimeUtil.uniqueOffsetDateTime());
+        dataLake.setData(node.toString());
+        return dataLake;
     }
 
     public DataLake convertSQSMessage(String messageJson, String type, String messageId) {

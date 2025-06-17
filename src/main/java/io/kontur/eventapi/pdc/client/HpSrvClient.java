@@ -19,4 +19,8 @@ public interface HpSrvClient {
 
     @GetMapping("/hp_srv/services/mags/1/json/get_mags")
     JsonNode getMags(@RequestParam("hazard_id") String hazardId);
+
+    @PostMapping("/hp_srv/services/products/1/json/search_product")
+    @Headers({"Content-Type: application/json", "accept: application/json"})
+    JsonNode searchProducts(@RequestBody HpSrvSearchBody body);
 }
