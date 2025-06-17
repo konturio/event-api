@@ -17,4 +17,9 @@ public class TraceConfig {
     public LogHttpTraceRepository traceRepository() {
         return new LogHttpTraceRepository();
     }
+
+    @Bean
+    public IncomingRequestLoggingFilter incomingRequestLoggingFilter() {
+        return new IncomingRequestLoggingFilter();
+    }
 }
