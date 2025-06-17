@@ -37,5 +37,14 @@ Return a single event by feed alias, event ID and optional version. When the ver
 - `version` – event version number (optional).
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
 
+## `GET /v1/events/{feed}/{eventId}/episodes`
+Return all episodes of the specified event from the provided feed. Episodes are returned from the latest event version.
+
+**Path parameters**
+- `feed` – feed name.
+- `eventId` – event UUID.
+
+Responds with a JSON array of episodes or `204 No Content` if none found.
+
 ## `GET /v1/user_feeds`
 Return the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token.

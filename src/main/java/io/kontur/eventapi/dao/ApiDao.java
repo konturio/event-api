@@ -26,9 +26,13 @@ public class ApiDao {
 		return mapper.getFeeds();
 	}
 
-	public Optional<String> findDataByObservationId(UUID observationId) {
-		return mapper.findDataByObservationId(observationId);
-	}
+        public Optional<String> findDataByObservationId(UUID observationId) {
+                return mapper.findDataByObservationId(observationId);
+        }
+
+        public Optional<String> getEpisodesByEventId(UUID eventId, String feedAlias) {
+                return mapper.getEpisodesByEventId(eventId, feedAlias);
+        }
 
 	public String searchForEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
 	                                      OffsetDateTime to, OffsetDateTime updatedAfter, int limit,

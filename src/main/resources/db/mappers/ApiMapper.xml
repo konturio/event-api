@@ -7,6 +7,14 @@
         from feeds
     </select>
 
+    <select id="getEpisodesByEventId" resultType="java.lang.String">
+        select fd.episodes::text
+        from feed_data fd
+        where fd.event_id = #{eventId}
+          and fd.feed_id = (select feed_id from feeds where alias = #{feedAlias})
+          and fd.is_latest_version
+    </select>
+
     <select id="findDataByObservationId" resultType="java.lang.String">
         select data
         from data_lake

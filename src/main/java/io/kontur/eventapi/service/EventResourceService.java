@@ -36,6 +36,10 @@ public class EventResourceService {
         return apiDao.findDataByObservationId(observationId);
     }
 
+    public Optional<String> getEpisodesByEventId(UUID eventId, String feedAlias) {
+        return apiDao.getEpisodesByEventId(eventId, feedAlias);
+    }
+
     public boolean isCacheEnabled() {
         return !Arrays.asList(environment.getActiveProfiles()).contains("cacheDisabled");
     }

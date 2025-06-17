@@ -258,6 +258,22 @@ public class EventResource {
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
+    @GetMapping(path = "/events/{feed}/{eventId}/episodes", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            tags = "Events",
+            summary = "Returns episodes for an event",
+            description = "Returns all episodes of the latest event version from the specified feed.")
+    @PreAuthorize("hasAuthority('read:feed:'+#feed)")
+    public ResponseEntity<String> getEventEpisodes(
+            @Parameter(description = "Feed name")
+            @PathVariable String feed,
+            @Parameter(description = "Event UUID")
+            @PathVariable UUID eventId) {
+        return eventResourceService.getEpisodesByEventId(eventId, feed)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
 
     @GetMapping(path = "/user_feeds", produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(

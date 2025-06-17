@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -86,6 +87,26 @@ public class EventResourceTest {
         assertTrue(second.isPresent());
         assertEquals(SECOND_DESCRIPTION, second.get().getDescription());
 
+    }
+
+    @Test
+    public void getEventEpisodesReturnsData() {
+        UUID eventId = UUID.randomUUID();
+        when(apiDao.getEpisodesByEventId(eventId, FIRST_ALIAS)).thenReturn(Optional.of("[]"));
+
+        String body = eventResource.getEventEpisodes(FIRST_ALIAS, eventId).getBody();
+
+        assertEquals("[]", body);
+    }
+
+    @Test
+    public void getEventEpisodesNoContent() {
+        UUID eventId = UUID.randomUUID();
+        when(apiDao.getEpisodesByEventId(eventId, FIRST_ALIAS)).thenReturn(Optional.empty());
+
+        var response = eventResource.getEventEpisodes(FIRST_ALIAS, eventId);
+
+        assertEquals(204, response.getStatusCodeValue());
     }
 
     private void mockAuthWithRoles(List<String> roles) {
