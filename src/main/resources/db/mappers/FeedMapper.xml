@@ -20,6 +20,7 @@
                                active, started_at, ended_at, updated_at, location, urls,
                                <if test='loss != null'>loss,</if>
                                <if test='severityData != null'>severity_data,</if>
+                               <if test='eventSeverityData != null'>event_severity_data,</if>
                                observations, geometries, episodes, enriched, auto_expire)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{type},
                 (select severity_id from severities where severity = #{severity}),
@@ -27,6 +28,7 @@
                 #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
                 <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
                 <if test='severityData != null'>#{severityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
+                <if test='eventSeverityData != null'>#{eventSeverityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
                 #{observations, typeHandler=io.kontur.eventapi.typehandler.UUIDArrayTypeHandler},
                 <choose>
                     <when test="geomFuncType != null &amp;&amp; geomFuncType == 1">
@@ -58,7 +60,7 @@
 
     <select id="getNotEnrichedEventsForFeed" resultMap="feedDataDtoMap">
         select event_id, feed_id, version, updated_at, name,
-               enriched, enrichment_attempts, event_details, geometries, episodes, enrichment_skipped
+               enriched, enrichment_attempts, event_details, event_severity_data, geometries, episodes, enrichment_skipped
         from feed_data
         where feed_id = #{feedId} and not enriched
         order by enrichment_attempts nulls first, updated_at
@@ -67,7 +69,7 @@
 
     <select id="getEnrichmentSkippedEventsForFeed" resultMap="feedDataDtoMap">
         select event_id, feed_id, version, updated_at, name,
-               enriched, enrichment_attempts, event_details, geometries, episodes, enrichment_skipped
+               enriched, enrichment_attempts, event_details, event_severity_data, geometries, episodes, enrichment_skipped
         from feed_data
         where feed_id = #{feedId}
               and enrichment_skipped
@@ -90,6 +92,9 @@
         set
             <if test='eventDetails != null'>
                 event_details = #{eventDetails,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
+            </if>
+            <if test='eventSeverityData != null'>
+                event_severity_data = #{eventSeverityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,
             </if>
             enriched_at = current_timestamp,
             enriched = #{enriched},
@@ -147,6 +152,7 @@
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler" />
         <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler" />
         <result property="severityData" column="severity_data" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler" />
+        <result property="eventSeverityData" column="event_severity_data" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler" />
         <result property="eventDetails" column="event_details" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="observations" column="observations" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler" />
         <result property="geometries" column="geometries" typeHandler="io.kontur.eventapi.typehandler.FeatureCollectionTypeHandler"/>

@@ -171,6 +171,7 @@ public class FeedCompositionJob extends AbstractJob {
                         .forEach(e -> severityData.put(e.getKey(), e.getValue())));
         setMaxSeverityDataValues(episodes, severityData);
         feedData.setSeverityData(severityData);
+        feedData.setEventSeverityData(new HashMap<>(severityData));
 
         feedData.setActive(eventObservations.stream()
                 .filter(ep -> ep.getActive() != null)

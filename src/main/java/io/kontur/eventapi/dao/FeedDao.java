@@ -42,7 +42,7 @@ public class FeedDao {
                 feedData.getName(), feedData.getProperName(), feedData.getDescription(), feedData.getType(),
                 feedData.getSeverity(), feedData.getActive(), feedData.getStartedAt(), feedData.getEndedAt(),
                 feedData.getUpdatedAt(), feedData.getLocation(), feedData.getUrls(), feedData.getLoss(),
-                feedData.getSeverityData(), feedData.getObservations(), episodesJson, feedData.getEnriched(),
+                feedData.getSeverityData(), feedData.getEventSeverityData(), feedData.getObservations(), episodesJson, feedData.getEnriched(),
                 feedData.getAutoExpire(), feedData.getGeomFuncType());
 
         if (count > 0) {
@@ -70,7 +70,7 @@ public class FeedDao {
     @Transactional
     public void addAnalytics(FeedData event, String feed) {
         mapper.addAnalytics(event.getFeedId(), event.getEventId(), event.getVersion(),
-                event.getName(), event.getEventDetails(), writeJson(event.getEpisodes()),
+                event.getName(), event.getEventDetails(), event.getEventSeverityData(), writeJson(event.getEpisodes()),
                 event.getEnriched(), event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
         if (event.getEnriched()) {
             cacheUtil.evictEventListCache(feed);
