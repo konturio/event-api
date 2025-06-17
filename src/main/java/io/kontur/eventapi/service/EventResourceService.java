@@ -40,7 +40,7 @@ public class EventResourceService {
         return !Arrays.asList(environment.getActiveProfiles()).contains("cacheDisabled");
     }
 
-    @Cacheable(cacheResolver = "cacheResolver", condition = "#root.target.isCacheEnabled()")
+    @Cacheable(cacheResolver = "cacheResolver", condition = "#root.target.isCacheEnabled() && #bbox == null")
     public Optional<String> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
                                        OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                        List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,

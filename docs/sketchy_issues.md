@@ -6,7 +6,7 @@ During review a few areas looked unclear or potentially problematic. They may re
 The listener contains a TODO comment to "skip products until it is clear how to handle them". It is not documented what kind of SQS messages are ignored and whether products will be supported in the future.
 
 ## Caching behaviour
-`EventResourceService` enables caching unless the `cacheDisabled` profile is active. There is no documentation describing cache invalidation rules or expected time to live.
+`EventResourceService` enables caching unless the `cacheDisabled` profile is active. Starting from v1.21.1 requests that specify a `bbox` filter bypass the cache. There is still no documentation describing cache invalidation rules or expected time to live.
 
 ## Database functions
 Liquibase scripts reference helper functions such as `collectgeometryfromepisodes` and `collectGeomFromGeoJSON`. Their definitions are not present in the repository, making it difficult to understand how geometry is aggregated.
