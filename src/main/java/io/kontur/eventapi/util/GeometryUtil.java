@@ -94,4 +94,20 @@ public class GeometryUtil {
         }
         return true;
     }
+
+    public static boolean isForecasted(FeatureCollection fc) {
+        if (fc == null || fc.getFeatures() == null) {
+            return false;
+        }
+        for (Feature feature : fc.getFeatures()) {
+            Map<String, Object> props = feature.getProperties();
+            if (props != null) {
+                Object observed = props.get(IS_OBSERVED_PROPERTY);
+                if (observed instanceof Boolean && (Boolean) observed) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

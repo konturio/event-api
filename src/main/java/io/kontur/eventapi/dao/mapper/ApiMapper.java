@@ -30,8 +30,9 @@ public interface ApiMapper {
 	                       @Param("xMin") BigDecimal xMin,
 	                       @Param("xMax") BigDecimal xMax,
 	                       @Param("yMin") BigDecimal yMin,
-	                       @Param("yMax") BigDecimal yMax,
-	                       @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+                               @Param("yMax") BigDecimal yMax,
+                               @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
+                               @Param("forecasted") Boolean forecasted);
 
 	String searchForEventsGeoJson(@Param("feedAlias") String feedAlias,
 	                              @Param("eventTypes") List<EventType> eventTypes,
@@ -44,11 +45,13 @@ public interface ApiMapper {
 	                              @Param("xMin") BigDecimal xMin,
 	                              @Param("xMax") BigDecimal xMax,
 	                              @Param("yMin") BigDecimal yMin,
-	                              @Param("yMax") BigDecimal yMax,
-	                              @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+                                      @Param("yMax") BigDecimal yMax,
+                                      @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
+                                      @Param("forecasted") Boolean forecasted);
 
 	Optional<String> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
 	                                                     @Param("feedAlias") String feedAlias,
-	                                                     @Param("version") Long version,
-	                                                     @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+                                                             @Param("version") Long version,
+                                                             @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
+                                                             @Param("forecasted") Boolean forecasted);
 }

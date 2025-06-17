@@ -110,11 +110,13 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
+            EpisodeFilterType episodeFilterType,
+            @RequestParam(value = "forecasted", required = false)
+            Boolean forecasted) {
         Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, forecasted);
         if (dataOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -198,11 +200,13 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
-            EpisodeFilterType episodeFilterType) {
+            EpisodeFilterType episodeFilterType,
+            @RequestParam(value = "forecasted", required = false)
+            Boolean forecasted) {
         Optional<String> geoJsonOpt = eventResourceService.searchEventsGeoJson(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, forecasted);
         if (geoJsonOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -252,8 +256,10 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
-        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType)
+            EpisodeFilterType episodeFilterType,
+            @RequestParam(value = "forecasted", required = false)
+            Boolean forecasted) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, forecasted)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

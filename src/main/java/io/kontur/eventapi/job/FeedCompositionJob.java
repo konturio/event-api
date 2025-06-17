@@ -182,6 +182,9 @@ public class FeedCompositionJob extends AbstractJob {
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt))
                 .map(NormalizedObservation::getAutoExpire)
                 .orElse(null));
+
+        feedData.setForecasted(episodes.stream()
+                .allMatch(ep -> Boolean.TRUE.equals(ep.getForecasted())));
     }
 
     private void fillEpisodes(List<NormalizedObservation> observations, FeedData feedData) {
@@ -217,6 +220,7 @@ public class FeedCompositionJob extends AbstractJob {
         checkNotNull(episode.getEndedAt());
         checkState(!episode.getStartedAt().isAfter(episode.getEndedAt()));
 
+        episode.setForecasted(GeometryUtil.isForecasted(episode.getGeometries()));
         feedData.addEpisode(episode);
     }
 

@@ -35,6 +35,7 @@ public class FeedData {
     private OffsetDateTime composedAt;
     private OffsetDateTime enrichedAt;
     private Boolean autoExpire;
+    private Boolean forecasted;
     private Integer geomFuncType;
 
     public FeedData(UUID eventId, UUID feedId, Long version) {

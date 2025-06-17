@@ -84,6 +84,7 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 | `proper_name` | `text` |
 | `location` | `text` |
 | `collected_geometry` | `geometry` generated from episodes |
+| `forecasted` | `boolean` |
 
 Unique key: (`event_id`, `version`, `feed_id`). Several GIST and BTREE indexes exist for geometry and timestamps.
 

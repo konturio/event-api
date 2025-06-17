@@ -35,6 +35,7 @@ public interface FeedMapper {
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,
                        @Param("autoExpire") Boolean autoExpire,
+                       @Param("forecasted") Boolean forecasted,
                        @Param("geomFuncType") Integer geomFuncType);
 
     /**

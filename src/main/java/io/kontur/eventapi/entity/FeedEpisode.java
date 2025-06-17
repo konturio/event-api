@@ -28,6 +28,7 @@ public class FeedEpisode {
     private Map<String, Object> episodeDetails;
     private Set<UUID> observations = new HashSet<>();
     private FeatureCollection geometries;
+    private Boolean forecasted;
 
     public void addUrlIfNotExists(String url) {
         if (isNotBlank(url) && !this.urls.contains(url)) {

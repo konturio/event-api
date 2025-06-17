@@ -15,6 +15,7 @@ Search for events within a feed.
 - `limit` – page size (default `20`).
 - `sortOrder` – `ASC` or `DESC` by `updatedAt`.
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
+- `forecasted` – `true` to request forecast events, `false` for only actual events.
 
 Returns events sorted by update date using cursor based pagination. Response body is JSON containing `pageMetadata.nextAfterValue` and event data.
 

@@ -44,23 +44,26 @@ public class EventResourceService {
     public Optional<String> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
                                        OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                        List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,
-                                       EpisodeFilterType episodeFilterType) {
+                                       EpisodeFilterType episodeFilterType,
+                                       Boolean forecasted) {
         String data = apiDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter,
-                limit, severities, sortOrder, bbox, episodeFilterType);
+                limit, severities, sortOrder, bbox, episodeFilterType, forecasted);
         return data == null ? Optional.empty() : Optional.of(data);
     }
 
     @Cacheable(cacheNames = EVENT_CACHE_NAME, cacheManager = "longCacheManager", condition = "#root.target.isCacheEnabled()")
-    public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
-        return apiDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
+    public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType,
+                                                               Boolean forecasted) {
+        return apiDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, forecasted);
     }
 
     public Optional<String> searchEventsGeoJson(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
                                                 OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                                 List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,
-                                                EpisodeFilterType episodeFilterType) {
+                                                EpisodeFilterType episodeFilterType,
+                                                Boolean forecasted) {
         String geoJson = apiDao.searchForEventsGeoJson(feedAlias, eventTypes, from, to,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, forecasted);
         return geoJson == null ? Optional.empty() : Optional.of(geoJson);
     }
 }
