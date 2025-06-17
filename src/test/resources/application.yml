@@ -33,7 +33,7 @@ tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 
 calfire:
-  host: 'https://www.fire.ca.gov/'
+  host: 'https://incidents.fire.ca.gov'
 
 nifc:
   host: 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services'
