@@ -50,7 +50,7 @@ class ReEnrichmentJobTest {
         feedWithEnrichment.setFeedId(UUID.randomUUID());
         feedWithEnrichment.setAlias("feedWithEnrichment");
         feedWithEnrichment.setEnrichment(List.of(POPULATION, OSM_GAPS_PERCENTAGE));
-        feedWithEnrichment.setEnrichmentRequest("{polygonStatistic (polygonStatisticRequest: {polygon: \"%s\"}){analytics {population {population}}}}");
+        feedWithEnrichment.setEnrichmentRequest("query ($polygon: String!) { polygonStatistic(polygonStatisticRequest: {polygon: $polygon}){analytics {population {population}}}}");
     }
 
     private static final Feed feedWithoutEnrichment;

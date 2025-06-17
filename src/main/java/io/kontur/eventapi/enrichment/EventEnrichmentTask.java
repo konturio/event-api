@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static io.kontur.eventapi.enrichment.InsightsApiResponseHandler.processResponse;
-import static java.lang.String.format;
 import static org.apache.commons.lang3.RegExUtils.replaceAll;
 
 public class EventEnrichmentTask {
@@ -109,8 +108,10 @@ public class EventEnrichmentTask {
                     .map(geometry -> new Feature(geometry, new HashMap<>()))
                     .toArray(Feature[]::new);
             FeatureCollection geom = new FeatureCollection(features);
-            String query = format(enrichmentRequest, replaceAll(geom.toString(), "\"", "\\\\\\\""));
-            InsightsApiRequest request = new InsightsApiRequest(query);
+            String polygon = replaceAll(geom.toString(), "\"", "\\\\\\\"");
+            InsightsApiRequest request = new InsightsApiRequest();
+            request.setQuery(enrichmentRequest);
+            request.setVariables(Map.of("polygon", polygon));
             InsightsApiResponse response = konturAppsClient.graphql(request);
             return Optional.of(processResponse(response, enrichmentFields));
         } catch (Exception e) {

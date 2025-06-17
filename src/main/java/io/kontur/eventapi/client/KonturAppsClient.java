@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Qualifier("konturAppsClient")
 @FeignClient(value = "konturAppsClient", url = "${konturApps.host}")
 public interface KonturAppsClient {
-    @PostMapping(value = "/insights-api/graphql", headers = "Content-Type=application/json")
+    @PostMapping(value = "/insights/graphql", headers = "Content-Type=application/json")
     @ResponseBody
     InsightsApiResponse graphql(@RequestBody InsightsApiRequest request);
 }
