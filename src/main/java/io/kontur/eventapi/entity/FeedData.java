@@ -3,6 +3,8 @@ package io.kontur.eventapi.entity;
 import lombok.Data;
 import org.wololo.geojson.FeatureCollection;
 
+import java.math.BigDecimal;
+
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -22,6 +24,7 @@ public class FeedData {
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;
     private String location;
+    private BigDecimal cost;
     private List<String> urls = new ArrayList<>();
     private Map<String, Object> loss = new HashMap<>();
     private Map<String, Object> severityData = new HashMap<>();

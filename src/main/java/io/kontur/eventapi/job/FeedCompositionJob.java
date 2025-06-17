@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.math.BigDecimal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -139,6 +140,12 @@ public class FeedCompositionJob extends AbstractJob {
                 .filter(e -> !isEmpty(e.getLocation()))
                 .max(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getLocation).orElse(null));
+
+        feedData.setCost(episodes.stream()
+                .filter(e -> e.getCost() != null)
+                .max(comparing(FeedEpisode::getSourceUpdatedAt))
+                .map(FeedEpisode::getCost)
+                .orElse(null));
 
         feedData.setSeverity(episodes.stream()
                 .map(FeedEpisode::getSeverity)

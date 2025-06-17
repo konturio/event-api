@@ -81,6 +81,7 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 | `event_details` | `jsonb` default `{}` |
 | `geometries` | `jsonb` |
 | `urls` | `text[]` |
+| `cost` | `jsonb` |
 | `proper_name` | `text` |
 | `location` | `text` |
 | `collected_geometry` | `geometry` generated from episodes |
