@@ -8,7 +8,8 @@ Search for events within a feed.
 **Parameters**
 - `feed` – feed name (required).
 - `types` – list of event types.
-- `severities` – list of severity values.
+- `severities` – list of severity values (`UNKNOWN`, `TERMINATION`, `MINOR`, `MODERATE`, `SEVERE`, `EXTREME`).
+  When several values are provided, events matching any of them are returned.
 - `after` – return events updated after this timestamp.
 - `datetime` – interval filter. Accepts single RFC3339 timestamp or open/closed interval.
 - `bbox` – bounding box defined as `minLon,minLat,maxLon,maxLat`.

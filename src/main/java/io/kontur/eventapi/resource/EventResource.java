@@ -66,7 +66,8 @@ public class EventResource {
             @Parameter(description = "Filters events by type. More than one can be chosen at once")
             @RequestParam(value = "types", defaultValue = "")
             List<EventType> eventTypes,
-            @Parameter(description = "Filters events by severity. More than one can be chosen at once")
+            @Parameter(description = "Filters events by severity. Allowed values: UNKNOWN, TERMINATION, MINOR, MODERATE, SEVERE, EXTREME. " +
+                    "Multiple values select events matching any of them.")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
             @Parameter(description = "Includes events that were updated after this time. `updatedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")")
@@ -151,7 +152,8 @@ public class EventResource {
             @Parameter(description = "Filters events by type. More than one can be chosen at once")
             @RequestParam(value = "types", defaultValue = "")
             List<EventType> eventTypes,
-            @Parameter(description = "Filters events by severity. More than one can be chosen at once")
+            @Parameter(description = "Filters events by severity. Allowed values: UNKNOWN, TERMINATION, MINOR, MODERATE, SEVERE, EXTREME. " +
+                    "Multiple values select events matching any of them.")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
             @Parameter(description = "Includes events that were updated after this time. " +

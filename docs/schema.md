@@ -95,6 +95,15 @@ Reference table of possible severity levels.
 | `severity_id` | `smallserial` primary key |
 | `severity` | `text` |
 
+Possible severities are:
+
+- `UNKNOWN`
+- `TERMINATION`
+- `MINOR`
+- `MODERATE`
+- `SEVERE`
+- `EXTREME`
+
 ## `feed_event_status`
 Tracks current events per feed.
 
