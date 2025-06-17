@@ -16,3 +16,8 @@ The table `feed_event_status` tracks the latest events per feed, but there are n
 
 ## External dependencies
 The project depends on a private Maven repository (`nexus.kontur.io`). Without access to it the build and tests cannot be executed.
+
+## `tornado.japan-ma` CSV ingestion
+The original implementation parsed HTML pages from the Japan Meteorological Agency.
+Updated data is provided as a CSV file. The import job now downloads the CSV and
+stores each row in `data_lake` without transformation.

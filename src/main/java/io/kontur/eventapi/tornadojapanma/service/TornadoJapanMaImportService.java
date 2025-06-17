@@ -6,6 +6,8 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.tornadojapanma.dto.ParsedCase;
 import io.kontur.eventapi.util.DateTimeUtil;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,10 @@ public class TornadoJapanMaImportService {
         this.dataLakeDao = dataLakeDao;
     }
 
+    public String downloadCsv(String url) throws Exception {
+        return Jsoup.connect(url).ignoreContentType(true).execute().body();
+    }
+
     public void storeDataLakes(Set<ParsedCase> parsedCases, OffsetDateTime updatedAt) {
         List<DataLake> dataLakes = new ArrayList<>();
         for (ParsedCase parsedCase : parsedCases) {
@@ -43,6 +49,33 @@ public class TornadoJapanMaImportService {
                     DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
                     dataLake.setProvider(TORNADO_JAPAN_MA_PROVIDER);
                     dataLake.setData(data);
+                    dataLakes.add(dataLake);
+                }
+            } catch (Exception e) {
+                LOG.warn(e.getMessage());
+            }
+        }
+        dataLakeDao.storeDataLakes(dataLakes);
+    }
+
+    public void storeCsvData(String csvData, OffsetDateTime updatedAt) {
+        String[] rows = csvData.split("\r?\n");
+        if (rows.length == 0) {
+            return;
+        }
+        String header = rows[0];
+        List<DataLake> dataLakes = new ArrayList<>();
+        for (int i = 1; i < rows.length; i++) {
+            String row = rows[i];
+            if (StringUtils.isBlank(row)) {
+                continue;
+            }
+            try {
+                String externalId = DigestUtils.md5Hex(row);
+                if (dataLakeDao.getLatestDataLakeByExternalIdAndProvider(externalId, TORNADO_JAPAN_MA_PROVIDER).isEmpty()) {
+                    DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
+                    dataLake.setProvider(TORNADO_JAPAN_MA_PROVIDER);
+                    dataLake.setData(header + "\n" + row);
                     dataLakes.add(dataLake);
                 }
             } catch (Exception e) {

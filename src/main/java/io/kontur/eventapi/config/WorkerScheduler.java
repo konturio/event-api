@@ -25,6 +25,7 @@ import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
+import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaCsvImportJob;
 import io.kontur.eventapi.uhc.job.HumanitarianCrisisImportJob;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -47,6 +48,7 @@ public class WorkerScheduler {
     private final StaticImportJob staticImportJob;
     private final StormsNoaaImportJob stormsNoaaImportJob;
     private final TornadoJapanMaImportJob tornadoJapanMaImportJob;
+    private final TornadoJapanMaCsvImportJob tornadoJapanMaCsvImportJob;
     private final HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob;
     private final PdcMapSrvSearchJobs pdcMapSrvSearchJobs;
     private final EnrichmentJob enrichmentJob;
@@ -87,6 +89,8 @@ public class WorkerScheduler {
     private String stormsNoaaImportEnabled;
     @Value("${scheduler.tornadoJapanMaImport.enable}")
     private String tornadoJapanMaImportEnabled;
+    @Value("${scheduler.tornadoJapanMaCsvImport.enable}")
+    private String tornadoJapanMaCsvImportEnabled;
     @Value("${scheduler.historicalTornadoJapanMaImport.enable}")
     private String historicalTornadoJapanMaImportEnabled;
     @Value("${scheduler.pdcMapSrvSearch.enable}")
@@ -122,6 +126,7 @@ public class WorkerScheduler {
                            FirmsImportNoaaJob firmsImportNoaaJob, FirmsImportSuomiJob firmsImportSuomiJob,
                            EmDatImportJob emDatImportJob, StaticImportJob staticImportJob,
                            StormsNoaaImportJob stormsNoaaImportJob, TornadoJapanMaImportJob tornadoJapanMaImportJob,
+                           TornadoJapanMaCsvImportJob tornadoJapanMaCsvImportJob,
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
                            PdcMapSrvSearchJobs pdcMapSrvSearchJobs,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
@@ -142,6 +147,7 @@ public class WorkerScheduler {
         this.staticImportJob = staticImportJob;
         this.stormsNoaaImportJob = stormsNoaaImportJob;
         this.tornadoJapanMaImportJob = tornadoJapanMaImportJob;
+        this.tornadoJapanMaCsvImportJob = tornadoJapanMaCsvImportJob;
         this.historicalTornadoJapanMaImportJob = historicalTornadoJapanMaImportJob;
         this.pdcMapSrvSearchJobs = pdcMapSrvSearchJobs;
         this.enrichmentJob = enrichmentJob;
@@ -237,6 +243,13 @@ public class WorkerScheduler {
     public void startTornadoJapanMaImport() {
         if (Boolean.parseBoolean(tornadoJapanMaImportEnabled)) {
             tornadoJapanMaImportJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.tornadoJapanMaCsvImport.initialDelay}", fixedDelayString = "${scheduler.tornadoJapanMaCsvImport.fixedDelay}")
+    public void startTornadoJapanMaCsvImport() {
+        if (Boolean.parseBoolean(tornadoJapanMaCsvImportEnabled)) {
+            tornadoJapanMaCsvImportJob.run();
         }
     }
 

@@ -31,6 +31,7 @@ humanitarianCrisis:
 
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
+  csv: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/data/ichiran.csv'
 
 calfire:
   host: 'https://www.fire.ca.gov/'
@@ -89,6 +90,10 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
   tornadoJapanMaImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  tornadoJapanMaCsvImport:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
