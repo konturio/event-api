@@ -8,6 +8,7 @@ import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
+import io.kontur.eventapi.gdacs.job.GdacsHistoryImportJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.EnrichmentJob;
 import io.kontur.eventapi.job.ReEnrichmentJob;
@@ -48,6 +49,7 @@ class WorkerSchedulerTest {
     private final EventCombinationJob eventCombinationJob = mock(EventCombinationJob.class);
     private final FeedCompositionJob feedCompositionJob = mock(FeedCompositionJob.class);
     private final GdacsSearchJob gdacsSearchJob = mock(GdacsSearchJob.class);
+    private final GdacsHistoryImportJob gdacsHistoryImportJob = mock(GdacsHistoryImportJob.class);
     private final FirmsImportModisJob firmsImportModisJob = mock(FirmsImportModisJob.class);
     private final FirmsImportNoaaJob firmsImportNoaaJob = mock(FirmsImportNoaaJob.class);
     private final FirmsImportSuomiJob firmsImportSuomiJob = mock(FirmsImportSuomiJob.class);
@@ -71,7 +73,7 @@ class WorkerSchedulerTest {
     private final ReEnrichmentJob reEnrichmentJob = mock(ReEnrichmentJob.class);
     private final EventExpirationJob eventExpirationJob = mock(EventExpirationJob.class);
 
-    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob,
+    private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, gdacsHistoryImportJob, normalizationJob,
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
             historicalTornadoJapanMaImportJob, pdcMapSrvSearchJobs, enrichmentJob, calFireSearchJob,
@@ -83,6 +85,7 @@ class WorkerSchedulerTest {
         Mockito.reset(hpSrvSearchJob);
         Mockito.reset(hpSrvMagsJob);
         Mockito.reset(gdacsSearchJob);
+        Mockito.reset(gdacsHistoryImportJob);
         Mockito.reset(firmsImportModisJob);
         Mockito.reset(firmsImportNoaaJob);
         Mockito.reset(firmsImportSuomiJob);
@@ -170,6 +173,22 @@ class WorkerSchedulerTest {
         scheduler.startGdacsImport();
 
         verify(gdacsSearchJob, times(1)).run();
+    }
+
+    @Test
+    public void startGdacsHistoryImportJob() {
+        ReflectionTestUtils.setField(scheduler, "gdacsHistoryImportEnabled", "true");
+        scheduler.startGdacsHistoryImport();
+
+        verify(gdacsHistoryImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipGdacsHistoryImportJob() {
+        ReflectionTestUtils.setField(scheduler, "gdacsHistoryImportEnabled", "false");
+        scheduler.startGdacsHistoryImport();
+
+        verify(gdacsHistoryImportJob, never()).run();
     }
 
     @Test

@@ -21,6 +21,7 @@ import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
+import io.kontur.eventapi.gdacs.job.GdacsHistoryImportJob;
 import io.kontur.eventapi.pdc.job.HpSrvMagsJob;
 import io.kontur.eventapi.pdc.job.HpSrvSearchJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
@@ -36,6 +37,7 @@ public class WorkerScheduler {
     private final HpSrvSearchJob hpSrvSearchJob;
     private final HpSrvMagsJob hpSrvMagsJob;
     private final GdacsSearchJob gdacsSearchJob;
+    private final GdacsHistoryImportJob gdacsHistoryImportJob;
     private final FirmsImportModisJob firmsImportModisJob;
     private final FirmsImportNoaaJob firmsImportNoaaJob;
     private final FirmsImportSuomiJob firmsImportSuomiJob;
@@ -67,6 +69,8 @@ public class WorkerScheduler {
     private String hpSrvMagsImportEnabled;
     @Value("${scheduler.gdacsImport.enable}")
     private String gdacsImportEnabled;
+    @Value("${scheduler.gdacsHistoryImport.enable}")
+    private String gdacsHistoryImportEnabled;
     @Value("${scheduler.firmsModisImport.enable}")
     private String firmsModisImportEnabled;
     @Value("${scheduler.firmsNoaaImport.enable}")
@@ -116,7 +120,8 @@ public class WorkerScheduler {
 
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
-                           GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
+                           GdacsSearchJob gdacsSearchJob, GdacsHistoryImportJob gdacsHistoryImportJob,
+                           NormalizationJob normalizationJob,
                            EventCombinationJob eventCombinationJob, FirmsEventCombinationJob firmsEventCombinationJob,
                            FeedCompositionJob feedCompositionJob, FirmsImportModisJob firmsImportModisJob,
                            FirmsImportNoaaJob firmsImportNoaaJob, FirmsImportSuomiJob firmsImportSuomiJob,
@@ -131,6 +136,7 @@ public class WorkerScheduler {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
+        this.gdacsHistoryImportJob = gdacsHistoryImportJob;
         this.normalizationJob = normalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.firmsEventCombinationJob = firmsEventCombinationJob;
@@ -188,6 +194,13 @@ public class WorkerScheduler {
     public void startGdacsImport() {
         if (Boolean.parseBoolean(gdacsImportEnabled)) {
             gdacsSearchJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.gdacsHistoryImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
+    public void startGdacsHistoryImport() {
+        if (Boolean.parseBoolean(gdacsHistoryImportEnabled)) {
+            gdacsHistoryImportJob.run();
         }
     }
 

@@ -112,6 +112,9 @@ scheduler:
   gdacsImport:
     enable: true
     cron: 0 1/5 * * * * # every five minutes after hh:01:00
+  gdacsHistoryImport:
+    enable: false
+    initialDelay: 1000
   firmsModisImport:
     enable: false
     initialDelay: 1000

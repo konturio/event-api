@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 #### Added
+- GDACS history import job
 
 #### Changed
 
