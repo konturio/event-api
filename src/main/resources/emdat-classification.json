@@ -1,0 +1,12 @@
+{
+  "Drought": "DROUGHT",
+  "Earthquake": "EARTHQUAKE",
+  "Flood": "FLOOD",
+  "Storm": "STORM",
+  "Tornado": "TORNADO",
+  "Tropical cyclone": "CYCLONE",
+  "Tsunami": "TSUNAMI",
+  "Volcanic activity": "VOLCANO",
+  "Wildfire": "WILDFIRE",
+  "Winter storm/Blizzard": "WINTER_STORM"
+}

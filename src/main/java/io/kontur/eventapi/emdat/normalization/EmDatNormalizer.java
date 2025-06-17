@@ -4,6 +4,7 @@ import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.emdat.normalization.converter.EmDatGeometryConverter;
 import io.kontur.eventapi.emdat.normalization.converter.EmDatSeverityConverter;
 import io.kontur.eventapi.emdat.service.EmDatNormalizationService;
+import io.kontur.eventapi.emdat.classification.EmDatTypeClassifier;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
@@ -35,18 +36,7 @@ public class EmDatNormalizer extends Normalizer {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmDatNormalizer.class);
 
-    private static final Map<String, EventType> typeMap = Map.of(
-            "Drought", EventType.DROUGHT,
-            "Earthquake", EventType.EARTHQUAKE,
-            "Flood", EventType.FLOOD,
-            "Storm", EventType.STORM,
-            "Tornado", EventType.TORNADO,
-            "Tropical cyclone", EventType.CYCLONE,
-            "Tsunami", EventType.TSUNAMI,
-            "Volcanic activity", EventType.VOLCANO,
-            "Wildfire", EventType.WILDFIRE,
-            "Winter storm/Blizzard", EventType.WINTER_STORM
-    );
+    private final EmDatTypeClassifier typeClassifier;
 
     private final List<EmDatSeverityConverter> severityConverters;
     private final EmDatGeometryConverter geometryConverter;
@@ -55,10 +45,13 @@ public class EmDatNormalizer extends Normalizer {
 
     public EmDatNormalizer(
             List<EmDatSeverityConverter> severityConverters,
-            EmDatGeometryConverter geometryConverter, EmDatNormalizationService normalizationService) {
+            EmDatGeometryConverter geometryConverter,
+            EmDatNormalizationService normalizationService,
+            EmDatTypeClassifier typeClassifier) {
         this.severityConverters = severityConverters;
         this.geometryConverter = geometryConverter;
         this.normalizationService = normalizationService;
+        this.typeClassifier = typeClassifier;
     }
 
     @Override
@@ -154,14 +147,14 @@ public class EmDatNormalizer extends Normalizer {
     }
 
     private EventType defineEventType(String disasterType, String disasterSubtype, String disasterSubSubtype) {
-        EventType type = typeMap.get(disasterSubSubtype);
-        if (type == null) {
-            type = typeMap.get(disasterSubtype);
+        EventType type = typeClassifier.classify(disasterSubSubtype);
+        if (type == EventType.OTHER) {
+            type = typeClassifier.classify(disasterSubtype);
         }
-        if (type == null) {
-            type = typeMap.get(disasterType);
+        if (type == EventType.OTHER) {
+            type = typeClassifier.classify(disasterType);
         }
-        return Optional.ofNullable(type).orElse(EventType.OTHER);
+        return type;
     }
 
     private String makeName(Map<String, String> csvData) {
