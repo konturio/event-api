@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.FeedDto;
+import static io.kontur.eventapi.util.CacheUtil.FEED_LIST_CACHE_NAME;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class EventResourceService {
         this.environment = environment;
     }
 
+    @Cacheable(cacheNames = FEED_LIST_CACHE_NAME, condition = "#root.target.isCacheEnabled()")
     public List<FeedDto> getFeeds() {
         return apiDao.getFeeds();
     }

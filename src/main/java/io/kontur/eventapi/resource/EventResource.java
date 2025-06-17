@@ -17,6 +17,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -34,6 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EventResource {
 
     private final EventResourceService eventResourceService;
+    private static final Logger LOG = LoggerFactory.getLogger(EventResource.class);
 
     public EventResource(EventResourceService eventResourceService) {
         this.eventResourceService = eventResourceService;
@@ -270,10 +273,12 @@ public class EventResource {
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> authority != null && authority.startsWith("read:feed:"))
                 .toList();
+        LOG.debug("User roles: {}", userRoles);
         List<FeedDto> allowedFeeds = eventResourceService.getFeeds()
                 .stream()
                 .filter(feed -> userRoles.contains("read:feed:" + feed.getFeed()))
                 .toList();
+        LOG.debug("Allowed feeds count: {}", allowedFeeds.size());
         return ResponseEntity.ok(allowedFeeds);
     }
 }
