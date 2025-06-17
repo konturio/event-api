@@ -45,6 +45,9 @@ spring:
   profiles:
     active: awsSqsDisabled, jwtAuthDisabled, cacheDisabled
 
+app:
+  enabledFeeds: kontur-public, kontur-private, pdc, wildfires, micglobal
+
 konturApi:
   host: 'https://test-api02.konturlabs.com/'
 

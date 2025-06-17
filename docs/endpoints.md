@@ -38,4 +38,6 @@ Return a single event by feed alias, event ID and optional version. When the ver
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
 
 ## `GET /v1/user_feeds`
-Return the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token.
+Return the list of feeds available for the authenticated user. The list is built
+from the roles present in the JWT token and limited by the `app.enabledFeeds`
+configuration option.

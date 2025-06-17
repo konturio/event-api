@@ -4,6 +4,9 @@ import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.FeedDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -13,7 +16,9 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static io.kontur.eventapi.util.CacheUtil.EVENT_CACHE_NAME;
 
@@ -22,6 +27,9 @@ public class EventResourceService {
 
     private final ApiDao apiDao;
     private final Environment environment;
+    @Value("${app.enabledFeeds:}")
+    private String[] enabledFeeds;
+    private static final Logger LOG = LoggerFactory.getLogger(EventResourceService.class);
 
     public EventResourceService(ApiDao apiDao, Environment environment) {
         this.apiDao = apiDao;
@@ -29,7 +37,18 @@ public class EventResourceService {
     }
 
     public List<FeedDto> getFeeds() {
-        return apiDao.getFeeds();
+        List<FeedDto> feeds = apiDao.getFeeds();
+        if (enabledFeeds == null || enabledFeeds.length == 0) {
+            LOG.debug("All feeds enabled; returning full list");
+            return feeds;
+        }
+        Set<String> allowed = Arrays.stream(enabledFeeds)
+                .filter(it -> it != null && !it.isBlank())
+                .collect(Collectors.toSet());
+        LOG.debug("Enabled feeds from config: {}", allowed);
+        return feeds.stream()
+                .filter(feed -> allowed.contains(feed.getFeed()))
+                .collect(Collectors.toList());
     }
 
     public Optional<String> getRawData(UUID observationId) {

@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +42,7 @@ public class EventResourceTest {
     @BeforeEach
     public void before() {
         eventResource = new EventResource(eventResourceService);
+        ReflectionTestUtils.setField(eventResourceService, "enabledFeeds", new String[]{FIRST_ALIAS, SECOND_ALIAS});
     }
 
     @Test
