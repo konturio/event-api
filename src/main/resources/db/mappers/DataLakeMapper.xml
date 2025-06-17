@@ -5,123 +5,121 @@
 <mapper namespace="io.kontur.eventapi.dao.mapper.DataLakeMapper">
 
     <insert id="create" useGeneratedKeys="false">
-        INSERT INTO data_lake (observation_id, external_id, updated_at, loaded_at, provider, data, normalized, skipped)
-        VALUES (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data}, #{normalized}, #{skipped})
+        insert into data_lake (observation_id, external_id, updated_at, loaded_at, provider, data, normalized, skipped)
+        values (#{observationId}, #{externalId}, #{updatedAt}, #{loadedAt}, #{provider}, #{data}, #{normalized}, #{skipped})
     </insert>
 
     <insert id="markAsNormalized">
-        UPDATE data_lake SET normalized = 'true' WHERE observation_id = #{observationId}
+        update data_lake set normalized = 'true' where observation_id = #{observationId}
     </insert>
 
     <insert id="markAsSkipped">
-        UPDATE data_lake SET skipped = true WHERE observation_id = #{observationId}
+        update data_lake set skipped = true where observation_id = #{observationId}
     </insert>
 
     <select id="getLatestUpdatedEventForProvider" resultType="io.kontur.eventapi.entity.DataLake">
-        SELECT observation_id as observationId, external_id as externalId, updated_at as updatedAt, loaded_at as loadedAt, provider, data
-        FROM data_lake
-        WHERE provider = #{provider}
-        ORDER BY updated_at DESC
-        LIMIT 1
+        select observation_id as observationId, external_id as externalId, updated_at as updatedAt, loaded_at as loadedAt, provider, data
+        from data_lake
+        where provider = #{provider}
+        order by updated_at desc
+        limit 1
     </select>
 
     <select id="getPdcHpSrvHazardsWithoutAreas" resultMap="dataLakeMap">
-        SELECT distinct on (e1.external_id) *
-        FROM data_lake e1
-        WHERE e1.provider = 'hpSrvSearch'
-          AND NOT EXISTS(
-                select * from data_lake e2 where e1.external_id = e2.external_id and e2.provider = 'hpSrvMag'
+        select distinct on (e1.external_id) *
+        from data_lake e1
+        where e1.provider = 'hpSrvSearch'
+          and not exists(
+                select from data_lake e2
+                where e1.external_id = e2.external_id
+                  and e2.provider = 'hpSrvMag'
               )
     </select>
 
     <select id="getDenormalizedEvents" resultMap="dataLakeMap">
-        SELECT *
-        FROM data_lake e
-        WHERE normalized is false and skipped is false
+        select *
+        from data_lake e
+        where normalized is false and skipped is false
         <foreach item="provider" collection="providers" separator="," open="and provider in (" close=")">
             #{provider}
         </foreach>
-        ORDER BY loaded_at
-        LIMIT 100000
+        order by loaded_at
+        limit 100000
     </select>
 
     <select id="getDataLakesByExternalId" resultMap="dataLakeMap">
-        SELECT *
-        FROM data_lake
-        WHERE external_id = #{externalId}
+        select *
+        from data_lake
+        where external_id = #{externalId}
     </select>
 
     <select id="getDataLakesByExternalIds" resultMap="dataLakeMap">
-        SELECT *
-        FROM data_lake
-        WHERE
+        select *
+        from data_lake
+        where
         <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
             #{externalId}
         </foreach>
     </select>
 
     <select id="getDataLakesByExternalIdsAndProvider" resultMap="dataLakeMap">
-        SELECT *
-        FROM data_lake
-        WHERE
-        provider = #{provider} AND
+        select *
+        from data_lake
+        where
+        provider = #{provider} and
         <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
             #{externalId}
         </foreach>
     </select>
 
     <select id="getDataLakesIdByExternalIdsAndProvider" resultType="java.lang.String">
-        SELECT external_id
-        FROM data_lake
-        WHERE
-        provider = #{provider} AND
+        select external_id
+        from data_lake
+        where
+        provider = #{provider} and
         <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
             #{externalId}
         </foreach>
     </select>
 
     <select id="getLatestDataLakeByExternalIdAndProvider" resultMap="dataLakeMap">
-        SELECT *
-        FROM data_lake
-        WHERE external_id = #{externalId}
-          AND provider = #{provider}
-        ORDER BY updated_at DESC
-        LIMIT 1
+        select *
+        from data_lake
+        where external_id = #{externalId}
+          and provider = #{provider}
+        order by updated_at desc
+        limit 1
     </select>
 
     <select id="getPdcExposureGeohashes" resultMap="exposureGeohash">
-        SELECT external_id, jsonb_object_field_text((data::jsonb)->'properties', 'geohash') as geohash
-        FROM data_lake
-        WHERE provider = 'pdcMapSrv' AND
+        select external_id, jsonb_object_field_text((data::jsonb)->'properties', 'geohash') as geohash
+        from data_lake
+        where provider = 'pdcMapSrv' and
         <foreach item="externalId" collection="externalIds" separator="," open="external_id in (" close=")">
             #{externalId}
         </foreach>
     </select>
 
     <select id="isNewPdcExposure" resultType="java.lang.Boolean">
-        WITH datalakes AS (
-            SELECT * FROM data_lake
-            WHERE external_id = #{externalId} AND provider = 'pdcMapSrv'
+        with datalakes as (
+            select * from data_lake
+            where external_id = #{externalId}
+              and provider = 'pdcMapSrv'
         )
-        SELECT
-            CASE WHEN EXISTS (
-                SELECT * FROM datalakes
-                WHERE jsonb_object_field_text((data::jsonb)->'properties', 'geohash') = #{geoHash}
-            ) THEN FALSE ELSE TRUE
-            END
+        select not exists(
+                select from datalakes
+                where jsonb_object_field_text((data::jsonb)->'properties', 'geohash') = #{geoHash}
+            )
     </select>
 
     <select id="isNewEvent" resultType="java.lang.Boolean">
-        SELECT
-            CASE WHEN EXISTS (
-                    SELECT a.*
-                    FROM (SELECT * FROM data_lake
-                          WHERE external_id =  #{externalId}
-                            AND provider = #{provider}
-                            AND updated_at at time zone 'UTC' = to_timestamp(#{updatedAt}, 'YYYY-MM-DDThh24:mi:ss')::timestamp
-                         ) a
-                ) THEN FALSE ELSE TRUE
-                END
+        select not exists(
+                select
+                from data_lake
+                where external_id = #{externalId}
+                  and provider = #{provider}
+                  and updated_at at time zone 'UTC' = to_timestamp(#{updatedAt}, 'YYYY-MM-DDThh24:mi:ss')::timestamp
+            )
     </select>
 
     <select id="getNotNormalizedObservationsCount" resultType="java.lang.Integer">

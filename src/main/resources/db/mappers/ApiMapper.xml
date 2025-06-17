@@ -8,9 +8,9 @@
     </select>
 
     <select id="findDataByObservationId" resultType="java.lang.String">
-        SELECT data
-        FROM data_lake
-        WHERE observation_id = #{observationId}
+        select data
+        from data_lake
+        where observation_id = #{observationId}
     </select>
 
     <select id="searchForEvents" resultType="java.lang.String">
@@ -51,8 +51,8 @@
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
                 <if test='updatedAfter != null'>
-                    <if test='"ASC".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
-                    <if test='"DESC".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
+                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
+                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
                 </if>
                 <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                     and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
@@ -64,7 +64,7 @@
             'pageMetadata', json_build_object('nextAfterValue',
                 (select
                     <choose>
-                        <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
+                        <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
                         <otherwise>max(e.updated_at)</otherwise>
                     </choose>
                 from events e)),
@@ -188,8 +188,8 @@
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
                 <if test='updatedAfter != null'>
-                    <if test='"ASC".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
-                    <if test='"DESC".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
+                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
+                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
                 </if>
                 <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                     and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
@@ -237,7 +237,7 @@
                 'pageMetadata', json_build_object('nextAfterValue',
                     (select
                         <choose>
-                            <when test='"DESC".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
+                            <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
                             <otherwise>max(e.updated_at)</otherwise>
                         </choose>
                     from events e)),
