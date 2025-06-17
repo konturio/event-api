@@ -86,6 +86,7 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 | `collected_geometry` | `geometry` generated from episodes |
 
 Unique key: (`event_id`, `version`, `feed_id`). Several GIST and BTREE indexes exist for geometry and timestamps.
+Additional index: (`feed_id`, `event_id`) where `is_latest_version` is `true`.
 
 ## `severities`
 Reference table of possible severity levels.
