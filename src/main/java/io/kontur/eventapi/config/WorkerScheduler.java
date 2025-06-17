@@ -10,6 +10,7 @@ import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
+import io.kontur.eventapi.firms.normalization.FirmsNormalizationJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.*;
 import io.kontur.eventapi.nhc.job.NhcAtImportJob;
@@ -39,6 +40,7 @@ public class WorkerScheduler {
     private final FirmsImportModisJob firmsImportModisJob;
     private final FirmsImportNoaaJob firmsImportNoaaJob;
     private final FirmsImportSuomiJob firmsImportSuomiJob;
+    private final FirmsNormalizationJob firmsNormalizationJob;
     private final NormalizationJob normalizationJob;
     private final EventCombinationJob eventCombinationJob;
     private final FirmsEventCombinationJob firmsEventCombinationJob;
@@ -117,6 +119,7 @@ public class WorkerScheduler {
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
                            GdacsSearchJob gdacsSearchJob, NormalizationJob normalizationJob,
+                           FirmsNormalizationJob firmsNormalizationJob,
                            EventCombinationJob eventCombinationJob, FirmsEventCombinationJob firmsEventCombinationJob,
                            FeedCompositionJob feedCompositionJob, FirmsImportModisJob firmsImportModisJob,
                            FirmsImportNoaaJob firmsImportNoaaJob, FirmsImportSuomiJob firmsImportSuomiJob,
@@ -132,6 +135,7 @@ public class WorkerScheduler {
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
         this.normalizationJob = normalizationJob;
+        this.firmsNormalizationJob = firmsNormalizationJob;
         this.eventCombinationJob = eventCombinationJob;
         this.firmsEventCombinationJob = firmsEventCombinationJob;
         this.feedCompositionJob = feedCompositionJob;
@@ -301,6 +305,13 @@ public class WorkerScheduler {
     public void startNormalization() {
         if (Boolean.parseBoolean(normalizationEnabled)) {
             normalizationJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedDelayString = "${scheduler.normalization.fixedDelay}")
+    public void startFirmsNormalization() {
+        if (Boolean.parseBoolean(normalizationEnabled)) {
+            firmsNormalizationJob.run();
         }
     }
 

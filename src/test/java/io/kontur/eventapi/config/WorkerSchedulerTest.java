@@ -7,6 +7,7 @@ import io.kontur.eventapi.firms.eventcombination.FirmsEventCombinationJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
+import io.kontur.eventapi.firms.normalization.FirmsNormalizationJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
 import io.kontur.eventapi.inciweb.job.InciWebImportJob;
 import io.kontur.eventapi.job.EnrichmentJob;
@@ -51,6 +52,7 @@ class WorkerSchedulerTest {
     private final FirmsImportModisJob firmsImportModisJob = mock(FirmsImportModisJob.class);
     private final FirmsImportNoaaJob firmsImportNoaaJob = mock(FirmsImportNoaaJob.class);
     private final FirmsImportSuomiJob firmsImportSuomiJob = mock(FirmsImportSuomiJob.class);
+    private final FirmsNormalizationJob firmsNormalizationJob = mock(FirmsNormalizationJob.class);
     private final EmDatImportJob emDatImportJob = mock(EmDatImportJob.class);
     private final StaticImportJob staticImportJob = mock(StaticImportJob.class);
     private final StormsNoaaImportJob stormsNoaaImportJob = mock(StormsNoaaImportJob.class);
@@ -72,6 +74,7 @@ class WorkerSchedulerTest {
     private final EventExpirationJob eventExpirationJob = mock(EventExpirationJob.class);
 
     private final WorkerScheduler scheduler = new WorkerScheduler(hpSrvSearchJob, hpSrvMagsJob, gdacsSearchJob, normalizationJob,
+            firmsNormalizationJob,
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
             historicalTornadoJapanMaImportJob, pdcMapSrvSearchJobs, enrichmentJob, calFireSearchJob,
@@ -86,6 +89,7 @@ class WorkerSchedulerTest {
         Mockito.reset(firmsImportModisJob);
         Mockito.reset(firmsImportNoaaJob);
         Mockito.reset(firmsImportSuomiJob);
+        Mockito.reset(firmsNormalizationJob);
         Mockito.reset(staticImportJob);
         Mockito.reset(normalizationJob);
         Mockito.reset(eventCombinationJob);
@@ -269,11 +273,27 @@ class WorkerSchedulerTest {
     }
 
     @Test
+    public void startFirmsNormalizationJob() {
+        ReflectionTestUtils.setField(scheduler, "normalizationEnabled", "true");
+        scheduler.startFirmsNormalization();
+
+        verify(firmsNormalizationJob, times(1)).run();
+    }
+
+    @Test
     public void skipNormalizationJob() {
         ReflectionTestUtils.setField(scheduler, "normalizationEnabled", "false");
         scheduler.startNormalization();
 
         verify(normalizationJob, never()).run();
+    }
+
+    @Test
+    public void skipFirmsNormalizationJob() {
+        ReflectionTestUtils.setField(scheduler, "normalizationEnabled", "false");
+        scheduler.startFirmsNormalization();
+
+        verify(firmsNormalizationJob, never()).run();
     }
 
     @Test
