@@ -38,7 +38,7 @@ public abstract class PdcHazardNormalizer extends Normalizer {
     );
 
     private static final Map<String, Severity> severityMap = Map.of(
-            "WARNING", Severity.EXTREME,
+            "WARNING", Severity.MINOR,
             "WATCH", Severity.SEVERE,
             "ADVISORY", Severity.MODERATE,
             "INFORMATION", Severity.MINOR,
