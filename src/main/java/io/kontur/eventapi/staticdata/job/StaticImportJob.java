@@ -71,14 +71,14 @@ public class StaticImportJob extends AbstractJob {
                     storeDataLakes(provider, updatedAt, dataSet);
                 }
             } catch (Exception e) {
-                LOG.error(e.getMessage());
+                LOG.warn(e.getMessage());
             }
         }
         if (!dataSet.isEmpty()) {
             try {
                 storeDataLakes(provider, updatedAt, dataSet);
             } catch (Exception e) {
-                LOG.error(e.getMessage());
+                LOG.warn(e.getMessage());
             }
         }
     }

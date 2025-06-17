@@ -90,7 +90,7 @@ public class EmDatImportJob extends AbstractJob {
                     save(row, data, fileCreationDate);
                 }
             } catch (Exception e) {
-                LOG.error("Can't create EM-DAT row: {}", csvData, e);
+                LOG.warn("Can't create EM-DAT row: {}", csvData, e);
             }
         }
     }

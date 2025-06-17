@@ -34,7 +34,7 @@ public class StormsNoaaHTMLParser {
                         return new FileInfo(filename, updatedAt);
                     }).collect(Collectors.toList());
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.warn(e.getMessage());
         }
         return Collections.emptyList();
     }

@@ -77,7 +77,7 @@ public abstract class CapBaseXmlParser {
 
                 items.put(id, writer.toString());
             } catch (TransformerException e) {
-                LOG.error(e.getMessage(), e);
+                LOG.warn(e.getMessage(), e);
             }
         }
         return items;

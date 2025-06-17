@@ -36,7 +36,7 @@ public class UHCDataLakeConverter {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Error while convert Humanitarian Crisis feature to data_lake. {}", e.getMessage());
+            LOG.warn("Error while convert Humanitarian Crisis feature to data_lake. {}", e.getMessage());
         }
         return null;
     }

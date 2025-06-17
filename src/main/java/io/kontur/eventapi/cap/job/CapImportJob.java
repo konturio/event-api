@@ -63,9 +63,9 @@ public abstract class CapImportJob extends AbstractJob {
                 List<DataLake> dataLakes = service.createDataLakes(filteredParsedEvents, getProvider());
                 service.saveDataLakes(dataLakes);
             } catch (DateTimeParseException e) {
-                LOG.error("Parsing pubDate from {} was failed", getName());
+                LOG.warn("Parsing pubDate from {} was failed", getName());
             } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
-                LOG.error(e.getMessage(), e);
+                LOG.warn(e.getMessage(), e);
             }
         }
     }

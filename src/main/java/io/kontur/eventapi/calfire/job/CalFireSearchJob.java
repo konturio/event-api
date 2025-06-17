@@ -63,7 +63,7 @@ public class CalFireSearchJob extends AbstractJob {
                         }
                     }
                 } catch (Exception e1) {
-                    LOG.error("Error while processing calfire feature. {}", e1.getMessage());
+                    LOG.warn("Error while processing calfire feature. {}", e1.getMessage());
                 }
             }
             if (!CollectionUtils.isEmpty(dataLakes)) {

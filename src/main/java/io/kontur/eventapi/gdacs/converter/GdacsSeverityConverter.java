@@ -41,7 +41,7 @@ public class GdacsSeverityConverter {
                 if (typeSeverityUnit.get(type).equals(severityUnit)) {
                     severityData.put(typeSeverityName.get(type), severity);
                 } else {
-                    LOG.error("Unknown GDACS severity unit for {}: {}", type, severityUnit);
+                    LOG.warn("Unknown GDACS severity unit for {}: {}", type, severityUnit);
                 }
             }
             if (EARTHQUAKE.equals(type)) {
@@ -54,7 +54,7 @@ public class GdacsSeverityConverter {
                 severityData.put(CATEGORY_SAFFIR_SIMPSON, getCycloneCategory(severity));
             }
         } catch (Exception e) {
-            LOG.error("Failed to process GDACS severity, severity: {}, severity unit: {}, severity text: {}",
+            LOG.warn("Failed to process GDACS severity, severity: {}, severity unit: {}, severity text: {}",
                     severity, severityUnit, severityText, e);
         }
 

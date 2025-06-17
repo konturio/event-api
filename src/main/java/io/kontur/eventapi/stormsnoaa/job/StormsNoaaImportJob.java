@@ -56,7 +56,7 @@ public class StormsNoaaImportJob extends AbstractJob {
                importService.downloadFile(file.getFilename(), tmpPath);
                processFile(tmpPath, file.getUpdatedAt());
             } catch (Exception e) {
-                LOG.error(e.getMessage());
+                LOG.warn(e.getMessage());
                 break;
             } finally {
                 importService.deleteFile(tmpPath);
