@@ -35,7 +35,6 @@ public interface NormalizedObservationsMapper {
                @Param("cost") BigDecimal cost,
                @Param("loss") Map<String, Object> loss,
                @Param("severityData") Map<String, Object> severityData,
-               @Param("point") String point,
                @Param("geometries") String geometries,
                @Param("autoExpire") Boolean autoExpire,
                @Param("recombined") boolean recombined);

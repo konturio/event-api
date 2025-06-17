@@ -60,7 +60,6 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP5+shtml/112045.shtml"), observation.getUrls());
-        assertNull(observation.getPoint());
         checkGeometriesValue(observation.getGeometries(), 9);
     }
 
@@ -86,7 +85,6 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMAT2+shtml/272045.shtml"), observation.getUrls());
-        assertNull(observation.getPoint());
         checkGeometriesValue(observation.getGeometries(), 9);
     }
 
@@ -112,7 +110,6 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMAT2+shtml/DDHHMM.shtml"), observation.getUrls());
-        assertNull(observation.getPoint());
         checkGeometriesValue(observation.getGeometries(), 9);
     }
 
@@ -138,7 +135,6 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP3+shtml/DDHHMM.shtml"), observation.getUrls());
-        assertNull(observation.getPoint());
         checkGeometriesValue(observation.getGeometries(), 9);
     }
 
@@ -164,7 +160,6 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP3+shtml/270852.shtml"), observation.getUrls());
-        assertNull(observation.getPoint());
         checkGeometriesValue(observation.getGeometries(), 6);
     }
 
