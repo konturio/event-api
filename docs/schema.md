@@ -52,7 +52,7 @@ List of available feeds.
 | `feed_id` | `uuid` | primary key |
 | `description` | `text` | |
 | `alias` | `text` | unique identifier used in API |
-| `providers` | `text[]` | source providers associated with the feed |
+| `providers` | `text[]` | source providers associated with the feed. See [feed_sources.md](feed_sources.md) |
 | `roles` | `text[]` | roles allowed to read the feed |
 
 ## `feed_data`
