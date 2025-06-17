@@ -205,6 +205,10 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 15000
+  dbReconnect:
+    enable: true
+    initialDelay: 1000
+    fixedDelay: 60000
   eventExpiration:
     enable: true
     initialDelay: 1000

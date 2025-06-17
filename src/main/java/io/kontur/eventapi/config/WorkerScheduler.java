@@ -56,6 +56,7 @@ public class WorkerScheduler {
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob;
     private final MetricsJob metricsJob;
     private final ReEnrichmentJob reEnrichmentJob;
+    private final DatabaseReconnectJob databaseReconnectJob;
     private final NhcAtImportJob nhcAtImportJob;
     private final NhcCpImportJob nhcCpImportJob;
     private final NhcEpImportJob nhcEpImportJob;
@@ -111,6 +112,8 @@ public class WorkerScheduler {
     private String metricsEnabled;
     @Value("${scheduler.reEnrichment.enable}")
     private String reEnrichmentEnabled;
+    @Value("${scheduler.dbReconnect.enable}")
+    private String dbReconnectEnabled;
     @Value("${scheduler.eventExpiration.enable}")
     private String eventExpirationEnabled;
 
@@ -127,7 +130,8 @@ public class WorkerScheduler {
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
-                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
+                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, DatabaseReconnectJob databaseReconnectJob,
+                           EventExpirationJob eventExpirationJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -153,6 +157,7 @@ public class WorkerScheduler {
         this.nhcEpImportJob = nhcEpImportJob;
         this.metricsJob = metricsJob;
         this.reEnrichmentJob = reEnrichmentJob;
+        this.databaseReconnectJob = databaseReconnectJob;
         this.humanitarianCrisisImportJob = humanitarianCrisisImportJob;
         this.eventExpirationJob = eventExpirationJob;
     }
@@ -343,6 +348,13 @@ public class WorkerScheduler {
     public void startMetricsJob() {
         if (Boolean.parseBoolean(metricsEnabled)) {
             metricsJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.dbReconnect.initialDelay}", fixedDelayString = "${scheduler.dbReconnect.fixedDelay}")
+    public void startDatabaseReconnectJob() {
+        if (Boolean.parseBoolean(dbReconnectEnabled)) {
+            databaseReconnectJob.run();
         }
     }
 

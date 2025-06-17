@@ -16,3 +16,7 @@ The table `feed_event_status` tracks the latest events per feed, but there are n
 
 ## External dependencies
 The project depends on a private Maven repository (`nexus.kontur.io`). Without access to it the build and tests cannot be executed.
+
+## Database reconnection
+The service could previously become unavailable when all pooled database connections were broken.
+A scheduled job now evicts stale connections automatically (see `database_reconnect.md`).
