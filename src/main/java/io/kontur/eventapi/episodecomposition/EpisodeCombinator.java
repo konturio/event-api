@@ -11,6 +11,8 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.job.Applicable;
+import io.kontur.eventapi.service.LocationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -22,6 +24,9 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
 
     protected static final Integer COMMON_GEOMETRY_FUNCTION = 0;
     protected static final Integer NHC_GEOMETRY_FUNCTION = 1;
+
+    @Autowired(required = false)
+    protected LocationService locationService;
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
         return episodes;
     }
@@ -165,11 +170,17 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
     }
 
     protected String findEpisodeLocation(Set<NormalizedObservation> observations) {
-        return observations.stream()
+        Optional<NormalizedObservation> obsOpt = observations.stream()
                 .filter(obs -> isNotBlank(obs.getRegion()))
-                .max(comparing(NormalizedObservation::getSourceUpdatedAt))
-                .map(NormalizedObservation::getRegion)
-                .orElse(null);
+                .max(comparing(NormalizedObservation::getSourceUpdatedAt));
+        if (obsOpt.isPresent()) {
+            return obsOpt.get().getRegion();
+        }
+        try {
+            return locationService == null ? null : locationService.findGaulLocation(observations);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     protected List<String> findEpisodeUrls(Set<NormalizedObservation> observations) {
