@@ -17,7 +17,7 @@
         with events as (
             select
                 fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.enriched_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
@@ -51,21 +51,21 @@
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
                 <if test='updatedAfter != null'>
-                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
-                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
+                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.enriched_at &gt; #{updatedAfter}</if>
+                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.enriched_at &lt; #{updatedAfter}</if>
                 </if>
                 <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                     and ST_Intersects(ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326), fd.collected_geometry)
                 </if>
-            order by fd.updated_at ${sortOrder}
+            order by fd.enriched_at ${sortOrder}
             limit #{limit}
         )
         select case when count(*) > 0 then json_build_object(
             'pageMetadata', json_build_object('nextAfterValue',
                 (select
                     <choose>
-                        <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
-                        <otherwise>max(e.updated_at)</otherwise>
+                        <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.enriched_at)</when>
+                        <otherwise>max(e.enriched_at)</otherwise>
                     </choose>
                 from events e)),
             'data', json_agg(json_build_object(
@@ -156,7 +156,7 @@
     <select id="searchForEventsGeoJson" resultType="java.lang.String">
         with events as (
             select
-                fd.event_id, fd.updated_at,
+                fd.event_id, fd.updated_at, fd.enriched_at,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
                         jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
@@ -188,13 +188,13 @@
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
                 <if test='updatedAfter != null'>
-                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.updated_at > #{updatedAfter}</if>
-                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.updated_at &lt; #{updatedAfter}</if>
+                    <if test='"asc".equalsIgnoreCase(sortOrder)'>and fd.enriched_at &gt; #{updatedAfter}</if>
+                    <if test='"desc".equalsIgnoreCase(sortOrder)'>and fd.enriched_at &lt; #{updatedAfter}</if>
                 </if>
                 <if test="xMin!=null &amp;&amp; yMin!=null &amp;&amp; xMax!=null &amp;&amp; yMax!=null">
                     and ST_MakeEnvelope(#{xMin}, #{yMin}, #{xMax}, #{yMax}, 4326) &amp;&amp; fd.collected_geometry
                 </if>
-            order by fd.updated_at ${sortOrder}
+            order by fd.enriched_at ${sortOrder}
             limit #{limit}
         ),
         episodes as (
@@ -237,8 +237,8 @@
                 'pageMetadata', json_build_object('nextAfterValue',
                     (select
                         <choose>
-                            <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.updated_at)</when>
-                            <otherwise>max(e.updated_at)</otherwise>
+                            <when test='"desc".equalsIgnoreCase(sortOrder)'>min(e.enriched_at)</when>
+                            <otherwise>max(e.enriched_at)</otherwise>
                         </choose>
                     from events e)),
                 'features', json_agg(ST_AsGeoJSON(props.*)::json))

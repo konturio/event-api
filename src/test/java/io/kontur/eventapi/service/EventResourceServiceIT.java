@@ -78,6 +78,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         feedEpisode.setGeometries(new FeatureCollection(new Feature[]{new Feature(write, Map.of())}));
         feedData.getEpisodes().add(feedEpisode);
         feedData.setEnriched(true);
+        feedData.setEnrichedAt(feedData.getUpdatedAt());
         feedDao.insertFeedData(feedData, feedAlias);
 
         //when-then
@@ -101,6 +102,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         feedData.setStartedAt(dateTimeOf(2020, 5, 1));
         feedData.setEndedAt(dateTimeOf(2020, 6, 1));
         feedData.setEnriched(true);
+        feedData.setEnrichedAt(feedData.getUpdatedAt());
         feedDao.insertFeedData(feedData, feedAlias);
 
         var resultOfSearching01 = findEvent(dateTimeOf(2020, 4, 15), dateTimeOf(2020, 5, 15));
@@ -154,16 +156,19 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         var earliestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         earliestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 22), ZoneOffset.UTC));
         earliestEvent.setEnriched(true);
+        earliestEvent.setEnrichedAt(earliestEvent.getUpdatedAt());
         feedDao.insertFeedData(earliestEvent, feedAlias);
 
         var middleEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         middleEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 23), ZoneOffset.UTC));
         middleEvent.setEnriched(true);
+        middleEvent.setEnrichedAt(middleEvent.getUpdatedAt());
         feedDao.insertFeedData(middleEvent, feedAlias);
 
         var latestEvent = new FeedData(UUID.randomUUID(), feed.getFeedId(), 1L);
         latestEvent.setUpdatedAt(OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 13, 24), ZoneOffset.UTC));
         latestEvent.setEnriched(true);
+        latestEvent.setEnrichedAt(latestEvent.getUpdatedAt());
         feedDao.insertFeedData(latestEvent, feedAlias);
 
         //when page 1 ASC
@@ -177,7 +182,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 2 ASC
         List<TestEventDto> page2Asc = objectMapper.readValue(eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, ASC, null, ANY).get(), TestEventListDto.class).getData();
+                .searchEvents(feedAlias, null, null, null, middleEvent.getEnrichedAt(), 2, null, ASC, null, ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(1, page2Asc.size());
@@ -194,7 +199,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 2 DESC
         List<TestEventDto> page2Desc = objectMapper.readValue(eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, DESC, null, ANY).get(), TestEventListDto.class).getData();
+                .searchEvents(feedAlias, null, null, null, middleEvent.getEnrichedAt(), 2, null, DESC, null, ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(1, page2Desc.size());

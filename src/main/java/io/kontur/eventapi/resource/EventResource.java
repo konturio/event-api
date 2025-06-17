@@ -69,7 +69,7 @@ public class EventResource {
             @Parameter(description = "Filters events by severity. More than one can be chosen at once")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
-            @Parameter(description = "Includes events that were updated after this time. `updatedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")")
+            @Parameter(description = "Includes events that were enriched after this time. `enrichedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")")
             @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             OffsetDateTime updatedAfter,
@@ -154,9 +154,7 @@ public class EventResource {
             @Parameter(description = "Filters events by severity. More than one can be chosen at once")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
-            @Parameter(description = "Includes events that were updated after this time. " +
-                    "`updatedAt` property is used for selection. " +
-                    "A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")")
+            @Parameter(description = "Includes events that were enriched after this time. `enrichedAt` property is used for selection. A date-time in ISO8601 format (e.g. "2020-04-12T23:20:50.52Z")")
             @RequestParam(value = "after", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             OffsetDateTime updatedAfter,

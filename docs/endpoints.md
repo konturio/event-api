@@ -9,11 +9,11 @@ Search for events within a feed.
 - `feed` – feed name (required).
 - `types` – list of event types.
 - `severities` – list of severity values.
-- `after` – return events updated after this timestamp.
+- `after` – return events enriched after this timestamp.
 - `datetime` – interval filter. Accepts single RFC3339 timestamp or open/closed interval.
 - `bbox` – bounding box defined as `minLon,minLat,maxLon,maxLat`.
 - `limit` – page size (default `20`).
-- `sortOrder` – `ASC` or `DESC` by `updatedAt`.
+- `sortOrder` – `ASC` or `DESC` by `enrichedAt`.
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
 
 Returns events sorted by update date using cursor based pagination. Response body is JSON containing `pageMetadata.nextAfterValue` and event data.
