@@ -76,6 +76,10 @@ humanitarianCrisis:
   s3Bucket: 'event-api-locker01'
   s3Folder: 'kontur_events/EXP/'
 
+pdcProduct:
+  s3Bucket: 'event-api-locker01'
+  s3Folder: 'products/EXP/'
+
 tornadoJapanMa:
   host: 'https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/'
 

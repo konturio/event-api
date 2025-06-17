@@ -70,7 +70,7 @@ class PdcSqsMessageListenerTest {
         String json = readMessageFromFile("testproduct01.json");
         messageListener.read(json);
 
-        verify(sqsService, never()).saveMessage(anyString(), anyString(), anyString());
+        verify(sqsService, times(1)).saveProduct("12776eb9-2585-4d93-9001-944cc7d9d022", json);
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

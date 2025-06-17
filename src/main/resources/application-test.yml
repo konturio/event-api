@@ -22,6 +22,9 @@ staticdata:
 humanitarianCrisis:
   s3Folder: 'kontur_events/TEST QA/'
 
+pdcProduct:
+  s3Folder: 'products/TEST QA/'
+
 aws:
   sqs:
     enabled: true

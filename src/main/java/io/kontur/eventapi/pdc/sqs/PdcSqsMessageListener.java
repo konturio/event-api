@@ -29,10 +29,11 @@ public class PdcSqsMessageListener {
         JsonNode sns = JsonUtil.readTree(sqsMessage).get("Sns");
 
         String type = getProductType(sns);
-        // TODO: skip products until it is clear how to handle them
         if ("PING".equals(type)) {
             return;
         } else if ("PRODUCT".equals(type)) {
+            String productId = getProductUuid(sns);
+            sqsService.saveProduct(productId, sqsMessage);
             return;
         }
 
@@ -50,6 +51,13 @@ public class PdcSqsMessageListener {
 
     private String getMessageId(JsonNode sns) {
         return sns.get("MessageId").asText();
+    }
+
+    private String getProductUuid(JsonNode sns) {
+        JsonNode message = JsonUtil.readTree(sns.get("Message").asText());
+        JsonNode event = JsonUtil.readTree(message.get("event").asText());
+        JsonNode masterSyncEvents = event.get("syncDa").get("masterSyncEvents");
+        return masterSyncEvents.get("uuid").asText();
     }
 
 }
