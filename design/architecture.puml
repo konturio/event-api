@@ -1,0 +1,26 @@
+@startuml
+!theme plain
+
+actor "External Provider" as Provider
+actor "API Consumer" as Consumer
+
+component "Ingestion Service" as Ingestion
+component "Normalization Service" as Normalization
+component "Enrichment Service" as Enrichment
+component "Combination Service" as Combination
+component "Event API" as API
+queue "AWS SQS" as SQS
+database "PostgreSQL + PostGIS" as DB
+
+Provider --> Ingestion : fetch data
+Ingestion --> DB : store raw payload
+DB --> Normalization
+Normalization --> DB : normalized events
+DB --> Enrichment
+Enrichment --> DB : enriched events
+DB --> Combination
+Combination --> DB : combined events
+API --> DB : read events
+Combination --> SQS : publish updates
+Consumer --> API : REST requests
+@enduml
