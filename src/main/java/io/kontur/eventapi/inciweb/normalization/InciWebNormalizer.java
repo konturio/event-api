@@ -55,7 +55,6 @@ public class InciWebNormalizer extends Normalizer {
 
             Point point = new Point(new double[] {parsedItem.get().getLongitude(), parsedItem.get().getLatitude()});
             normalizedObservation.setGeometries(convertGeometryToFeatureCollection(point, INCIWEB_PROPERTIES));
-            normalizedObservation.setPoint(
                     makeWktPoint(parsedItem.get().getLongitude(), parsedItem.get().getLatitude()));
 
             return normalizedObservation;

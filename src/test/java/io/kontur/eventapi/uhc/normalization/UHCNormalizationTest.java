@@ -63,7 +63,6 @@ class UHCNormalizationTest {
         assertEquals(1645671600000L, observation.getEndedAt().toInstant().toEpochMilli());
         assertEquals(1647820800000L, observation.getSourceUpdatedAt().toInstant().toEpochMilli());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
-        assertEquals("POINT(1.0 1.0)", observation.getPoint());
     }
 
     private DataLake createDataLake() throws Exception {

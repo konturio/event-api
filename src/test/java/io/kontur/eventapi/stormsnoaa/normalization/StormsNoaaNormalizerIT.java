@@ -55,7 +55,6 @@ class StormsNoaaNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(OffsetDateTime.parse("1950-04-29T14:45:00Z"), normalizedObservation.getEndedAt());
         assertEquals(Severity.SEVERE, normalizedObservation.getEventSeverity());
         assertEquals("Tornado - WASHITA, OKLAHOMA, USA", normalizedObservation.getName());
-        assertNotNull(normalizedObservation.getPoint());
         assertNotNull(normalizedObservation.getGeometries());
         assertEquals(1, normalizedObservation.getGeometries().getFeatures().length);
         assertEquals(STORMS_NOAA_TRACK_PROPERTIES, normalizedObservation.getGeometries().getFeatures()[0].getProperties());

@@ -37,7 +37,6 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
 
         MultiPolygon multiPolygon = (MultiPolygon) reader.read(feature.getGeometry());
         Point point = multiPolygon.getCentroid();
-        normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), WILDFIRE_PROPERTIES));
 
         String state = readString(properties, "STATE");

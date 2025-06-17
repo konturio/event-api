@@ -64,7 +64,6 @@ public class FirmsNormalizer extends Normalizer {
             Double longitude = csvData.getLongitude();
             Double latitude = csvData.getLatitude();
 
-            normalizedObservation.setPoint(makeWktPoint(longitude, latitude));
 
             String wktPolygon = createWktPolygon(longitude, latitude);
             normalizedObservation.setGeometries(createGeometry(wktPolygon));

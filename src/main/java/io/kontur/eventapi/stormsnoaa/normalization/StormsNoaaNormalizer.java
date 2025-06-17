@@ -163,7 +163,6 @@ public class StormsNoaaNormalizer extends Normalizer {
         boolean startPointPresent = x1 != null && y1 != null;
         boolean endPointPresent = x2 != null && y2 != null;
         String point = startPointPresent ? makeWktPoint(x1, y1) : endPointPresent ? makeWktPoint(x2, y2) : null;
-        normalizedObservation.setPoint(point);
         try {
             if (startPointPresent && endPointPresent) {
                 Geometry geometry = geoJsonWriter.write(wktReader.read(makeWktLine(x1, y1, x2, y2)));

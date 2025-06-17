@@ -24,7 +24,6 @@ Normalized information extracted from `data_lake`.
 | `observation_id` | `uuid` (references `data_lake`)
 | `external_id` | `text`
 | `provider` | `text`
-| `point` | `geometry`
 | `geometries` | `jsonb`
 | `event_severity` | `text`
 | `name` | `text`

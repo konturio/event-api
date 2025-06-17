@@ -94,13 +94,13 @@ public class EmDatNormalizer extends Normalizer {
         }
 
         Point point = null;
+        String wktPoint = null;
         if (!StringUtils.isEmpty(csvData.get("Latitude")) && !StringUtils.isEmpty(csvData.get("Longitude"))) {
             try {
                 Double lon = parseDouble(csvData.get("Longitude"));
                 Double lat = parseDouble(csvData.get("Latitude"));
-                String wktPoint = makeWktPoint(lon, lat);
+                wktPoint = makeWktPoint(lon, lat);
                 wktReader.read(wktPoint); //validate coordinates
-                obs.setPoint(wktPoint);
                 point = new Point(new double[]{lon, lat});
             } catch (NumberFormatException | ParseException e) {
                 LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
@@ -109,7 +109,7 @@ public class EmDatNormalizer extends Normalizer {
 
         Geometry geom = normalizationService
                 .obtainGeometries(csvData.get("Country"), csvData.get("Location"))
-                .or(() -> normalizationService.convertWktPointIntoGeometry(obs.getPoint()))
+                .or(() -> normalizationService.convertWktPointIntoGeometry(wktPoint))
                 .orElse(null);
         obs.setGeometries(geometryConverter.convertGeometry(geom, point, csvData.get("Dis Mag Scale"), csvData.get("Dis Mag Value")));
 

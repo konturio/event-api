@@ -39,7 +39,6 @@ public class AustraliaWildfireNormalizer extends StaticNormalizer {
         Feature feature = (Feature) GeoJSONFactory.create(dataLake.getData());
 
         Point point = reader.read(feature.getGeometry()).getCentroid();
-        normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
 
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), WILDFIRE_PROPERTIES));
 
