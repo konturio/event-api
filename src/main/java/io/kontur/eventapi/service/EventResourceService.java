@@ -63,4 +63,9 @@ public class EventResourceService {
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         return geoJson == null ? Optional.empty() : Optional.of(geoJson);
     }
+
+    public Optional<String> findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance) {
+        String data = apiDao.findSimilarEvents(eventId, feedAlias, limit, distance);
+        return data == null ? Optional.empty() : Optional.of(data);
+    }
 }
