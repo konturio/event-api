@@ -5,6 +5,7 @@
 #### Added
 
 #### Changed
+ - CalFire and NIFC episode combinators skip episodes if nothing significant changed
 
 #### Removed
 
