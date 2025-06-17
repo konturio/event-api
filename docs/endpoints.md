@@ -39,3 +39,8 @@ Return a single event by feed alias, event ID and optional version. When the ver
 
 ## `GET /v1/user_feeds`
 Return the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token.
+
+## Swagger UI authentication
+The API documentation at `/doc` uses Swagger UI. It supports the OAuth2 `authorizationCode` flow
+with Keycloak. Use the **Authorize** button and sign in with your Keycloak account
+to obtain a token automatically.
