@@ -57,6 +57,9 @@ List of available feeds.
 
 ## `feed_data`
 Stores event versions for each feed. Table was redesigned in version 1.15.
+GDACS observations are now combined into episodes during feed composition,
+so GDACS events retrieved from the API contain timelines built from these
+episodes.
 
 | Column | Type | Notes |
 | ------ | ---- | ----- |
