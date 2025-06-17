@@ -103,14 +103,20 @@ public class EventResource {
             @Max(1000)
             int limit,
             @Parameter(description = "Sort selection. Default value is ASC")
-            @RequestParam(value = "sortOrder", defaultValue = "ASC")
+            @RequestParam(value = "sortOrder", required = false)
             SortOrder sortOrder,
             @Parameter(description = "How many episodes to select: " +
                     "<ul><li>ANY - all episodes</li>" +
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
-            @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
+            @RequestParam(value = "episodeFilterType", required = false)
             EpisodeFilterType episodeFilterType) {
+        if (sortOrder == null) {
+            sortOrder = SortOrder.ASC;
+        }
+        if (episodeFilterType == null) {
+            episodeFilterType = EpisodeFilterType.NONE;
+        }
         Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
@@ -191,14 +197,20 @@ public class EventResource {
             @Min(1) @Max(1000)
             int limit,
             @Parameter(description = "Sort selection. Default value is ASC")
-            @RequestParam(value = "sortOrder", defaultValue = "ASC")
+            @RequestParam(value = "sortOrder", required = false)
             SortOrder sortOrder,
             @Parameter(description = "How many episodes to select: " +
                     "<ul><li>ANY - all episodes</li>" +
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
-            @RequestParam(value = "episodeFilterType", defaultValue = "ANY")
+            @RequestParam(value = "episodeFilterType", required = false)
             EpisodeFilterType episodeFilterType) {
+        if (sortOrder == null) {
+            sortOrder = SortOrder.ASC;
+        }
+        if (episodeFilterType == null) {
+            episodeFilterType = EpisodeFilterType.ANY;
+        }
         Optional<String> geoJsonOpt = eventResourceService.searchEventsGeoJson(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
@@ -251,8 +263,11 @@ public class EventResource {
                     "<ul><li>ANY - all episodes</li>" +
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
-            @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
+            @RequestParam(value = "episodeFilterType", required = false)
             EpisodeFilterType episodeFilterType) {
+        if (episodeFilterType == null) {
+            episodeFilterType = EpisodeFilterType.NONE;
+        }
         return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());

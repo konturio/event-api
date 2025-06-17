@@ -13,8 +13,8 @@ Search for events within a feed.
 - `datetime` – interval filter. Accepts single RFC3339 timestamp or open/closed interval.
 - `bbox` – bounding box defined as `minLon,minLat,maxLon,maxLat`.
 - `limit` – page size (default `20`).
-- `sortOrder` – `ASC` or `DESC` by `updatedAt`.
-- `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
+- `sortOrder` – `ASC` or `DESC` by `updatedAt`. Defaults to `ASC` when omitted.
+- `episodeFilterType` – `ANY`, `LATEST` or `NONE`. Defaults to `NONE` when omitted.
 
 Returns events sorted by update date using cursor based pagination. Response body is JSON containing `pageMetadata.nextAfterValue` and event data.
 
