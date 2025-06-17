@@ -1,0 +1,12 @@
+@startuml
+
+package "Notification Sender" {
+  [Subscription API] --> [Subscription DB]
+  [Notification Ingest] --> [Subscription DB]
+  [Notification Ingest] --> [Recipient Matcher]
+  [Recipient Matcher] --> [Delivery Workers]
+  [Delivery Workers] --> [Email provider]
+  [Delivery Workers] --> [Push provider]
+}
+
+@enduml
