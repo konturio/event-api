@@ -87,6 +87,18 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 
 Unique key: (`event_id`, `version`, `feed_id`). Several GIST and BTREE indexes exist for geometry and timestamps.
 
+## `kontur_events`
+Links observations with the events they belong to.
+
+| Column | Type | Notes |
+| ------ | ---- | ----- |
+| `event_id` | `uuid` | |
+| `observation_id` | `uuid` references `normalized_observations` |
+| `provider` | `text` |
+| `recombined_at` | `timestamptz` default `now()` |
+
+Unique key: (`event_id`, `observation_id`). Index on `recombined_at` speeds up aging queries.
+
 ## `severities`
 Reference table of possible severity levels.
 

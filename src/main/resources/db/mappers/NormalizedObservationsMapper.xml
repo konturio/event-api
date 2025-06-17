@@ -82,9 +82,10 @@
     </select>
 
     <select id="getObservationsByEventId" resultMap="normalizedObservationsDtoMap">
-        select *
-        from normalized_observations
-        where observation_id in (select observation_id from kontur_events where event_id = #{eventId});
+        select no.*
+        from normalized_observations no
+                 join kontur_events ke on ke.observation_id = no.observation_id
+        where ke.event_id = #{eventId};
     </select>
 
     <select id="getObservations" resultMap="normalizedObservationsDtoMap">
