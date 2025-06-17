@@ -1,6 +1,11 @@
 # Event API Endpoints
 
-This document describes all available REST endpoints exposed by the application. All paths are prefixed with `/v1`.
+This document describes all available REST endpoints exposed by the application.
+
+## `GET /`
+Simple service check endpoint. Returns plain `OK` text.
+
+All paths below are prefixed with `/v1`.
 
 ## `GET /v1/`
 Search for events within a feed.
