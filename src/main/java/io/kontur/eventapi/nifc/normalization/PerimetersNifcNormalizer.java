@@ -2,6 +2,7 @@ package io.kontur.eventapi.nifc.normalization;
 
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.service.LocationService;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import java.util.Map;
@@ -16,6 +17,10 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Component
 public class PerimetersNifcNormalizer extends NifcNormalizer {
+
+    public PerimetersNifcNormalizer(LocationService locationService) {
+        super(locationService);
+    }
 
     @Override
     public boolean isApplicable(DataLake dataLakeDto) {
@@ -48,6 +53,7 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         Double lon = selectFirstNotNull(readDouble(props, "attr_InitialLongitude"), readDouble(props, "irwin_InitialLongitude"));
         Double lat = selectFirstNotNull(readDouble(props, "attr_InitialLatitude"), readDouble(props, "irwin_InitialLatitude"));
         observation.setPoint(makeWktPoint(lon, lat));
+        observation.setRegion(locationService.getLocation(lon, lat));
 
         double areaSqKm2 = convertAcresToSqKm(readDouble(props, "poly_GISAcres"));
         long durationHours = between(observation.getStartedAt(), observation.getEndedAt()).toHours();

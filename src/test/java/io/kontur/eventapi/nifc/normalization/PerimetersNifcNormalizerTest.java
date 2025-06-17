@@ -4,9 +4,11 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
+import io.kontur.eventapi.service.LocationService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -20,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PerimetersNifcNormalizerTest {
 
-    private final PerimetersNifcNormalizer normalizer = new PerimetersNifcNormalizer();
+    private final PerimetersNifcNormalizer normalizer = new PerimetersNifcNormalizer(mock(LocationService.class));
 
     @Test
     void testNormalize() throws IOException {
@@ -44,7 +46,7 @@ class PerimetersNifcNormalizerTest {
         assertNull(observation.getEpisodeDescription());
         assertNull(observation.getActive());
         assertNull(observation.getCost());
-        assertNull(observation.getRegion());
+        assertNotNull(observation.getRegion());
         assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());
 

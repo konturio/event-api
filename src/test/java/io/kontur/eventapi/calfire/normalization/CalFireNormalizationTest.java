@@ -5,9 +5,11 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
+import io.kontur.eventapi.service.LocationService;
 import io.kontur.eventapi.util.DateTimeUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -24,7 +26,8 @@ class CalFireNormalizationTest {
     @Test
     public void testIsApplicable() throws Exception {
         DataLake dataLake = createDataLake();
-        assertTrue(new CalFireNormalizer().isApplicable(dataLake));
+        CalFireNormalizer normalizer = new CalFireNormalizer(mock(LocationService.class));
+        assertTrue(normalizer.isApplicable(dataLake));
     }
 
     @Test
@@ -33,7 +36,7 @@ class CalFireNormalizationTest {
         DataLake dataLake = createDataLake();
 
         //when
-        NormalizedObservation observation = new CalFireNormalizer().normalize(dataLake);
+        NormalizedObservation observation = new CalFireNormalizer(mock(LocationService.class)).normalize(dataLake);
 
         //then
         assertEquals(dataLake.getObservationId(), observation.getObservationId());

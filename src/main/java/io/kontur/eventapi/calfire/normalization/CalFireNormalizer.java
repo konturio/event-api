@@ -5,6 +5,7 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
+import io.kontur.eventapi.service.LocationService;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.kontur.eventapi.util.GeometryUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
+import org.wololo.jts2geojson.GeoJSONReader;
+import org.locationtech.jts.geom.Point;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -27,6 +30,13 @@ import static io.kontur.eventapi.util.SeverityUtil.CONTAINED_AREA_PCT;
 
 @Component
 public class CalFireNormalizer extends Normalizer {
+
+    private final LocationService locationService;
+    private final GeoJSONReader geoJSONReader = new GeoJSONReader();
+
+    public CalFireNormalizer(LocationService locationService) {
+        this.locationService = locationService;
+    }
 
     private final static Logger LOG = LoggerFactory.getLogger(CalFireNormalizer.class);
     private final static String WILDFIRE = "Wildfire";
@@ -61,6 +71,11 @@ public class CalFireNormalizer extends Normalizer {
         normalizedObservation.setName(WILDFIRE + " " + name);
         normalizedObservation.setProperName(name);
         normalizedObservation.setRegion(readString(properties, "Location"));
+        if (StringUtils.isBlank(normalizedObservation.getRegion())) {
+            Point centroid = geoJSONReader.read(geometry).getCentroid();
+            normalizedObservation.setRegion(
+                    locationService.getLocation(centroid.getX(), centroid.getY()));
+        }
 
         normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
         if (StringUtils.isNotBlank(readString(properties, "Started"))) {
