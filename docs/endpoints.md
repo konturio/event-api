@@ -39,3 +39,12 @@ Return a single event by feed alias, event ID and optional version. When the ver
 
 ## `GET /v1/user_feeds`
 Return the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token.
+
+## `GET /v1/search`
+Search events by text across all feeds.
+
+**Parameters**
+- `query` – substring to search in `name`, `proper_name` and `description` fields.
+- `limit` – maximum number of returned records (default `20`).
+
+Returns a list of matching events sorted by latest update time.

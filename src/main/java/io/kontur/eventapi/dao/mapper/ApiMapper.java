@@ -47,8 +47,10 @@ public interface ApiMapper {
 	                              @Param("yMax") BigDecimal yMax,
 	                              @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 
-	Optional<String> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
-	                                                     @Param("feedAlias") String feedAlias,
-	                                                     @Param("version") Long version,
-	                                                     @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+        Optional<String> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
+                                                             @Param("feedAlias") String feedAlias,
+                                                             @Param("version") Long version,
+                                                             @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+
+        String searchEventsByText(@Param("query") String query, @Param("limit") Integer limit);
 }

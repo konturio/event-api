@@ -116,4 +116,25 @@ public class EventResourceTest {
         second.setDescription(SECOND_DESCRIPTION);
         return List.of(first, second);
     }
+
+    @Test
+    public void searchEventsByTextNoContentTest() {
+        EventResourceService mockService = mock(EventResourceService.class);
+        when(mockService.searchEventsByText("quake", null)).thenReturn(Optional.empty());
+        EventResource resource = new EventResource(mockService);
+
+        var response = resource.searchEventsByText("quake", null);
+        assertEquals(204, response.getStatusCodeValue());
+    }
+
+    @Test
+    public void searchEventsByTextOkTest() {
+        EventResourceService mockService = mock(EventResourceService.class);
+        when(mockService.searchEventsByText("quake", 5)).thenReturn(Optional.of("[]"));
+        EventResource resource = new EventResource(mockService);
+
+        var response = resource.searchEventsByText("quake", 5);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("[]", response.getBody());
+    }
 }

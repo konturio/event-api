@@ -209,6 +209,24 @@ public class EventResource {
         return ResponseEntity.ok(geoJsonOpt.get());
     }
 
+    @GetMapping(path = "/search", produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            tags = "Events",
+            summary = "Search events by text",
+            description = "Full text search across all feeds in name, proper name and description fields."
+    )
+    public ResponseEntity<String> searchEventsByText(
+            @Parameter(description = "Search query")
+            @RequestParam("query")
+            String query,
+            @Parameter(description = "Maximum number of results", example = "20")
+            @RequestParam(value = "limit", required = false)
+            Integer limit
+    ) {
+        Optional<String> result = eventResourceService.searchEventsByText(query, limit);
+        return result.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
     @GetMapping(path = "/observations/{observationId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @Operation(
             tags = "Raw Data",
