@@ -273,6 +273,10 @@ management:
       path-mapping:
         prometheus: metrics
 
+features:
+  cross_provider_merge:
+    roles: cross_provider_merge
+
 sentry:
   dsn: https://fixme@dsn.ingest.sentry.io/project-id
   # Set traces-sample-rate to 1.0 to capture 100% of transactions for performance monitoring.

@@ -38,6 +38,7 @@ There are five config files:
 - `application-test.yml` - config file for TEST environment
 - `application-prod.yml` - config file for PROD environment
 - `config.yaml` - template of external config
+- See `docs/feature_flags.md` for available feature flags.
 
 We should use `dev`, `test` and `prod` config files to store different properties for different environments.
 
