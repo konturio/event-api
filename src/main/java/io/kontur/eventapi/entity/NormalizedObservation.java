@@ -31,6 +31,7 @@ public class NormalizedObservation {
     private BigDecimal cost;
     private Map<String, Object> loss = new HashMap<>();
     private Map<String, Object> severityData = new HashMap<>();
+    private Map<String, Object> eventSeverityData = new HashMap<>();
     private String point;
     private FeatureCollection geometries;
     private Boolean autoExpire;

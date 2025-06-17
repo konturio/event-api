@@ -42,7 +42,8 @@ public class FeedDao {
                 feedData.getName(), feedData.getProperName(), feedData.getDescription(), feedData.getType(),
                 feedData.getSeverity(), feedData.getActive(), feedData.getStartedAt(), feedData.getEndedAt(),
                 feedData.getUpdatedAt(), feedData.getLocation(), feedData.getUrls(), feedData.getLoss(),
-                feedData.getSeverityData(), feedData.getObservations(), episodesJson, feedData.getEnriched(),
+                feedData.getSeverityData(), feedData.getEventSeverityData(),
+                feedData.getObservations(), episodesJson, feedData.getEnriched(),
                 feedData.getAutoExpire(), feedData.getGeomFuncType());
 
         if (count > 0) {
