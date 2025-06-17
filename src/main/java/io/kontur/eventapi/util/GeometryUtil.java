@@ -94,4 +94,20 @@ public class GeometryUtil {
         }
         return true;
     }
+
+    public static boolean isValid(FeatureCollection featureCollection) {
+        if (featureCollection == null) return true;
+        for (Feature feature : featureCollection.getFeatures()) {
+            try {
+                Geometry geometry = reader.read(feature.getGeometry());
+                if (!IsValidOp.isValid(geometry)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                LOG.warn("Failed to parse geometry", e);
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -18,6 +18,7 @@ Stores raw provider payloads.
 
 ## `normalized_observations`
 Normalized information extracted from `data_lake`.
+Invalid geometries are discarded during normalization and such observations are marked as skipped.
 
 | Column | Type |
 | ------ | ---- |

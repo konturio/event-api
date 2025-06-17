@@ -5,6 +5,7 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.normalization.Normalizer;
+import io.kontur.eventapi.util.GeometryUtil;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -67,7 +68,13 @@ public class NormalizationJob extends AbstractJob {
             Normalizer normalizer = Applicable.get(normalizers, denormalizedEvent);
             if (!normalizer.isSkipped()) {
                 NormalizedObservation normalizedDto = normalizer.normalize(denormalizedEvent);
-                normalizedObservationsDao.insert(checkNotNull(normalizedDto));
+                if (GeometryUtil.isValid(normalizedDto.getGeometries())) {
+                    normalizedObservationsDao.insert(checkNotNull(normalizedDto));
+                } else {
+                    LOG.warn("Invalid geometry. Observation {} will be skipped", denormalizedEvent.getObservationId());
+                    dataLakeDao.markAsSkipped(denormalizedEvent.getObservationId());
+                    return false;
+                }
             } else {
                 dataLakeDao.markAsSkipped(denormalizedEvent.getObservationId());
             }
