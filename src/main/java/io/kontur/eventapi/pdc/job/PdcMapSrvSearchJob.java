@@ -6,6 +6,7 @@ import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.pdc.client.PdcMapSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.entity.ExposureGeohash;
+import feign.FeignException;
 import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -87,6 +88,10 @@ public class PdcMapSrvSearchJob extends AbstractJob {
     public void execute(String serviceId) throws Exception {
         try {
             String geoJson = pdcMapSrvClient.getTypeSpecificExposures(serviceId);
+            if (geoJson == null || geoJson.isBlank()) {
+                LOG.warn("Received empty response from PDC MapSrv {}", serviceId);
+                return;
+            }
             FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
             Map<String, String> ids = new HashMap<>();
@@ -114,6 +119,8 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                     dataLakeDao.storeDataLakes(dataLakes);
                 }
             }
+        } catch (FeignException e) {
+            LOG.warn("Exposures wasn't received from PDC MapSrv {}. HTTP {} - {}", serviceId, e.status(), e.getMessage());
         } catch (Exception e) {
             LOG.warn("Exposures wasn't received from PDC MapSrv {}. Error: {}", serviceId, e.getMessage());
         }
