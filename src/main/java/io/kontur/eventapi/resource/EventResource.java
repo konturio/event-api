@@ -95,6 +95,9 @@ public class EventResource {
             @RequestParam(value = "bbox", required = false)
             @ValidBbox
             List<BigDecimal> bbox,
+            @Parameter(description = "Embedding vector for semantic search")
+            @RequestParam(value = "embedding", required = false)
+            List<Double> embedding,
             @Parameter(description = "Number of records on the page. Default value is 20, minimum - 1, maximum - 1000",
                     example = "20",
                     schema = @Schema(allowableValues = {}, minimum = "1", maximum = "1000"))
@@ -111,7 +114,9 @@ public class EventResource {
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
             EpisodeFilterType episodeFilterType) {
-        Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
+        Optional<String> dataOpt = embedding != null && !embedding.isEmpty()
+                ? eventResourceService.searchByEmbedding(feed, embedding, limit, episodeFilterType)
+                : eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);

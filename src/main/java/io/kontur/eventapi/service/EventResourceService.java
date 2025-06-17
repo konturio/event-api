@@ -50,6 +50,12 @@ public class EventResourceService {
         return data == null ? Optional.empty() : Optional.of(data);
     }
 
+    public Optional<String> searchByEmbedding(String feedAlias, List<Double> embedding, int limit,
+                                              EpisodeFilterType episodeFilterType) {
+        String data = apiDao.searchByEmbedding(feedAlias, embedding, limit, episodeFilterType);
+        return data == null ? Optional.empty() : Optional.of(data);
+    }
+
     @Cacheable(cacheNames = EVENT_CACHE_NAME, cacheManager = "longCacheManager", condition = "#root.target.isCacheEnabled()")
     public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
         return apiDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);

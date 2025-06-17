@@ -17,7 +17,12 @@ public interface ApiMapper {
 
 	List<FeedDto> getFeeds();
 
-	Optional<String> findDataByObservationId(@Param("observationId") UUID observationId);
+    Optional<String> findDataByObservationId(@Param("observationId") UUID observationId);
+
+    String searchByEmbedding(@Param("feedAlias") String feedAlias,
+                             @Param("embedding") List<Double> embedding,
+                             @Param("limit") int limit,
+                             @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
 
 	String searchForEvents(@Param("feedAlias") String feedAlias,
 	                       @Param("eventTypes") List<EventType> eventTypes,

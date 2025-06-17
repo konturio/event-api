@@ -13,6 +13,61 @@
         where observation_id = #{observationId}
     </select>
 
+    <select id="searchByEmbedding" resultType="java.lang.String">
+        with events as (
+            select
+                fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data,
+                fd.event_details, fd.observations, fd.geometries,
+                jsonb_array_length(fd.episodes) as episode_count,
+                <choose>
+                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                        jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
+                                           order by (episode ->> 'updatedAt')::timestamptz desc
+                                           limit 1)) as episodes,
+                    </when>
+                    <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                        '[]'::jsonb as episodes,
+                    </when>
+                    <otherwise>fd.episodes,</otherwise>
+                </choose>
+                box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
+            from feed_data fd
+            left join severities sv on fd.severity_id = sv.severity_id
+            where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
+                and fd.is_latest_version and fd.enriched
+            order by fd.embedding <-> cast(#{embedding} as vector)
+            limit #{limit}
+        )
+        select case when count(*) > 0 then json_build_object(
+            'data', json_agg(json_build_object(
+                'eventId', event_id,
+                'version', version,
+                'name', name,
+                'properName', proper_name,
+                'description', description,
+                'type', type,
+                'severity', severity,
+                'active', active,
+                'startedAt', started_at,
+                'endedAt', ended_at,
+                'updatedAt', updated_at,
+                'location', location,
+                'urls', urls,
+                'loss', loss,
+                'severityData', severity_data,
+                'eventDetails', event_details,
+                'observations', observations,
+                'geometries', geometries,
+                'episodes', episodes,
+                'episodeCount', episode_count,
+                'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox),st_ymax(bbox)],
+                'centroid', array[st_x(centroid), st_y(centroid)]
+              )))
+            end
+        from events
+    </select>
+
     <select id="searchForEvents" resultType="java.lang.String">
         with events as (
             select

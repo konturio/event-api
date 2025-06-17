@@ -12,6 +12,7 @@ Search for events within a feed.
 - `after` – return events updated after this timestamp.
 - `datetime` – interval filter. Accepts single RFC3339 timestamp or open/closed interval.
 - `bbox` – bounding box defined as `minLon,minLat,maxLon,maxLat`.
+- `embedding` – optional vector of floats for semantic search.
 - `limit` – page size (default `20`).
 - `sortOrder` – `ASC` or `DESC` by `updatedAt`.
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
@@ -22,6 +23,7 @@ Returns events sorted by update date using cursor based pagination. Response bod
 Same as the root `/v1/` endpoint but returns results as GeoJSON `FeatureCollection`.
 
 Additional optional parameter `access_token` can be passed for geojson visualisation services.
+Optional parameter `embedding` works the same as in `/v1/` endpoint.
 
 ## `GET /v1/observations/{observationId}`
 Return raw observation data by its UUID. Content type can be JSON, XML, CSV, or another one depending on the source.

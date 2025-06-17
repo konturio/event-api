@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 #### Added
+- semantic search by embedding vector in event search endpoint
 
 #### Changed
 
