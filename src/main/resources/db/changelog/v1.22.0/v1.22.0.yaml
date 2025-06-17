@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: create-split-antimeridian-function.sql
+  - include:
+      relativeToChangelogFile: true
+      file: update-collect-functions-antimeridian.sql
