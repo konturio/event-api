@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
+import io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer;
+import io.kontur.eventapi.util.LossUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -131,7 +133,25 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setExternalEpisodeId(parseString(data, "EVENT_ID"));
         normalizedObservation.setDescription(parseString(data, "EPISODE_NARRATIVE"));
         normalizedObservation.setEpisodeDescription(parseString(data, "EVENT_NARRATIVE"));
-        normalizedObservation.setCost(getCost(parseString(data, "DAMAGE_PROPERTY")));
+        BigDecimal propertyDamage = getCost(parseString(data, "DAMAGE_PROPERTY"));
+        normalizedObservation.setCost(propertyDamage);
+        Map<String, Object> loss = new HashMap<>();
+        if (propertyDamage != null) {
+            loss.put(LossUtil.PROPERTY_DAMAGE, propertyDamage);
+        }
+        BigDecimal cropsDamage = getCost(parseString(data, "DAMAGE_CROPS"));
+        if (cropsDamage != null) {
+            loss.put(LossUtil.CROPS_DAMAGE, cropsDamage);
+        }
+        int dead = parseInt(data, "DEATHS_DIRECT") + parseInt(data, "DEATHS_INDIRECT");
+        if (dead > 0) {
+            loss.put(LossUtil.PEOPLE_DEAD, dead);
+        }
+        int injured = parseInt(data, "INJURIES_DIRECT") + parseInt(data, "INJURIES_INDIRECT");
+        if (injured > 0) {
+            loss.put(LossUtil.PEOPLE_INJURED, injured);
+        }
+        normalizedObservation.setLoss(loss);
         normalizedObservation.setEventSeverity(convertFujitaScale(parseString(data, "TOR_F_SCALE")));
 
         setGeometry(data, normalizedObservation);
@@ -148,6 +168,7 @@ public class StormsNoaaNormalizer extends Normalizer {
         String zone = parseString(data, "CZ_NAME");
         String state = parseString(data, "STATE");
         normalizedObservation.setName(createName(eventType, zone, state, "USA"));
+        normalizedObservation.setRegion(PdcHazardNormalizer.parseLocation(normalizedObservation.getName()));
 
         normalizedObservation.setSeverityData(getSeverityData(data, normalizedObservation.getType()));
 
@@ -251,6 +272,15 @@ public class StormsNoaaNormalizer extends Normalizer {
     private Double parseDouble(Map<String, String> map, String key) {
         String value = parseString(map, key);
         return value == null ? null : Double.valueOf(value);
+    }
+
+    private int parseInt(Map<String, String> map, String key) {
+        String value = parseString(map, key);
+        try {
+            return value == null ? 0 : Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private String parseTimezone(String timezoneAbbr) {

@@ -22,27 +22,34 @@ Normalized information extracted from `data_lake`.
 | Column | Type |
 | ------ | ---- |
 | `observation_id` | `uuid` (references `data_lake`)
-| `external_id` | `text`
+| `external_event_id` | `text`
+| `external_episode_id` | `text`
 | `provider` | `text`
-| `point` | `geometry`
-| `geometries` | `jsonb`
-| `event_severity` | `text`
+| `origin` | `text`
 | `name` | `text`
+| `proper_name` | `text`
 | `description` | `text`
 | `episode_description` | `text`
 | `type` | `text`
+| `event_severity` | `text`
 | `active` | `boolean`
-| `cost` | `numeric`
-| `region` | `text`
 | `loaded_at` | `timestamptz`
 | `started_at` | `timestamptz`
 | `ended_at` | `timestamptz`
-| `updated_at` | `timestamptz`
-| `source_uri` | `text`
-| `external_episode_id` | `text`
+| `source_updated_at` | `timestamptz`
+| `region` | `text`
+| `urls` | `text[]`
+| `cost` | `numeric`
+| `loss` | `jsonb`
+| `severity_data` | `jsonb`
+| `point` | `geometry`
+| `geometries` | `jsonb`
+| `auto_expire` | `boolean`
+| `recombined` | `boolean`
+| `normalized_at` | `timestamptz`
 | `collected_geography` | `geography` (generated from `geometries`)
 
-Indexes exist for `external_id` and `collected_geography`.
+Indexes exist for `external_event_id` and `collected_geography`.
 
 ## `feeds`
 List of available feeds.
