@@ -26,11 +26,13 @@ aws:
   sqs:
     enabled: true
 
+userAgent: Event API DEV
+
 feign:
   client:
     config:
       default:
         defaultRequestHeaders:
-          User-Agent: Event API DEV
+          User-Agent: ${userAgent}
       auth:
         logger-level: HEADERS

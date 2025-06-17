@@ -13,12 +13,16 @@ public class StormsNoaaImportService {
     @Value("${stormsNoaa.host}")
     private String URL;
 
+    @Value("${userAgent:Event API}")
+    private String userAgent;
+
     private static final String tmpDir = System.getProperty("java.io.tmpdir");
     private static final String separator = System.getProperty("file.separator");
 
     public void downloadFile(String filename, String tmpFilePath) throws Exception {
         File file = new File(tmpFilePath);
         URLConnection conn = new URI(URL + filename).toURL().openConnection();
+        conn.setRequestProperty("User-Agent", userAgent);
         transferData(conn, file);
     }
 

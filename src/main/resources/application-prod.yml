@@ -26,9 +26,11 @@ aws:
   sqs:
     enabled: true
 
+userAgent: Event API PROD
+
 feign:
   client:
     config:
       default:
         defaultRequestHeaders:
-          User-Agent: Event API PROD
+          User-Agent: ${userAgent}

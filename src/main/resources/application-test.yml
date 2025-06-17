@@ -26,9 +26,11 @@ aws:
   sqs:
     enabled: true
 
+userAgent: Event API TEST
+
 feign:
   client:
     config:
       default:
         defaultRequestHeaders:
-          User-Agent: Event API TEST
+          User-Agent: ${userAgent}
