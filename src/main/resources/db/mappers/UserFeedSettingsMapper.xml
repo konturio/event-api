@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.UserFeedSettingsMapper">
+
+    <select id="getUserFeedSettings" resultType="io.kontur.eventapi.entity.UserFeedSettings">
+        select user_name, feeds, default_feed
+        from user_feed_settings
+        where user_name = #{userName}
+    </select>
+
+    <insert id="upsertUserFeedSettings">
+        insert into user_feed_settings (user_name, feeds, default_feed)
+        values (#{userName}, #{feeds, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, #{defaultFeed})
+        on conflict (user_name) do update
+            set feeds = EXCLUDED.feeds,
+                default_feed = EXCLUDED.default_feed
+    </insert>
+
+    <update id="updateDefaultFeed">
+        update user_feed_settings
+        set default_feed = #{defaultFeed}
+        where user_name = #{userName}
+    </update>
+</mapper>

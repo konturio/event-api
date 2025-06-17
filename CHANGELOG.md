@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 #### Added
+- Endpoints and database table to store per-user feed settings
 
 #### Changed
 

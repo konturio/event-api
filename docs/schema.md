@@ -105,3 +105,12 @@ Tracks current events per feed.
 | `actual` | `boolean` |
 
 Unique on (`feed_id`, `event_id`).
+
+## `user_feed_settings`
+User specific feeds configuration.
+
+| Column | Type | Notes |
+| ------ | ---- | ----- |
+| `user_name` | `text` primary key |
+| `feeds` | `text[]` | available feed aliases |
+| `default_feed` | `text` | alias used by default |

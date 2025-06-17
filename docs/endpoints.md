@@ -39,3 +39,28 @@ Return a single event by feed alias, event ID and optional version. When the ver
 
 ## `GET /v1/user_feeds`
 Return the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token.
+
+## `GET /v1/user_feed_settings`
+Return stored feed settings for the authenticated user. Response contains `userName`, list of `feeds` and `defaultFeed`.
+
+## `PUT /v1/user_feed_settings/default`
+Set default feed for the authenticated user. Body example:
+
+```json
+{
+  "defaultFeed": "micglobal"
+}
+```
+
+## `GET /v1/admin/user_feed_settings/{user}`
+Return feed settings for a specified user.
+
+## `PUT /v1/admin/user_feed_settings/{user}`
+Update feeds available for a user. Body example:
+
+```json
+{
+  "feeds": ["micglobal", "kontur-public"],
+  "defaultFeed": "micglobal"
+}
+```
