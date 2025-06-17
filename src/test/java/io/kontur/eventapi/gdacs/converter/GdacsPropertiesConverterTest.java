@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.kontur.eventapi.util.GeometryUtil.*;
+import static io.kontur.eventapi.util.SeverityUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GdacsPropertiesConverterTest {
@@ -149,21 +150,30 @@ public class GdacsPropertiesConverterTest {
         assertEquals(3, props.size());
         assertEquals(ALERT_AREA, props.get(AREA_TYPE_PROPERTY));
         assertEquals(false, props.get(IS_OBSERVED_PROPERTY));
-        assertEquals(Map.of(WIND_SPEED_KPH, 60), props.get(SEVERITY_DATA_PROPERTY));
+        assertEquals(Map.of(
+                WIND_SPEED_KPH, 60,
+                CATEGORY_SAFFIR_SIMPSON, CATEGORY_TD
+        ), props.get(SEVERITY_DATA_PROPERTY));
 
         props = converter.convertProperties("Poly_Orange", polygonDate, polygonLabel, false);
 
         assertEquals(3, props.size());
         assertEquals(ALERT_AREA, props.get(AREA_TYPE_PROPERTY));
         assertEquals(false, props.get(IS_OBSERVED_PROPERTY));
-        assertEquals(Map.of(WIND_SPEED_KPH, 90), props.get(SEVERITY_DATA_PROPERTY));
+        assertEquals(Map.of(
+                WIND_SPEED_KPH, 90,
+                CATEGORY_SAFFIR_SIMPSON, CATEGORY_TS
+        ), props.get(SEVERITY_DATA_PROPERTY));
 
         props = converter.convertProperties("Poly_Red", polygonDate, polygonLabel, false);
 
         assertEquals(3, props.size());
         assertEquals(ALERT_AREA, props.get(AREA_TYPE_PROPERTY));
         assertEquals(false, props.get(IS_OBSERVED_PROPERTY));
-        assertEquals(Map.of(WIND_SPEED_KPH, 120), props.get(SEVERITY_DATA_PROPERTY));
+        assertEquals(Map.of(
+                WIND_SPEED_KPH, 120,
+                CATEGORY_SAFFIR_SIMPSON, CATEGORY_1
+        ), props.get(SEVERITY_DATA_PROPERTY));
     }
 
     @Test

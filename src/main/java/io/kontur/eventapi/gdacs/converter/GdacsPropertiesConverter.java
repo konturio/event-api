@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static io.kontur.eventapi.util.GeometryUtil.*;
 import static io.kontur.eventapi.util.GeometryUtil.IS_OBSERVED_PROPERTY;
+import static io.kontur.eventapi.util.SeverityUtil.*;
 import static java.lang.Integer.parseInt;
 import static java.time.temporal.ChronoField.YEAR;
 import static java.time.temporal.ChronoUnit.HOURS;
@@ -59,9 +60,18 @@ public class GdacsPropertiesConverter {
     );
 
     private final Map<String, Map<String, Object>> severityDataMap = Map.ofEntries(
-            entry("Poly_Green", singletonMap(WIND_SPEED_KPH, 60)),
-            entry("Poly_Orange", singletonMap(WIND_SPEED_KPH, 90)),
-            entry("Poly_Red", singletonMap(WIND_SPEED_KPH, 120))
+            entry("Poly_Green", Map.of(
+                    WIND_SPEED_KPH, 60,
+                    CATEGORY_SAFFIR_SIMPSON, getCycloneCategory(60d)
+            )),
+            entry("Poly_Orange", Map.of(
+                    WIND_SPEED_KPH, 90,
+                    CATEGORY_SAFFIR_SIMPSON, getCycloneCategory(90d)
+            )),
+            entry("Poly_Red", Map.of(
+                    WIND_SPEED_KPH, 120,
+                    CATEGORY_SAFFIR_SIMPSON, getCycloneCategory(120d)
+            ))
     );
 
 
