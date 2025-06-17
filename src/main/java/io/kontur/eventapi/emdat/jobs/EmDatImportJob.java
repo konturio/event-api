@@ -80,26 +80,49 @@ public class EmDatImportJob extends AbstractJob {
         OffsetDateTime fileCreationDate = getFileCreationDate(rows);
         int headerRowNum = findHeaderRow(rows);
         String csvHeader = convertRowIntoCsv(rows.get(headerRowNum));
+
+        List<String> csvRows = new ArrayList<>();
+        List<Map<String, String>> parsedRows = new ArrayList<>();
+        Set<String> externalIds = new HashSet<>();
+
         for (int dataRowNum = headerRowNum + 1; dataRowNum < rows.size(); dataRowNum++) {
             String csvData = convertRowIntoCsv(rows.get(dataRowNum));
             try {
                 Map<String, String> row = parseRow(csvHeader, csvData);
-                String externalId = row.get(CSV_ID_HEADER);
-                String data = csvHeader + "\n" + csvData;
-                if (isNewEvent(externalId, data)) {
-                    save(row, data, fileCreationDate);
-                }
+                csvRows.add(csvData);
+                parsedRows.add(row);
+                externalIds.add(row.get(CSV_ID_HEADER));
             } catch (Exception e) {
                 LOG.error("Can't create EM-DAT row: {}", csvData, e);
             }
         }
+
+        Map<String, DataLake> existing = getLatestDataByExternalIds(externalIds);
+
+        for (int i = 0; i < parsedRows.size(); i++) {
+            Map<String, String> row = parsedRows.get(i);
+            String externalId = row.get(CSV_ID_HEADER);
+            String data = csvHeader + "\n" + csvRows.get(i);
+            if (isNewEvent(externalId, data, existing)) {
+                save(row, data, fileCreationDate);
+            }
+        }
     }
 
-    private boolean isNewEvent(String externalId, String data) {
-        Optional<DataLake> dataLake = dataLakeDao.getDataLakesByExternalId(externalId)
-                .stream()
-                .max(comparing(DataLake::getLoadedAt));
-        return dataLake.isEmpty() || !data.equals(dataLake.get().getData());
+    private boolean isNewEvent(String externalId, String data, Map<String, DataLake> existing) {
+        DataLake dataLake = existing.get(externalId);
+        return dataLake == null || !data.equals(dataLake.getData());
+    }
+
+    private Map<String, DataLake> getLatestDataByExternalIds(Set<String> externalIds) {
+        Map<String, DataLake> result = new HashMap<>();
+        if (externalIds.isEmpty()) {
+            return result;
+        }
+        dataLakeDao.getDataLakesByExternalIdsAndProvider(externalIds, EM_DAT_PROVIDER)
+                .forEach(dl -> result.compute(dl.getExternalId(),
+                        (k, v) -> v == null || dl.getLoadedAt().isAfter(v.getLoadedAt()) ? dl : v));
+        return result;
     }
 
     private int findHeaderRow(List<Row> rows) {
