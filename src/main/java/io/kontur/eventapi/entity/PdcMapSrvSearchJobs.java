@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class PdcMapSrvSearchJobs {
     public static final String[] PDC_MAP_SRV_IDS
             = new String[] {"0", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
-            "13", "14", "15", "16", "17", "25",
+            "13", "14", "15", "16", "17", "20", "25",
             "32", "33", "34", "35", "36", "37", "38", "39", "42"};
 
     private final List<PdcMapSrvSearchJob> jobs;
