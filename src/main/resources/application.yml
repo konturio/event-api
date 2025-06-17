@@ -51,6 +51,12 @@ konturApi:
 konturApps:
   host: 'https://test-apps02.konturlabs.com/'
 
+insightsLlmApi:
+  host: 'https://test-llm.konturlabs.com'
+
+embeddings:
+  enabled: true
+
 pdc:
   host: 'https://testdisasteraware.pdc.org'
   mapSrvHost: 'https://testapps.pdc.org'

@@ -36,6 +36,7 @@ public class FeedData {
     private OffsetDateTime enrichedAt;
     private Boolean autoExpire;
     private Integer geomFuncType;
+    private List<Double> embedding = new ArrayList<>();
 
     public FeedData(UUID eventId, UUID feedId, Long version) {
         this.eventId = eventId;

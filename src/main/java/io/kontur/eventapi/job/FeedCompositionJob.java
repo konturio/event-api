@@ -6,6 +6,7 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
+import io.kontur.eventapi.embedding.EmbeddingService;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -41,14 +42,18 @@ public class FeedCompositionJob extends AbstractJob {
     protected final FeedDao feedDao;
     private final NormalizedObservationsDao observationsDao;
     private final List<EpisodeCombinator> episodeCombinators;
+    private final EmbeddingService embeddingService;
 
     public FeedCompositionJob(KonturEventsDao eventsDao, FeedDao feedDao,
-                              NormalizedObservationsDao observationsDao, List<EpisodeCombinator> episodeCombinators, MeterRegistry meterRegistry) {
+                              NormalizedObservationsDao observationsDao, List<EpisodeCombinator> episodeCombinators,
+                              EmbeddingService embeddingService,
+                              MeterRegistry meterRegistry) {
         super(meterRegistry);
         this.eventsDao = eventsDao;
         this.feedDao = feedDao;
         this.observationsDao = observationsDao;
         this.episodeCombinators = episodeCombinators;
+        this.embeddingService = embeddingService;
     }
 
     @Override
@@ -91,6 +96,7 @@ public class FeedCompositionJob extends AbstractJob {
             feedData.setEnriched(feed.getEnrichment().isEmpty());
 
             feedDao.insertFeedData(feedData, feed.getAlias());
+            embeddingService.updateEmbedding(feedData);
         } catch (FeedCompositionSkipException fe) {
             LOG.info(format("Skipped processing event: id = '%s', feed = '%s'. Error: %s",
                     eventId.toString(), feed.getAlias(), fe.getMessage()));

@@ -35,7 +35,8 @@ public interface FeedMapper {
                        @Param("episodes") String episodes,
                        @Param("enriched") Boolean enriched,
                        @Param("autoExpire") Boolean autoExpire,
-                       @Param("geomFuncType") Integer geomFuncType);
+                       @Param("geomFuncType") Integer geomFuncType,
+                       @Param("embedding") List<Double> embedding);
 
     /**
      * Mark events below specified version outdated
@@ -50,6 +51,11 @@ public interface FeedMapper {
     List<FeedData> getNotEnrichedEventsForFeed(@Param("feedId") UUID feedId);
 
     List<FeedData> getEnrichmentSkippedEventsForFeed(@Param("feedId") UUID feedId);
+
+    void updateEmbedding(@Param("feedId") UUID feedId,
+                         @Param("eventId") UUID eventId,
+                         @Param("version") Long version,
+                         @Param("embedding") List<Double> embedding);
 
     void addAnalytics(@Param("feedId") UUID feedId,
                       @Param("eventId") UUID eventId,

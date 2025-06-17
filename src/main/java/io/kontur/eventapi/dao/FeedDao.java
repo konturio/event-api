@@ -43,7 +43,7 @@ public class FeedDao {
                 feedData.getSeverity(), feedData.getActive(), feedData.getStartedAt(), feedData.getEndedAt(),
                 feedData.getUpdatedAt(), feedData.getLocation(), feedData.getUrls(), feedData.getLoss(),
                 feedData.getSeverityData(), feedData.getObservations(), episodesJson, feedData.getEnriched(),
-                feedData.getAutoExpire(), feedData.getGeomFuncType());
+                feedData.getAutoExpire(), feedData.getGeomFuncType(), feedData.getEmbedding());
 
         if (count > 0) {
             mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
@@ -84,6 +84,10 @@ public class FeedDao {
 
     public Integer getEnrichmentSkippedEventsCount() {
         return mapper.getEnrichmentSkippedEventsCount();
+    }
+
+    public void updateEmbedding(UUID feedId, UUID eventId, Long version, List<Double> embedding) {
+        mapper.updateEmbedding(feedId, eventId, version, embedding);
     }
 
     public void createFeed(UUID feedId, String alias, String name, List<String> providers) {

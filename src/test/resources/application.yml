@@ -18,6 +18,12 @@ konturApi:
 konturApps:
   host: 'https://test-apps02.konturlabs.com/'
 
+insightsLlmApi:
+  host: 'http://localhost'
+
+embeddings:
+  enabled: false
+
 stormsNoaa:
   host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
 
