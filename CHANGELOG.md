@@ -5,6 +5,7 @@
 #### Added
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 #### Removed
 
@@ -18,6 +19,7 @@
 ## 1.14.5 - 2023-01-06
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - update EM-DAT license and turn it on for import 
 
@@ -28,6 +30,7 @@
 - Bbox and centroid to API response
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Switched off EM-DAT
 
@@ -39,6 +42,7 @@
 - Index to optimize requests with severity
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Update LOG level for GDACS exceptions
 
@@ -50,6 +54,7 @@
 ## 1.14.2 - 2022-11-10
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Event API to k8s
 
@@ -57,6 +62,7 @@
 ## 1.14.1 - 2022-11-03
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Optimized indexes in `feed_data`
 
@@ -79,6 +85,7 @@
 - Add name to feeds
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fix NHC description parsing
 - Fix pdcMapSrv null geometry issue
@@ -97,6 +104,7 @@
 - Redis caching for `/v1/event` endpoint
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Add `NONE` option to `episodeFilterType` API parameter
 - Add `episodeFilterType` parameter ro `v1/event` endpoint
@@ -114,6 +122,7 @@
 - NHC cyclones feed composition
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Updated the logic of episode composition for `kontur.events` to create episodes on change
 
@@ -124,6 +133,7 @@
 ## 1.10.1 - 2022-08-03
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Update requests to use `latest_severity` and `severities` columns as filter
 - Update records with unknown latest severity to use the latest known severity
@@ -136,6 +146,7 @@
 - Added `severities` and `latest_severity` columns into `feed_data`
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Get english names for admin boundaries
 
@@ -147,6 +158,7 @@
 - Added import cyclones from NHC (enable is set to false until the end of US development)
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fixed duplicate key unique constraint violation for NIFC and GDACS
 - Changed source URL for FIRMS Modis
@@ -155,6 +167,7 @@
 ## 1.8 - 2022-06-09
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Increased application heap memory size
 - Remove properties from geometry before sending to Insights API
@@ -186,6 +199,7 @@
 - Disaster loss estimation on enrichment stage
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fix EM-DAT cost setup
  
@@ -208,6 +222,7 @@
 ## 1.4.1 - 2022-03-23
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fixed duplicates key violation for InciWeb
 
@@ -215,6 +230,7 @@
 ## 1.4 - 2022-03-17
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Reworked PDC's episodes
 - Switched off logging to stdout
@@ -227,6 +243,7 @@
 ## 1.3.2 - 2022-03-04
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fixed center point computing in event geometries
 
@@ -234,6 +251,7 @@
 ## 1.3.1 - 2022-02-21
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fixed mixed SRID geometry in collectEventGeometries function
 
@@ -241,6 +259,7 @@
 ## 1.3 - 2022-02-17
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 - feed `kontur-public` is renamed to `kontur-public-v1`
 - feed `disaster-ninja-02` is renamed to `kontur-public`
 
@@ -252,6 +271,7 @@
 - Add `/user_feeds` endpoint
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Unify geometry properties structure for all providers:
   - areaType 
@@ -282,6 +302,7 @@ aws:
 ```
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - search for existing firms events in batches, not one-by-one
 
@@ -304,6 +325,7 @@ aws:
 - metrics on observation / event processing on each stage: avg, max, min, count
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - migrate to Java 16, update dependencies
 - `em-dat` import job inherits from `AbstractJob` not `Runnuble`
@@ -317,6 +339,7 @@ aws:
 ## 0.9.1 - 2021-12-02
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Rename technical feeds, add `test` prefix: `test-gdacs`, `test-firms`, `test-em-dat`, `test-calfire`,
  `test-nifc`, `test-pdc-v0`
@@ -332,6 +355,7 @@ aws:
 - `wildfire.perimeters.nifc` and `wildfire.locations.nifc` providers
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - moment episodes ascending sort
 
@@ -339,6 +363,7 @@ aws:
 ## 0.8.1 - 2021-11-16
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fixed `WILDFIRE` type calculation during enrichment post-processing
 
@@ -376,6 +401,7 @@ aws:
 - Added `enrichment_skipped` column into `feed_data` table which indicates whether event has been skipped during enrichment or not
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Async events enrichment execution
 - Configs by profiles: `dev`, `test`, `prod`. We should leave only properties from
@@ -387,6 +413,7 @@ aws:
 ## 0.6.2 - 2021-08-30
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Fix empty event.observations in events/v1 endpoint
 
@@ -394,6 +421,7 @@ aws:
 ## 0.6.1 - 2021-08-27
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - `geometries` filed in `feed_data` is calculated only for new events
 
@@ -416,6 +444,7 @@ scheduler:
 ```
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Keycloak auth, we need to use ISSUER_URI as follows - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]`,
   and JWK_SET_URI - `http://[KEYCLOAK_HOST]/auth/realms/[REALM]/protocol/openid-connect/certs`
@@ -503,6 +532,7 @@ feign:
 ```
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - !BE AWARE! It might take a  while to install this version. Heavy sql scripts will be run.  
 - Denormalize feed_data table in order to improve search speed. #4736 #5183 #5168 
@@ -538,6 +568,7 @@ feign:
 - storms.noaa provider
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Event versioning is removed 
 - Refactored normalization, event and episods jobs
@@ -590,6 +621,7 @@ scheduler:
 - `types` and `severities` filter to the `/v1/` endpoint
 
 #### Changed
+- `event_details` column default is now `null` instead of `{}`
 
 - Changed `/v1/` endpoint pagination to cursor based.
 

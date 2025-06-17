@@ -78,7 +78,7 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 | `description` | `text` |
 | `episodes` | `jsonb` |
 | `observations` | `uuid[]` |
-| `event_details` | `jsonb` default `{}` |
+| `event_details` | `jsonb` default `null` |
 | `geometries` | `jsonb` |
 | `urls` | `text[]` |
 | `proper_name` | `text` |
