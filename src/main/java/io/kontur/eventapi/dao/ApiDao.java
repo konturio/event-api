@@ -62,7 +62,18 @@ public class ApiDao {
 				null, null, null, null, episodeFilterType);
 	}
 
-	public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
-		return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
-	}
+        public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
+                return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
+        }
+
+        public String getLatestEvents(int limit, List<BigDecimal> bBox) {
+                if (bBox != null) {
+                        var xMin = bBox.get(0);
+                        var yMin = bBox.get(1);
+                        var xMax = bBox.get(2);
+                        var yMax = bBox.get(3);
+                        return mapper.getLatestEvents(limit, xMin, xMax, yMin, yMax);
+                }
+                return mapper.getLatestEvents(limit, null, null, null, null);
+        }
 }

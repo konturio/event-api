@@ -63,4 +63,9 @@ public class EventResourceService {
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         return geoJson == null ? Optional.empty() : Optional.of(geoJson);
     }
+
+    public Optional<String> getLatestEvents(int limit, List<BigDecimal> bbox) {
+        String result = apiDao.getLatestEvents(limit, bbox);
+        return result == null ? Optional.empty() : Optional.of(result);
+    }
 }

@@ -276,4 +276,22 @@ public class EventResource {
                 .toList();
         return ResponseEntity.ok(allowedFeeds);
     }
+
+    @GetMapping(path = "/latest", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            tags = "Events",
+            summary = "Returns active significant events")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successful operation",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    public ResponseEntity<String> getLatestEvents(
+            @Parameter(description = "Number of records to return, maximum 1000", example = "20")
+            @RequestParam(value = "limit", defaultValue = "20")
+            @Min(0) @Max(1000) int limit,
+            @Parameter(description = "Bounding box as four numbers: minLon,minLat,maxLon,maxLat")
+            @RequestParam(value = "bbox", required = false) @ValidBbox List<BigDecimal> bbox) {
+        Optional<String> res = eventResourceService.getLatestEvents(limit, bbox);
+        return res.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
 }

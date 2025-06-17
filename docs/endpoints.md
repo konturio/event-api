@@ -39,3 +39,10 @@ Return a single event by feed alias, event ID and optional version. When the ver
 
 ## `GET /v1/user_feeds`
 Return the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token.
+
+## `GET /v1/latest`
+Return active significant events from all feeds sorted by update date.
+
+**Parameters**
+- `limit` – maximum number of events to return (default `20`, min `0`, max `1000`).
+- `bbox` – bounding box filter `minLon,minLat,maxLon,maxLat` (optional).
