@@ -17,7 +17,11 @@
         with events as (
             select
                 fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations,
+                <choose>
+                    <when test='"NONE".equalsIgnoreCase(geometryFilterType)'>null as geometries,</when>
+                    <otherwise>fd.geometries,</otherwise>
+                </choose>
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
@@ -100,7 +104,11 @@
         with event as (
             select
                 fd.event_id, fd.feed_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type, sv.severity, fd.active,
-                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls, fd.loss, fd.severity_data, fd.event_details, fd.observations,
+                <choose>
+                    <when test='"NONE".equalsIgnoreCase(geometryFilterType)'>null as geometries,</when>
+                    <otherwise>fd.geometries,</otherwise>
+                </choose>
                 jsonb_array_length(fd.episodes) as episode_count,
                 <choose>
                     <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>

@@ -36,6 +36,7 @@ import static io.kontur.eventapi.TestUtil.readFile;
 import static io.kontur.eventapi.entity.EventType.THERMAL_ANOMALY;
 import static io.kontur.eventapi.entity.SortOrder.ASC;
 import static io.kontur.eventapi.resource.dto.EpisodeFilterType.ANY;
+import io.kontur.eventapi.resource.dto.GeometryFilterType;
 import static java.time.OffsetDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -238,7 +239,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
     private List<TestEventDto> searchFeedData() throws IOException {
         List<TestEventDto> firms = objectMapper.readValue(apiMapper.searchForEvents(
                 "test-feed", List.of(THERMAL_ANOMALY), null, null, OffsetDateTime.parse("2020-11-02T11:00Z"), 100,
-                List.of(), ASC, null, null, null, null, ANY), TestEventListDto.class).getData();
+                List.of(), ASC, null, null, null, null, ANY, GeometryFilterType.ANY), TestEventListDto.class).getData();
         firms.sort(Comparator.comparing(f -> f.getObservations().size()));
         return firms;
     }

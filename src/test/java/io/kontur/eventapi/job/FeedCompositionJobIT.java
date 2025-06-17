@@ -8,6 +8,7 @@ import io.kontur.eventapi.dao.FeedDao;
 import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.resource.dto.GeometryFilterType;
 import io.kontur.eventapi.resource.dto.TestEventDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
 import io.kontur.eventapi.resource.dto.TestEventListDto;
@@ -124,7 +125,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         feedCompositionJob.run();
 
         return objectMapper.readValue(apiDao.searchForEvents("test-feed", List.of(), null,
-                null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY), TestEventListDto.class).getData().get(0);
+                null, null, 1, List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY, GeometryFilterType.ANY), TestEventListDto.class).getData().get(0);
     }
 
     private void createNormalizations(String externalEventUUId, OffsetDateTime loadedTime, String provider, String data) {
@@ -177,7 +178,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
 
         TestEventDto feed = objectMapper.readValue(apiDao.searchForEvents(
                 "test-feed", List.of(EventType.FLOOD), null, null, loadHpSrvHazardLoadTime, 1,
-                List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY), TestEventListDto.class).getData().get(0);
+                List.of(), SortOrder.ASC, null, EpisodeFilterType.ANY, GeometryFilterType.ANY), TestEventListDto.class).getData().get(0);
         assertEquals(latestUpdatedDate, feed.getUpdatedAt());
     }
 
