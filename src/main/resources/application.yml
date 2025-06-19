@@ -230,6 +230,10 @@ springdoc:
   swagger-ui:
     path: 'doc'
     disable-swagger-default-url: true
+    oauth2-redirect-url: '/events/doc/oauth2-redirect.html'
+    oauth:
+      client-id: event-api
+      use-pkce-with-authorization-code-grant: true
 
 aws:
   sqs:

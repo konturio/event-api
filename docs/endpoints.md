@@ -2,6 +2,12 @@
 
 This document describes all available REST endpoints exposed by the application. All paths are prefixed with `/v1`.
 
+## Authentication
+
+Swagger UI now integrates with Keycloak. Click **Authorize** and log in with your
+Kontur account. Once authorized, Swagger will automatically attach the acquired
+access token to your requests.
+
 ## `GET /v1/`
 Search for events within a feed.
 
