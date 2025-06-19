@@ -46,7 +46,6 @@ class FrapCalStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(dataLake.getProvider(), normalizedObservation.getProvider());
         assertFalse(normalizedObservation.getActive());
         assertEquals(EventType.WILDFIRE, normalizedObservation.getType());
-        assertNotNull(normalizedObservation.getPoint());
         assertNotNull(normalizedObservation.getGeometries());
         assertEquals(WILDFIRE_PROPERTIES, normalizedObservation.getGeometries().getFeatures()[0].getProperties());
         assertEquals("Wildfire - Los Angeles County, California, USA", normalizedObservation.getName());

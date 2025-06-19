@@ -43,7 +43,6 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
 
         Double lon = readDouble(props, "InitialLongitude");
         Double lat = readDouble(props, "InitialLatitude");
-        observation.setPoint(makeWktPoint(lon, lat));
 
         Double calculatedAcres = readDouble(props, "CalculatedAcres");
         Double incidentSize = readDouble(props, "IncidentSize");

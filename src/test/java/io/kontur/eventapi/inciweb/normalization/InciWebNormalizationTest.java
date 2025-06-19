@@ -55,7 +55,6 @@ class InciWebNormalizationTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("http://example.com/incident/1/"), observation.getUrls());
-        assertEquals("POINT(-110.111 10.111)", observation.getPoint());
         checkGeometriesValue(observation.getGeometries());
     }
 

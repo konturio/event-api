@@ -42,7 +42,6 @@ Normalized information extracted from `data_lake`.
 | `cost` | `numeric`
 | `loss` | `jsonb`
 | `severity_data` | `jsonb`
-| `point` | `geometry`
 | `geometries` | `jsonb`
 | `auto_expire` | `boolean`
 | `recombined` | `boolean`

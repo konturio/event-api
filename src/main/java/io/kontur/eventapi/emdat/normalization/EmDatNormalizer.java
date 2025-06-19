@@ -10,7 +10,6 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.job.Applicable;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.apache.commons.lang3.StringUtils;
-import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,21 +95,16 @@ public class EmDatNormalizer extends Normalizer {
         Point point = null;
         if (!StringUtils.isEmpty(csvData.get("Latitude")) && !StringUtils.isEmpty(csvData.get("Longitude"))) {
             try {
-                Double lon = parseDouble(csvData.get("Longitude"));
-                Double lat = parseDouble(csvData.get("Latitude"));
-                String wktPoint = makeWktPoint(lon, lat);
-                wktReader.read(wktPoint); //validate coordinates
-                obs.setPoint(wktPoint);
-                point = new Point(new double[]{lon, lat});
-            } catch (NumberFormatException | ParseException e) {
+                point = new Point(new double[]{parseDouble(csvData.get("Longitude")), parseDouble(csvData.get("Latitude"))});
+            } catch (NumberFormatException e) {
                 LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
             }
         }
 
         Geometry geom = normalizationService
                 .obtainGeometries(csvData.get("Country"), csvData.get("Location"))
-                .or(() -> normalizationService.convertWktPointIntoGeometry(obs.getPoint()))
                 .orElse(null);
+
         obs.setGeometries(geometryConverter.convertGeometry(geom, point, csvData.get("Dis Mag Scale"), csvData.get("Dis Mag Value")));
 
         return obs;

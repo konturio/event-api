@@ -34,7 +34,6 @@ class PerimetersNifcNormalizerTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getEndedAt());
         assertEquals(dataLake.getProvider(), observation.getProvider());
         assertEquals("2021-ALALF-210222", observation.getExternalEventId());
-        assertEquals("POINT(-85.82526 33.48939)", observation.getPoint());
         assertEquals(Severity.MINOR, observation.getEventSeverity());
         assertEquals("Wildfire TL DUCK NEST", observation.getName());
         assertEquals("TL DUCK NEST", observation.getProperName());
