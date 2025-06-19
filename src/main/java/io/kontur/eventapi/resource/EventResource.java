@@ -122,7 +122,7 @@ public class EventResource {
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
                 effectiveAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         if (dataOpt.isEmpty()) {
-            if (effectiveAfter != null) {
+            if (effectiveAfter != null && updatedAfter == null) {
                 return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
             }
             return ResponseEntity.noContent().build();
