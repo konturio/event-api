@@ -5,7 +5,6 @@
 #### Added
 
 #### Changed
- - update H3 library to 4.1.1
 
 #### Removed
 
