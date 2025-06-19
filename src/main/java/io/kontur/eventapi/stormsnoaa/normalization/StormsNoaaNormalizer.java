@@ -168,7 +168,6 @@ public class StormsNoaaNormalizer extends Normalizer {
         String zone = parseString(data, "CZ_NAME");
         String state = parseString(data, "STATE");
         normalizedObservation.setName(createName(eventType, zone, state, "USA"));
-        normalizedObservation.setRegion(PdcHazardNormalizer.parseLocation(normalizedObservation.getName()));
 
         normalizedObservation.setSeverityData(getSeverityData(data, normalizedObservation.getType()));
 
