@@ -133,12 +133,21 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setDescription(parseString(data, "EPISODE_NARRATIVE"));
         normalizedObservation.setEpisodeDescription(parseString(data, "EVENT_NARRATIVE"));
         BigDecimal propertyDamage = getCost(parseString(data, "DAMAGE_PROPERTY"));
-        normalizedObservation.setCost(propertyDamage);
+        BigDecimal cropsDamage = getCost(parseString(data, "DAMAGE_CROPS"));
+        List<Map<String, Object>> costs = new ArrayList<>();
+        if (propertyDamage != null) {
+            costs.add(Map.of("damage_property_cost", propertyDamage));
+        }
+        if (cropsDamage != null) {
+            costs.add(Map.of("damage_crops_cost", cropsDamage));
+        }
+        if (!costs.isEmpty()) {
+            normalizedObservation.setCost(costs);
+        }
         Map<String, Object> loss = new HashMap<>();
         if (propertyDamage != null) {
             loss.put(LossUtil.PROPERTY_DAMAGE, propertyDamage);
         }
-        BigDecimal cropsDamage = getCost(parseString(data, "DAMAGE_CROPS"));
         if (cropsDamage != null) {
             loss.put(LossUtil.CROPS_DAMAGE, cropsDamage);
         }

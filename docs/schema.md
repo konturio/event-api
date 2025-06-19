@@ -39,7 +39,7 @@ Normalized information extracted from `data_lake`.
 | `source_updated_at` | `timestamptz`
 | `region` | `text`
 | `urls` | `text[]`
-| `cost` | `numeric`
+| `cost` | `jsonb` | provider specific cost information
 | `loss` | `jsonb`
 | `severity_data` | `jsonb`
 | `point` | `geometry`

@@ -29,6 +29,13 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         Feature feature = readFeature(dataLakeDto.getData());
         Map<String, Object> props = feature.getProperties();
 
+        Double suppressionCost = selectFirstNotNull(
+                readDouble(props, "attr_EstimatedCostToDate"),
+                readDouble(props, "irwin_EstimatedCostToDate"));
+        if (suppressionCost != null) {
+            observation.setCost(List.of(Map.of("suppression_cost", suppressionCost)));
+        }
+
         observation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), PERIMETERS_PROPERTIES));
         observation.setDescription(selectFirstNotNull(
                 readString(props, "attr_IncidentShortDescription"),

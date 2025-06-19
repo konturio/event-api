@@ -41,7 +41,10 @@ public class CommonStaticNormalizer extends StaticNormalizer {
         normalizedObservation.setStartedAt(date);
         normalizedObservation.setEndedAt(date);
 
-        normalizedObservation.setCost(NumberUtils.createBigDecimal(readString(properties, "damage_property")));
+        String damage = readString(properties, "damage_property");
+        if (!damage.isEmpty()) {
+            normalizedObservation.setCost(List.of(Map.of("damage_property_cost", NumberUtils.createBigDecimal(damage))));
+        }
         normalizedObservation.setEventSeverity(convertFujitaScale(readString(properties, "fujita_scale")));
         normalizedObservation.setDescription(readString(properties, "comments"));
         normalizedObservation.setType(EventType.TORNADO);

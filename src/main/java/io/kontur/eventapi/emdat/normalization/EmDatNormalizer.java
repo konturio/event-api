@@ -85,12 +85,33 @@ public class EmDatNormalizer extends Normalizer {
         obs.setName(makeName(csvData));
         obs.setProperName(csvData.get("Event Name"));
         obs.setRegion(csvData.get("ISO") + " " + csvData.get("Location"));
-        if (!StringUtils.isEmpty(csvData.get("Total Damages ('000 US$)"))) {
-            try {
-                obs.setCost(new BigDecimal(csvData.get("Total Damages ('000 US$)")).multiply(BigDecimal.valueOf(1000)));
-            } catch (NumberFormatException e) {
-                LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
+        List<Map<String, Object>> costs = new ArrayList<>();
+        try {
+            String recon = csvData.get("Reconstruction Costs ('000 US$)");
+            if (StringUtils.isNotBlank(recon)) {
+                costs.add(Map.of("reconstruction_cost", new BigDecimal(recon).multiply(BigDecimal.valueOf(1000))));
             }
+        } catch (NumberFormatException e) {
+            LOG.debug("{} for observation {}", e.getMessage(), obs.getObservationId());
+        }
+        try {
+            String insured = csvData.get("Insured Damages ('000 US$)");
+            if (StringUtils.isNotBlank(insured)) {
+                costs.add(Map.of("insured_damages_cost", new BigDecimal(insured).multiply(BigDecimal.valueOf(1000))));
+            }
+        } catch (NumberFormatException e) {
+            LOG.debug("{} for observation {}", e.getMessage(), obs.getObservationId());
+        }
+        try {
+            String total = csvData.get("Total Damages ('000 US$)");
+            if (StringUtils.isNotBlank(total)) {
+                costs.add(Map.of("total_damage_cost", new BigDecimal(total).multiply(BigDecimal.valueOf(1000))));
+            }
+        } catch (NumberFormatException e) {
+            LOG.debug("{} for observation {}", e.getMessage(), obs.getObservationId());
+        }
+        if (!costs.isEmpty()) {
+            obs.setCost(costs);
         }
 
         Point point = null;

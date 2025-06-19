@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static io.kontur.eventapi.staticdata.normalization.StaticNormalizer.TORNADO_PROPERTIES;
@@ -48,7 +50,7 @@ class CommonStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(dataLake.getProvider(), normalizedObservation.getProvider());
         assertFalse(normalizedObservation.getActive());
         assertEquals("Tornado - Stratford, Canada", normalizedObservation.getName());
-        assertEquals(BigDecimal.valueOf(100), normalizedObservation.getCost());
+        assertEquals(List.of(Map.of("damage_property_cost", BigDecimal.valueOf(100))), normalizedObservation.getCost());
         assertEquals(Severity.MINOR, normalizedObservation.getEventSeverity());
         assertEquals("tornado", normalizedObservation.getDescription());
         assertEquals(EventType.TORNADO, normalizedObservation.getType());

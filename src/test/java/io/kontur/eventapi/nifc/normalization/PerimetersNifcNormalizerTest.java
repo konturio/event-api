@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static io.kontur.eventapi.TestUtil.readFile;
@@ -43,7 +45,7 @@ class PerimetersNifcNormalizerTest {
         assertEquals(getDateTimeFromMilli(1637450954000L), observation.getStartedAt());
         assertNull(observation.getEpisodeDescription());
         assertNull(observation.getActive());
-        assertNull(observation.getCost());
+        assertEquals(List.of(Map.of("suppression_cost", 35000.0)), observation.getCost());
         assertNull(observation.getRegion());
         assertTrue(observation.getUrls().isEmpty());
         assertNull(observation.getExternalEpisodeId());

@@ -30,6 +30,11 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
         Feature feature = readFeature(dataLakeDto.getData());
         Map<String, Object> props = feature.getProperties();
 
+        Double suppressionCost = readDouble(props, "EstimatedCostToDate");
+        if (suppressionCost != null) {
+            observation.setCost(List.of(Map.of("suppression_cost", suppressionCost)));
+        }
+
         observation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), LOCATIONS_PROPERTIES));
         observation.setDescription(readString(props, "IncidentShortDescription"));
 

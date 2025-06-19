@@ -17,7 +17,7 @@
             #{observationId}, #{externalEventId}, #{externalEpisodeId}, #{provider}, #{origin}, #{name}, #{properName},
             #{description}, #{episodeDescription}, #{type}, #{eventSeverity}, #{active}, #{loadedAt}, #{startedAt},
             #{endedAt}, #{sourceUpdatedAt}, #{region}, #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler},
-            #{cost},
+            #{cost,typeHandler=io.kontur.eventapi.typehandler.MapListTypeHandler}::jsonb,
             <if test='loss != null'>#{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
             <if test='severityData != null'>#{severityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
             <if test='point != null'>'SRID=4326;${point}'::geometry,</if>
@@ -30,7 +30,7 @@
             episode_description = #{episodeDescription}, type = #{type}, event_severity = #{eventSeverity},
             active = #{active}, loaded_at = #{loadedAt}, started_at = #{startedAt}, ended_at = #{endedAt},
             source_updated_at = #{sourceUpdatedAt}, region = #{region},
-            urls = #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, cost = #{cost},
+            urls = #{urls, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}, cost = #{cost,typeHandler=io.kontur.eventapi.typehandler.MapListTypeHandler}::jsonb,
             <if test='loss != null'>loss = #{loss,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
             <if test='severityData != null'>severity_data = #{severityData,typeHandler=io.kontur.eventapi.typehandler.MapTypeHandler}::jsonb,</if>
             <if test='point != null'>point = 'SRID=4326;${point}'::geometry,</if>
@@ -133,7 +133,7 @@
         <result property="sourceUpdatedAt" column="source_updated_at"/>
         <result property="region" column="region"/>
         <result property="urls" column="urls" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
-        <result property="cost" column="cost"/>
+        <result property="cost" column="cost" typeHandler="io.kontur.eventapi.typehandler.MapListTypeHandler"/>
         <result property="loss" column="loss" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="severityData" column="severity_data" typeHandler="io.kontur.eventapi.typehandler.MapTypeHandler"/>
         <result property="point" column="point"/>
