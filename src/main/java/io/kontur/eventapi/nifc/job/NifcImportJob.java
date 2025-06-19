@@ -100,7 +100,7 @@ public class NifcImportJob extends AbstractJob {
                                 dataLakeConverter.convertDataLake(externalId, updatedAt, provider, data));
                     }
                 } catch (Exception e) {
-                    LOG.warn("Failed to process feature from " + provider, e);
+                    LOG.error("Failed to process feature from " + provider, e);
                 }
             }
             if (MapUtils.isNotEmpty(dataLakes)) {
