@@ -119,8 +119,6 @@ public class PdcMapSrvSearchJob extends AbstractJob {
                     dataLakeDao.storeDataLakes(dataLakes);
                 }
             }
-        } catch (FeignException e) {
-            LOG.warn("Exposures wasn't received from PDC MapSrv {}. HTTP {} - {}", serviceId, e.status(), e.getMessage());
         } catch (Exception e) {
             LOG.warn("Exposures wasn't received from PDC MapSrv {}. Error: {}", serviceId, e.getMessage());
         }
