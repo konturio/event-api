@@ -60,7 +60,7 @@ public class InciWebNormalizer extends Normalizer {
 
             return normalizedObservation;
         } else {
-            LOG.warn("Can't parse input source for normalization for event: {}", dataLakeDto.getExternalId());
+            LOG.error("Can't parse input source for normalization for event: {}", dataLakeDto.getExternalId());
         }
         return null;
     }
