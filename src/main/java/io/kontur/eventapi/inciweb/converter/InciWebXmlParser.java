@@ -45,7 +45,7 @@ public class InciWebXmlParser extends CapBaseXmlParser {
             item.setData(xml);
             return Optional.of(item);
         } catch (ParserConfigurationException | IOException | SAXException | DateTimeParseException | NumberFormatException e) {
-            LOG.warn("Error while parsing item from InciWeb events list. {}",
+            LOG.error("Error while parsing item from InciWeb events list. {}",
                     StringUtils.isNotBlank(item.getGuid()) ? item.getGuid() : "unknown");
             return Optional.empty();
         }
