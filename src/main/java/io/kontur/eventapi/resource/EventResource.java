@@ -260,6 +260,32 @@ public class EventResource {
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
+    @GetMapping(path = "/event/similar", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            tags = "Events",
+            summary = "Returns events similar to the given event",
+            description = "Searches for events of the same type in the specified feed " +
+                    "that are geographically close to the provided event.")
+    @PreAuthorize("hasAuthority('read:feed:'+#feed)")
+    public ResponseEntity<String> getSimilarEvents(
+            @Parameter(description = "Feed name")
+            @RequestParam(value = "feed")
+            String feed,
+            @Parameter(description = "Event UUID")
+            @RequestParam(value = "eventId")
+            UUID eventId,
+            @Parameter(description = "Maximum number of similar events to return", example = "10")
+            @RequestParam(value = "limit", defaultValue = "10")
+            @Min(1) @Max(100)
+            int limit,
+            @Parameter(description = "Search radius in meters", example = "50000")
+            @RequestParam(value = "distance", defaultValue = "50000")
+            double distance) {
+        return eventResourceService.findSimilarEvents(eventId, feed, limit, distance)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
 
     @GetMapping(path = "/user_feeds", produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(

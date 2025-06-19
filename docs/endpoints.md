@@ -40,5 +40,14 @@ Return a single event by feed alias, event ID and optional version. When the ver
 - `version` – event version number (optional).
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
 
+## `GET /v1/event/similar`
+Find events similar to the specified event. Similarity is determined by event type and proximity of geometries.
+
+**Parameters**
+- `feed` – feed name (required).
+- `eventId` – reference event UUID (required).
+- `limit` – number of records to return. Default is `10`.
+- `distance` – search radius in meters. Default is `50000`.
+
 ## `GET /v1/user_feeds`
 Returns the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token and is cached for one hour to improve response time.

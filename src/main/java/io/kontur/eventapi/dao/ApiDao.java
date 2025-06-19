@@ -62,7 +62,11 @@ public class ApiDao {
 				null, null, null, null, episodeFilterType);
 	}
 
-	public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
-		return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
-	}
+    public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
+        return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
+    }
+
+    public String findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance) {
+        return mapper.findSimilarEvents(eventId, feedAlias, limit, distance);
+    }
 }
