@@ -49,7 +49,7 @@ public class NhcXmlParser extends CapBaseXmlParser {
                 return Optional.empty();
             }
         } catch (ParserConfigurationException | IOException | SAXException | DateTimeParseException | NumberFormatException e) {
-            LOG.warn("Error while parsing item from {} events list. {}", provider,
+            LOG.error("Error while parsing item from {} events list. {}", provider,
                     StringUtils.isNotBlank(item.getGuid()) ? item.getGuid() : "unknown");
             return Optional.empty();
         }
