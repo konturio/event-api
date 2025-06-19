@@ -173,7 +173,7 @@ public class StormsNoaaNormalizer extends Normalizer {
                 normalizedObservation.setGeometries(convertGeometryToFeatureCollection(geometry, STORMS_NOAA_POSITION_PROPERTIES));
             }
         } catch (ParseException e) {
-            LOG.warn(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
