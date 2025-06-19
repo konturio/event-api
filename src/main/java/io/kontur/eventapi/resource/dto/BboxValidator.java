@@ -18,12 +18,28 @@ public class BboxValidator implements ConstraintValidator<ValidBbox, List<BigDec
             return true;
         }
         if (bbox.size() != 4) {
+            ctx.disableDefaultConstraintViolation();
             ctx.buildConstraintViolationWithTemplate("bbox should be provided as 4 numbers.")
                     .addConstraintViolation();
             return false;
         }
 
-        return true;
+        BigDecimal minLon = bbox.get(0);
+        BigDecimal minLat = bbox.get(1);
+        BigDecimal maxLon = bbox.get(2);
+        BigDecimal maxLat = bbox.get(3);
+
+        boolean valid = checkLon(minLon) && checkLon(maxLon)
+                && checkLat(minLat) && checkLat(maxLat)
+                && minLon.compareTo(maxLon) < 0 && minLat.compareTo(maxLat) < 0;
+
+        if (!valid) {
+            ctx.disableDefaultConstraintViolation();
+            ctx.buildConstraintViolationWithTemplate(
+                    "bbox coordinates must be minLon,minLat,maxLon,maxLat within valid ranges")
+                    .addConstraintViolation();
+        }
+        return valid;
     }
 
     private boolean checkLat(BigDecimal lat) {
