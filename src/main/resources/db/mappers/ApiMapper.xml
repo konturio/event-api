@@ -41,12 +41,12 @@
                     </foreach>
                 </if>
                 <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
+                    and fd.severity_id in (
+                        select severity_id from severities where severity in
+                        <foreach item="severity" collection="severities" separator="," open="(" close=")">
+                            #{severity}::text
+                        </foreach>
+                    )
                 </if>
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
@@ -178,12 +178,12 @@
                     </foreach>
                 </if>
                 <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
+                    and fd.severity_id in (
+                        select severity_id from severities where severity in
+                        <foreach item="severity" collection="severities" separator="," open="(" close=")">
+                            #{severity}::text
+                        </foreach>
+                    )
                 </if>
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
