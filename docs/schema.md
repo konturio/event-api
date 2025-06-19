@@ -22,26 +22,36 @@ Normalized information extracted from `data_lake`.
 | Column | Type |
 | ------ | ---- |
 | `observation_id` | `uuid` (references `data_lake`)
-| `external_id` | `text`
+| `external_event_id` | `text`
+| `external_episode_id` | `text`
 | `provider` | `text`
 | `geometries` | `jsonb`
 | `event_severity` | `text`
+| `origin` | `text`
 | `name` | `text`
+| `proper_name` | `text`
 | `description` | `text`
 | `episode_description` | `text`
 | `type` | `text`
+| `event_severity` | `text`
 | `active` | `boolean`
-| `cost` | `numeric`
-| `region` | `text`
 | `loaded_at` | `timestamptz`
 | `started_at` | `timestamptz`
 | `ended_at` | `timestamptz`
-| `updated_at` | `timestamptz`
-| `source_uri` | `text`
-| `external_episode_id` | `text`
+| `source_updated_at` | `timestamptz`
+| `region` | `text`
+| `urls` | `text[]`
+| `cost` | `numeric`
+| `loss` | `jsonb`
+| `severity_data` | `jsonb`
+| `point` | `geometry`
+| `geometries` | `jsonb`
+| `auto_expire` | `boolean`
+| `recombined` | `boolean`
+| `normalized_at` | `timestamptz`
 | `collected_geography` | `geography` (generated from `geometries`)
 
-Indexes exist for `external_id` and `collected_geography`.
+Indexes exist for `external_event_id` and `collected_geography`.
 
 ## `feeds`
 List of available feeds.
@@ -51,7 +61,7 @@ List of available feeds.
 | `feed_id` | `uuid` | primary key |
 | `description` | `text` | |
 | `alias` | `text` | unique identifier used in API |
-| `providers` | `text[]` | source providers associated with the feed |
+| `providers` | `text[]` | source providers associated with the feed. See [feed_sources.md](feed_sources.md) |
 | `roles` | `text[]` | roles allowed to read the feed |
 
 ## `feed_data`
@@ -93,6 +103,15 @@ Reference table of possible severity levels.
 | ------ | ---- |
 | `severity_id` | `smallserial` primary key |
 | `severity` | `text` |
+
+Possible severities are:
+
+- `UNKNOWN`
+- `TERMINATION`
+- `MINOR`
+- `MODERATE`
+- `SEVERE`
+- `EXTREME`
 
 ## `feed_event_status`
 Tracks current events per feed.

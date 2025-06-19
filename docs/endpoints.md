@@ -8,10 +8,13 @@ Search for events within a feed.
 **Parameters**
 - `feed` – feed name (required).
 - `types` – list of event types.
-- `severities` – list of severity values.
+- `severities` – list of severity values (`UNKNOWN`, `TERMINATION`, `MINOR`, `MODERATE`, `SEVERE`, `EXTREME`).
+  When several values are provided, events matching any of them are returned.
 - `after` – return events updated after this timestamp.
 - `datetime` – interval filter. Accepts single RFC3339 timestamp or open/closed interval.
-- `bbox` – bounding box defined as `minLon,minLat,maxLon,maxLat`.
+- `bbox` – bounding box defined as `minLon,minLat,maxLon,maxLat`. Each latitude must
+  be between `-90` and `90`, longitude between `-180` and `180`, and minimum values
+  should be less than maximum ones.
 - `limit` – page size (default `20`).
 - `sortOrder` – `ASC` or `DESC` by `updatedAt`.
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
@@ -37,5 +40,14 @@ Return a single event by feed alias, event ID and optional version. When the ver
 - `version` – event version number (optional).
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
 
+## `GET /v1/event/similar`
+Find events similar to the specified event. Similarity is determined by event type and proximity of geometries.
+
+**Parameters**
+- `feed` – feed name (required).
+- `eventId` – reference event UUID (required).
+- `limit` – number of records to return. Default is `10`.
+- `distance` – search radius in meters. Default is `50000`.
+
 ## `GET /v1/user_feeds`
-Return the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token.
+Returns the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token and is cached for one hour to improve response time.

@@ -7,6 +7,64 @@
         from feeds
     </select>
 
+    <select id="findSimilarEvents" resultType="java.lang.String">
+        with target as (
+            select fd.collected_geometry, fd.type
+            from feed_data fd
+            where fd.event_id = #{eventId}
+              and fd.feed_id = (select feed_id from feeds where alias = #{feedAlias})
+              and fd.is_latest_version
+        ), events as (
+            select
+                fd.event_id, fd.version, fd.name, fd.proper_name, fd.description, fd.type,
+                sv.severity, fd.active,
+                fd.started_at, fd.ended_at, fd.updated_at, fd.location, fd.urls,
+                fd.loss, fd.severity_data, fd.event_details, fd.observations, fd.geometries,
+                jsonb_array_length(fd.episodes) as episode_count,
+                fd.episodes,
+                box2d(fd.collected_geometry) as bbox,
+                st_pointonsurface(fd.collected_geometry) as centroid,
+                st_distance(fd.collected_geometry::geography, t.collected_geometry::geography) as dist
+            from feed_data fd
+            cross join target t
+            left join severities sv on fd.severity_id = sv.severity_id
+            where fd.feed_id = (select feed_id from feeds where alias = #{feedAlias})
+              and fd.is_latest_version and fd.enriched
+              and fd.event_id != #{eventId}
+              and fd.type = t.type
+              and st_dwithin(fd.collected_geometry::geography, t.collected_geometry::geography, #{distance})
+            order by dist
+            limit #{limit}
+        )
+        select case when count(*) > 0 then json_build_object(
+                'data', json_agg(json_build_object(
+                        'eventId', event_id,
+                        'version', version,
+                        'name', name,
+                        'properName', proper_name,
+                        'description', description,
+                        'type', type,
+                        'severity', severity,
+                        'active', active,
+                        'startedAt', started_at,
+                        'endedAt', ended_at,
+                        'updatedAt', updated_at,
+                        'location', location,
+                        'urls', urls,
+                        'loss', loss,
+                        'severityData', severity_data,
+                        'eventDetails', event_details,
+                        'observations', observations,
+                        'geometries', geometries,
+                        'episodes', episodes,
+                        'episodeCount', episode_count,
+                        'bbox', array[st_xmin(bbox), st_ymin(bbox), st_xmax(bbox), st_ymax(bbox)],
+                        'centroid', array[st_x(centroid), st_y(centroid)]
+                )))
+            end
+        from events;
+    </select>
+
     <select id="findDataByObservationId" resultType="java.lang.String">
         select data
         from data_lake
@@ -41,12 +99,12 @@
                     </foreach>
                 </if>
                 <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
+                    and fd.severity_id in (
+                        select severity_id from severities where severity in
+                        <foreach item="severity" collection="severities" separator="," open="(" close=")">
+                            #{severity}::text
+                        </foreach>
+                    )
                 </if>
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>
@@ -178,12 +236,12 @@
                     </foreach>
                 </if>
                 <if test="severities!=null &amp;&amp; !severities.isEmpty"  >
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &gt;= (select min(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
-                    <foreach item="severity" collection="severities" separator="," open="and fd.severity_id &lt;= (select max(severity_id) from severities where severity in (" close="))">
-                        #{severity}::text
-                    </foreach>
+                    and fd.severity_id in (
+                        select severity_id from severities where severity in
+                        <foreach item="severity" collection="severities" separator="," open="(" close=")">
+                            #{severity}::text
+                        </foreach>
+                    )
                 </if>
                 <if test='from != null'><![CDATA[and (fd.ended_at >= #{from})]]></if>
                 <if test='to != null'><![CDATA[and (fd.started_at <= #{to})]]></if>

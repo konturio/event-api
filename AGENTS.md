@@ -22,6 +22,7 @@ Style:
  - Do not break indentation.
  - Do not mix tabs and spaces.
  - Format the code nicely and consistently.
+ - Do not replace URLs with non-existing ones
 
 Java:
  - Write enough comments so that people proficient in Python, PostGIS can grasp the Java code.

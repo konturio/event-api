@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static io.kontur.eventapi.util.CacheUtil.EVENT_CACHE_NAME;
+import static io.kontur.eventapi.util.CacheUtil.FEED_CACHE_NAME;
 
 @Service
 public class EventResourceService {
@@ -28,6 +29,7 @@ public class EventResourceService {
         this.environment = environment;
     }
 
+    @Cacheable(cacheNames = FEED_CACHE_NAME, condition = "#root.target.isCacheEnabled()")
     public List<FeedDto> getFeeds() {
         return apiDao.getFeeds();
     }
@@ -62,5 +64,10 @@ public class EventResourceService {
         String geoJson = apiDao.searchForEventsGeoJson(feedAlias, eventTypes, from, to,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
         return geoJson == null ? Optional.empty() : Optional.of(geoJson);
+    }
+
+    public Optional<String> findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance) {
+        String data = apiDao.findSimilarEvents(eventId, feedAlias, limit, distance);
+        return data == null ? Optional.empty() : Optional.of(data);
     }
 }

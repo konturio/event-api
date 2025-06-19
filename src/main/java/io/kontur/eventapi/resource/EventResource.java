@@ -66,7 +66,8 @@ public class EventResource {
             @Parameter(description = "Filters events by type. More than one can be chosen at once")
             @RequestParam(value = "types", defaultValue = "")
             List<EventType> eventTypes,
-            @Parameter(description = "Filters events by severity. More than one can be chosen at once")
+            @Parameter(description = "Filters events by severity. Allowed values: UNKNOWN, TERMINATION, MINOR, MODERATE, SEVERE, EXTREME. " +
+                    "Multiple values select events matching any of them.")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
             @Parameter(description = "Includes events that were updated after this time. `updatedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")")
@@ -151,7 +152,8 @@ public class EventResource {
             @Parameter(description = "Filters events by type. More than one can be chosen at once")
             @RequestParam(value = "types", defaultValue = "")
             List<EventType> eventTypes,
-            @Parameter(description = "Filters events by severity. More than one can be chosen at once")
+            @Parameter(description = "Filters events by severity. Allowed values: UNKNOWN, TERMINATION, MINOR, MODERATE, SEVERE, EXTREME. " +
+                    "Multiple values select events matching any of them.")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
             @Parameter(description = "Includes events that were updated after this time. " +
@@ -254,6 +256,32 @@ public class EventResource {
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
             EpisodeFilterType episodeFilterType) {
         return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping(path = "/event/similar", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            tags = "Events",
+            summary = "Returns events similar to the given event",
+            description = "Searches for events of the same type in the specified feed " +
+                    "that are geographically close to the provided event.")
+    @PreAuthorize("hasAuthority('read:feed:'+#feed)")
+    public ResponseEntity<String> getSimilarEvents(
+            @Parameter(description = "Feed name")
+            @RequestParam(value = "feed")
+            String feed,
+            @Parameter(description = "Event UUID")
+            @RequestParam(value = "eventId")
+            UUID eventId,
+            @Parameter(description = "Maximum number of similar events to return", example = "10")
+            @RequestParam(value = "limit", defaultValue = "10")
+            @Min(1) @Max(100)
+            int limit,
+            @Parameter(description = "Search radius in meters", example = "50000")
+            @RequestParam(value = "distance", defaultValue = "50000")
+            double distance) {
+        return eventResourceService.findSimilarEvents(eventId, feed, limit, distance)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
