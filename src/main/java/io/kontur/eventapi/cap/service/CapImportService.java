@@ -72,7 +72,7 @@ public abstract class CapImportService {
                     dataLakes.add(getDataLakeConverter().convertEvent(item, provider));
                 }
             } catch (Exception e) {
-                LOG.warn("Error while processing {} wildfire event. {}", provider, e.getMessage());
+                LOG.error("Error while processing {} wildfire event. {}", provider, e.getMessage());
             }
         }
         return dataLakes;
