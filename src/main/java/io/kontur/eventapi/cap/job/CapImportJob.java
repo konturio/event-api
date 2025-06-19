@@ -65,7 +65,7 @@ public abstract class CapImportJob extends AbstractJob {
             } catch (DateTimeParseException e) {
                 LOG.error("Parsing pubDate from {} was failed", getName());
             } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
-                LOG.warn(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         }
     }
