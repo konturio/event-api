@@ -30,7 +30,7 @@
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.feed_id = (select feed_id from feeds where alias = #{feedAlias})
               and fd.is_latest_version and fd.enriched
-              and fd.event_id <> #{eventId}
+              and fd.event_id != #{eventId}
               and fd.type = t.type
               and st_dwithin(fd.collected_geometry::geography, t.collected_geometry::geography, #{distance})
             order by dist
