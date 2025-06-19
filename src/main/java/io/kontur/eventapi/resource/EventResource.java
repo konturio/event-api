@@ -125,7 +125,7 @@ public class EventResource {
 
     @GetMapping(path = "/geojson/events", produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            tags = "GeoJSON",
+            tags = "GeoJson Events",
             summary = "Returns events in GeoJson format",
             description = "Returns events for specified feed name. All events are sorted by update date. <br> This method returns results using a cursor-based pagination approach:" +
                     "<ul><li>It accepts after and limit parameters.</li>" +
