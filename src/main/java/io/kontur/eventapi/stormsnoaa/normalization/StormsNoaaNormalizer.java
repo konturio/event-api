@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
-import io.kontur.eventapi.pdc.normalization.PdcHazardNormalizer;
 import io.kontur.eventapi.util.LossUtil;
 
 import java.math.BigDecimal;
