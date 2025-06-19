@@ -65,7 +65,7 @@ public final class CsvUtil {
                     .readValues(csvHeader + "\n" + csvRow);
             return mappingIterator.hasNext() ? mappingIterator.next() : null;
         } catch (IOException e) {
-            LOG.warn("Error while parsing csv for {}. {}", provider, e.getMessage());
+            LOG.error("Error while parsing csv for {}. {}", provider, e.getMessage());
         }
         return null;
     }
