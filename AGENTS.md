@@ -8,6 +8,7 @@ Documentation:
  - Don't update `README.md` with minor code fixes.
  - Every feature needs to have comprehensive up-to-date documentation near it.
  - API documentation is using Swagger, its descriptions should be clear for data consumers who don't have access to codebase.
+ - We do not update CHANGELOG.md anymore
 
 Debugging:
  - Add enough debug logs so you can find out what's wrong but not be overwhelmed when something does not work as expected.
