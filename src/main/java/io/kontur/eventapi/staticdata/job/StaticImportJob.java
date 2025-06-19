@@ -78,7 +78,7 @@ public class StaticImportJob extends AbstractJob {
             try {
                 storeDataLakes(provider, updatedAt, dataSet);
             } catch (Exception e) {
-                LOG.warn(e.getMessage());
+                LOG.error(e.getMessage());
             }
         }
     }
