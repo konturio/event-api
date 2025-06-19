@@ -25,8 +25,6 @@ Normalized information extracted from `data_lake`.
 | `external_event_id` | `text`
 | `external_episode_id` | `text`
 | `provider` | `text`
-| `geometries` | `jsonb`
-| `event_severity` | `text`
 | `origin` | `text`
 | `name` | `text`
 | `proper_name` | `text`
@@ -44,7 +42,6 @@ Normalized information extracted from `data_lake`.
 | `cost` | `numeric`
 | `loss` | `jsonb`
 | `severity_data` | `jsonb`
-| `point` | `geometry`
 | `geometries` | `jsonb`
 | `auto_expire` | `boolean`
 | `recombined` | `boolean`
