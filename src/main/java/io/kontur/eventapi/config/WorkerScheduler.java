@@ -28,9 +28,11 @@ import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
 import io.kontur.eventapi.uhc.job.HumanitarianCrisisImportJob;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!pipelineDisabled")
 public class WorkerScheduler {
 
     private final HpSrvSearchJob hpSrvSearchJob;
