@@ -29,7 +29,6 @@ public class CommonStaticNormalizer extends StaticNormalizer {
 
         Double lon = readDouble(properties, "longitude");
         Double lat = readDouble(properties, "latitude");
-        normalizedObservation.setPoint(makeWktPoint(lon, lat));
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), TORNADO_PROPERTIES));
 
         String name = readString(properties, "name");

@@ -45,7 +45,6 @@ public class CalFireNormalizer extends Normalizer {
         Feature feature = (Feature) GeoJSONFactory.create(dataLakeDto.getData());
         Geometry geometry = feature.getGeometry();
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(geometry, CALFIRE_PROPERTIES));
-        normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
 
         Map<String, Object> properties = feature.getProperties();
         normalizedObservation.setObservationId(dataLakeDto.getObservationId());

@@ -119,7 +119,6 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         assertEquals(toDate, observation.getEndedAt());
 
         assertTrue(observation.getActive());
-        assertNull(observation.getPoint());
         assertNull(observation.getCost());
         assertNotNull(observation.getRegion());
 
@@ -150,7 +149,6 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         assertNull(observation.getName());
         assertNull(observation.getDescription());
         assertNull(observation.getEpisodeDescription());
-        assertNull(observation.getPoint());
         assertNull(observation.getCost());
         assertNotNull(observation.getRegion());
     }

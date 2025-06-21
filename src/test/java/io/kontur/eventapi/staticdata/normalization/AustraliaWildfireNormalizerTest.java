@@ -66,7 +66,6 @@ class AustraliaWildfireNormalizerTest {
     }
 
     private void assertDefault(DataLake dataLake, NormalizedObservation observation) {
-        assertEquals("POINT(0.5 0.5)", observation.getPoint());
         assertEquals(1, observation.getGeometries().getFeatures().length);
         assertEquals(WILDFIRE_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
         assertEquals(UNKNOWN, observation.getEventSeverity());

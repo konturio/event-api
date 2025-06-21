@@ -56,7 +56,6 @@ public class NhcNormalizer extends Normalizer {
             normalizedObservation.setLoadedAt(dataLakeDto.getLoadedAt());
             normalizedObservation.setSourceUpdatedAt(dataLakeDto.getUpdatedAt());
             normalizedObservation.setUrls(parsedItem.get().getLink() != null ? List.of(parsedItem.get().getLink()) : null);
-            normalizedObservation.setPoint(null);
             normalizedObservation.setActive(null);
 
             Map<Integer, Map<Integer, String>> mainMatchers = parser.parseDescription(description);

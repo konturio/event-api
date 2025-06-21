@@ -5,7 +5,6 @@ import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.GeometryFilterType;
 import io.kontur.eventapi.resource.dto.FeedDto;
-import io.kontur.eventapi.util.CacheUtil;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -64,9 +63,13 @@ public class ApiDao {
 				null, null, null, null, episodeFilterType);
 	}
 
-        public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version,
-                                                                    EpisodeFilterType episodeFilterType,
-                                                                    GeometryFilterType geometryFilterType) {
-                return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, geometryFilterType);
-        }
+    public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version,
+                                                                EpisodeFilterType episodeFilterType,
+                                                                GeometryFilterType geometryFilterType) {
+        return mapper.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, geometryFilterType);
+    }
+
+    public String findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance) {
+        return mapper.findSimilarEvents(eventId, feedAlias, limit, distance);
+    }
 }

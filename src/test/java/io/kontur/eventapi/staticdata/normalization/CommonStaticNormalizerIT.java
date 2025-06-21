@@ -52,7 +52,6 @@ class CommonStaticNormalizerIT extends AbstractCleanableIntegrationTest {
         assertEquals(Severity.MINOR, normalizedObservation.getEventSeverity());
         assertEquals("tornado", normalizedObservation.getDescription());
         assertEquals(EventType.TORNADO, normalizedObservation.getType());
-        assertNotNull(normalizedObservation.getPoint());
         assertNotNull(normalizedObservation.getGeometries());
 
         OffsetDateTime date = OffsetDateTime.parse("1980-05-06T00:00:00Z");

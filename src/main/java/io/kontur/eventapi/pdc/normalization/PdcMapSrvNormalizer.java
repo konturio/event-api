@@ -50,7 +50,6 @@ public class PdcMapSrvNormalizer extends PdcHazardNormalizer {
 
         normalizedObservation.setType(defineType(readString(properties, "type_id")));
         normalizedObservation.setGeometries(convertGeometries(geometry));
-        normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
         return normalizedObservation;
     }
 

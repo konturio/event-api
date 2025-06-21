@@ -5,6 +5,8 @@ import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import io.kontur.eventapi.resource.dto.GeometryFilterType;
 import io.kontur.eventapi.resource.dto.FeedDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static io.kontur.eventapi.util.CacheUtil.EVENT_CACHE_NAME;
+import static io.kontur.eventapi.util.CacheUtil.FEED_CACHE_NAME;
 
 @Service
 public class EventResourceService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EventResourceService.class);
 
     private final ApiDao apiDao;
     private final Environment environment;
@@ -29,6 +34,7 @@ public class EventResourceService {
         this.environment = environment;
     }
 
+    @Cacheable(cacheNames = FEED_CACHE_NAME, condition = "#root.target.isCacheEnabled()")
     public List<FeedDto> getFeeds() {
         return apiDao.getFeeds();
     }
@@ -46,8 +52,12 @@ public class EventResourceService {
                                        OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                        List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,
                                        EpisodeFilterType episodeFilterType, GeometryFilterType geometryFilterType) {
+        long start = System.currentTimeMillis();
         String data = apiDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter,
                 limit, severities, sortOrder, bbox, episodeFilterType, geometryFilterType);
+        long duration = System.currentTimeMillis() - start;
+        logger.debug("searchEvents feed={} eventTypes={} bboxPresent={} duration={}ms",
+                feedAlias, eventTypes, bbox != null, duration);
         return data == null ? Optional.empty() : Optional.of(data);
     }
 
@@ -61,8 +71,17 @@ public class EventResourceService {
                                                 OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                                 List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,
                                                 EpisodeFilterType episodeFilterType) {
+        long start = System.currentTimeMillis();
         String geoJson = apiDao.searchForEventsGeoJson(feedAlias, eventTypes, from, to,
                 updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+        long duration = System.currentTimeMillis() - start;
+        logger.debug("searchEventsGeoJson feed={} eventTypes={} bboxPresent={} duration={}ms",
+                feedAlias, eventTypes, bbox != null, duration);
         return geoJson == null ? Optional.empty() : Optional.of(geoJson);
+    }
+
+    public Optional<String> findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance) {
+        String data = apiDao.findSimilarEvents(eventId, feedAlias, limit, distance);
+        return data == null ? Optional.empty() : Optional.of(data);
     }
 }

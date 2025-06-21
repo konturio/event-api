@@ -17,6 +17,7 @@ public class CacheUtil {
 
     public static final String EVENT_LIST_CACHE_NAME_PREFIX = "feed:";
     public static final String EVENT_CACHE_NAME = "events";
+    public static final String FEED_CACHE_NAME = "feeds";
     public static final String CACHED_TARGET = "EventResourceService";
     public static final String EVENT_LIST_CACHED_METHOD = "searchEvents";
 

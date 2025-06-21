@@ -48,7 +48,6 @@ public class HumanitarianCrisisNormalizer extends Normalizer {
         normalizedObservation.setProvider(dataLakeDto.getProvider());
         Geometry geometry = feature.getGeometry();
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(geometry, UHC_PROPERTIES));
-        normalizedObservation.setPoint(GeometryUtil.getCentroid(geometry, normalizedObservation.getObservationId()));
         try {
             String severity = readString(properties, "severity");
             normalizedObservation.setEventSeverity(Severity.valueOf(severity.toUpperCase()));
