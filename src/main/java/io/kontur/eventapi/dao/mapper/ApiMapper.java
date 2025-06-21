@@ -2,6 +2,7 @@ package io.kontur.eventapi.dao.mapper;
 
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.resource.dto.GeometryFilterType;
 import io.kontur.eventapi.resource.dto.FeedDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -29,9 +30,10 @@ public interface ApiMapper {
 	                       @Param("sortOrder") SortOrder sortOrder,
 	                       @Param("xMin") BigDecimal xMin,
 	                       @Param("xMax") BigDecimal xMax,
-	                       @Param("yMin") BigDecimal yMin,
-	                       @Param("yMax") BigDecimal yMax,
-	                       @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+                               @Param("yMin") BigDecimal yMin,
+                               @Param("yMax") BigDecimal yMax,
+                               @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
+                               @Param("geometryFilterType") GeometryFilterType geometryFilterType);
 
 	String searchForEventsGeoJson(@Param("feedAlias") String feedAlias,
 	                              @Param("eventTypes") List<EventType> eventTypes,
@@ -50,7 +52,8 @@ public interface ApiMapper {
     Optional<String> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
                                                          @Param("feedAlias") String feedAlias,
                                                          @Param("version") Long version,
-                                                         @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+                                                         @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
+                                                         @Param("geometryFilterType") GeometryFilterType geometryFilterType);
 
     String findSimilarEvents(@Param("eventId") UUID eventId,
                              @Param("feedAlias") String feedAlias,

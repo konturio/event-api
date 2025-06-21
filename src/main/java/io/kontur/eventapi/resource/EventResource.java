@@ -111,11 +111,16 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
+            EpisodeFilterType episodeFilterType,
+            @Parameter(description = "How geometries should be returned: " +
+                    "<ul><li>ANY - include geometries</li>" +
+                    "<li>NONE - omit geometries</li></ul>")
+            @RequestParam(value = "geometryFilterType", defaultValue = "ANY")
+            GeometryFilterType geometryFilterType) {
         Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, geometryFilterType);
         if (dataOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -254,8 +259,13 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
-        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType)
+            EpisodeFilterType episodeFilterType,
+            @Parameter(description = "How geometries should be returned: " +
+                    "<ul><li>ANY - include geometries</li>" +
+                    "<li>NONE - omit geometries</li></ul>")
+            @RequestParam(value = "geometryFilterType", defaultValue = "ANY")
+            GeometryFilterType geometryFilterType) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, geometryFilterType)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

@@ -3,6 +3,7 @@ package io.kontur.eventapi.service;
 import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.resource.dto.EpisodeFilterType;
+import io.kontur.eventapi.resource.dto.GeometryFilterType;
 import io.kontur.eventapi.resource.dto.FeedDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +51,10 @@ public class EventResourceService {
     public Optional<String> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
                                        OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                        List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,
-                                       EpisodeFilterType episodeFilterType) {
+                                       EpisodeFilterType episodeFilterType, GeometryFilterType geometryFilterType) {
         long start = System.currentTimeMillis();
         String data = apiDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter,
-                limit, severities, sortOrder, bbox, episodeFilterType);
+                limit, severities, sortOrder, bbox, episodeFilterType, geometryFilterType);
         long duration = System.currentTimeMillis() - start;
         logger.debug("searchEvents feed={} eventTypes={} bboxPresent={} duration={}ms",
                 feedAlias, eventTypes, bbox != null, duration);
@@ -61,8 +62,9 @@ public class EventResourceService {
     }
 
     @Cacheable(cacheNames = EVENT_CACHE_NAME, cacheManager = "longCacheManager", condition = "#root.target.isCacheEnabled()")
-    public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType) {
-        return apiDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType);
+    public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version, EpisodeFilterType episodeFilterType,
+                                                               GeometryFilterType geometryFilterType) {
+        return apiDao.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, geometryFilterType);
     }
 
     public Optional<String> searchEventsGeoJson(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,

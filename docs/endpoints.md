@@ -23,6 +23,7 @@ Search for events within a feed.
 - `limit` – page size (default `20`).
 - `sortOrder` – `ASC` or `DESC` by `updatedAt`.
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
+- `geometryFilterType` – `ANY` or `NONE`.
 
 Returns events sorted by update date using cursor based pagination. Response body is JSON containing `pageMetadata.nextAfterValue` and event data.
 
@@ -44,6 +45,7 @@ Return a single event by feed alias, event ID and optional version. When the ver
 - `eventId` – event UUID (required).
 - `version` – event version number (optional).
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
+- `geometryFilterType` – `ANY` or `NONE`.
 
 ## `GET /v1/event/similar`
 Find events similar to the specified event. Similarity is determined by event type and proximity of geometries.
