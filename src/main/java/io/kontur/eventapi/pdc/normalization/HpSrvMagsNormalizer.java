@@ -48,8 +48,7 @@ public class HpSrvMagsNormalizer extends PdcHazardNormalizer {
             normalizedDto.setEndedAt(readDateTime(props, "hazard.endDate"));
             normalizedDto.setSourceUpdatedAt(readDateTime(props, "updateDate"));
 
-            normalizedDto.setPoint(makeWktPoint(readDouble(props, "hazard.longitude"),
-                    readDouble(props, "hazard.latitude")));
+
         }
 
         return normalizedDto;

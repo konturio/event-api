@@ -62,7 +62,6 @@ public class HpSrvSearchNormalizer extends PdcHazardNormalizer {
         normalizedDto.setEndedAt(endedAt != null ? endedAt : startedAt);
 
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
-        normalizedDto.setPoint(pointWkt);
 
         try {
             normalizedDto.setGeometries(convertGeometry(pointWkt, props));

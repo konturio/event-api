@@ -47,7 +47,6 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
 
         Double lon = selectFirstNotNull(readDouble(props, "attr_InitialLongitude"), readDouble(props, "irwin_InitialLongitude"));
         Double lat = selectFirstNotNull(readDouble(props, "attr_InitialLatitude"), readDouble(props, "irwin_InitialLatitude"));
-        observation.setPoint(makeWktPoint(lon, lat));
 
         double areaSqKm2 = convertAcresToSqKm(readDouble(props, "poly_GISAcres"));
         long durationHours = between(observation.getStartedAt(), observation.getEndedAt()).toHours();

@@ -87,6 +87,10 @@ public class PdcMapSrvSearchJob extends AbstractJob {
     public void execute(String serviceId) throws Exception {
         try {
             String geoJson = pdcMapSrvClient.getTypeSpecificExposures(serviceId);
+            if (geoJson == null || geoJson.isBlank()) {
+                LOG.warn("Received empty response from PDC MapSrv {}", serviceId);
+                return;
+            }
             FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
             List<DataLake> dataLakes = new ArrayList<>();
             Map<String, String> ids = new HashMap<>();

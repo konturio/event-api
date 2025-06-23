@@ -97,7 +97,6 @@ public class TornadoJapanMaNormalizer extends Normalizer {
         boolean endPointPresent = x2 != null && y2 != null;
         String point = startPointPresent ? makeWktPoint(x1, y1) : endPointPresent ? makeWktPoint(x2, y2) : null;
         String geom = startPointPresent && endPointPresent ? makeWktLine(x1, y1, x2, y2) : point;
-        normalizedObservation.setPoint(point);
         try {
             Geometry geometry = geom == null ? null : geoJsonWriter.write(wktReader.read(geom));
             Feature feature = new Feature(geometry, Collections.emptyMap());

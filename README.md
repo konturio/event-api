@@ -5,6 +5,7 @@ Available profiles:
 - For local use:
   - `jwtAuthDisabled` - Disables JWT authorization
   - `awsSqsDisabled` - Disables AWS SQS integration
+  - `pipelineDisabled` - Disables all scheduled ETL jobs
 - For external use:
   - `dev` - for DEV environment
   - `test` - for TEST environment

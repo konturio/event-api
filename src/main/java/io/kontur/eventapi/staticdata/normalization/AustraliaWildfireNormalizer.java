@@ -4,7 +4,6 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.GeoJSONFactory;
@@ -38,8 +37,7 @@ public class AustraliaWildfireNormalizer extends StaticNormalizer {
     protected void setExtraFields(DataLake dataLake, NormalizedObservation normalizedObservation) {
         Feature feature = (Feature) GeoJSONFactory.create(dataLake.getData());
 
-        Point point = reader.read(feature.getGeometry()).getCentroid();
-        normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
+
 
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), WILDFIRE_PROPERTIES));
 

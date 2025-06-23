@@ -50,7 +50,6 @@ class CalFireNormalizationTest {
         assertEquals(1611582312000L, observation.getSourceUpdatedAt().toInstant().toEpochMilli());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.fire.ca.gov"), observation.getUrls());
-        assertEquals("POINT(-100.12345 30.12345)", observation.getPoint());
         checkGeometriesValue(observation.getGeometries());
     }
 

@@ -38,7 +38,6 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(dataLake.getProvider(), observation.getProvider());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
 
-        assertEquals("POINT(10.0 10.0)", observation.getPoint());
 
         assertEquals(1, observation.getGeometries().getFeatures().length);
         assertEquals(geoJSONWriter.write(wktReader.read("POINT(10.0 10.0)")).toString(),
@@ -76,7 +75,6 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(dataLake.getProvider(), observation.getProvider());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
 
-        assertEquals("POINT(10.0 10.0)", observation.getPoint());
 
         assertEquals(1, observation.getGeometries().getFeatures().length);
         assertEquals(geoJSONWriter.write(wktReader.read("POINT(10.0 10.0)")).toString(),
@@ -114,7 +112,6 @@ class PdcSqsMessageNormalizerTest {
         assertEquals(dataLake.getProvider(), observation.getProvider());
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
 
-        assertEquals("POINT(10.0 10.0)", observation.getPoint());
 
         assertEquals(1, observation.getGeometries().getFeatures().length);
         assertEquals(geoJSONWriter.write(wktReader.read("POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))")).toString(),

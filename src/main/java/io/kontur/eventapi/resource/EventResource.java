@@ -66,7 +66,8 @@ public class EventResource {
             @Parameter(description = "Filters events by type. More than one can be chosen at once")
             @RequestParam(value = "types", defaultValue = "")
             List<EventType> eventTypes,
-            @Parameter(description = "Filters events by severity. More than one can be chosen at once")
+            @Parameter(description = "Filters events by severity. Allowed values: UNKNOWN, TERMINATION, MINOR, MODERATE, SEVERE, EXTREME. " +
+                    "Multiple values select events matching any of them.")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
             @Parameter(description = "Includes events that were updated after this time. `updatedAt` property is used for selection. A date-time in ISO8601 format (e.g. \\\"2020-04-12T23:20:50.52Z\\\")")
@@ -110,11 +111,16 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
+            EpisodeFilterType episodeFilterType,
+            @Parameter(description = "How geometries should be returned: " +
+                    "<ul><li>ANY - include geometries</li>" +
+                    "<li>NONE - omit geometries</li></ul>")
+            @RequestParam(value = "geometryFilterType", defaultValue = "ANY")
+            GeometryFilterType geometryFilterType) {
         Optional<String> dataOpt = eventResourceService.searchEvents(feed, eventTypes,
                 datetime != null && datetime.getFrom() != null ? datetime.getFrom() : null,
                 datetime != null && datetime.getTo() != null ? datetime.getTo() : null,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, geometryFilterType);
         if (dataOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -124,7 +130,7 @@ public class EventResource {
 
     @GetMapping(path = "/geojson/events", produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            tags = "GeoJSON",
+            tags = "GeoJson Events",
             summary = "Returns events in GeoJson format",
             description = "Returns events for specified feed name. All events are sorted by update date. <br> This method returns results using a cursor-based pagination approach:" +
                     "<ul><li>It accepts after and limit parameters.</li>" +
@@ -151,7 +157,8 @@ public class EventResource {
             @Parameter(description = "Filters events by type. More than one can be chosen at once")
             @RequestParam(value = "types", defaultValue = "")
             List<EventType> eventTypes,
-            @Parameter(description = "Filters events by severity. More than one can be chosen at once")
+            @Parameter(description = "Filters events by severity. Allowed values: UNKNOWN, TERMINATION, MINOR, MODERATE, SEVERE, EXTREME. " +
+                    "Multiple values select events matching any of them.")
             @RequestParam(value = "severities", defaultValue = "")
             List<Severity> severities,
             @Parameter(description = "Includes events that were updated after this time. " +
@@ -252,8 +259,39 @@ public class EventResource {
                     "<li>LATEST - the latest episode</li>" +
                     "<li>NONE - no episodes</li></ul>")
             @RequestParam(value = "episodeFilterType", defaultValue = "NONE")
-            EpisodeFilterType episodeFilterType) {
-        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType)
+            EpisodeFilterType episodeFilterType,
+            @Parameter(description = "How geometries should be returned: " +
+                    "<ul><li>ANY - include geometries</li>" +
+                    "<li>NONE - omit geometries</li></ul>")
+            @RequestParam(value = "geometryFilterType", defaultValue = "ANY")
+            GeometryFilterType geometryFilterType) {
+        return eventResourceService.getEventByEventIdAndByVersionOrLast(eventId, feed, version, episodeFilterType, geometryFilterType)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping(path = "/event/similar", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            tags = "Events",
+            summary = "Returns events similar to the given event",
+            description = "Searches for events of the same type in the specified feed " +
+                    "that are geographically close to the provided event.")
+    @PreAuthorize("hasAuthority('read:feed:'+#feed)")
+    public ResponseEntity<String> getSimilarEvents(
+            @Parameter(description = "Feed name")
+            @RequestParam(value = "feed")
+            String feed,
+            @Parameter(description = "Event UUID")
+            @RequestParam(value = "eventId")
+            UUID eventId,
+            @Parameter(description = "Maximum number of similar events to return", example = "10")
+            @RequestParam(value = "limit", defaultValue = "10")
+            @Min(1) @Max(100)
+            int limit,
+            @Parameter(description = "Search radius in meters", example = "50000")
+            @RequestParam(value = "distance", defaultValue = "50000")
+            double distance) {
+        return eventResourceService.findSimilarEvents(eventId, feed, limit, distance)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

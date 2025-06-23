@@ -33,6 +33,7 @@ import java.util.UUID;
 import static io.kontur.eventapi.entity.SortOrder.ASC;
 import static io.kontur.eventapi.entity.SortOrder.DESC;
 import static io.kontur.eventapi.resource.dto.EpisodeFilterType.ANY;
+import io.kontur.eventapi.resource.dto.GeometryFilterType;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -168,7 +169,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 1 ASC
         List<TestEventDto> page1Asc = objectMapper.readValue(eventResourceService
-                .searchEvents(feedAlias, null, null, null, null, 2, null, ASC, null, ANY).get(), TestEventListDto.class).getData();
+                .searchEvents(feedAlias, null, null, null, null, 2, null, ASC, null, ANY, GeometryFilterType.ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(2, page1Asc.size());
@@ -177,7 +178,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 2 ASC
         List<TestEventDto> page2Asc = objectMapper.readValue(eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, ASC, null, ANY).get(), TestEventListDto.class).getData();
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, ASC, null, ANY, GeometryFilterType.ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(1, page2Asc.size());
@@ -185,7 +186,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 1 DESC
         List<TestEventDto> page1Desc = objectMapper.readValue(eventResourceService
-                .searchEvents(feedAlias, null, null, null, null, 2, null, DESC, null, ANY).get(), TestEventListDto.class).getData();
+                .searchEvents(feedAlias, null, null, null, null, 2, null, DESC, null, ANY, GeometryFilterType.ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(2, page1Desc.size());
@@ -194,7 +195,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
         //when page 2 DESC
         List<TestEventDto> page2Desc = objectMapper.readValue(eventResourceService
-                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, DESC, null, ANY).get(), TestEventListDto.class).getData();
+                .searchEvents(feedAlias, null, null, null, middleEvent.getUpdatedAt(), 2, null, DESC, null, ANY, GeometryFilterType.ANY).get(), TestEventListDto.class).getData();
 
         //then
         assertEquals(1, page2Desc.size());
@@ -212,7 +213,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
     private List<TestEventDto> fetchEvent(OffsetDateTime from, OffsetDateTime to) throws IOException {
         Optional<String> response = eventResourceService.searchEvents(
-                feedAlias, List.of(), from, to, null, 1, List.of(), ASC, null, ANY);
+                feedAlias, List.of(), from, to, null, 1, List.of(), ASC, null, ANY, GeometryFilterType.ANY);
         if (response.isPresent()) {
             return objectMapper.readValue(response.get(), TestEventListDto.class).getData();
         }
@@ -221,7 +222,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
 
     private List<TestEventDto> fetchEvent(List<BigDecimal> bbox) throws IOException {
         Optional<String> response = eventResourceService.searchEvents(
-                feedAlias, List.of(), null, null, null, 1, List.of(), ASC, bbox, ANY);
+                feedAlias, List.of(), null, null, null, 1, List.of(), ASC, bbox, ANY, GeometryFilterType.ANY);
         if (response.isPresent()) {
             return objectMapper.readValue(response.get(), TestEventListDto.class).getData();
         }

@@ -112,7 +112,6 @@ public class PdcSqsMessageNormalizer extends PdcHazardNormalizer {
             normalizedDto.setUrls(List.of(url));
         }
         String pointWkt = makeWktPoint(readDouble(props, "longitude"), readDouble(props, "latitude"));
-        normalizedDto.setPoint(pointWkt);
 
         if(normalizedDto.getExternalEpisodeId() == null) {
             normalizedDto.setExternalEpisodeId(readString(props, "uuid"));

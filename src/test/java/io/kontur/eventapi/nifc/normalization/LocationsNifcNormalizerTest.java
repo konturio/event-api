@@ -34,7 +34,6 @@ class LocationsNifcNormalizerTest {
         assertEquals(dataLake.getUpdatedAt(), observation.getEndedAt());
         assertEquals(dataLake.getProvider(), observation.getProvider());
         assertEquals("2021-IDIPF-000504", observation.getExternalEventId());
-        assertEquals("POINT(-115.354225 47.128143)", observation.getPoint());
         assertEquals(Severity.MINOR, observation.getEventSeverity());
         assertEquals("Wildfire Stateline Complex", observation.getName());
         assertEquals("Stateline Complex", observation.getProperName());

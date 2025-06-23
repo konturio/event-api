@@ -4,8 +4,6 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
-import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.GeoJSONFactory;
@@ -35,9 +33,6 @@ public class FrapCalStaticNormalizer extends StaticNormalizer {
         Feature feature = (Feature) GeoJSONFactory.create(dataLake.getData());
         Map<String, Object> properties = feature.getProperties();
 
-        MultiPolygon multiPolygon = (MultiPolygon) reader.read(feature.getGeometry());
-        Point point = multiPolygon.getCentroid();
-        normalizedObservation.setPoint(makeWktPoint(point.getX(), point.getY()));
         normalizedObservation.setGeometries(convertGeometryToFeatureCollection(feature.getGeometry(), WILDFIRE_PROPERTIES));
 
         String state = readString(properties, "STATE");
