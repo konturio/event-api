@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: drop-point-column.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-latest-event-index.sql
