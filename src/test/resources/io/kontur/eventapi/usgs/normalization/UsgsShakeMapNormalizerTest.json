@@ -1,0 +1,18 @@
+{
+  "type": "Feature",
+  "properties": {
+    "mag": 5.5,
+    "place": "Test Place",
+    "time": 1620000000000,
+    "updated": 1620003600000,
+    "url": "http://example.com/event",
+    "code": "test1",
+    "title": "M 5.5 - Test Place",
+    "types": "origin,shakemap"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [10.0, 20.0, 5.0]
+  },
+  "id": "test1"
+}

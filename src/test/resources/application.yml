@@ -44,6 +44,9 @@ inciweb:
 nhc:
   host: 'https://www.nhc.noaa.gov'
 
+usgs:
+  host: 'https://earthquake.usgs.gov'
+
 firms:
   host: 'https://firms.modaps.eosdis.nasa.gov/data/active_fire'
   modis: '/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv'

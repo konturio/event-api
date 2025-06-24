@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1620000000000,
+    "title": "Test Feed"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 5.5,
+        "place": "Test Place",
+        "time": 1620000000000,
+        "updated": 1620003600000,
+        "url": "http://example.com/event",
+        "code": "test1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.0, 20.0, 5.0]
+      },
+      "id": "test1"
+    }
+  ]
+}
