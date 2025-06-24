@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.kontur.eventapi.dao.mapper.MergeOperationsMapper">
+
+    <select id="getByEventIds" resultMap="mergeOperationMap">
+        select * from merge_operations where event_ids = #{eventIds, typeHandler=io.kontur.eventapi.typehandler.StringArrayTypeHandler}
+    </select>
+
+    <select id="selectNext" resultMap="mergeOperationMap">
+        select * from merge_operations order by taken_to_merge_at asc nulls first limit 1
+    </select>
+
+    <update id="markTaken">
+        update merge_operations set taken_to_merge_at = now() where merge_operation_id = #{id}
+    </update>
+
+    <resultMap id="mergeOperationMap" type="io.kontur.eventapi.entity.MergeOperation">
+        <id property="mergeOperationId" column="merge_operation_id"/>
+        <result property="eventIds" column="event_ids" typeHandler="io.kontur.eventapi.typehandler.StringArrayTypeHandler"/>
+        <result property="confidence" column="confidence"/>
+        <result property="approved" column="approved"/>
+        <result property="decisionMadeBy" column="decision_made_by"/>
+        <result property="executed" column="executed"/>
+        <result property="decisionMadeAt" column="decision_made_at"/>
+        <result property="takenToMergeAt" column="taken_to_merge_at"/>
+    </resultMap>
+</mapper>

@@ -58,6 +58,7 @@ public class WorkerScheduler {
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob;
     private final MetricsJob metricsJob;
     private final ReEnrichmentJob reEnrichmentJob;
+    private final CrossProviderMergeJob crossProviderMergeJob;
     private final NhcAtImportJob nhcAtImportJob;
     private final NhcCpImportJob nhcCpImportJob;
     private final NhcEpImportJob nhcEpImportJob;
@@ -115,6 +116,8 @@ public class WorkerScheduler {
     private String reEnrichmentEnabled;
     @Value("${scheduler.eventExpiration.enable}")
     private String eventExpirationEnabled;
+    @Value("${scheduler.crossProviderMerge.enable}")
+    private String crossProviderMergeEnabled;
 
 
     public WorkerScheduler(HpSrvSearchJob hpSrvSearchJob, HpSrvMagsJob hpSrvMagsJob,
@@ -129,7 +132,8 @@ public class WorkerScheduler {
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
-                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
+                           MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob,
+                           CrossProviderMergeJob crossProviderMergeJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
         this.gdacsSearchJob = gdacsSearchJob;
@@ -157,6 +161,7 @@ public class WorkerScheduler {
         this.reEnrichmentJob = reEnrichmentJob;
         this.humanitarianCrisisImportJob = humanitarianCrisisImportJob;
         this.eventExpirationJob = eventExpirationJob;
+        this.crossProviderMergeJob = crossProviderMergeJob;
     }
 
     @Scheduled(initialDelayString = "${scheduler.hpSrvImport.initialDelay}", fixedDelay = Integer.MAX_VALUE)
@@ -352,6 +357,13 @@ public class WorkerScheduler {
     public void startExpirationJob() {
         if (Boolean.parseBoolean(eventExpirationEnabled)) {
             eventExpirationJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.crossProviderMerge.initialDelay}", fixedDelayString = "${scheduler.crossProviderMerge.fixedDelay}")
+    public void startCrossProviderMergeJob() {
+        if (Boolean.parseBoolean(crossProviderMergeEnabled)) {
+            crossProviderMergeJob.run();
         }
     }
 }

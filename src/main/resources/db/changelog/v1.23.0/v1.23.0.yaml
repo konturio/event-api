@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: create-cross-merge-feed.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-merge-done-column.sql
+  - include:
+      relativeToChangelogFile: true
+      file: create-merge-operations.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-external-event-id-to-kontur-events.sql
+  - include:
+      relativeToChangelogFile: true
+      file: add-external-ids-providers-to-feed-data.sql

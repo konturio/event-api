@@ -210,6 +210,10 @@ scheduler:
     initialDelay: 1000
     fixedDelay: PT3H
 
+  crossProviderMerge:
+    enable: false
+    initialDelay: 1000
+    fixedDelay: 1000
 
 feign:
   client:

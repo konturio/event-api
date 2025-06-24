@@ -58,3 +58,9 @@ Find events similar to the specified event. Similarity is determined by event ty
 
 ## `GET /v1/user_feeds`
 Returns the list of feeds available for the authenticated user. The list is built from the roles present in the JWT token and is cached for one hour to improve response time.
+
+## `GET /v1/merge_pair`
+Retrieve merge candidate pair for manual review. When `pairID` is omitted the next available pair is returned.
+
+**Parameters**
+- `pairID` – array with two external event IDs.

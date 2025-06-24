@@ -89,6 +89,9 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 | `urls` | `text[]` |
 | `proper_name` | `text` |
 | `location` | `text` |
+| `external_event_ids` | `text[]` |
+| `providers` | `text[]` |
+| `merge_done` | `boolean` default `true` |
 | `collected_geometry` | `geometry` generated from episodes |
 
 Unique key: (`event_id`, `version`, `feed_id`). Several GIST and BTREE indexes exist for geometry and timestamps. An additional
@@ -122,3 +125,17 @@ Tracks current events per feed.
 | `actual` | `boolean` |
 
 Unique on (`feed_id`, `event_id`).
+
+## `merge_operations`
+Pairs of events suggested for manual merge.
+
+| Column | Type | Notes |
+| ------ | ---- | ----- |
+| `merge_operation_id` | `serial` | primary key |
+| `event_ids` | `text[]` | pair of external event IDs |
+| `confidence` | `double` | similarity score |
+| `approved` | `boolean` | decision flag |
+| `decision_made_by` | `text` | username of approver |
+| `executed` | `boolean` | whether merge was executed |
+| `decision_made_at` | `timestamptz` | when decision was saved |
+| `taken_to_merge_at` | `timestamptz` | when the pair was taken for merge |
