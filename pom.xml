@@ -20,7 +20,7 @@
 		<project.resource.directory>src/main/resources</project.resource.directory>
                 <spring-cloud.version>2021.0.9</spring-cloud.version>
 		<spring-cloud-aws-messaging.version>2.2.6.RELEASE</spring-cloud-aws-messaging.version>
-                <springdoc-openapi-ui.version>1.6.12</springdoc-openapi-ui.version>
+                <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
                 <feign-micrometer.version>13.6</feign-micrometer.version>
                 <mybatis-spring-boot-starter.version>3.0.4</mybatis-spring-boot-starter.version>
                 <liquibase-core.version>4.32.0</liquibase-core.version>
@@ -28,7 +28,7 @@
                 <geographiclib-java.version>2.0</geographiclib-java.version>
                 <gt-geojson.version>24.2-oss84-1</gt-geojson.version>
 		<spatial4j.version>0.8</spatial4j.version>
-                <jts-core.version>1.19.0</jts-core.version>
+                <jts-core.version>1.20.0</jts-core.version>
                 <jib.source.image>openjdk:17-alpine</jib.source.image>
                 <image.tag>${IMAGE_TAG}</image.tag>
                 <use.system.proxies>-Djava.net.useSystemProxies=true</use.system.proxies>
@@ -130,11 +130,12 @@
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>${mybatis-spring-boot-starter.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+                <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>42.7.7</version>
+                        <scope>runtime</scope>
+                </dependency>
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
