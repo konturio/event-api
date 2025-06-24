@@ -19,7 +19,7 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
-import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.BeforeEach;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -57,7 +57,7 @@ public class EventResourceServiceIT extends AbstractCleanableIntegrationTest {
         this.eventResourceService = eventResourceService;
     }
 
-    @PostConstruct
+    @BeforeEach
     public void setUp() {
         objectMapper.registerModule(new JavaTimeModule());
     }

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.BeforeEach;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -54,7 +54,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         this.apiDao = apiDao;
     }
 
-    @PostConstruct
+    @BeforeEach
     public void setUp() {
         objectMapper.registerModule(new JavaTimeModule());
     }

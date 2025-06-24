@@ -27,7 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.wololo.geojson.FeatureCollection;
 
-import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.BeforeEach;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -83,7 +83,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         this.apiMapper = apiMapper;
     }
 
-    @PostConstruct
+    @BeforeEach
     public void setUp() {
         objectMapper.registerModule(new JavaTimeModule());
     }
