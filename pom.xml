@@ -285,7 +285,14 @@
                         <version>1.21.2</version>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        </dependencies>
+
+        <repositories>
+                <repository>
+                        <id>osgeo</id>
+                        <url>https://repo.osgeo.org/repository/release/</url>
+                </repository>
+        </repositories>
 
 	<dependencyManagement>
 		<dependencies>
