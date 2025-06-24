@@ -15,7 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import io.kontur.eventapi.cap.converter.CapBaseXmlParser;
 import io.kontur.eventapi.cap.dto.CapParsedEvent;
 import io.kontur.eventapi.cap.dto.CapParsedItem;
-import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
