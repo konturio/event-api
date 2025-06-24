@@ -6,7 +6,9 @@ All unit and integration tests run with Maven by default:
 mvn test
 ```
 
-Tests needing PostgreSQL and Redis require Docker. They run by default, but you can skip them when Docker isn't available:
+Integration tests rely on PostgreSQL and Redis containers.
+They run by default together with unit tests.
+If Docker isn't available you may skip them:
 
 ```bash
 mvn -DskipITs=true -Ddocker.tests.exclude='**/PdcEpisodeCompositionTest.*' test
