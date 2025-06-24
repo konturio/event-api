@@ -7,20 +7,4 @@
       <mirrorOf>central</mirrorOf>
     </mirror>
   </mirrors>
-  <proxies>
-    <proxy>
-      <id>proxy</id>
-      <active>true</active>
-      <protocol>http</protocol>
-      <host>proxy</host>
-      <port>8080</port>
-    </proxy>
-    <proxy>
-      <id>proxy-https</id>
-      <active>true</active>
-      <protocol>https</protocol>
-      <host>proxy</host>
-      <port>8080</port>
-    </proxy>
-  </proxies>
 </settings>
