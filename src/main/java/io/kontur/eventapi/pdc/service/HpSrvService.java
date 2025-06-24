@@ -8,6 +8,8 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.client.HpSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Component;
 public class HpSrvService {
 
     private final static Logger LOG = LoggerFactory.getLogger(HpSrvService.class);
+    private static final ScheduledExecutorService SCHEDULER =
+            Executors.newSingleThreadScheduledExecutor();
 
     private final DataLakeDao dataLakeDao;
     private final Bucket bucket;
@@ -73,21 +77,13 @@ public class HpSrvService {
     }
 
     private JsonNode obtainHazardsScheduled(HpSrvSearchBody searchBody) {
-        try {
-            bucket.asScheduler().consume(1);
-            return hpSrvClient.searchHazards(searchBody);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        bucket.asScheduler().consume(1, SCHEDULER);
+        return hpSrvClient.searchHazards(searchBody);
     }
 
     private JsonNode obtainMagsScheduled(String hazardId) {
-        try {
-            bucket.asScheduler().consume(1);
-            return hpSrvClient.getMags(hazardId);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        bucket.asScheduler().consume(1, SCHEDULER);
+        return hpSrvClient.getMags(hazardId);
     }
 
 }

@@ -10,7 +10,7 @@ import io.kontur.eventapi.cap.job.CapImportJob;
 import io.kontur.eventapi.nhc.converter.NhcXmlParser;
 import io.kontur.eventapi.cap.service.CapImportService;
 import io.micrometer.core.instrument.MeterRegistry;
-import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class NhcImportJob extends CapImportJob {

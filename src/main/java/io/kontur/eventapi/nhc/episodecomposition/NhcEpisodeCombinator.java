@@ -25,7 +25,7 @@ import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.nhc.NhcUtil;
 import io.kontur.eventapi.util.DateTimeUtil;
-import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.measure.Measure;

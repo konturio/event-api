@@ -23,7 +23,7 @@ import io.kontur.eventapi.nhc.converter.NhcXmlParser;
 import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.util.DateTimeUtil;
 import io.kontur.eventapi.util.SeverityUtil;
-import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
