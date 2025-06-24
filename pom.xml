@@ -288,10 +288,7 @@
         </dependencies>
 
         <repositories>
-                <repository>
-                        <id>osgeo</id>
-                        <url>https://repo.osgeo.org/repository/release/</url>
-                </repository>
+                <!-- Default: Maven Central -->
         </repositories>
 
 	<dependencyManagement>
@@ -407,7 +404,7 @@
 					<tarLongFileMode>posix</tarLongFileMode>
 				</configuration>
 			</plugin>
-			<!-- Gitlab CI -->
+                        <!-- CI test configuration -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
                                 <artifactId>maven-surefire-plugin</artifactId>
