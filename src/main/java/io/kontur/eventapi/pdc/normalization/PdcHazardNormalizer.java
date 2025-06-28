@@ -36,7 +36,6 @@ public abstract class PdcHazardNormalizer extends Normalizer {
             Map.entry("DROUGHT", EventType.DROUGHT),
             Map.entry("VOLCANO", EventType.VOLCANO),
             Map.entry("HIGHWIND", EventType.STORM),
-            Map.entry("SEVEREWEATHER", EventType.STORM),
             Map.entry("HIGHSURF", EventType.STORM),
             Map.entry("MARINE", EventType.STORM),
             Map.entry("COMBAT", EventType.SITUATION),
