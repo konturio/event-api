@@ -77,7 +77,7 @@ public class NifcImportJob extends AbstractJob {
 
     private void processFeatureCollection(String geoJson, String provider, String updatedAtProp, String externalIdProp) {
         try {
-            if (StringUtils.isBlank(geoJson) || !geoJson.trim().startsWith("{\"type\"")) {
+            if (StringUtils.isBlank(geoJson)) {
                 LOG.warn("Skip processing {} due to invalid response", provider);
                 return;
             }
