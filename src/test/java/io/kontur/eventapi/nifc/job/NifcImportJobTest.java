@@ -51,7 +51,7 @@ class NifcImportJobTest {
     @Test
     void skipInvalidResponses() throws Exception {
         when(nifcClient.getNifcLocations()).thenReturn(" ");
-        when(nifcClient.getNifcPerimeters()).thenReturn("{\"error\":{}}");
+        when(nifcClient.getNifcPerimeters()).thenReturn(null);
 
         nifcImportJob.execute();
 
