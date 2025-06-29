@@ -269,17 +269,21 @@ class WorkerSchedulerTest {
     @Test
     public void startNormalizationJob() {
         ReflectionTestUtils.setField(scheduler, "normalizationEnabled", "true");
+        ReflectionTestUtils.setField(scheduler, "normalizationProvidersGroup1", new String[]{"p1"});
+        ReflectionTestUtils.setField(scheduler, "normalizationProvidersGroup2", new String[]{"p2"});
         scheduler.startNormalization();
 
-        verify(normalizationJob, times(1)).run();
+        verify(normalizationJob, times(2)).run(anyList());
     }
 
     @Test
     public void skipNormalizationJob() {
         ReflectionTestUtils.setField(scheduler, "normalizationEnabled", "false");
+        ReflectionTestUtils.setField(scheduler, "normalizationProvidersGroup1", new String[]{"p1"});
+        ReflectionTestUtils.setField(scheduler, "normalizationProvidersGroup2", new String[]{"p2"});
         scheduler.startNormalization();
 
-        verify(normalizationJob, never()).run();
+        verify(normalizationJob, never()).run(anyList());
     }
 
     @Test

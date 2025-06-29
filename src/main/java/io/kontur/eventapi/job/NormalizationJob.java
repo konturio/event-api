@@ -10,11 +10,9 @@ import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,8 +26,7 @@ public class NormalizationJob extends AbstractJob {
     private final DataLakeDao dataLakeDao;
     private final NormalizedObservationsDao normalizedObservationsDao;
 
-    @Value("${scheduler.normalization.providers}")
-    private String[] providers;
+    private List<String> providers = List.of();
 
     public NormalizationJob(List<Normalizer> normalizers, DataLakeDao dataLakeDao,
                             NormalizedObservationsDao normalizedObservationsDao, MeterRegistry meterRegistry) {
@@ -39,9 +36,14 @@ public class NormalizationJob extends AbstractJob {
         this.normalizedObservationsDao = normalizedObservationsDao;
     }
 
+    public void run(List<String> providers) {
+        this.providers = providers;
+        super.run();
+    }
+
     @Override
     public void execute() {
-        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(Arrays.asList(providers));
+        List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(providers);
         if (!CollectionUtils.isEmpty(dataLakes)) {
             LOG.info("Normalization processing: {} data lakes", dataLakes.size());
 

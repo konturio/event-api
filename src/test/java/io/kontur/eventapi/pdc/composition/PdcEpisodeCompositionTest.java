@@ -213,7 +213,7 @@ public class PdcEpisodeCompositionTest extends AbstractCleanableIntegrationTest 
         dataLake.setData(data);
 
         dataLakeDao.storeEventData(dataLake);
-        normalizationJob.run();
+        normalizationJob.run(List.of(provider));
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

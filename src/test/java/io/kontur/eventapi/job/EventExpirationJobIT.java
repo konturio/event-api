@@ -89,7 +89,7 @@ public class EventExpirationJobIT extends AbstractCleanableIntegrationTest {
 		DataLake dataLake = createDataLake(fileName);
 		dataLakeDao.storeEventData(dataLake);
 
-		normalizationJob.run();
+                normalizationJob.run(List.of(PDC_SQS_PROVIDER));
 		List<NormalizedObservation> observations = normalizedObservationsDao.getObservationsNotLinkedToEvent(List.of(PDC_SQS_PROVIDER));
 		assertEquals(1, observations.size());
 		NormalizedObservation observation = observations.get(0);

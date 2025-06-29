@@ -2,6 +2,7 @@ package io.kontur.eventapi.config;
 
 import static io.kontur.eventapi.entity.PdcMapSrvSearchJobs.PDC_MAP_SRV_IDS;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import io.kontur.eventapi.calfire.job.CalFireSearchJob;
@@ -81,6 +82,10 @@ public class WorkerScheduler {
     private String firmsSuomiImportEnabled;
     @Value("${scheduler.normalization.enable}")
     private String normalizationEnabled;
+    @Value("${scheduler.normalization.providersGroup1}")
+    private String[] normalizationProvidersGroup1;
+    @Value("${scheduler.normalization.providersGroup2}")
+    private String[] normalizationProvidersGroup2;
     @Value("${scheduler.eventCombination.enable}")
     private String eventCombinationEnabled;
     @Value("${scheduler.feedComposition.enable}")
@@ -319,7 +324,12 @@ public class WorkerScheduler {
     @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedDelayString = "${scheduler.normalization.fixedDelay}")
     public void startNormalization() {
         if (Boolean.parseBoolean(normalizationEnabled)) {
-            normalizationJob.run();
+            if (normalizationProvidersGroup1.length > 0) {
+                normalizationJob.run(Arrays.asList(normalizationProvidersGroup1));
+            }
+            if (normalizationProvidersGroup2.length > 0) {
+                normalizationJob.run(Arrays.asList(normalizationProvidersGroup2));
+            }
         }
     }
 

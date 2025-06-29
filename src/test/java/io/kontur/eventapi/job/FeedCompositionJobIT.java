@@ -137,7 +137,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         dataLake.setData(data);
 
         dataLakeDao.storeEventData(dataLake);
-        normalizationJob.run();
+        normalizationJob.run(List.of(provider));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class FeedCompositionJobIT extends AbstractCleanableIntegrationTest {
         hpSrvHazardDataLake.setData(readMessageFromFile("HpSrvSearchTestOrder.json"));
         dataLakeDao.storeEventData(hpSrvHazardDataLake);
 
-        normalizationJob.run();
+        normalizationJob.run(List.of(HP_SRV_SEARCH_PROVIDER));
         eventCombinationJob.run();
 
         feedCompositionJob.run();

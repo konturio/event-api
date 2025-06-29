@@ -16,6 +16,7 @@ import io.kontur.eventapi.firms.jobs.FirmsImportModisJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportNoaaJob;
 import io.kontur.eventapi.firms.jobs.FirmsImportSuomiJob;
 import io.kontur.eventapi.job.NormalizationJob;
+import io.kontur.eventapi.firms.FirmsUtil;
 import io.kontur.eventapi.resource.dto.TestEpisodeDto;
 import io.kontur.eventapi.resource.dto.TestEventDto;
 import io.kontur.eventapi.test.AbstractCleanableIntegrationTest;
@@ -100,7 +101,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         firmsImportModisJob.run();
         firmsImportNoaaJob.run();
         firmsImportSuomiJob.run();
-        normalizationJob.run();
+        normalizationJob.run(FirmsUtil.FIRMS_PROVIDERS);
         eventCombinationJob.run();
 
         //THEN
@@ -137,7 +138,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         firmsImportModisJob.run();
         firmsImportNoaaJob.run();
         firmsImportSuomiJob.run();
-        normalizationJob.run();
+        normalizationJob.run(FirmsUtil.FIRMS_PROVIDERS);
         eventCombinationJob.run();
 
         //THEN
@@ -208,7 +209,7 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         firmsImportModisJob.run();
         firmsImportNoaaJob.run();
         firmsImportSuomiJob.run();
-        normalizationJob.run();
+        normalizationJob.run(FirmsUtil.FIRMS_PROVIDERS);
         eventCombinationJob.run();
         feedCompositionJob.run();
 

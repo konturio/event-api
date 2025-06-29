@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.HP_SRV_MAG_PROVIDER;
@@ -93,7 +94,7 @@ public class EventCombinationJobIT extends AbstractCleanableIntegrationTest {
         dataLake.setData(data);
 
         dataLakeDao.storeEventData(dataLake);
-        normalizationJob.run();
+        normalizationJob.run(List.of(provider));
     }
 
     private String readMessageFromFile(String fileName) throws IOException {

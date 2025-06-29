@@ -134,11 +134,12 @@ scheduler:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999
-    providers: em-dat, gdacsAlert, gdacsAlertGeometry, hpSrvMag, hpSrvSearch, pdcMapSrv, pdcSqs, tornado.canada-gov, 
+    providersGroup1: em-dat, gdacsAlert, gdacsAlertGeometry, hpSrvMag, hpSrvSearch, pdcMapSrv, pdcSqs, tornado.canada-gov,
       tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
       wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
       wildfire.perimeters.nifc, wildfire.locations.nifc, wildfire.inciweb, kontur.events, cyclones.nhc-at.noaa,
-      cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa, firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
+      cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa
+    providersGroup2: firms.modis-c6, firms.suomi-npp-viirs-c2, firms.noaa-20-viirs-c2
   eventCombination:
     enable: false
     initialDelay: 999999
