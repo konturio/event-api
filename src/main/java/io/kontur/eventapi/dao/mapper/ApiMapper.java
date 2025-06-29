@@ -58,5 +58,6 @@ public interface ApiMapper {
     String findSimilarEvents(@Param("eventId") UUID eventId,
                              @Param("feedAlias") String feedAlias,
                              @Param("limit") int limit,
-                             @Param("distance") double distance);
+                             @Param("distance") double distance,
+                             @Param("geometryFilterType") GeometryFilterType geometryFilterType);
 }

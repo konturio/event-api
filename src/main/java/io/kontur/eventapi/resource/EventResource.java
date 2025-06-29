@@ -290,8 +290,13 @@ public class EventResource {
             int limit,
             @Parameter(description = "Search radius in meters", example = "50000")
             @RequestParam(value = "distance", defaultValue = "50000")
-            double distance) {
-        return eventResourceService.findSimilarEvents(eventId, feed, limit, distance)
+            double distance,
+            @Parameter(description = "How geometries should be returned: " +
+                    "<ul><li>ANY - include geometries</li>" +
+                    "<li>NONE - omit geometries</li></ul>")
+            @RequestParam(value = "geometryFilterType", defaultValue = "ANY")
+            GeometryFilterType geometryFilterType) {
+        return eventResourceService.findSimilarEvents(eventId, feed, limit, distance, geometryFilterType)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

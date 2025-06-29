@@ -80,8 +80,9 @@ public class EventResourceService {
         return geoJson == null ? Optional.empty() : Optional.of(geoJson);
     }
 
-    public Optional<String> findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance) {
-        String data = apiDao.findSimilarEvents(eventId, feedAlias, limit, distance);
+    public Optional<String> findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance,
+                                              GeometryFilterType geometryFilterType) {
+        String data = apiDao.findSimilarEvents(eventId, feedAlias, limit, distance, geometryFilterType);
         return data == null ? Optional.empty() : Optional.of(data);
     }
 }
