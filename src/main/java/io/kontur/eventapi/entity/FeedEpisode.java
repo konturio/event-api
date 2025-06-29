@@ -17,6 +17,10 @@ public class FeedEpisode {
     private String description;
     private EventType type;
     private Severity severity;
+    /**
+     * Indicates that the episode was produced from forecast data rather than actual observations.
+     */
+    private Boolean forecasted;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
     private OffsetDateTime updatedAt;

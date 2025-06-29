@@ -51,10 +51,11 @@ public class EventResourceService {
     public Optional<String> searchEvents(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
                                        OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                        List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,
-                                       EpisodeFilterType episodeFilterType, GeometryFilterType geometryFilterType) {
+                                       EpisodeFilterType episodeFilterType, GeometryFilterType geometryFilterType,
+                                       boolean actual) {
         long start = System.currentTimeMillis();
         String data = apiDao.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter,
-                limit, severities, sortOrder, bbox, episodeFilterType, geometryFilterType);
+                limit, severities, sortOrder, bbox, episodeFilterType, geometryFilterType, actual);
         long duration = System.currentTimeMillis() - start;
         logger.debug("searchEvents feed={} eventTypes={} bboxPresent={} duration={}ms",
                 feedAlias, eventTypes, bbox != null, duration);
@@ -70,10 +71,10 @@ public class EventResourceService {
     public Optional<String> searchEventsGeoJson(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
                                                 OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                                 List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bbox,
-                                                EpisodeFilterType episodeFilterType) {
+                                                EpisodeFilterType episodeFilterType, boolean actual) {
         long start = System.currentTimeMillis();
         String geoJson = apiDao.searchForEventsGeoJson(feedAlias, eventTypes, from, to,
-                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType);
+                updatedAfter, limit, severities, sortOrder, bbox, episodeFilterType, actual);
         long duration = System.currentTimeMillis() - start;
         logger.debug("searchEventsGeoJson feed={} eventTypes={} bboxPresent={} duration={}ms",
                 feedAlias, eventTypes, bbox != null, duration);

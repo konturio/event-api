@@ -24,6 +24,7 @@ Search for events within a feed.
 - `sortOrder` – `ASC` or `DESC` by `updatedAt`.
 - `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
 - `geometryFilterType` – `ANY` or `NONE`.
+- `actual` – if `true`, return only events marked as actual.
 
 Returns events sorted by update date using cursor based pagination. Response body is JSON containing `pageMetadata.nextAfterValue` and event data.
 
@@ -31,6 +32,7 @@ Returns events sorted by update date using cursor based pagination. Response bod
 Same as the root `/v1/` endpoint but returns results as GeoJSON `FeatureCollection`.
 
 Additional optional parameter `access_token` can be passed for geojson visualisation services.
+All other parameters are the same as for `/v1/`. The `actual` flag can be used here as well.
 
 ## `GET /v1/observations/{observationId}`
 Return raw observation data by its UUID. Content type can be JSON, XML, CSV, or another one depending on the source.

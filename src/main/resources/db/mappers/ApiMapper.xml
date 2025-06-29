@@ -94,6 +94,9 @@
                 </choose>
                 box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
+            <if test='actual'>
+                inner join feed_event_status fes on fd.event_id = fes.event_id and fd.feed_id = fes.feed_id and fes.actual
+            </if>
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )
                 and fd.is_latest_version and fd.enriched
@@ -183,6 +186,9 @@
                 </choose>
                 box2d(fd.collected_geometry) as bbox, st_pointonsurface(fd.collected_geometry) as centroid
             from feed_data fd
+            <if test='actual'>
+                inner join feed_event_status fes on fd.event_id = fes.event_id and fd.feed_id = fes.feed_id and fes.actual
+            </if>
             left join severities sv on fd.severity_id = sv.severity_id
             where fd.event_id = #{eventId}
                 and fd.feed_id = ( select feed_id from feeds where alias = #{feedAlias} )

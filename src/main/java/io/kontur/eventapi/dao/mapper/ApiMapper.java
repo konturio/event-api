@@ -33,7 +33,8 @@ public interface ApiMapper {
                                @Param("yMin") BigDecimal yMin,
                                @Param("yMax") BigDecimal yMax,
                                @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
-                               @Param("geometryFilterType") GeometryFilterType geometryFilterType);
+                               @Param("geometryFilterType") GeometryFilterType geometryFilterType,
+                               @Param("actual") boolean actual);
 
 	String searchForEventsGeoJson(@Param("feedAlias") String feedAlias,
 	                              @Param("eventTypes") List<EventType> eventTypes,
@@ -46,8 +47,9 @@ public interface ApiMapper {
 	                              @Param("xMin") BigDecimal xMin,
 	                              @Param("xMax") BigDecimal xMax,
 	                              @Param("yMin") BigDecimal yMin,
-	                              @Param("yMax") BigDecimal yMax,
-	                              @Param("episodeFilterType") EpisodeFilterType episodeFilterType);
+                                      @Param("yMax") BigDecimal yMax,
+                                      @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
+                                      @Param("actual") boolean actual);
 
     Optional<String> getEventByEventIdAndByVersionOrLast(@Param("eventId") UUID eventId,
                                                          @Param("feedAlias") String feedAlias,

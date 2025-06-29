@@ -17,6 +17,10 @@ public class FeedData {
     private String description;
     private EventType type;
     private Severity severity;
+    /**
+     * True if the event is derived from forecast data only.
+     */
+    private Boolean forecasted;
     private Boolean active;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;

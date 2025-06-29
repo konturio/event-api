@@ -34,33 +34,34 @@ public class ApiDao {
                                               OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
                                               List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
                                               EpisodeFilterType episodeFilterType,
-                                              GeometryFilterType geometryFilterType) {
+                                              GeometryFilterType geometryFilterType,
+                                              boolean actual) {
                 if (bBox != null) {
                         var xMin = bBox.get(0);
                         var yMin = bBox.get(1);
                         var xMax = bBox.get(2);
                         var yMax = bBox.get(3);
                         return mapper.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-                                        xMin, xMax, yMin, yMax, episodeFilterType, geometryFilterType);
+                                        xMin, xMax, yMin, yMax, episodeFilterType, geometryFilterType, actual);
                 }
                 return mapper.searchForEvents(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-                                null, null, null, null, episodeFilterType, geometryFilterType);
+                                null, null, null, null, episodeFilterType, geometryFilterType, actual);
         }
 
-	public String searchForEventsGeoJson(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
-	                                            OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
-	                                            List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
-	                                            EpisodeFilterType episodeFilterType) {
+        public String searchForEventsGeoJson(String feedAlias, List<EventType> eventTypes, OffsetDateTime from,
+                                                    OffsetDateTime to, OffsetDateTime updatedAfter, int limit,
+                                                    List<Severity> severities, SortOrder sortOrder, List<BigDecimal> bBox,
+                                                    EpisodeFilterType episodeFilterType, boolean actual) {
 		if (bBox != null) {
 			var xMin = bBox.get(0);
 			var yMin = bBox.get(1);
 			var xMax = bBox.get(2);
 			var yMax = bBox.get(3);
-			return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-					xMin, xMax, yMin, yMax, episodeFilterType);
+                        return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                                        xMin, xMax, yMin, yMax, episodeFilterType, actual);
 		}
-		return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
-				null, null, null, null, episodeFilterType);
+                return mapper.searchForEventsGeoJson(feedAlias, eventTypes, from, to, updatedAfter, limit, severities, sortOrder,
+                                null, null, null, null, episodeFilterType, actual);
 	}
 
     public Optional<String> getEventByEventIdAndByVersionOrLast(UUID eventId, String feed, Long version,
