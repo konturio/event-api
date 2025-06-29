@@ -106,6 +106,8 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 Unique key: (`event_id`, `version`, `feed_id`). Several GIST and BTREE indexes exist for geometry and timestamps. An additional
 index `feed_data_event_feed_latest_idx` on `(event_id, feed_id)` with condition `is_latest_version` speeds up retrieval of the
 latest event by its ID.
+Index `feed_data_updated_at_feed_id_is_latest_version_enriched_idx` on `(updated_at, feed_id)` helps
+searching events within a feed sorted by update time.
 
 ## `severities`
 Reference table of possible severity levels.
