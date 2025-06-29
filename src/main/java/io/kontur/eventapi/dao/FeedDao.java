@@ -46,9 +46,9 @@ public class FeedDao {
                 feedData.getAutoExpire(), feedData.getGeomFuncType());
 
         if (count > 0) {
-            mapper.markOutdatedEventsVersions(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
             feedEventStatusDao.markAsActual(feedData.getFeedId(), feedData.getEventId(), true);
             if (feedData.getEnriched()) {
+                mapper.markEventVersionAsLatest(feedData.getEventId(), feedData.getFeedId(), feedData.getVersion());
                 cacheUtil.evictEventListCache(feed);
                 cacheUtil.evictEventCache(feedData.getEventId(), feed);
             }
@@ -73,6 +73,7 @@ public class FeedDao {
                 event.getName(), event.getEventDetails(), writeJson(event.getEpisodes()),
                 event.getEnriched(), event.getEnrichmentAttempts(), event.getEnrichmentSkipped());
         if (event.getEnriched()) {
+            mapper.markEventVersionAsLatest(event.getEventId(), event.getFeedId(), event.getVersion());
             cacheUtil.evictEventListCache(feed);
             cacheUtil.evictEventCache(event.getEventId(), feed);
         }

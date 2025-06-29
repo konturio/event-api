@@ -103,6 +103,10 @@ Stores event versions for each feed. Table was redesigned in version 1.15.
 | `location` | `text` |
 | `collected_geometry` | `geometry` generated from episodes |
 
+`is_latest_version` becomes `true` only after the corresponding event version is
+successfully enriched. Until then the previous enriched version remains the
+latest for API queries.
+
 Unique key: (`event_id`, `version`, `feed_id`). Several GIST and BTREE indexes exist for geometry and timestamps. An additional
 index `feed_data_event_feed_latest_idx` on `(event_id, feed_id)` with condition `is_latest_version` speeds up retrieval of the
 latest event by its ID.
