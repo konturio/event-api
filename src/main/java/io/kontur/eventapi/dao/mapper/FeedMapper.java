@@ -44,6 +44,10 @@ public interface FeedMapper {
                                     @Param("feedId") UUID feedId,
                                     @Param("version") Long version);
 
+    void markEventVersionAsLatest(@Param("eventId") UUID eventId,
+                                  @Param("feedId") UUID feedId,
+                                  @Param("version") Long version);
+
     Optional<Long> getLastFeedDataVersion(@Param("eventId") UUID eventId,
                                           @Param("feedId") UUID feedId);
 
