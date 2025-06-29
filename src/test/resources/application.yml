@@ -20,6 +20,8 @@ konturApps:
 
 stormsNoaa:
   host: 'https://www1.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
+jtwc:
+  rss: 'https://www.metoc.navy.mil/jtwc/rss/jtwc.rss'
 
 staticdata:
   s3Bucket: 'event-api-locker01'
@@ -120,6 +122,10 @@ scheduler:
     initialDelay: 999999
     fixedDelay: 999999
   nhcEpImport:
+    enable: false
+    initialDelay: 999999
+    fixedDelay: 999999
+  jtwcImport:
     enable: false
     initialDelay: 999999
     fixedDelay: 999999

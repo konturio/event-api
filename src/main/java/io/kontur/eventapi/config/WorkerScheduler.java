@@ -15,6 +15,7 @@ import io.kontur.eventapi.job.*;
 import io.kontur.eventapi.nhc.job.NhcAtImportJob;
 import io.kontur.eventapi.nhc.job.NhcCpImportJob;
 import io.kontur.eventapi.nhc.job.NhcEpImportJob;
+import io.kontur.eventapi.jtwc.job.JtwcImportJob;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
@@ -61,6 +62,7 @@ public class WorkerScheduler {
     private final NhcAtImportJob nhcAtImportJob;
     private final NhcCpImportJob nhcCpImportJob;
     private final NhcEpImportJob nhcEpImportJob;
+    private final JtwcImportJob jtwcImportJob;
     private final EventExpirationJob eventExpirationJob;
 
     @Value("${scheduler.hpSrvImport.enable}")
@@ -109,6 +111,8 @@ public class WorkerScheduler {
     private String nhcCpEnabled;
     @Value("${scheduler.nhcEpImport.enable}")
     private String nhcEpEnabled;
+    @Value("${scheduler.jtwcImport.enable}")
+    private String jtwcImportEnabled;
     @Value("${scheduler.metrics.enable}")
     private String metricsEnabled;
     @Value("${scheduler.reEnrichment.enable}")
@@ -129,6 +133,7 @@ public class WorkerScheduler {
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
+                           JtwcImportJob jtwcImportJob,
                            MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
         this.hpSrvSearchJob = hpSrvSearchJob;
         this.hpSrvMagsJob = hpSrvMagsJob;
@@ -153,6 +158,7 @@ public class WorkerScheduler {
         this.nhcAtImportJob = nhcAtImportJob;
         this.nhcCpImportJob = nhcCpImportJob;
         this.nhcEpImportJob = nhcEpImportJob;
+        this.jtwcImportJob = jtwcImportJob;
         this.metricsJob = metricsJob;
         this.reEnrichmentJob = reEnrichmentJob;
         this.humanitarianCrisisImportJob = humanitarianCrisisImportJob;
@@ -296,6 +302,13 @@ public class WorkerScheduler {
     public void startNhcEpImport() {
         if (Boolean.parseBoolean(nhcEpEnabled)) {
             nhcEpImportJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.jtwcImport.initialDelay}", fixedDelayString = "${scheduler.jtwcImport.fixedDelay}")
+    public void startJtwcImport() {
+        if (Boolean.parseBoolean(jtwcImportEnabled)) {
+            jtwcImportJob.run();
         }
     }
 
