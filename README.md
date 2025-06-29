@@ -33,14 +33,11 @@ To configure additional external config file for Spring Boot application set up 
 
 #### Config file
 
-There are five config files:
-- `application.yml` - default config file
-- `application-dev.yml` - config file for DEV environment
-- `application-test.yml` - config file for TEST environment
-- `application-prod.yml` - config file for PROD environment
+There are two config files:
+- `application.yml` - default config file used for local development
 - `config.yaml` - template of external config
 
-We should use `dev`, `test` and `prod` config files to store different properties for different environments.
+Environment-specific properties for `dev`, `test` and `prod` profiles are stored in the deployment configuration (disaster-ninja-cd repository).
 
 Secure data should be stored in an external config file: `config.local.yaml`
 
