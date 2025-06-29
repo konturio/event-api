@@ -3,7 +3,14 @@
 During review a few areas looked unclear or potentially problematic. They may require further clarification:
 
 ## `PdcSqsMessageListener`
-The listener contains a TODO comment to "skip products until it is clear how to handle them". It is not documented what kind of SQS messages are ignored and whether products will be supported in the future.
+The listener previously skipped `PING` and `PRODUCT` messages silently. Debug
+logs have been added to make it obvious when such messages are ignored.
+Handling of `PRODUCT` messages is still not implemented and requires further
+clarification.
+
+## Service Level Agreement
+There is currently **no SLA** defined for Event API. Availability and response
+times are provided on a best effort basis.
 
 ## Caching behaviour
 `EventResourceService` enables caching unless the `cacheDisabled` profile is active. There is no documentation describing cache invalidation rules or expected time to live.

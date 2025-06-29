@@ -31,8 +31,14 @@ public class PdcSqsMessageListener {
         String type = getProductType(sns);
         // TODO: skip products until it is clear how to handle them
         if ("PING".equals(type)) {
+            LOG.debug("Skipping PING message");
             return;
         } else if ("PRODUCT".equals(type)) {
+            LOG.debug("Skipping PRODUCT message");
+            return;
+        }
+        if (!"HAZARD".equals(type) && !"MAG".equals(type)) {
+            LOG.warn("Unknown PDC message type: {}", type);
             return;
         }
 
