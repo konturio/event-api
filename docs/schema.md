@@ -41,7 +41,7 @@ Normalized information extracted from `data_lake`.
 | `urls` | `text[]`
 | `cost` | `numeric`
 | `loss` | `jsonb`
-| `severity_data` | `jsonb`
+| `severity_data` | `jsonb` | additional metrics such as `magnitude`, `windSpeedKph`, or `categorySaffirSimpson`
 | `geometries` | `jsonb`
 | `auto_expire` | `boolean`
 | `recombined` | `boolean`
