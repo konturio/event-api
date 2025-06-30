@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.Geometry;
 import org.wololo.geojson.Point;
 
+import java.util.HashMap;
+
 import java.math.BigDecimal;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
@@ -25,6 +27,8 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static io.kontur.eventapi.util.SeverityUtil.*;
 
 import static io.kontur.eventapi.util.CsvUtil.parseRow;
 import static java.lang.Double.parseDouble;
@@ -90,6 +94,28 @@ public class EmDatNormalizer extends Normalizer {
             } catch (NumberFormatException e) {
                 LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
             }
+        }
+
+        Map<String, Object> severityData = new HashMap<>();
+        String severityUnit = csvData.get("Dis Mag Scale");
+        String severityValue = csvData.get("Dis Mag Value");
+        if ("Richter".equals(severityUnit)) {
+            try {
+                severityData.put(MAGNITUDE, Double.parseDouble(severityValue));
+            } catch (Exception e) {
+                LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
+            }
+        } else if ("Kph".equals(severityUnit)) {
+            try {
+                double windSpeed = Double.parseDouble(severityValue);
+                severityData.put(WIND_SPEED_KPH, windSpeed);
+                severityData.put(CATEGORY_SAFFIR_SIMPSON, getCycloneCategory(windSpeed));
+            } catch (Exception e) {
+                LOG.debug(String.format("'%s' for observation %s", e.getMessage(), obs.getObservationId()));
+            }
+        }
+        if (!severityData.isEmpty()) {
+            obs.setSeverityData(severityData);
         }
 
         Point point = null;
