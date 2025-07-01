@@ -161,6 +161,30 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP3+shtml/270852.shtml"), observation.getUrls());
         checkGeometriesValue(observation.getGeometries(), 6);
+
+    @Test
+    public void testSpecialAdvisoryWithoutRequestLine() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test_special.xml", NhcUtil.NHC_EP_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+        assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider());
+        assertEquals("EP102024", observation.getExternalEventId());
+        assertEquals("EP102024_10", observation.getExternalEpisodeId());
+        assertEquals(Severity.MINOR, observation.getEventSeverity());
+        assertEquals("REMNANTS OF JOHN", observation.getName());
+        assertEquals("THIS IS THE LAST FORECAST/ADVISORY ISSUED BY THE NATIONAL HURRICANE CENTER ON THIS SYSTEM", observation.getDescription());
+        assertEquals(EventType.CYCLONE, observation.getType());
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2024-09-24T18:00:00Z", null), observation.getStartedAt());
+        assertNull(observation.getEndedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP5+shtml/241747.shtml"), observation.getUrls());
+        checkGeometriesValue(observation.getGeometries(), 1);
     }
 
     @Test
