@@ -70,7 +70,8 @@ public class ApiDao {
     }
 
     public String findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance,
+                                   EpisodeFilterType episodeFilterType,
                                    GeometryFilterType geometryFilterType) {
-        return mapper.findSimilarEvents(eventId, feedAlias, limit, distance, geometryFilterType);
+        return mapper.findSimilarEvents(eventId, feedAlias, limit, distance, episodeFilterType, geometryFilterType);
     }
 }

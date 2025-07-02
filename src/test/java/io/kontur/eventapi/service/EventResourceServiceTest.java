@@ -2,6 +2,7 @@ package io.kontur.eventapi.service;
 
 import io.kontur.eventapi.dao.ApiDao;
 import io.kontur.eventapi.resource.dto.GeometryFilterType;
+import io.kontur.eventapi.resource.dto.EpisodeFilterType;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
 
@@ -20,12 +21,15 @@ public class EventResourceServiceTest {
 
         UUID eventId = UUID.randomUUID();
         String feed = "test";
-        when(apiDao.findSimilarEvents(eventId, feed, 5, 10.0, GeometryFilterType.NONE))
+        when(apiDao.findSimilarEvents(eventId, feed, 5, 10.0,
+                EpisodeFilterType.ANY, GeometryFilterType.NONE))
                 .thenReturn("{}");
 
-        Optional<String> result = service.findSimilarEvents(eventId, feed, 5, 10.0, GeometryFilterType.NONE);
+        Optional<String> result = service.findSimilarEvents(eventId, feed, 5, 10.0,
+                EpisodeFilterType.ANY, GeometryFilterType.NONE);
 
-        verify(apiDao, times(1)).findSimilarEvents(eventId, feed, 5, 10.0, GeometryFilterType.NONE);
+        verify(apiDao, times(1)).findSimilarEvents(eventId, feed, 5, 10.0,
+                EpisodeFilterType.ANY, GeometryFilterType.NONE);
         assertTrue(result.isPresent());
     }
 }

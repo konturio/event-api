@@ -55,6 +55,7 @@ Find events similar to the specified event. Similarity is determined by event ty
 - `eventId` – reference event UUID (required).
 - `limit` – number of records to return. Default is `10`.
 - `distance` – search radius in meters. Default is `50000`.
+- `episodeFilterType` – `ANY`, `LATEST` or `NONE`.
 - `geometryFilterType` – `ANY` or `NONE`.
 
 ## `GET /v1/user_feeds`

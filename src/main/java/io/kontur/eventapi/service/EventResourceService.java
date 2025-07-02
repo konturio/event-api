@@ -81,8 +81,9 @@ public class EventResourceService {
     }
 
     public Optional<String> findSimilarEvents(UUID eventId, String feedAlias, int limit, double distance,
+                                              EpisodeFilterType episodeFilterType,
                                               GeometryFilterType geometryFilterType) {
-        String data = apiDao.findSimilarEvents(eventId, feedAlias, limit, distance, geometryFilterType);
+        String data = apiDao.findSimilarEvents(eventId, feedAlias, limit, distance, episodeFilterType, geometryFilterType);
         return data == null ? Optional.empty() : Optional.of(data);
     }
 }
