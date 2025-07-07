@@ -59,5 +59,6 @@ public interface ApiMapper {
                              @Param("feedAlias") String feedAlias,
                              @Param("limit") int limit,
                              @Param("distance") double distance,
+                             @Param("episodeFilterType") EpisodeFilterType episodeFilterType,
                              @Param("geometryFilterType") GeometryFilterType geometryFilterType);
 }

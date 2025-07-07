@@ -25,7 +25,17 @@
                     <otherwise>fd.geometries,</otherwise>
                 </choose>
                 jsonb_array_length(fd.episodes) as episode_count,
-                fd.episodes,
+                <choose>
+                    <when test='"LATEST".equalsIgnoreCase(episodeFilterType)'>
+                        jsonb_build_array((select episode from jsonb_array_elements(fd.episodes) episode
+                                           order by (episode ->> 'updatedAt')::timestamptz desc
+                                           limit 1)) as episodes,
+                    </when>
+                    <when test='"NONE".equalsIgnoreCase(episodeFilterType)'>
+                        '[]'::jsonb as episodes,
+                    </when>
+                    <otherwise>fd.episodes,</otherwise>
+                </choose>
                 box2d(fd.collected_geometry) as bbox,
                 st_pointonsurface(fd.collected_geometry) as centroid,
                 st_distance(fd.collected_geometry::geography, t.collected_geometry::geography) as dist
