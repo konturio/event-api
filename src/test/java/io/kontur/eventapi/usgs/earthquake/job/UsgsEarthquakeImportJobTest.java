@@ -38,7 +38,7 @@ class UsgsEarthquakeImportJobTest {
 
     @Test
     void execute() {
-        Feature feature = new Feature(new Point(new double[]{0,0}), Map.of("updated", "123"), "id1");
+        Feature feature = new Feature("id1", new Point(new double[]{0,0}), Map.of("updated", "123"));
         FeatureCollection fc = new FeatureCollection(new Feature[]{feature});
         when(client.getEarthquakes()).thenReturn(fc.toString());
         when(dataLakeDao.isNewEvent(anyString(), anyString(), anyString())).thenReturn(true);

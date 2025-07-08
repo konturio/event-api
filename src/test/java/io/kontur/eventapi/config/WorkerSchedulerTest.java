@@ -28,6 +28,7 @@ import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.tornadojapanma.job.HistoricalTornadoJapanMaImportJob;
 import io.kontur.eventapi.tornadojapanma.job.TornadoJapanMaImportJob;
 import io.kontur.eventapi.uhc.job.HumanitarianCrisisImportJob;
+import io.kontur.eventapi.usgs.earthquake.job.UsgsEarthquakeImportJob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -62,6 +63,7 @@ class WorkerSchedulerTest {
     private final FirmsEventCombinationJob firmsEventCombinationJob = mock(FirmsEventCombinationJob.class);
     private final CalFireSearchJob calFireSearchJob = mock(CalFireSearchJob.class);
     private final NifcImportJob nifcImportJob = mock(NifcImportJob.class);
+    private final UsgsEarthquakeImportJob usgsEarthquakeImportJob = mock(UsgsEarthquakeImportJob.class);
     private final InciWebImportJob inciWebImportJob = mock(InciWebImportJob.class);
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob = mock(HumanitarianCrisisImportJob.class);
     private final NhcAtImportJob nhcAtImportJob = mock(NhcAtImportJob.class);
@@ -75,8 +77,8 @@ class WorkerSchedulerTest {
             eventCombinationJob, firmsEventCombinationJob, feedCompositionJob, firmsImportModisJob, firmsImportNoaaJob,
             firmsImportSuomiJob, emDatImportJob, staticImportJob, stormsNoaaImportJob, tornadoJapanMaImportJob,
             historicalTornadoJapanMaImportJob, pdcMapSrvSearchJobs, enrichmentJob, calFireSearchJob,
-            nifcImportJob, inciWebImportJob, humanitarianCrisisImportJob, nhcAtImportJob, nhcCpImportJob, nhcEpImportJob,
-            metricsJob, reEnrichmentJob, eventExpirationJob);
+            nifcImportJob, usgsEarthquakeImportJob, inciWebImportJob, humanitarianCrisisImportJob, nhcAtImportJob,
+            nhcCpImportJob, nhcEpImportJob, metricsJob, reEnrichmentJob, eventExpirationJob);
 
     @AfterEach
     public void resetMocks() {
@@ -95,6 +97,8 @@ class WorkerSchedulerTest {
         Mockito.reset(historicalTornadoJapanMaImportJob);
         Mockito.reset(pdcMapSrvSearchJobs);
         Mockito.reset(calFireSearchJob);
+        Mockito.reset(nifcImportJob);
+        Mockito.reset(usgsEarthquakeImportJob);
         Mockito.reset(inciWebImportJob);
         Mockito.reset(reEnrichmentJob);
         Mockito.reset(eventExpirationJob);
@@ -322,6 +326,22 @@ class WorkerSchedulerTest {
         scheduler.startCalFireSearchJob();
 
         verify(calFireSearchJob, never()).run();
+    }
+
+    @Test
+    public void startUsgsEarthquakeImportJob() {
+        ReflectionTestUtils.setField(scheduler, "usgsEarthquakeImportEnabled", "true");
+        scheduler.startUsgsEarthquakeImport();
+
+        verify(usgsEarthquakeImportJob, times(1)).run();
+    }
+
+    @Test
+    public void skipUsgsEarthquakeImportJob() {
+        ReflectionTestUtils.setField(scheduler, "usgsEarthquakeImportEnabled", "false");
+        scheduler.startUsgsEarthquakeImport();
+
+        verify(usgsEarthquakeImportJob, never()).run();
     }
 
     @Test
