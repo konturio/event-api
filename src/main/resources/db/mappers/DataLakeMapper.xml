@@ -118,7 +118,7 @@
                 from data_lake
                 where external_id = #{externalId}
                   and provider = #{provider}
-                  and updated_at at time zone 'UTC' = #{updatedAt}::timestamptz
+                  and updated_at at time zone 'UTC' = to_timestamp(#{updatedAt}, 'YYYY-MM-DDThh24:mi:ss')::timestamp
             )
     </select>
 
