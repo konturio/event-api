@@ -97,7 +97,6 @@ class WorkerSchedulerTest {
         Mockito.reset(historicalTornadoJapanMaImportJob);
         Mockito.reset(pdcMapSrvSearchJobs);
         Mockito.reset(calFireSearchJob);
-        Mockito.reset(nifcImportJob);
         Mockito.reset(usgsEarthquakeImportJob);
         Mockito.reset(inciWebImportJob);
         Mockito.reset(reEnrichmentJob);
