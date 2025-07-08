@@ -35,3 +35,7 @@ feign:
       default:
         defaultRequestHeaders:
           User-Agent: Event API PROD
+
+scheduler:
+  usgsEarthquakeImport:
+    enable: true

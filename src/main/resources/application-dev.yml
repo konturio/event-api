@@ -37,3 +37,7 @@ feign:
           User-Agent: Event API DEV
       auth:
         logger-level: HEADERS
+
+scheduler:
+  usgsEarthquakeImport:
+    enable: true
