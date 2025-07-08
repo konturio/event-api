@@ -108,6 +108,8 @@ scheduler:
     fixedDelay: 999999
   usgsEarthquakeImport:
     enable: true
+    initialDelay: 999999
+    fixedDelay: 999999
   inciwebImport:
     enable: false
     initialDelay: 999999
