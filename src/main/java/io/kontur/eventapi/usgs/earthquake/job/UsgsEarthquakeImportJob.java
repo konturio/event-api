@@ -61,10 +61,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                     if (updatedObj != null && StringUtils.isNotBlank(externalId)) {
                         long updatedMilli = Long.parseLong(String.valueOf(updatedObj));
                         OffsetDateTime updatedAt = DateTimeUtil.getDateTimeFromMilli(updatedMilli);
-                        if (Boolean.TRUE.equals(dataLakeDao.isNewEvent(externalId, USGS_EARTHQUAKE_PROVIDER,
-                                updatedAt.format(DateTimeFormatter.ISO_INSTANT)))) {
-                            dataLakes.add(converter.convert(externalId, updatedAt, JsonUtil.writeJson(feature)));
-                        }
+                        dataLakes.add(converter.convert(externalId, updatedAt, JsonUtil.writeJson(feature)));
                     }
                 } catch (Exception e) {
                     LOG.error("Failed to process feature from usgs earthquake feed", e);
