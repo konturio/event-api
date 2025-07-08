@@ -41,6 +41,9 @@ nifc:
 inciweb:
   host: 'https://inciweb.nwcg.gov'
 
+usgs:
+  host: 'https://earthquake.usgs.gov'
+
 nhc:
   host: 'https://www.nhc.noaa.gov'
 
