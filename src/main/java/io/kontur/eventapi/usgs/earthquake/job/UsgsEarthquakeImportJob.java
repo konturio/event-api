@@ -87,13 +87,13 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             }
             String detailJson = client.getDetail(externalId);
             if (StringUtils.isBlank(detailJson)) {
-                feature.put("shakemap", false);
+                feature.put("shakemap_retrieval", false);
                 return;
             }
             JsonNode detail = JsonUtil.readTree(detailJson);
             JsonNode shakemapArray = detail.at("/properties/products/shakemap");
             if (!shakemapArray.isArray() || shakemapArray.size() == 0) {
-                feature.put("shakemap", false);
+                feature.put("shakemap_retrieval", false);
                 return;
             }
             JsonNode first = shakemapArray.get(0);
@@ -111,23 +111,26 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 result.set("properties", props);
             }
             JsonNode contNode = first.at("/contents/download/cont_pga.json");
-            if (contNode.isMissingNode()) {
-                feature.put("shakemap", false);
+            if (!contNode.isMissingNode()) {
+                String url = contNode.get("url").asText();
+                feature.put("shm_url", url);
+                String contPga = fetchUrl(url);
+                if (contPga != null) {
+                    result.set("download/cont_pga.json", contNode);
+                    result.put("cont_pga", contPga);
+                } else {
+                    feature.put("shakemap_retrieval", false);
+                    return;
+                }
+            } else {
+                feature.put("shakemap_retrieval", false);
                 return;
             }
-            result.set("download/cont_pga.json", contNode);
-            String url = contNode.get("url").asText();
-            String contPga = fetchUrl(url);
-            if (contPga == null) {
-                feature.put("shakemap", false);
-                return;
-            }
-            result.put("cont_pga", contPga);
             ArrayNode arr = feature.putArray("shakemap");
             arr.add(result);
         } catch (Exception e) {
             LOG.warn("Failed to enrich feature with shakemap", e);
-            feature.put("shakemap", false);
+            feature.put("shakemap_retrieval", false);
         }
     }
 
