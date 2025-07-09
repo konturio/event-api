@@ -118,7 +118,14 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 String contPga = fetchUrl(url);
                 if (contPga != null) {
                     result.set("download/cont_pga.json", contNode);
-                    result.put("cont_pga", contPga);
+                    try {
+                        JsonNode contPgaNode = JsonUtil.readTree(contPga);
+                        result.set("cont_pga", contPgaNode);
+                    } catch (Exception e) {
+                        LOG.warn("Failed to parse cont_pga.json for event {}", externalId, e);
+                        feature.put("shakemap_retrieval", false);
+                        return;
+                    }
                 } else {
                     feature.put("shakemap_retrieval", false);
                     return;
