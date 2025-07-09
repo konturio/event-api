@@ -56,7 +56,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             List<DataLake> dataLakes = new ArrayList<>();
             for (Feature feature : featureCollection.getFeatures()) {
                 try {
-                    String externalId = String.valueOf(feature.getId());
+                    String externalId = StringUtils.strip(String.valueOf(feature.getId()), "\"");
                     Object updatedObj = feature.getProperties().get("updated");
                     if (updatedObj != null && StringUtils.isNotBlank(externalId)) {
                         long updatedMilli = Long.parseLong(String.valueOf(updatedObj));
