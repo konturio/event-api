@@ -64,7 +64,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                     JsonNode updatedNode = feature.get("properties").get("updated");
                     if (updatedNode != null && StringUtils.isNotBlank(externalId)) {
                         OffsetDateTime updatedAt = DateTimeUtil.getDateTimeFromMilli(updatedNode.asLong());
-                        enrichWithShakemap(feature, externalId);
+                        enrichFeature(feature, externalId);
                         dataLakes.add(converter.convert(externalId, updatedAt, feature.toString()));
                     }
                 } catch (Exception e) {
@@ -79,18 +79,39 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
         }
     }
 
-    private void enrichWithShakemap(ObjectNode feature, String externalId) {
+    private void enrichFeature(ObjectNode feature, String externalId) {
         try {
             JsonNode typesNode = feature.get("properties").get("types");
-            if (typesNode == null || !typesNode.asText().contains("shakemap")) {
+            String types = typesNode != null ? typesNode.asText() : null;
+            boolean needShakemap = types != null && types.contains("shakemap");
+            boolean needLoss = types != null && types.contains("losspager");
+            if (!needShakemap && !needLoss) {
                 return;
             }
             String detailJson = client.getDetail(externalId);
             if (StringUtils.isBlank(detailJson)) {
-                feature.put("shakemap_retrieval", false);
+                if (needShakemap) {
+                    feature.put("shakemap_retrieval", false);
+                }
+                if (needLoss) {
+                    feature.put("loss_estimation_retrieval", false);
+                }
                 return;
             }
             JsonNode detail = JsonUtil.readTree(detailJson);
+            if (needShakemap) {
+                enrichWithShakemap(feature, detail, externalId);
+            }
+            if (needLoss) {
+                enrichWithLossEstimation(feature, detail, externalId);
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to enrich feature {}", externalId, e);
+        }
+    }
+
+    private void enrichWithShakemap(ObjectNode feature, JsonNode detail, String externalId) {
+        try {
             JsonNode shakemapArray = detail.at("/properties/products/shakemap");
             if (!shakemapArray.isArray() || shakemapArray.size() == 0) {
                 feature.put("shakemap_retrieval", false);
@@ -139,6 +160,52 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
         } catch (Exception e) {
             LOG.warn("Failed to enrich feature with shakemap", e);
             feature.put("shakemap_retrieval", false);
+        }
+    }
+
+    private void enrichWithLossEstimation(ObjectNode feature, JsonNode detail, String externalId) {
+        try {
+            JsonNode pagerArray = detail.at("/properties/products/losspager");
+            if (!pagerArray.isArray() || pagerArray.size() == 0) {
+                feature.put("loss_estimation_retrieval", false);
+                return;
+            }
+            JsonNode first = pagerArray.get(0);
+            ObjectNode result = (ObjectNode) JsonUtil.readTree("{}");
+            copyField(first, result, "indexid");
+            copyField(first, result, "indexTime");
+            copyField(first, result, "id");
+            copyField(first, result, "type");
+            copyField(first, result, "code");
+            copyField(first, result, "source");
+            copyField(first, result, "updateTime");
+            copyField(first, result, "status");
+            JsonNode props = first.get("properties");
+            if (props != null) {
+                result.set("properties", props);
+            }
+            JsonNode contents = first.get("contents");
+            JsonNode lossNode = contents != null ? contents.get("json/losses.json") : null;
+            if (lossNode != null) {
+                String url = lossNode.get("url").asText();
+                feature.put("loss_url", url);
+                String body = fetchUrl(url);
+                if (body != null) {
+                    JsonNode loss = JsonUtil.readTree(body);
+                    result.set("loss_estimations", loss);
+                } else {
+                    feature.put("loss_estimation_retrieval", false);
+                    return;
+                }
+            } else {
+                feature.put("loss_estimation_retrieval", false);
+                return;
+            }
+            ArrayNode arr = feature.putArray("loss_estimation");
+            arr.add(result);
+        } catch (Exception e) {
+            LOG.warn("Failed to enrich feature with loss estimation", e);
+            feature.put("loss_estimation_retrieval", false);
         }
     }
 
