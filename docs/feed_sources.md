@@ -35,4 +35,4 @@ The system ingests data from multiple providers. Each provider name reflects its
 | `cyclones.nhc-at.noaa` | Atlantic cyclone advisories from NHC |
 | `cyclones.nhc-cp.noaa` | Central Pacific cyclone advisories from NHC |
 | `cyclones.nhc-ep.noaa` | Eastern Pacific cyclone advisories from NHC |
-| `usgs.earthquake` | Earthquake events from the USGS feed |
+| `usgs.earthquake` | Earthquake events from the USGS feed with optional ShakeMap enrichment |
