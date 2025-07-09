@@ -36,3 +36,7 @@ The system ingests data from multiple providers. Each provider name reflects its
 | `cyclones.nhc-cp.noaa` | Central Pacific cyclone advisories from NHC |
 | `cyclones.nhc-ep.noaa` | Eastern Pacific cyclone advisories from NHC |
 | `usgs.earthquake` | Earthquake events from the USGS feed with optional ShakeMap enrichment |
+
+ShakeMap data is fetched from the event detail feed when available. If the file
+`cont_pga.json` exists, its content is stored along with the event and the
+download link is placed in the `shm_url` field.

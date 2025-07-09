@@ -110,8 +110,9 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             if (props != null) {
                 result.set("properties", props);
             }
-            JsonNode contNode = first.at("/contents/download/cont_pga.json");
-            if (!contNode.isMissingNode()) {
+            JsonNode contents = first.get("contents");
+            JsonNode contNode = contents != null ? contents.get("download/cont_pga.json") : null;
+            if (contNode != null) {
                 String url = contNode.get("url").asText();
                 feature.put("shm_url", url);
                 String contPga = fetchUrl(url);
