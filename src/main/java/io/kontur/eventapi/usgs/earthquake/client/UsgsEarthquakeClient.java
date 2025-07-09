@@ -8,4 +8,7 @@ public interface UsgsEarthquakeClient {
 
     @GetMapping("/earthquakes/feed/v1.0/summary/all_hour.geojson")
     String getEarthquakes();
+
+    @GetMapping("/earthquakes/feed/v1.0/detail/{id}.geojson")
+    String getDetail(@org.springframework.web.bind.annotation.PathVariable String id);
 }
