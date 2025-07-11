@@ -16,7 +16,6 @@ public class UsgsEarthquakeDataLakeConverter {
         DataLake dataLake = new DataLake(UUID.randomUUID(), externalId, updatedAt, DateTimeUtil.uniqueOffsetDateTime());
         dataLake.setProvider(USGS_EARTHQUAKE_PROVIDER);
         dataLake.setData(data);
-        dataLake.setSkipped(true);
         return dataLake;
     }
 }
