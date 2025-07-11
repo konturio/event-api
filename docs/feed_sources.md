@@ -35,13 +35,5 @@ The system ingests data from multiple providers. Each provider name reflects its
 | `cyclones.nhc-at.noaa` | Atlantic cyclone advisories from NHC |
 | `cyclones.nhc-cp.noaa` | Central Pacific cyclone advisories from NHC |
 | `cyclones.nhc-ep.noaa` | Eastern Pacific cyclone advisories from NHC |
-| `usgs.earthquake` | Earthquake events from the USGS 4.5‑week feed with optional ShakeMap and loss estimation enrichment |
+| `usgs.earthquake` | Earthquake events from the USGS hourly feed |
 
-ShakeMap data is fetched from the event detail feed when available. If the file
-`cont_pga.json` exists, its content is stored along with the event and the
-download link is placed in the `shm_url` field. The `coverage_pga_high_res.covjson`
-file is also downloaded and embedded when present. If either download fails,
-the `shakemap_cont_retrieval` or `shakemap_hishres_pga_retrieval` flag is set to
-`false` respectively. If the detail entry also contains loss estimation information
-(`losspager` product), the `loss_url` field stores a link to `losses.json` and the
-parsed data is saved under `loss_estimation`.
