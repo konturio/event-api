@@ -41,18 +41,24 @@ public class UsgsEarthquakeNormalizationJob extends AbstractJob {
     public void execute() {
         List<DataLake> dataLakes = dataLakeDao.getDenormalizedEvents(
                 List.of(UsgsEarthquakeDataLakeConverter.USGS_EARTHQUAKE_PROVIDER));
-        if (!CollectionUtils.isEmpty(dataLakes)) {
-            LOG.info("USGS normalization: {} data lakes", dataLakes.size());
-            for (DataLake dl : dataLakes) {
-                try {
-                    if (!normalizer.isSkipped()) {
-                        observationsDao.insert(normalizer.normalize(dl));
-                    } else {
-                        dataLakeDao.markAsSkipped(dl.getObservationId());
-                    }
-                } catch (Exception e) {
-                    LOG.warn(e.getMessage(), e);
+        if (CollectionUtils.isEmpty(dataLakes)) {
+            LOG.debug("No USGS earthquake data to normalize");
+            return;
+        }
+
+        LOG.info("USGS normalization: {} data lakes", dataLakes.size());
+        for (DataLake dl : dataLakes) {
+            try {
+                LOG.debug("Normalizing USGS earthquake {} at {}", dl.getExternalId(), dl.getUpdatedAt());
+                if (!normalizer.isSkipped()) {
+                    observationsDao.insert(normalizer.normalize(dl));
+                    LOG.info("USGS earthquake {} normalized", dl.getExternalId());
+                } else {
+                    dataLakeDao.markAsSkipped(dl.getObservationId());
+                    LOG.info("USGS earthquake {} skipped", dl.getExternalId());
                 }
+            } catch (Exception e) {
+                LOG.warn("Failed to normalize USGS earthquake {}", dl.getExternalId(), e);
             }
         }
     }
