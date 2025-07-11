@@ -43,9 +43,6 @@ public class GdacsAlertEpisodeCombinator extends EpisodeCombinator {
         FeedEpisode episode = createDefaultEpisode(alertObservation);
         episode.setObservations(findObservationsForEpisode(eventObservations));
         episode.setGeometries(geometryObservation.getGeometries());
-        if (CollectionUtils.isEmpty(episode.getUrls()) && !CollectionUtils.isEmpty(geometryObservation.getUrls())) {
-            episode.addUrlIfNotExists(geometryObservation.getUrls());
-        }
         if (isBlank(episode.getProperName())) {
             episode.setProperName(geometryObservation.getProperName());
         }
