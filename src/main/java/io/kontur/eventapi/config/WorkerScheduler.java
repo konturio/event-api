@@ -19,6 +19,7 @@ import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
 import io.kontur.eventapi.usgs.earthquake.job.UsgsEarthquakeImportJob;
+import io.kontur.eventapi.usgs.earthquake.job.UsgsEarthquakeNormalizationJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
@@ -56,6 +57,7 @@ public class WorkerScheduler {
     private final CalFireSearchJob calFireSearchJob;
     private final NifcImportJob nifcImportJob;
     private final UsgsEarthquakeImportJob usgsEarthquakeImportJob;
+    private final UsgsEarthquakeNormalizationJob usgsEarthquakeNormalizationJob;
     private final InciWebImportJob inciWebImportJob;
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob;
     private final MetricsJob metricsJob;
@@ -132,6 +134,7 @@ public class WorkerScheduler {
                            PdcMapSrvSearchJobs pdcMapSrvSearchJobs,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
                            UsgsEarthquakeImportJob usgsEarthquakeImportJob,
+                           UsgsEarthquakeNormalizationJob usgsEarthquakeNormalizationJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
                            MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
@@ -155,6 +158,7 @@ public class WorkerScheduler {
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
         this.usgsEarthquakeImportJob = usgsEarthquakeImportJob;
+        this.usgsEarthquakeNormalizationJob = usgsEarthquakeNormalizationJob;
         this.inciWebImportJob = inciWebImportJob;
         this.nhcAtImportJob = nhcAtImportJob;
         this.nhcCpImportJob = nhcCpImportJob;
@@ -316,6 +320,13 @@ public class WorkerScheduler {
     public void startNormalization() {
         if (Boolean.parseBoolean(normalizationEnabled)) {
             normalizationJob.run();
+        }
+    }
+
+    @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedDelayString = "${scheduler.normalization.fixedDelay}")
+    public void startUsgsEarthquakeNormalization() {
+        if (Boolean.parseBoolean(normalizationEnabled)) {
+            usgsEarthquakeNormalizationJob.run();
         }
     }
 
