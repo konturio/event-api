@@ -8,6 +8,8 @@ import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.usgs.earthquake.converter.UsgsEarthquakeDataLakeConverter;
 import io.kontur.eventapi.util.JsonUtil;
 import io.kontur.eventapi.util.GeometryUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Point;
@@ -19,6 +21,8 @@ import static io.kontur.eventapi.util.GeometryUtil.*;
 
 @Component
 public class UsgsEarthquakeNormalizer extends Normalizer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UsgsEarthquakeNormalizer.class);
 
     private static final Map<String, String> NETWORKS = Map.ofEntries(
             Map.entry("admin", "USGS Administrative"),
@@ -67,6 +71,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
     @Override
     @SuppressWarnings("unchecked")
     public NormalizedObservation normalize(DataLake dataLake) {
+        LOG.debug("Start normalization of USGS earthquake {}", dataLake.getExternalId());
         Map<String, Object> feature = JsonUtil.readJson(dataLake.getData(), Map.class);
         NormalizedObservation obs = new NormalizedObservation();
         obs.setObservationId(dataLake.getObservationId());
@@ -131,6 +136,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                 obs.setGeometries(fc);
             }
         }
+        LOG.debug("Finished normalization of USGS earthquake {}", dataLake.getExternalId());
         return obs;
     }
 }
