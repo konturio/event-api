@@ -33,8 +33,10 @@ class GdacsAlertEpisodeCombinatorTest {
     @Test
     public void testProcessObservation() throws IOException {
         NormalizedObservation alertObservation = createObservation(GDACS_ALERT_PROVIDER, null);
+        alertObservation.setUrls(List.of("alert-url"));
         FeatureCollection geometries = (FeatureCollection) GeoJSONFactory.create(readFile("geometry.json"));
         NormalizedObservation geometryObservation = createObservation(GDACS_ALERT_GEOMETRY_PROVIDER, geometries);
+        geometryObservation.setUrls(List.of("geometry-url"));
         FeedData feedData = new FeedData(UUID.randomUUID(), UUID.randomUUID(), 1L);
 
         List<FeedEpisode> feedEpisodes = episodeCombinator.processObservation(alertObservation,
@@ -46,6 +48,7 @@ class GdacsAlertEpisodeCombinatorTest {
         assertTrue(feedEpisode.getObservations().contains(alertObservation.getObservationId()));
         assertTrue(feedEpisode.getObservations().contains(geometryObservation.getObservationId()));
         assertNotNull(feedEpisode.getGeometries());
+        assertEquals(List.of("geometry-url"), feedEpisode.getUrls());
     }
 
     @Test
