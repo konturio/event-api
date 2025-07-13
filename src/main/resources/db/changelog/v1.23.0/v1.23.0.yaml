@@ -1,4 +1,6 @@
 databaseChangeLog:
-  - include:
+  - sqlFile:
+      path: create-shakemap-polygons-function.sql
       relativeToChangelogFile: true
-      file: create-shakemap-polygons-function.sql
+      splitStatements: false
+      endDelimiter: $_$;
