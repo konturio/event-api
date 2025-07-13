@@ -1,6 +1,10 @@
 databaseChangeLog:
-  - sqlFile:
-      path: create-shakemap-polygons-function.sql
-      relativeToChangelogFile: true
-      splitStatements: false
-      endDelimiter: $_$;
+  - changeSet:
+      id: create-shakemap-polygons
+      author: event-api-migrations
+      changes:
+        - sqlFile:
+            path: create-shakemap-polygons-function.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            endDelimiter: $_$;
