@@ -52,7 +52,8 @@ Indexes exist for `external_event_id` and `collected_geography`.
 
 For USGS earthquakes `geometries` may contain ShakeMap polygons. They are derived
 from contour lines published by USGS and do not include the original `Class`,
-`country` or `areaType` attributes.
+`country` or `areaType` attributes. Polygons whose `value` ends up `null` are
+discarded during normalization.
 
 ## `feeds`
 List of available feeds.
