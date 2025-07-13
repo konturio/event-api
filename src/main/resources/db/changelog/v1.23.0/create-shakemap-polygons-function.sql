@@ -109,23 +109,27 @@ as $_$
         from step1 s
         left join step1 n on s.id <> n.id and ST_Touches(s.geom, n.geom)
         group by s.id
+    ),
+    final as (
+        select s.geom,
+               (s.props - 'Class' - 'country' - 'areaType') as props,
+               case
+                   when s.pga is null and nn.all_null then (select min_pga from ext)
+                   else s.pga
+               end as value
+        from step1 s
+        left join neighbors_null nn on nn.id = s.id
     )
     select jsonb_build_object(
         'type','FeatureCollection',
         'features', jsonb_agg(
             jsonb_build_object(
                 'type','Feature',
-                'geometry', ST_AsGeoJSON(s.geom)::jsonb,
-                'properties',
-                    (s.props - 'Class' - 'country' - 'areaType') ||
-                    jsonb_build_object('value',
-                        case
-                            when s.pga is null and nn.all_null then (select min_pga from ext)
-                            else s.pga
-                        end)
+                'geometry', ST_AsGeoJSON(f.geom)::jsonb,
+                'properties', f.props || jsonb_build_object('value', f.value)
             )
         )
     )
-    from step1 s
-    left join neighbors_null nn on nn.id = s.id;
+    from final f
+    where f.value is not null;
 $_$;
