@@ -9,7 +9,8 @@ create function buildShakemapPolygons(jsonb) returns jsonb
     volatile
     strict
     parallel safe
-as $$
+as
+$$
     with cnt as (
         select $1 -> 'bbox' as bbox,
                $1 -> 'features' as features
