@@ -6,6 +6,8 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.util.DateTimeUtil;
 import org.junit.jupiter.api.Test;
+import io.kontur.eventapi.dao.ShakemapDao;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -17,7 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UsgsEarthquakeNormalizerTest {
 
-    private final UsgsEarthquakeNormalizer normalizer = new UsgsEarthquakeNormalizer();
+    private final ShakemapDao shakemapDao = mock(ShakemapDao.class);
+    private final UsgsEarthquakeNormalizer normalizer = new UsgsEarthquakeNormalizer(shakemapDao);
 
     @Test
     void testNormalize() throws IOException {
