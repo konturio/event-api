@@ -128,11 +128,19 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             Object smObj = props.get("shakemap");
             Map<String, Object> shakemap = null;
             if (smObj instanceof List<?> list) {
+                LOG.debug("ShakeMap is array with {} item(s)", list.size());
                 if (!list.isEmpty() && list.get(0) instanceof Map<?, ?> first) {
                     shakemap = (Map<String, Object>) first;
+                } else {
+                    LOG.debug("ShakeMap array is empty or first element is not a map");
                 }
             } else if (smObj instanceof Map<?, ?>) {
+                LOG.debug("ShakeMap is an object");
                 shakemap = (Map<String, Object>) smObj;
+            } else if (smObj != null) {
+                LOG.debug("Unexpected ShakeMap type: {}", smObj.getClass());
+            } else {
+                LOG.debug("No ShakeMap found in properties");
             }
             if (shakemap != null) {
                 Map<String, Object> shaProps = (Map<String, Object>) shakemap.get("properties");
@@ -143,6 +151,9 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                 FeatureCollection smPolygons = buildShakemapPolygons(shakemap);
                 if (smPolygons != null) {
                     geometryFeatures.addAll(Arrays.asList(smPolygons.getFeatures()));
+                    LOG.debug("Appended {} ShakeMap polygon(s)", smPolygons.getFeatures().length);
+                } else {
+                    LOG.debug("No ShakeMap polygons were built");
                 }
             }
         }
@@ -170,11 +181,17 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
     private FeatureCollection buildShakemapPolygons(Map<String, Object> shakemap) {
         Object contObj = shakemap.get("cont_pga");
         if (!(contObj instanceof Map)) {
+            LOG.debug("ShakeMap does not contain cont_pga section");
             return null;
         }
         try {
             String fcJson = shakemapDao.buildShakemapPolygons(JsonUtil.writeJson(contObj));
-            return fcJson == null ? null : JsonUtil.readJson(fcJson, FeatureCollection.class);
+            if (fcJson == null) {
+                LOG.debug("buildShakemapPolygons returned null JSON");
+                return null;
+            }
+            LOG.debug("ShakeMap polygons JSON size: {} bytes", fcJson.length());
+            return JsonUtil.readJson(fcJson, FeatureCollection.class);
         } catch (Exception e) {
             LOG.warn("Failed to build ShakeMap polygons", e);
             return null;
