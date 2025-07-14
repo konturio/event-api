@@ -111,6 +111,10 @@
         select count(*) from normalized_observations where not recombined;
     </select>
 
+    <select id="buildShakemapPolygons" resultType="string">
+        select buildShakemapPolygons(#{json}::jsonb)::text
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>

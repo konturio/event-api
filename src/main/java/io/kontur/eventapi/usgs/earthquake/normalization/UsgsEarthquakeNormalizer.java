@@ -8,6 +8,8 @@ import io.kontur.eventapi.normalization.Normalizer;
 import io.kontur.eventapi.usgs.earthquake.converter.UsgsEarthquakeDataLakeConverter;
 import io.kontur.eventapi.util.JsonUtil;
 import io.kontur.eventapi.util.GeometryUtil;
+import io.kontur.eventapi.dao.ShakemapDao;
+import org.wololo.geojson.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,8 +26,10 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
 
     private static final Logger LOG = LoggerFactory.getLogger(UsgsEarthquakeNormalizer.class);
 
+    private final ShakemapDao shakemapDao;
+
     private static final Map<String, String> NETWORKS = Map.ofEntries(
-            Map.entry("admin", "USGS Administrative"),
+        Map.entry("admin", "USGS Administrative"),
             Map.entry("ak", "Alaska Earthquake Center"),
             Map.entry("at", "National Tsunami Warning Center"),
             Map.entry("atlas", "ATLAS seismic network"),
@@ -49,8 +53,12 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             Map.entry("tx", "Texas Seismological Network"),
             Map.entry("us", "USGS National Earthquake Information Center"),
             Map.entry("uu", "University of Utah Seismograph Stations"),
-            Map.entry("uw", "Pacific Northwest Seismic Network")
+        Map.entry("uw", "Pacific Northwest Seismic Network")
     );
+
+    public UsgsEarthquakeNormalizer(ShakemapDao shakemapDao) {
+        this.shakemapDao = shakemapDao;
+    }
 
     private static Severity mapAlert(String alert) {
         if (alert == null) return Severity.UNKNOWN;
@@ -74,6 +82,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
         LOG.debug("Start normalization of USGS earthquake {}", dataLake.getExternalId());
         Map<String, Object> feature = JsonUtil.readJson(dataLake.getData(), Map.class);
         NormalizedObservation obs = new NormalizedObservation();
+        List<Feature> geometryFeatures = new ArrayList<>();
         obs.setObservationId(dataLake.getObservationId());
         obs.setProvider(dataLake.getProvider());
         obs.setLoadedAt(dataLake.getLoadedAt());
@@ -116,11 +125,24 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             String lossUrl = readString(feature, "loss_url");
             if (lossUrl != null) urls.add(lossUrl);
             obs.setUrls(urls);
-            Map<String, Object> shakemap = (Map<String, Object>) props.get("shakemap");
+            Object smObj = props.get("shakemap");
+            Map<String, Object> shakemap = null;
+            if (smObj instanceof List<?> list) {
+                if (!list.isEmpty() && list.get(0) instanceof Map<?, ?> first) {
+                    shakemap = (Map<String, Object>) first;
+                }
+            } else if (smObj instanceof Map<?, ?>) {
+                shakemap = (Map<String, Object>) smObj;
+            }
             if (shakemap != null) {
                 Map<String, Object> shaProps = (Map<String, Object>) shakemap.get("properties");
                 if (shaProps != null) {
                     obs.setSeverityData(shaProps);
+                }
+
+                FeatureCollection smPolygons = buildShakemapPolygons(shakemap);
+                if (smPolygons != null) {
+                    geometryFeatures.addAll(Arrays.asList(smPolygons.getFeatures()));
                 }
             }
         }
@@ -133,10 +155,30 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                 Double lat = Double.valueOf(coords.get(1).toString());
                 Point point = new Point(new double[]{lon, lat});
                 FeatureCollection fc = convertGeometryToFeatureCollection(point, Map.of(AREA_TYPE_PROPERTY, CENTER_POINT));
-                obs.setGeometries(fc);
+                geometryFeatures.addAll(Arrays.asList(fc.getFeatures()));
             }
+        }
+
+        if (!geometryFeatures.isEmpty()) {
+            obs.setGeometries(new FeatureCollection(geometryFeatures.toArray(new Feature[0])));
         }
         LOG.debug("Finished normalization of USGS earthquake {}", dataLake.getExternalId());
         return obs;
     }
+
+    @SuppressWarnings("unchecked")
+    private FeatureCollection buildShakemapPolygons(Map<String, Object> shakemap) {
+        Object contObj = shakemap.get("cont_pga");
+        if (!(contObj instanceof Map)) {
+            return null;
+        }
+        try {
+            String fcJson = shakemapDao.buildShakemapPolygons(JsonUtil.writeJson(contObj));
+            return fcJson == null ? null : JsonUtil.readJson(fcJson, FeatureCollection.class);
+        } catch (Exception e) {
+            LOG.warn("Failed to build ShakeMap polygons", e);
+            return null;
+        }
+    }
+
 }
