@@ -1,4 +1,8 @@
 databaseChangeLog:
-  - include:
-      relativeToChangelogFile: true
-      file: add-usgs-to-feeds.sql
+  - changeSet:
+      id: v1.24.0/add-usgs-to-feeds
+      author: event-api-migrations
+      changes:
+        - sqlFile:
+            path: add-usgs-to-feeds.sql
+            relativeToChangelogFile: true
