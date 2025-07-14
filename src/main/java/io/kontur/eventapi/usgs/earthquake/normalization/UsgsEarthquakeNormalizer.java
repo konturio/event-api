@@ -125,7 +125,15 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             String lossUrl = readString(feature, "loss_url");
             if (lossUrl != null) urls.add(lossUrl);
             obs.setUrls(urls);
-            Map<String, Object> shakemap = (Map<String, Object>) props.get("shakemap");
+            Object smObj = props.get("shakemap");
+            Map<String, Object> shakemap = null;
+            if (smObj instanceof List<?> list) {
+                if (!list.isEmpty() && list.get(0) instanceof Map<?, ?> first) {
+                    shakemap = (Map<String, Object>) first;
+                }
+            } else if (smObj instanceof Map<?, ?>) {
+                shakemap = (Map<String, Object>) smObj;
+            }
             if (shakemap != null) {
                 Map<String, Object> shaProps = (Map<String, Object>) shakemap.get("properties");
                 if (shaProps != null) {
