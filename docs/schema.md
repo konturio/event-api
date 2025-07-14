@@ -51,7 +51,7 @@ Normalized information extracted from `data_lake`.
 Indexes exist for `external_event_id` and `collected_geography`.
 
 For USGS earthquakes `geometries` may contain ShakeMap polygons. They are derived
-from contour lines published by USGS. If `properties.shakemap` is an array, only
+from contour lines published by USGS. If `shakemap` is an array, only
 its first element is used. ShakeMap polygons do not include the original
 `Class`, `country` or `areaType` attributes. Polygons whose `value` ends up
 `null` are discarded during normalization.

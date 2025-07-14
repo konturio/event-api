@@ -14,8 +14,9 @@
     "code": "0258ve2yvm",
     "types": ",dyfi,origin,phase-data,shakemap,",
     "title": "M 4.5 - 33 km ESE of Susitna North, Alaska",
-    "shm_url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_pga.json",
-    "shakemap": [{
+    "shm_url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_pga.json"
+  },
+  "shakemap": [{
       "indexid": 5558727,
       "indexTime": 1752324557299,
       "id": "urn:usgs-product:ak:shakemap:0258ve2yvm:1752324490873",
@@ -165,8 +166,7 @@
           63.85
         ]
       }
-    }]
-  },
+    }],
   "geometry": {
     "type": "Point",
     "coordinates": [-149.2269,62.0771,25.4]
