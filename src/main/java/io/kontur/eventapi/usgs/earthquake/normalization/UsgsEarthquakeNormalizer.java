@@ -125,7 +125,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             String lossUrl = readString(feature, "loss_url");
             if (lossUrl != null) urls.add(lossUrl);
             obs.setUrls(urls);
-            Object smObj = props.get("shakemap");
+            Object smObj = feature.get("shakemap");
             Map<String, Object> shakemap = null;
             if (smObj instanceof List<?> list) {
                 LOG.debug("ShakeMap is array with {} item(s)", list.size());
@@ -140,7 +140,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             } else if (smObj != null) {
                 LOG.debug("Unexpected ShakeMap type: {}", smObj.getClass());
             } else {
-                LOG.debug("No ShakeMap found in properties");
+                LOG.debug("No ShakeMap found in root object");
             }
             if (shakemap != null) {
                 Map<String, Object> shaProps = (Map<String, Object>) shakemap.get("properties");
