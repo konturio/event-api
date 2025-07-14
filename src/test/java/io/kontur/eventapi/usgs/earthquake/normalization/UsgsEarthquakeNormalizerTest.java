@@ -6,6 +6,8 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.util.DateTimeUtil;
 import org.junit.jupiter.api.Test;
+import io.kontur.eventapi.dao.ShakemapDao;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -17,11 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UsgsEarthquakeNormalizerTest {
 
-    private final UsgsEarthquakeNormalizer normalizer = new UsgsEarthquakeNormalizer();
+    private final ShakemapDao shakemapDao = mock(ShakemapDao.class);
+    private final UsgsEarthquakeNormalizer normalizer = new UsgsEarthquakeNormalizer(shakemapDao);
 
     @Test
     void testNormalize() throws IOException {
-        DataLake dl = createDataLake();
+        DataLake dl = createDataLake("/usgs/sample.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         assertEquals(dl.getObservationId(), obs.getObservationId());
@@ -37,8 +40,19 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals(1, obs.getGeometries().getFeatures().length);
     }
 
-    private DataLake createDataLake() throws IOException {
-        String data = readFile(this, "/usgs/sample.json");
+    @Test
+    void testNormalizeWithShakemap() throws Exception {
+        when(shakemapDao.buildShakemapPolygons(any())).thenReturn("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{}}]}");
+
+        DataLake dl = createDataLake("/usgs/sample_with_shakemap.json");
+        NormalizedObservation obs = normalizer.normalize(dl);
+
+        verify(shakemapDao).buildShakemapPolygons(any());
+        assertEquals(2, obs.getGeometries().getFeatures().length);
+    }
+
+    private DataLake createDataLake(String file) throws IOException {
+        String data = readFile(this, file);
         DataLake dl = new DataLake(UUID.randomUUID(), "nc75206757",
                 DateTimeUtil.getDateTimeFromMilli(1751906694946L), OffsetDateTime.now());
         dl.setData(data);

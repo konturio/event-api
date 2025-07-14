@@ -60,4 +60,6 @@ public interface NormalizedObservationsMapper {
                                           @Param("timezone") String timezone);
 
     Integer getNotRecombinedObservationsCount();
+
+    String buildShakemapPolygons(@Param("json") String json);
 }
