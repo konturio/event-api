@@ -1,1 +1,63 @@
-{"type":"Feature","properties":{"mag":1.6,"place":"2 km E of Aromas, CA","time":1751906597590,"updated":1751906694946,"url":"https://earthquake.usgs.gov/earthquakes/eventpage/nc75206757","detail":"https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/nc75206757.geojson","alert":"green","status":"automatic","tsunami":0,"sig":40,"net":"nc","code":"75206757","types":",origin,phase-data,","type":"earthquake","title":"M 1.6 - 2 km E of Aromas, CA","shakemap":[{"properties":{"max":1.0},"cont_pga":{"bbox":[0,0,1,1],"features":[]}}]},"geometry":{"type":"Point","coordinates":[-121.6175,36.895168,0.45]},"id":"nc75206757"}
+{
+  "type": "Feature",
+  "properties": {
+    "mag": 4.5,
+    "place": "33 km ESE of Susitna North, Alaska",
+    "time": 1752323793810,
+    "updated": 1752324573948,
+    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ak0258ve2yvm",
+    "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ak0258ve2yvm.geojson",
+    "status": "reviewed",
+    "tsunami": 0,
+    "sig": 317,
+    "net": "ak",
+    "code": "0258ve2yvm",
+    "types": ",dyfi,origin,phase-data,shakemap,",
+    "title": "M 4.5 - 33 km ESE of Susitna North, Alaska",
+    "shm_url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_pga.json",
+    "shakemap": [{
+      "indexid": 5558727,
+      "indexTime": 1752324557299,
+      "id": "urn:usgs-product:ak:shakemap:0258ve2yvm:1752324490873",
+      "type": "shakemap",
+      "code": "0258ve2yvm",
+      "source": "ak",
+      "updateTime": 1752324490873,
+      "status": "UPDATE",
+      "properties": {
+        "depth": "31.3",
+        "event-description": "36 km (22 miles) NNE of Hatcher Pass",
+        "version": "1"
+      },
+      "download/cont_pga.json": {
+        "contentType": "application/json",
+        "lastModified": 1752324366000,
+        "length": 57351,
+        "url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_pga.json"
+      },
+      "cont_pga": {
+        "type": "FeatureCollection",
+        "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84"}},
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {"value": 0.01, "units": "pctg", "color": "#ffffff", "weight": 4},
+            "geometry": {
+              "type": "MultiLineString",
+              "coordinates": [[[
+                [-145.108324,60.694155],
+                [-145.149945,60.684217],
+                [-145.20921,60.682265]
+              ]]]
+            }
+          }
+        ]
+      }
+    }]
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-149.2269,62.0771,25.4]
+  },
+  "id": "ak0258ve2yvm"
+}
