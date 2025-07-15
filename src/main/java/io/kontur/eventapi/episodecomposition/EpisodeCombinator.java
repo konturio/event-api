@@ -4,6 +4,7 @@ import static io.kontur.eventapi.entity.Severity.UNKNOWN;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import io.kontur.eventapi.entity.FeedData;
@@ -139,10 +140,12 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
     }
 
     protected Set<UUID> mapObservationsToIDs(Set<NormalizedObservation> observations) {
+        // sort by observation date to ensure deterministic order for comparison
         return observations
                 .stream()
+                .sorted(comparing(NormalizedObservation::getSourceUpdatedAt))
                 .map(NormalizedObservation::getObservationId)
-                .collect(toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     protected Map<String, Object> findEpisodeLoss(Set<NormalizedObservation> episodeObservations) {

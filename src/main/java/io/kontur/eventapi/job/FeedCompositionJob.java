@@ -28,6 +28,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.*;
 import static java.util.stream.Collectors.toSet;
+import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
@@ -83,8 +84,12 @@ public class FeedCompositionJob extends AbstractJob {
             FeedData feedData = new FeedData(eventId, feed.getFeedId(),
                     lastFeedDataVersion.map(v -> v + 1).orElse(1L));
 
+            // sort observations by their timestamp for deterministic ordering in feed_data
             feedData.setObservations(
-                    eventObservations.stream().map(NormalizedObservation::getObservationId).collect(toSet()));
+                    eventObservations.stream()
+                            .sorted(comparing(NormalizedObservation::getSourceUpdatedAt))
+                            .map(NormalizedObservation::getObservationId)
+                            .collect(Collectors.toCollection(LinkedHashSet::new)));
             fillEpisodes(eventObservations, feedData);
             fillFeedData(feedData, eventObservations);
 
