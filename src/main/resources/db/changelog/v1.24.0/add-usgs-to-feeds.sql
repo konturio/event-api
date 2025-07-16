@@ -12,5 +12,5 @@ set providers = '{"wildfire.calfire","wildfire.perimeters.nifc","wildfire.locati
 where feed_id = 'f26f09c9-f5e6-43f8-8c92-34bb8739b106';
 
 update feeds
-set providers = providers || '{"usgs.earthquake"}'
+set providers = '{"gdacsAlert","gdacsAlertGeometry","kontur.events","usgs.earthquake"}'::text[]
 where alias = 'kontur-public';
