@@ -115,6 +115,10 @@
         select buildShakemapPolygons(#{json}::jsonb)::text
     </select>
 
+    <select id="buildPgaMask" resultType="string">
+        select ST_AsGeoJSON(buildPgaMask(#{json}::jsonb))
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>

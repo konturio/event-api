@@ -9,6 +9,7 @@ import io.kontur.eventapi.usgs.earthquake.converter.UsgsEarthquakeDataLakeConver
 import io.kontur.eventapi.util.JsonUtil;
 import io.kontur.eventapi.util.GeometryUtil;
 import io.kontur.eventapi.dao.ShakemapDao;
+import static io.kontur.eventapi.util.SeverityUtil.PGA_MASK;
 import org.wololo.geojson.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,6 +146,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             if (shakemap != null) {
                 Map<String, Object> shaProps = (Map<String, Object>) shakemap.get("properties");
                 if (shaProps != null) {
+                    enrichPgaMask(shakemap, shaProps);
                     obs.setSeverityData(shaProps);
                 }
 
@@ -175,6 +177,25 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
         }
         LOG.debug("Finished normalization of USGS earthquake {}", dataLake.getExternalId());
         return obs;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void enrichPgaMask(Map<String, Object> shakemap, Map<String, Object> shaProps) {
+        try {
+            Object maxPgaObj = shaProps.get("maxpga");
+            Double maxPga = maxPgaObj == null ? null : Double.valueOf(maxPgaObj.toString());
+            if (maxPga != null && maxPga >= 0.4) {
+                Object coverage = shakemap.get("coverage_pga_high_res");
+                if (coverage instanceof Map) {
+                    String mask = shakemapDao.buildPgaMask(JsonUtil.writeJson(coverage));
+                    if (mask != null) {
+                        shaProps.put(PGA_MASK, mask);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to build PGA mask", e);
+        }
     }
 
     @SuppressWarnings("unchecked")
