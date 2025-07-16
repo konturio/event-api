@@ -14,4 +14,8 @@ public class ShakemapDao {
     public String buildShakemapPolygons(String json) {
         return mapper.buildShakemapPolygons(json);
     }
+
+    public String buildPgaMask(String json) {
+        return mapper.buildPgaMask(json);
+    }
 }

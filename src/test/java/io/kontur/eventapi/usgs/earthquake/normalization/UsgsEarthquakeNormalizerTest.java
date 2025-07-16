@@ -51,6 +51,17 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals(2, obs.getGeometries().getFeatures().length);
     }
 
+    @Test
+    void testNormalizeWithPgaMask() throws Exception {
+        when(shakemapDao.buildPgaMask(any())).thenReturn("{\"type\":\"Polygon\"}");
+
+        DataLake dl = createDataLake("/usgs/sample_with_pga.json");
+        NormalizedObservation obs = normalizer.normalize(dl);
+
+        verify(shakemapDao).buildPgaMask(any());
+        assertEquals("{\"type\":\"Polygon\"}", obs.getSeverityData().get("pgaMask"));
+    }
+
     private DataLake createDataLake(String file) throws IOException {
         String data = readFile(this, file);
         DataLake dl = new DataLake(UUID.randomUUID(), "nc75206757",
