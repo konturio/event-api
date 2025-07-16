@@ -95,7 +95,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             if (StringUtils.isBlank(detailJson)) {
                 if (needShakemap) {
                     feature.put("shakemap_cont_retrieval", false);
-                    feature.put("shakemap_hishres_mmi_retrieval", false);
+                    feature.put("shakemap_hishres_pga_retrieval", false);
                 }
                 if (needLoss) {
                     feature.put("loss_estimation_retrieval", false);
@@ -119,7 +119,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             JsonNode shakemapArray = detail.at("/properties/products/shakemap");
             if (!shakemapArray.isArray() || shakemapArray.size() == 0) {
                 feature.put("shakemap_cont_retrieval", false);
-                feature.put("shakemap_hishres_mmi_retrieval", false);
+                feature.put("shakemap_hishres_pga_retrieval", false);
                 return;
             }
             JsonNode first = shakemapArray.get(0);
@@ -172,20 +172,20 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                         result.set("coverage_pga_high_res", hiRes);
                     } catch (Exception e) {
                         LOG.warn("Failed to parse coverage_pga_high_res.covjson for event {}", externalId, e);
-                        feature.put("shakemap_hishres_mmi_retrieval", false);
+                        feature.put("shakemap_hishres_pga_retrieval", false);
                     }
                 } else {
-                    feature.put("shakemap_hishres_mmi_retrieval", false);
+                    feature.put("shakemap_hishres_pga_retrieval", false);
                 }
             } else {
-                feature.put("shakemap_hishres_mmi_retrieval", false);
+                feature.put("shakemap_hishres_pga_retrieval", false);
             }
             ArrayNode arr = feature.putArray("shakemap");
             arr.add(result);
         } catch (Exception e) {
             LOG.warn("Failed to enrich feature with shakemap", e);
             feature.put("shakemap_cont_retrieval", false);
-            feature.put("shakemap_hishres_mmi_retrieval", false);
+            feature.put("shakemap_hishres_pga_retrieval", false);
         }
     }
 
