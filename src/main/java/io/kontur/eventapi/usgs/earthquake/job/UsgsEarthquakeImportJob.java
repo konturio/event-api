@@ -161,17 +161,17 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 return;
             }
 
-            JsonNode hiResNode = contents != null ? contents.get("download/coverage_mmi_high_res.covjson") : null;
+            JsonNode hiResNode = contents != null ? contents.get("download/coverage_pga_high_res.covjson") : null;
             if (hiResNode != null) {
                 String url = hiResNode.get("url").asText();
                 String hiResContent = fetchUrl(url);
                 if (hiResContent != null) {
-                    result.set("download/coverage_mmi_high_res.covjson", hiResNode);
+                    result.set("download/coverage_pga_high_res.covjson", hiResNode);
                     try {
                         JsonNode hiRes = JsonUtil.readTree(hiResContent);
-                        result.set("coverage_mmi_high_res", hiRes);
+                        result.set("coverage_pga_high_res", hiRes);
                     } catch (Exception e) {
-                        LOG.warn("Failed to parse coverage_mmi_high_res.covjson for event {}", externalId, e);
+                        LOG.warn("Failed to parse coverage_pga_high_res.covjson for event {}", externalId, e);
                         feature.put("shakemap_hishres_mmi_retrieval", false);
                     }
                 } else {
