@@ -56,6 +56,18 @@ its first element is used. ShakeMap polygons do not include the original
 `Class`, `country` or `areaType` attributes. Polygons whose `value` ends up
 `null` are discarded during normalization.
 
+## `kontur_events`
+Links observations to events.
+
+| Column | Type | Notes |
+| ------ | ---- | ----- |
+| `event_id` | `uuid` | event identifier |
+| `observation_id` | `uuid` references `normalized_observations` |
+| `provider` | `text` | observation provider |
+| `recombined_at` | `timestamptz` | when observation was attached |
+
+Unique on (`event_id`, `observation_id`). Indexes exist for `observation_id` and `recombined_at`.
+
 ## `feeds`
 List of available feeds.
 

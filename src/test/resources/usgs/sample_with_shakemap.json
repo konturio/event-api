@@ -14,7 +14,7 @@
     "code": "0258ve2yvm",
     "types": ",dyfi,origin,phase-data,shakemap,",
     "title": "M 4.5 - 33 km ESE of Susitna North, Alaska",
-    "shm_url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_pga.json"
+    "shm_url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_mmi.json"
   },
   "shakemap": [{
       "indexid": 5558727,
@@ -30,13 +30,13 @@
         "event-description": "36 km (22 miles) NNE of Hatcher Pass",
         "version": "1"
       },
-      "download/cont_pga.json": {
+      "download/cont_mmi.json": {
         "contentType": "application/json",
         "lastModified": 1752324366000,
         "length": 57351,
-        "url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_pga.json"
+        "url": "https://earthquake.usgs.gov/realtime/product/shakemap/0258ve2yvm/ak/1752324490873/download/cont_mmi.json"
       },
-      "cont_pga": {
+      "cont_mmi": {
         "type": "FeatureCollection",
         "crs": {
           "type": "name",
@@ -49,7 +49,7 @@
             "type": "Feature",
             "properties": {
               "value": 1.0,
-              "units": "pctg",
+              "units": "mmi",
               "color": "#96edff",
               "weight": 4
             },
