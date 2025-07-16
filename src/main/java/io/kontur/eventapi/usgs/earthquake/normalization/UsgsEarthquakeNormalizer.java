@@ -179,9 +179,9 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
 
     @SuppressWarnings("unchecked")
     private FeatureCollection buildShakemapPolygons(Map<String, Object> shakemap) {
-        Object contObj = shakemap.get("cont_pga");
+        Object contObj = shakemap.get("cont_mmi");
         if (!(contObj instanceof Map)) {
-            LOG.debug("ShakeMap does not contain cont_pga section");
+            LOG.debug("ShakeMap does not contain cont_mmi section");
             return null;
         }
         try {

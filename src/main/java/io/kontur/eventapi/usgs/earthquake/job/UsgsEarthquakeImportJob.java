@@ -95,7 +95,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             if (StringUtils.isBlank(detailJson)) {
                 if (needShakemap) {
                     feature.put("shakemap_cont_retrieval", false);
-                    feature.put("shakemap_hishres_pga_retrieval", false);
+                    feature.put("shakemap_hishres_mmi_retrieval", false);
                 }
                 if (needLoss) {
                     feature.put("loss_estimation_retrieval", false);
@@ -119,7 +119,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             JsonNode shakemapArray = detail.at("/properties/products/shakemap");
             if (!shakemapArray.isArray() || shakemapArray.size() == 0) {
                 feature.put("shakemap_cont_retrieval", false);
-                feature.put("shakemap_hishres_pga_retrieval", false);
+                feature.put("shakemap_hishres_mmi_retrieval", false);
                 return;
             }
             JsonNode first = shakemapArray.get(0);
@@ -137,18 +137,18 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 result.set("properties", props);
             }
             JsonNode contents = first.get("contents");
-            JsonNode contNode = contents != null ? contents.get("download/cont_pga.json") : null;
+            JsonNode contNode = contents != null ? contents.get("download/cont_mmi.json") : null;
             if (contNode != null) {
                 String url = contNode.get("url").asText();
                 feature.put("shm_url", url);
                 String contPga = fetchUrl(url);
                 if (contPga != null) {
-                    result.set("download/cont_pga.json", contNode);
+                    result.set("download/cont_mmi.json", contNode);
                     try {
                         JsonNode contPgaNode = JsonUtil.readTree(contPga);
-                        result.set("cont_pga", contPgaNode);
+                        result.set("cont_mmi", contPgaNode);
                     } catch (Exception e) {
-                        LOG.warn("Failed to parse cont_pga.json for event {}", externalId, e);
+                        LOG.warn("Failed to parse cont_mmi.json for event {}", externalId, e);
                         feature.put("shakemap_cont_retrieval", false);
                         return;
                     }
@@ -161,31 +161,31 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 return;
             }
 
-            JsonNode hiResNode = contents != null ? contents.get("download/coverage_pga_high_res.covjson") : null;
+            JsonNode hiResNode = contents != null ? contents.get("download/coverage_mmi_high_res.covjson") : null;
             if (hiResNode != null) {
                 String url = hiResNode.get("url").asText();
                 String hiResContent = fetchUrl(url);
                 if (hiResContent != null) {
-                    result.set("download/coverage_pga_high_res.covjson", hiResNode);
+                    result.set("download/coverage_mmi_high_res.covjson", hiResNode);
                     try {
                         JsonNode hiRes = JsonUtil.readTree(hiResContent);
-                        result.set("coverage_pga_high_res", hiRes);
+                        result.set("coverage_mmi_high_res", hiRes);
                     } catch (Exception e) {
-                        LOG.warn("Failed to parse coverage_pga_high_res.covjson for event {}", externalId, e);
-                        feature.put("shakemap_hishres_pga_retrieval", false);
+                        LOG.warn("Failed to parse coverage_mmi_high_res.covjson for event {}", externalId, e);
+                        feature.put("shakemap_hishres_mmi_retrieval", false);
                     }
                 } else {
-                    feature.put("shakemap_hishres_pga_retrieval", false);
+                    feature.put("shakemap_hishres_mmi_retrieval", false);
                 }
             } else {
-                feature.put("shakemap_hishres_pga_retrieval", false);
+                feature.put("shakemap_hishres_mmi_retrieval", false);
             }
             ArrayNode arr = feature.putArray("shakemap");
             arr.add(result);
         } catch (Exception e) {
             LOG.warn("Failed to enrich feature with shakemap", e);
             feature.put("shakemap_cont_retrieval", false);
-            feature.put("shakemap_hishres_pga_retrieval", false);
+            feature.put("shakemap_hishres_mmi_retrieval", false);
         }
     }
 

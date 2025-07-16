@@ -58,7 +58,7 @@ as $_$
     poly_attr as (
         select row_number() over () as id,
                p.geom as geom,
-               (l.props ->> 'value')::float as pga,
+               (l.props ->> 'value')::float as mmi,
                l.props as props
         from polys p
         cross join lateral (
@@ -69,22 +69,22 @@ as $_$
         ) l
     ),
     vals as (
-        select pga,
-               lag(pga) over(order by pga) as lower_pga
+        select mmi,
+               lag(mmi) over(order by mmi) as lower_mmi
         from (
-            select distinct pga
+            select distinct mmi
             from poly_attr
-            order by pga
+            order by mmi
         ) v
     ),
     ext as (
-        select min(pga) as min_pga,
-               max(pga) as max_pga
+        select min(mmi) as min_mmi,
+               max(mmi) as max_mmi
         from poly_attr
     ),
     neighbors_equal as (
         select a.id,
-               bool_and(coalesce(b.pga, a.pga) = a.pga) as all_equal
+               bool_and(coalesce(b.mmi, a.mmi) = a.mmi) as all_equal
         from poly_attr a
         left join poly_attr b on a.id <> b.id and ST_Touches(a.geom, b.geom)
         group by a.id
@@ -93,19 +93,19 @@ as $_$
         select a.id,
                a.geom,
                case
-                   when ne.all_equal and a.pga = (select max_pga from ext) then a.pga
-                   when ne.all_equal and a.pga = (select min_pga from ext) then null
-                   when ne.all_equal then v.lower_pga
-                   else a.pga
-               end as pga,
+                   when ne.all_equal and a.mmi = (select max_mmi from ext) then a.mmi
+                   when ne.all_equal and a.mmi = (select min_mmi from ext) then null
+                   when ne.all_equal then v.lower_mmi
+                   else a.mmi
+               end as mmi,
                a.props
         from poly_attr a
         join neighbors_equal ne on ne.id = a.id
-        left join vals v on v.pga = a.pga
+        left join vals v on v.mmi = a.mmi
     ),
     neighbors_null as (
         select s.id,
-               bool_and(n.pga is null) as all_null
+               bool_and(n.mmi is null) as all_null
         from step1 s
         left join step1 n on s.id <> n.id and ST_Touches(s.geom, n.geom)
         group by s.id
@@ -114,8 +114,8 @@ as $_$
         select s.geom,
                (s.props - 'Class' - 'country' - 'areaType') as props,
                case
-                   when s.pga is null and nn.all_null then (select min_pga from ext)
-                   else s.pga
+                   when s.mmi is null and nn.all_null then (select min_mmi from ext)
+                   else s.mmi
                end as value
         from step1 s
         left join neighbors_null nn on nn.id = s.id
