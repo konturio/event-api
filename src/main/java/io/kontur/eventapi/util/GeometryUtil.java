@@ -94,4 +94,29 @@ public class GeometryUtil {
         }
         return true;
     }
+
+    public static boolean intersectsEnvelope(FeatureCollection fc,
+                                             double minLon, double minLat,
+                                             double maxLon, double maxLat) {
+        if (fc == null) {
+            return false;
+        }
+        var gf = new org.locationtech.jts.geom.GeometryFactory();
+        var envelope = new org.locationtech.jts.geom.Envelope(minLon, maxLon, minLat, maxLat);
+        var bbox = gf.toGeometry(envelope);
+        for (Feature feature : fc.getFeatures()) {
+            try {
+                Geometry geom = reader.read(feature.getGeometry());
+                if (!IsValidOp.isValid(geom)) {
+                    geom = geom.buffer(0);
+                }
+                if (geom.intersects(bbox)) {
+                    return true;
+                }
+            } catch (Exception e) {
+                LOG.debug("Failed intersection check: {}", e.getMessage());
+            }
+        }
+        return false;
+    }
 }

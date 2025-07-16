@@ -61,6 +61,8 @@ List of available feeds.
 | `providers` | `text[]` | source providers associated with the feed. See [feed_sources.md](feed_sources.md) |
 | `roles` | `text[]` | roles allowed to read the feed |
 
+Feed `micglobal` only contains events whose geometries intersect the United States.
+
 ## `feed_data`
 Stores event versions for each feed. Table was redesigned in version 1.15.
 

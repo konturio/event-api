@@ -23,4 +23,8 @@ public class FeedEventStatusDao {
     public void markAsNonActual(String provider, UUID eventId) {
         mapper.markAsNonActual(provider, eventId);
     }
+
+    public void markAsNonActualExcludeFeed(String provider, UUID eventId, String excludeAlias) {
+        mapper.markAsNonActualExcludeFeed(provider, eventId, excludeAlias);
+    }
 }

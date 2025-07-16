@@ -18,4 +18,13 @@
         on conflict (feed_id, event_id) do update set actual = false
     </insert>
 
+    <insert id="markAsNonActualExcludeFeed" >
+        insert into feed_event_status (feed_id, event_id, actual)
+        select feed_id, #{eventId}, false
+        from feeds
+        where providers &amp;&amp; array[#{provider}::text]
+          and alias != #{excludeAlias}
+        on conflict (feed_id, event_id) do update set actual = false
+    </insert>
+
 </mapper>

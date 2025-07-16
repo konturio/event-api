@@ -14,4 +14,8 @@ public interface FeedEventStatusMapper {
 
     void markAsNonActual(@Param("provider") String provider,
                          @Param("eventId") UUID eventId);
+
+    void markAsNonActualExcludeFeed(@Param("provider") String provider,
+                                    @Param("eventId") UUID eventId,
+                                    @Param("excludeAlias") String excludeAlias);
 }
