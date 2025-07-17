@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
+import org.wololo.geojson.Feature;
 
 import static io.kontur.eventapi.TestUtil.readFile;
 import static io.kontur.eventapi.usgs.earthquake.converter.UsgsEarthquakeDataLakeConverter.USGS_EARTHQUAKE_PROVIDER;
