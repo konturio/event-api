@@ -187,8 +187,9 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             Double maxPga = maxPgaObj == null ? null : Double.valueOf(maxPgaObj.toString());
 
             Object contPga = shakemap.get("cont_pga_highres");
-            if (contPga instanceof Map<?, ?> cp) {
-                shaProps.put(CONT_PGA_HIGH_RES, cp);
+            if (contPga instanceof Map) {
+                //noinspection unchecked
+                shaProps.put(CONT_PGA_HIGH_RES, (Map<String, Object>) contPga);
             }
 
             Object coverage = shakemap.get("coverage_pga_high_res");
