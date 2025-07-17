@@ -10,7 +10,6 @@ import io.kontur.eventapi.util.JsonUtil;
 import io.kontur.eventapi.util.GeometryUtil;
 import io.kontur.eventapi.dao.ShakemapDao;
 import static io.kontur.eventapi.util.SeverityUtil.PGA40_MASK;
-import static io.kontur.eventapi.util.SeverityUtil.CONT_PGA_HIGH_RES;
 import static io.kontur.eventapi.util.SeverityUtil.COVERAGE_PGA_HIGH_RES;
 import org.wololo.geojson.Feature;
 import org.slf4j.Logger;
@@ -186,12 +185,6 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
         try {
             Object maxPgaObj = shaProps.get("maxpga");
             Double maxPga = maxPgaObj == null ? null : Double.valueOf(maxPgaObj.toString());
-
-            Object contPga = shakemap.get("cont_pga_highres");
-            if (contPga instanceof Map) {
-                //noinspection unchecked
-                shaProps.put(CONT_PGA_HIGH_RES, (Map<String, Object>) contPga);
-            }
 
             Object coverage = shakemap.get("coverage_pga_high_res");
             if (coverage instanceof Map) {
