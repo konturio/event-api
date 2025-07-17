@@ -11,6 +11,7 @@ import io.kontur.eventapi.util.GeometryUtil;
 import io.kontur.eventapi.dao.ShakemapDao;
 import static io.kontur.eventapi.util.SeverityUtil.PGA40_MASK;
 import static io.kontur.eventapi.util.SeverityUtil.CONT_PGA_HIGH_RES;
+import static io.kontur.eventapi.util.SeverityUtil.COVERAGE_PGA_HIGH_RES;
 import org.wololo.geojson.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -193,10 +194,15 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             }
 
             Object coverage = shakemap.get("coverage_pga_high_res");
-            if (coverage instanceof Map && maxPga != null && maxPga >= 0.4) {
-                String mask = shakemapDao.buildPgaMask(JsonUtil.writeJson(coverage));
-                if (mask != null) {
-                    shaProps.put(PGA40_MASK, JsonUtil.readJson(mask, Map.class));
+            if (coverage instanceof Map) {
+                //noinspection unchecked
+                shaProps.put(COVERAGE_PGA_HIGH_RES, (Map<String, Object>) coverage);
+
+                if (maxPga != null && maxPga >= 0.4) {
+                    String mask = shakemapDao.buildPgaMask(JsonUtil.writeJson(coverage));
+                    if (mask != null) {
+                        shaProps.put(PGA40_MASK, JsonUtil.readJson(mask, Map.class));
+                    }
                 }
             }
         } catch (Exception e) {

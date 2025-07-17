@@ -62,6 +62,7 @@ class UsgsEarthquakeNormalizerTest {
         verify(shakemapDao).buildPgaMask(any());
         assertEquals(Map.of("type", "Polygon"), obs.getSeverityData().get("pga40Mask"));
         assertEquals(Map.of("type", "FeatureCollection"), obs.getSeverityData().get("contPgaHighRes"));
+        assertEquals(Map.of("type", "Coverage"), obs.getSeverityData().get("coveragePgaHighRes"));
     }
 
     private DataLake createDataLake(String file) throws IOException {
