@@ -43,13 +43,21 @@ class UsgsEarthquakeNormalizerTest {
 
     @Test
     void testNormalizeWithShakemap() throws Exception {
-        when(shakemapDao.buildShakemapPolygons(any())).thenReturn("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{}}]}");
+        when(shakemapDao.buildShakemapPolygons(any())).thenReturn(
+                "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{\"value\":2.5}}]}");
 
         DataLake dl = createDataLake("/usgs/sample_with_shakemap.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildShakemapPolygons(any());
         assertEquals(2, obs.getGeometries().getFeatures().length);
+
+        Feature polygon = obs.getGeometries().getFeatures()[0];
+        Map<String, Object> props = polygon.getProperties();
+        assertEquals("Poly_SMPInt_2.5", props.get("Class"));
+        assertEquals(dl.getExternalId(), props.get("eventid"));
+        assertEquals("EQ", props.get("eventtype"));
+        assertEquals("Intensity 2.5", props.get("polygonlabel"));
     }
 
     @Test
