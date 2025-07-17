@@ -154,11 +154,11 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                 FeatureCollection smPolygons = buildShakemapPolygons(shakemap);
                 if (smPolygons != null) {
                     for (Feature smFeature : smPolygons.getFeatures()) {
-                        Map<String, Object> props = smFeature.getProperties() == null
+                        Map<String, Object> polygonProps = smFeature.getProperties() == null
                                 ? new HashMap<>()
                                 : new HashMap<>(smFeature.getProperties());
 
-                        Object valObj = props.get("value");
+                        Object valObj = polygonProps.get("value");
                         String intensity = null;
                         if (valObj != null) {
                             try {
@@ -172,13 +172,13 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                         }
 
                         if (intensity != null) {
-                            props.put("Class", "Poly_SMPInt_" + intensity);
-                            props.put("eventid", dataLake.getExternalId());
-                            props.put("eventtype", "EQ");
-                            props.put("polygonlabel", "Intensity " + intensity);
+                            polygonProps.put("Class", "Poly_SMPInt_" + intensity);
+                            polygonProps.put("eventid", dataLake.getExternalId());
+                            polygonProps.put("eventtype", "EQ");
+                            polygonProps.put("polygonlabel", "Intensity " + intensity);
                         }
 
-                        geometryFeatures.add(new Feature(smFeature.getGeometry(), props));
+                        geometryFeatures.add(new Feature(smFeature.getGeometry(), polygonProps));
                     }
                     LOG.debug("Appended {} ShakeMap polygon(s)", smPolygons.getFeatures().length);
                 } else {
