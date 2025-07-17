@@ -153,7 +153,33 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
 
                 FeatureCollection smPolygons = buildShakemapPolygons(shakemap);
                 if (smPolygons != null) {
-                    geometryFeatures.addAll(Arrays.asList(smPolygons.getFeatures()));
+                    for (Feature smFeature : smPolygons.getFeatures()) {
+                        Map<String, Object> props = smFeature.getProperties() == null
+                                ? new HashMap<>()
+                                : new HashMap<>(smFeature.getProperties());
+
+                        Object valObj = props.get("value");
+                        String intensity = null;
+                        if (valObj != null) {
+                            try {
+                                double val = Double.parseDouble(valObj.toString());
+                                intensity = (val % 1 == 0)
+                                        ? String.valueOf((int) val)
+                                        : String.format(Locale.US, "%.1f", val);
+                            } catch (NumberFormatException ignored) {
+                                intensity = valObj.toString();
+                            }
+                        }
+
+                        if (intensity != null) {
+                            props.put("Class", "Poly_SMPInt_" + intensity);
+                            props.put("eventid", dataLake.getExternalId());
+                            props.put("eventtype", "EQ");
+                            props.put("polygonlabel", "Intensity " + intensity);
+                        }
+
+                        geometryFeatures.add(new Feature(smFeature.getGeometry(), props));
+                    }
                     LOG.debug("Appended {} ShakeMap polygon(s)", smPolygons.getFeatures().length);
                 } else {
                     LOG.debug("No ShakeMap polygons were built");
