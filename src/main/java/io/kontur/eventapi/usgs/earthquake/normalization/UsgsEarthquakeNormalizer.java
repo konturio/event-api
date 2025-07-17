@@ -9,7 +9,7 @@ import io.kontur.eventapi.usgs.earthquake.converter.UsgsEarthquakeDataLakeConver
 import io.kontur.eventapi.util.JsonUtil;
 import io.kontur.eventapi.util.GeometryUtil;
 import io.kontur.eventapi.dao.ShakemapDao;
-import static io.kontur.eventapi.util.SeverityUtil.PGA_MASK;
+import static io.kontur.eventapi.util.SeverityUtil.PGA40_MASK;
 import org.wololo.geojson.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,7 +189,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                 if (coverage instanceof Map) {
                     String mask = shakemapDao.buildPgaMask(JsonUtil.writeJson(coverage));
                     if (mask != null) {
-                        shaProps.put(PGA_MASK, mask);
+                        shaProps.put(PGA40_MASK, JsonUtil.readJson(mask, Map.class));
                     }
                 }
             }

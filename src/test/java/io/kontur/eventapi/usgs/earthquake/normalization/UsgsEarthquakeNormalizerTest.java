@@ -11,6 +11,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 import static io.kontur.eventapi.TestUtil.readFile;
@@ -59,7 +60,7 @@ class UsgsEarthquakeNormalizerTest {
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildPgaMask(any());
-        assertEquals("{\"type\":\"Polygon\"}", obs.getSeverityData().get("pgaMask"));
+        assertEquals(Map.of("type", "Polygon"), obs.getSeverityData().get("pga40Mask"));
     }
 
     private DataLake createDataLake(String file) throws IOException {
