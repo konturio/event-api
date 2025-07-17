@@ -20,6 +20,7 @@ public class SeverityUtil {
     public final static String TORNADO_LENGTH_KM = "tornadoLengthKm";
     public final static String TORNADO_WIDTH_M = "tornadoWidthM";
     public final static String PGA40_MASK = "pga40Mask";
+    public final static String CONT_PGA_HIGH_RES = "contPgaHighRes";
 
     public final static String CATEGORY_TD = "TD";
     public final static String CATEGORY_TS = "TS";

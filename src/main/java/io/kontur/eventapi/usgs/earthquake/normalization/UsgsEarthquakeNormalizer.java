@@ -10,6 +10,7 @@ import io.kontur.eventapi.util.JsonUtil;
 import io.kontur.eventapi.util.GeometryUtil;
 import io.kontur.eventapi.dao.ShakemapDao;
 import static io.kontur.eventapi.util.SeverityUtil.PGA40_MASK;
+import static io.kontur.eventapi.util.SeverityUtil.CONT_PGA_HIGH_RES;
 import org.wololo.geojson.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,13 +185,17 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
         try {
             Object maxPgaObj = shaProps.get("maxpga");
             Double maxPga = maxPgaObj == null ? null : Double.valueOf(maxPgaObj.toString());
-            if (maxPga != null && maxPga >= 0.4) {
-                Object coverage = shakemap.get("coverage_pga_high_res");
-                if (coverage instanceof Map) {
-                    String mask = shakemapDao.buildPgaMask(JsonUtil.writeJson(coverage));
-                    if (mask != null) {
-                        shaProps.put(PGA40_MASK, JsonUtil.readJson(mask, Map.class));
-                    }
+
+            Object contPga = shakemap.get("cont_pga_highres");
+            if (contPga instanceof Map<?, ?> cp) {
+                shaProps.put(CONT_PGA_HIGH_RES, cp);
+            }
+
+            Object coverage = shakemap.get("coverage_pga_high_res");
+            if (coverage instanceof Map && maxPga != null && maxPga >= 0.4) {
+                String mask = shakemapDao.buildPgaMask(JsonUtil.writeJson(coverage));
+                if (mask != null) {
+                    shaProps.put(PGA40_MASK, JsonUtil.readJson(mask, Map.class));
                 }
             }
         } catch (Exception e) {

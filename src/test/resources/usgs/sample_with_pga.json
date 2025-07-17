@@ -29,6 +29,8 @@
           "PGA": {"type": "NdArray", "shape": [1,1], "values": [-9]}
         }
       }
+      ,
+      "cont_pga_highres": {"type": "FeatureCollection"}
     }
   ]
 }
