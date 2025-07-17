@@ -161,6 +161,21 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 return;
             }
 
+            JsonNode contPgaHiNode = contents != null ? contents.get("download/cont_pga_highres.json") : null;
+            if (contPgaHiNode != null) {
+                String url = contPgaHiNode.get("url").asText();
+                String contHiContent = fetchUrl(url);
+                if (contHiContent != null) {
+                    result.set("download/cont_pga_highres.json", contPgaHiNode);
+                    try {
+                        JsonNode contHi = JsonUtil.readTree(contHiContent);
+                        result.set("cont_pga_highres", contHi);
+                    } catch (Exception e) {
+                        LOG.warn("Failed to parse cont_pga_highres.json for event {}", externalId, e);
+                    }
+                }
+            }
+
             JsonNode hiResNode = contents != null ? contents.get("download/coverage_pga_high_res.covjson") : null;
             if (hiResNode != null) {
                 String url = hiResNode.get("url").asText();

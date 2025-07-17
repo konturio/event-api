@@ -58,6 +58,7 @@ its first element is used. ShakeMap polygons do not include the original
 reaches at least `0.4` and the data provides `coverage_pga_high_res`, a union of
 pixels with PGA above `0.4 g` is computed and stored as a GeoJSON object in
 `severity_data` under the key `pga40Mask`.
+If ShakeMap provides `coverage_pga_high_res`, it is copied to `severity_data` under `coverage_pga_highres`.
 
 ## `kontur_events`
 Links observations to events.
