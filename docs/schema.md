@@ -54,8 +54,12 @@ For USGS earthquakes `geometries` may contain ShakeMap polygons. They are derive
 from contour lines published by USGS. If `shakemap` is an array, only
 its first element is used. ShakeMap polygons do not include the original
 `Class`, `country` or `areaType` attributes. Polygons whose `value` ends up
-`null` are discarded during normalization. If `maxpga` in ShakeMap properties
-reaches at least `0.4` and the data provides `coverage_pga_high_res`, a union of
+`null` are discarded during normalization. Each polygon is enriched with
+`Class`, `eventid`, `eventtype` and `polygonlabel` derived from the intensity
+value. `Class` becomes `Poly_SMPInt_&lt;intensity&gt;`, `eventid` matches the
+earthquake external ID, `eventtype` is `EQ` and `polygonlabel` is
+`Intensity &lt;intensity&gt;`. If `maxpga` in ShakeMap properties reaches at
+least `0.4` and the data provides `coverage_pga_high_res`, a union of
 pixels with PGA above `0.4 g` is computed and stored as a GeoJSON object in
 `severity_data` under the key `pga40Mask`.
 If ShakeMap provides `coverage_pga_high_res`, it is copied to `severity_data` under `coverage_pga_highres`.
