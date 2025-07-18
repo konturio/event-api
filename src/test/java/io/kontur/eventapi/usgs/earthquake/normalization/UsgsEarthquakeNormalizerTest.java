@@ -35,7 +35,8 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals("nc75206757", obs.getExternalEventId());
         assertEquals(Severity.MINOR, obs.getEventSeverity());
         assertEquals(EventType.EARTHQUAKE, obs.getType());
-        assertEquals("M 1.6 - 2 km E of Aromas, CA", obs.getName());
+        assertEquals("Earthquake", obs.getName());
+        assertNull(obs.getProperName());
         assertEquals("2 km E of Aromas, CA", obs.getDescription());
         assertEquals("CA", obs.getRegion());
         String descr = "On 7/7/2025 4:43:17 PM, an earthquake occurred 2 km E of Aromas, CA. The earthquake had Magnitude 1.6M, Depth:0.45km.";
