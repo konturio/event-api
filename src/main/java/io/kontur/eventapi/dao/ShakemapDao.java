@@ -18,4 +18,8 @@ public class ShakemapDao {
     public String buildPgaMask(String json) {
         return mapper.buildPgaMask(json);
     }
+
+    public String buildCentroidBuffer(Double lon, Double lat) {
+        return mapper.buildCentroidBuffer(lon, lat);
+    }
 }
