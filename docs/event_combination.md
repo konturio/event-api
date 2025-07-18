@@ -31,4 +31,5 @@ trailing part is stored as the observation `region`. A human‑readable episode
 description is composed using the event start time, magnitude and depth from the
 source data, for example: `On 7/5/2025 7:42:20 PM, an earthquake occurred 55 km
 SSW of Lithakiá, Greece. The earthquake had Magnitude 4.7M, Depth:10km.` The
-event name is always set to `Earthquake`.
+observation `name` is assembled as `M {magnitude} - {place}` (same as the USGS
+`title` field).
