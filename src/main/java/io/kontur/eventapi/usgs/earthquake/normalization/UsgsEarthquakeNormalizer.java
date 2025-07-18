@@ -201,13 +201,13 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                     String circleJson = shakemapDao.buildCentroidBuffer(lon, lat);
                     if (circleJson != null) {
                         org.wololo.geojson.Geometry circle = JsonUtil.readJson(circleJson, org.wololo.geojson.Geometry.class);
-                        Map<String, Object> props = new HashMap<>();
-                        props.put("Class", "Poly_Circle");
-                        props.put("eventid", dataLake.getExternalId());
-                        props.put("areaType", ALERT_AREA);
-                        props.put("eventtype", "EQ");
-                        props.put("polygonlabel", "100km");
-                        geometryFeatures.add(new Feature(circle, props));
+                        Map<String, Object> circleProps = new HashMap<>();
+                        circleProps.put("Class", "Poly_Circle");
+                        circleProps.put("eventid", dataLake.getExternalId());
+                        circleProps.put("areaType", ALERT_AREA);
+                        circleProps.put("eventtype", "EQ");
+                        circleProps.put("polygonlabel", "100km");
+                        geometryFeatures.add(new Feature(circle, circleProps));
                         LOG.debug("Appended 100km buffer polygon");
                     } else {
                         LOG.debug("buildCentroidBuffer returned null JSON");
