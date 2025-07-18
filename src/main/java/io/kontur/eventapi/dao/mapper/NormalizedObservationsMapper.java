@@ -64,4 +64,7 @@ public interface NormalizedObservationsMapper {
     String buildShakemapPolygons(@Param("json") String json);
 
     String buildPgaMask(@Param("json") String json);
+
+    String buildCentroidBuffer(@Param("lon") Double lon,
+                               @Param("lat") Double lat);
 }

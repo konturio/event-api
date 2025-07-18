@@ -196,6 +196,25 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                 Point point = new Point(new double[]{lon, lat});
                 FeatureCollection fc = convertGeometryToFeatureCollection(point, Map.of(AREA_TYPE_PROPERTY, CENTER_POINT));
                 geometryFeatures.addAll(Arrays.asList(fc.getFeatures()));
+
+                try {
+                    String circleJson = shakemapDao.buildCentroidBuffer(lon, lat);
+                    if (circleJson != null) {
+                        org.wololo.geojson.Geometry circle = JsonUtil.readJson(circleJson, org.wololo.geojson.Geometry.class);
+                        Map<String, Object> props = new HashMap<>();
+                        props.put("Class", "Poly_Circle");
+                        props.put("eventid", dataLake.getExternalId());
+                        props.put("areaType", ALERT_AREA);
+                        props.put("eventtype", "EQ");
+                        props.put("polygonlabel", "100km");
+                        geometryFeatures.add(new Feature(circle, props));
+                        LOG.debug("Appended 100km buffer polygon");
+                    } else {
+                        LOG.debug("buildCentroidBuffer returned null JSON");
+                    }
+                } catch (Exception e) {
+                    LOG.warn("Failed to build 100km buffer polygon", e);
+                }
             }
         }
 

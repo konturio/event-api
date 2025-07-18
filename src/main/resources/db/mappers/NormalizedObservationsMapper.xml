@@ -119,6 +119,15 @@
         select ST_AsGeoJSON(buildPgaMask(#{json}::jsonb))
     </select>
 
+    <select id="buildCentroidBuffer" resultType="string">
+        select ST_AsGeoJSON(
+                ST_Buffer(
+                        ST_SetSRID(ST_MakePoint(#{lon}, #{lat}), 4326)::geography,
+                        100000
+                    )::geometry, 6, 4
+    )
+    </select>
+
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
         <result property="observationId" column="observation_id"/>
         <result property="externalEventId" column="external_event_id"/>
