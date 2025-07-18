@@ -8,3 +8,28 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: false
             endDelimiter: $_$;
+  - changeSet:
+      id: v1.23.0/add-usgs-to-feeds
+      author: event-api-migrations
+      changes:
+        - sqlFile:
+            path: add-usgs-to-feeds.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: v1.23.0/create-pga-mask-function
+      author: event-api-migrations
+      changes:
+        - sqlFile:
+            path: create-pga-mask-function.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            endDelimiter: $_$;
+  - changeSet:
+      id: v1.23.0/update-shiftlongitude
+      author: event-api-migrations
+      changes:
+        - sqlFile:
+            path: update-shiftlongitude.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            endDelimiter: $_$;
