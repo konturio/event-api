@@ -32,5 +32,9 @@
       ,
       "cont_pga_highres": {"type": "FeatureCollection"}
     }
-  ]
+  ],
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-121.6175, 36.895168, 0.45]
+  }
 }

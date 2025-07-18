@@ -26,6 +26,7 @@ class UsgsEarthquakeNormalizerTest {
 
     @Test
     void testNormalize() throws IOException {
+        when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
         DataLake dl = createDataLake("/usgs/sample.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
@@ -39,19 +40,22 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals(dl.getUpdatedAt(), obs.getEndedAt());
         assertEquals(dl.getLoadedAt(), obs.getLoadedAt());
         assertTrue(obs.getUrls().contains("https://earthquake.usgs.gov/earthquakes/eventpage/nc75206757"));
-        assertEquals(1, obs.getGeometries().getFeatures().length);
+        assertEquals(2, obs.getGeometries().getFeatures().length);
+        Feature circle = obs.getGeometries().getFeatures()[1];
+        assertEquals("Polygon", circle.getGeometry().getType());
     }
 
     @Test
     void testNormalizeWithShakemap() throws Exception {
         when(shakemapDao.buildShakemapPolygons(any())).thenReturn(
                 "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{\"value\":2.5}}]}");
+        when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
         DataLake dl = createDataLake("/usgs/sample_with_shakemap.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildShakemapPolygons(any());
-        assertEquals(2, obs.getGeometries().getFeatures().length);
+        assertEquals(3, obs.getGeometries().getFeatures().length);
 
         Feature polygon = obs.getGeometries().getFeatures()[0];
         Map<String, Object> props = polygon.getProperties();
@@ -64,12 +68,14 @@ class UsgsEarthquakeNormalizerTest {
     @Test
     void testNormalizeWithPgaMask() throws Exception {
         when(shakemapDao.buildPgaMask(any())).thenReturn("{\"type\":\"Polygon\"}");
+        when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
         DataLake dl = createDataLake("/usgs/sample_with_pga.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildPgaMask(any());
         assertEquals(Map.of("type", "Polygon"), obs.getSeverityData().get("pga40Mask"));
+        assertEquals(2, obs.getGeometries().getFeatures().length);
 
         Object cov = obs.getSeverityData().get("coverage_pga_highres");
         assertTrue(cov instanceof Map);

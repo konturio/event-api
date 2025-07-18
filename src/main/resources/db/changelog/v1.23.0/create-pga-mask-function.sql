@@ -52,6 +52,14 @@ as $_$
                 dx/100.0, dy/100.0
             )::geometry(Polygon,4326) as geom
         from grid
+    ),
+    unioned as (
+        select ST_Union(geom)::geometry(MultiPolygon,4326) as geom
+        from cells
     )
-    select ST_Union(geom)::geometry(MultiPolygon,4326) from cells;
+    select CASE
+               WHEN ST_XMax(geom) > 180 OR ST_XMin(geom) < -180 THEN ST_ShiftLongitude(geom)
+               ELSE geom
+           END
+    from unioned;
 $_$;

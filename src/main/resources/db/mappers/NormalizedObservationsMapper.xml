@@ -116,7 +116,30 @@
     </select>
 
     <select id="buildPgaMask" resultType="string">
-        select ST_AsGeoJSON(buildPgaMask(#{json}::jsonb))
+        select ST_AsGeoJSON(
+                   CASE
+                       WHEN ST_XMax(g) - ST_XMin(g) > 180 THEN ST_ShiftLongitude(g)
+                       ELSE g
+                   END
+               )
+        from (
+            select buildPgaMask(#{json}::jsonb) as g
+        ) s
+    </select>
+
+    <select id="buildCentroidBuffer" resultType="string">
+        select ST_AsGeoJSON(
+                   CASE
+                       WHEN ST_XMax(g) - ST_XMin(g) > 180 THEN ST_ShiftLongitude(g)
+                       ELSE g
+                   END, 6, 4
+               )
+        from (
+            select ST_Buffer(
+                       ST_SetSRID(ST_MakePoint(#{lon}, #{lat}), 4326)::geography,
+                       100000
+                   )::geometry as g
+        ) s
     </select>
 
     <resultMap id="normalizedObservationsDtoMap" type="io.kontur.eventapi.entity.NormalizedObservation">
