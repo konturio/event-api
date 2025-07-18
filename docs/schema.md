@@ -63,7 +63,8 @@ least `0.4` and the data provides `coverage_pga_high_res`, a union of
 pixels with PGA above `0.4 g` is computed and stored as a GeoJSON object in
 `severity_data` under the key `pga40Mask`.
 If ShakeMap provides `coverage_pga_high_res`, it is copied to `severity_data` under `coverage_pga_highres`.
-For every USGS earthquake a circular polygon with 100&nbsp;km radius is built around the epicenter.
+Polygons created from ShakeMap contours and the `pga40Mask` are shifted with `ST_ShiftLongitude` if they cross the antimeridian so that longitudes stay within `[-180, 180]`.
+For every USGS earthquake a circular polygon with 100&nbsp;km radius is built around the epicenter. If this buffer crosses the antimeridian it is also shifted.
 It is stored in `geometries` with properties `Class`=`Poly_Circle`, `eventid` equal
 to the external ID, `areaType`=`alertArea`, `eventtype`=`EQ` and `polygonlabel`=`100km`.
 

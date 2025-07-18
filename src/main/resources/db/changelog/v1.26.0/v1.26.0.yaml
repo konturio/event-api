@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1.26.0/update-shiftlongitude
+      author: event-api-migrations
+      changes:
+        - sqlFile:
+            path: update-shiftlongitude.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            endDelimiter: $_$;
