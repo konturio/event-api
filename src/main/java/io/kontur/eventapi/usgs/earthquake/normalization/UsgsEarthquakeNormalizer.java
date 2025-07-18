@@ -18,6 +18,9 @@ import org.springframework.stereotype.Component;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.Point;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -27,6 +30,9 @@ import static io.kontur.eventapi.util.GeometryUtil.*;
 public class UsgsEarthquakeNormalizer extends Normalizer {
 
     private static final Logger LOG = LoggerFactory.getLogger(UsgsEarthquakeNormalizer.class);
+
+    private static final DateTimeFormatter DESCRIPTION_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("M/d/yyyy h:mm:ss a", Locale.US);
 
     private final ShakemapDao shakemapDao;
 
@@ -85,6 +91,8 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
         Map<String, Object> feature = JsonUtil.readJson(dataLake.getData(), Map.class);
         NormalizedObservation obs = new NormalizedObservation();
         List<Feature> geometryFeatures = new ArrayList<>();
+        Double depthKm = null;
+        Double magnitude = null;
         obs.setObservationId(dataLake.getObservationId());
         obs.setProvider(dataLake.getProvider());
         obs.setLoadedAt(dataLake.getLoadedAt());
@@ -99,10 +107,18 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
 
         Map<String, Object> props = (Map<String, Object>) feature.get("properties");
         if (props != null) {
-            obs.setName(readString(props, "title"));
-            obs.setDescription(readString(props, "place"));
-            obs.setProperName(obs.getName() != null ? obs.getName() : obs.getDescription());
+            String place = readString(props, "place");
+            obs.setDescription(place);
+            obs.setName("Earthquake");
+            obs.setProperName(obs.getName());
             obs.setStartedAt(readDateTime(props, "time"));
+
+            if (place != null) {
+                int idx = place.lastIndexOf(',');
+                obs.setRegion(idx >= 0 ? place.substring(idx + 1).trim() : place);
+            }
+
+            magnitude = readDouble(props, "mag");
             obs.setEventSeverity(mapAlert(readString(props, "alert")));
             String net = readString(props, "net");
             if (net == null) {
@@ -193,6 +209,9 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             if (coords != null && coords.size() >= 2) {
                 Double lon = Double.valueOf(coords.get(0).toString());
                 Double lat = Double.valueOf(coords.get(1).toString());
+                if (coords.size() >= 3) {
+                    depthKm = Double.valueOf(coords.get(2).toString());
+                }
                 Point point = new Point(new double[]{lon, lat});
                 FeatureCollection fc = convertGeometryToFeatureCollection(point, Map.of(AREA_TYPE_PROPERTY, CENTER_POINT));
                 geometryFeatures.addAll(Arrays.asList(fc.getFeatures()));
@@ -216,6 +235,29 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                     LOG.warn("Failed to build 100km buffer polygon", e);
                 }
             }
+        }
+
+        if (obs.getStartedAt() != null) {
+            String dateStr = obs.getStartedAt().format(DESCRIPTION_DATE_FORMATTER);
+            StringBuilder sb = new StringBuilder();
+            sb.append("On ").append(dateStr).append(", an earthquake occurred ");
+            if (obs.getDescription() != null) {
+                sb.append(obs.getDescription());
+            }
+            sb.append(". The earthquake had");
+            if (magnitude != null) {
+                sb.append(" Magnitude ").append(magnitude).append("M,");
+            }
+            if (depthKm != null) {
+                sb.append(" Depth:").append(depthKm).append("km.");
+            } else {
+                if (sb.charAt(sb.length() - 1) == ',') {
+                    sb.setCharAt(sb.length() - 1, '.');
+                } else {
+                    sb.append('.');
+                }
+            }
+            obs.setEpisodeDescription(sb.toString());
         }
 
         if (!geometryFeatures.isEmpty()) {
