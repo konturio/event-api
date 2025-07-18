@@ -125,7 +125,12 @@ as $_$
         'features', jsonb_agg(
             jsonb_build_object(
                 'type','Feature',
-                'geometry', ST_AsGeoJSON(f.geom)::jsonb,
+                'geometry', ST_AsGeoJSON(
+                    CASE
+                        WHEN ST_XMax(f.geom) > 180 OR ST_XMin(f.geom) < -180 THEN ST_ShiftLongitude(f.geom)
+                        ELSE f.geom
+                    END
+                )::jsonb,
                 'properties', f.props || jsonb_build_object('value', f.value)
             )
         )
