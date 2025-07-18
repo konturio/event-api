@@ -110,15 +110,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             String place = readString(props, "place");
             obs.setDescription(place);
             magnitude = readDouble(props, "mag");
-            String title = readString(props, "title");
-            if (title == null) {
-                if (magnitude != null && place != null) {
-                    title = String.format(Locale.US, "M %.1f - %s", magnitude, place);
-                } else {
-                    title = "Earthquake";
-                }
-            }
-            obs.setName(title);
+            obs.setName("Earthquake");
             obs.setStartedAt(readDateTime(props, "time"));
 
             if (place != null) {
