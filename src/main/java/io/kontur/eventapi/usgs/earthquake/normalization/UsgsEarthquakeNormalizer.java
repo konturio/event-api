@@ -93,6 +93,8 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
         List<Feature> geometryFeatures = new ArrayList<>();
         Double depthKm = null;
         Double magnitude = null;
+        Double maxPga = null;
+        Severity eventSeverity = Severity.UNKNOWN;
         obs.setObservationId(dataLake.getObservationId());
         obs.setProvider(dataLake.getProvider());
         obs.setLoadedAt(dataLake.getLoadedAt());
@@ -125,7 +127,8 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                 obs.setRegion(idx >= 0 ? place.substring(idx + 1).trim() : place);
             }
 
-            obs.setEventSeverity(mapAlert(readString(props, "alert")));
+            Integer sig = readInt(props, "sig");
+            eventSeverity = defineSeverityFromSig(sig);
             String net = readString(props, "net");
             if (net == null) {
                 net = readString(props, "source");
@@ -169,7 +172,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             if (shakemap != null) {
                 Map<String, Object> shaProps = (Map<String, Object>) shakemap.get("properties");
                 if (shaProps != null) {
-                    enrichPgaMask(shakemap, shaProps);
+                    maxPga = enrichPgaMask(shakemap, shaProps);
                     obs.setSeverityData(shaProps);
                 }
 
@@ -269,12 +272,20 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
         if (!geometryFeatures.isEmpty()) {
             obs.setGeometries(new FeatureCollection(geometryFeatures.toArray(new Feature[0])));
         }
+
+        if ((maxPga != null && maxPga >= 0.4) || (magnitude != null && magnitude >= 7.5)) {
+            if (eventSeverity.getValue() < Severity.SEVERE.getValue()) {
+                eventSeverity = Severity.SEVERE;
+            }
+        }
+        obs.setEventSeverity(eventSeverity);
+
         LOG.debug("Finished normalization of USGS earthquake {}", dataLake.getExternalId());
         return obs;
     }
 
     @SuppressWarnings("unchecked")
-    private void enrichPgaMask(Map<String, Object> shakemap, Map<String, Object> shaProps) {
+    private Double enrichPgaMask(Map<String, Object> shakemap, Map<String, Object> shaProps) {
         try {
             Object maxPgaObj = shaProps.get("maxpga");
             Double maxPga = maxPgaObj == null ? null : Double.valueOf(maxPgaObj.toString());
@@ -291,8 +302,10 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                     }
                 }
             }
+            return maxPga;
         } catch (Exception e) {
             LOG.warn("Failed to build PGA mask", e);
+            return null;
         }
     }
 
@@ -315,6 +328,15 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             LOG.warn("Failed to build ShakeMap polygons", e);
             return null;
         }
+    }
+
+    private Severity defineSeverityFromSig(Integer sig) {
+        if (sig == null) return Severity.UNKNOWN;
+        if (sig >= 900) return Severity.EXTREME;
+        if (sig >= 600) return Severity.SEVERE;
+        if (sig >= 450) return Severity.MODERATE;
+        if (sig >= 300) return Severity.MINOR;
+        return Severity.UNKNOWN;
     }
 
 }

@@ -1,0 +1,14 @@
+{
+  "type": "Feature",
+  "properties": {
+    "mag": 7.6,
+    "place": "somewhere",
+    "time": 0,
+    "updated": 0,
+    "sig": 300
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [10.0, 10.0, 5.0]
+  }
+}

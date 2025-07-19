@@ -67,6 +67,7 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals(dl.getExternalId(), props.get("eventid"));
         assertEquals("EQ", props.get("eventtype"));
         assertEquals("Intensity 2.5", props.get("polygonlabel"));
+        assertEquals(Severity.MINOR, obs.getEventSeverity());
     }
 
     @Test
@@ -84,6 +85,17 @@ class UsgsEarthquakeNormalizerTest {
         Object cov = obs.getSeverityData().get("coverage_pga_highres");
         assertTrue(cov instanceof Map);
         assertEquals("Coverage", ((Map<?, ?>) cov).get("type"));
+        assertEquals(Severity.SEVERE, obs.getEventSeverity());
+    }
+
+    @Test
+    void testMagnitudeUpgrade() throws Exception {
+        when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
+
+        DataLake dl = createDataLake("/usgs/sample_high_mag.json");
+        NormalizedObservation obs = normalizer.normalize(dl);
+
+        assertEquals(Severity.SEVERE, obs.getEventSeverity());
     }
 
     private DataLake createDataLake(String file) throws IOException {
