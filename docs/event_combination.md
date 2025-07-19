@@ -25,3 +25,10 @@ represents the same event with more details, so the default combination job just
 groups observations by `external_event_id`. When several updates for the same
 earthquake are present, the observation with the most recent ShakeMap geometry
 provides the geometry for the resulting event.
+
+During normalization the `place` property is split by the last comma and the
+trailing part is stored as the observation `region`. A human‑readable episode
+description is composed using the event start time, magnitude and depth from the
+source data, for example: `On 7/5/2025 7:42:20 PM, an earthquake occurred 55 km
+SSW of Lithakiá, Greece. The earthquake had Magnitude 4.7M, Depth:10km.` The
+observation `name` is always `Earthquake` and `proper_name` remains `null`.
