@@ -35,7 +35,7 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals("nc75206757", obs.getExternalEventId());
         assertEquals(Severity.MINOR, obs.getEventSeverity());
         assertEquals(EventType.EARTHQUAKE, obs.getType());
-        assertEquals("Earthquake", obs.getName());
+        assertEquals("M 1.6 - 2 km E of Aromas, CA", obs.getName());
         assertNull(obs.getProperName());
         assertEquals("2 km E of Aromas, CA", obs.getDescription());
         assertEquals("CA", obs.getRegion());
