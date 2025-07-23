@@ -41,6 +41,7 @@ class UsgsEarthquakeImportJobTest {
         Feature feature = new Feature("id1", new Point(new double[]{0,0}), Map.of("updated", "123"));
         FeatureCollection fc = new FeatureCollection(new Feature[]{feature});
         when(client.getEarthquakes()).thenReturn(fc.toString());
+        when(dataLakeDao.isNewEvent(anyString(), anyString(), anyString())).thenReturn(true);
         when(converter.convert(anyString(), any(), anyString())).thenReturn(new DataLake());
         doNothing().when(dataLakeDao).storeDataLakes(anyList());
 
@@ -49,7 +50,25 @@ class UsgsEarthquakeImportJobTest {
         job.run();
 
         verify(client, times(1)).getEarthquakes();
+        verify(dataLakeDao, times(1)).isNewEvent(anyString(), anyString(), anyString());
         verify(converter, times(1)).convert(anyString(), any(), anyString());
         verify(dataLakeDao, times(1)).storeDataLakes(anyList());
+    }
+
+    @Test
+    void skipExistingEvent() {
+        Feature feature = new Feature("id1", new Point(new double[]{0,0}), Map.of("updated", "123"));
+        FeatureCollection fc = new FeatureCollection(new Feature[]{feature});
+        when(client.getEarthquakes()).thenReturn(fc.toString());
+        when(dataLakeDao.isNewEvent(anyString(), anyString(), anyString())).thenReturn(false);
+
+        UsgsEarthquakeImportJob job = new UsgsEarthquakeImportJob(new SimpleMeterRegistry(), client,
+                dataLakeDao, converter);
+        job.run();
+
+        verify(client, times(1)).getEarthquakes();
+        verify(dataLakeDao, times(1)).isNewEvent(anyString(), anyString(), anyString());
+        verify(converter, never()).convert(anyString(), any(), anyString());
+        verify(dataLakeDao, never()).storeDataLakes(anyList());
     }
 }

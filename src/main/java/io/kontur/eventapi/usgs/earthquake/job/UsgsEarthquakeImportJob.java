@@ -21,6 +21,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +68,14 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                     JsonNode updatedNode = feature.path("properties").path("updated");
                     if (!updatedNode.isMissingNode() && StringUtils.isNotBlank(externalId)) {
                         OffsetDateTime updatedAt = DateTimeUtil.getDateTimeFromMilli(updatedNode.asLong());
-                        enrichFeature(feature, externalId);
-                        dataLakes.add(converter.convert(externalId, updatedAt, feature.toString()));
+                        if (Boolean.TRUE.equals(dataLakeDao.isNewEvent(externalId,
+                                UsgsEarthquakeDataLakeConverter.USGS_EARTHQUAKE_PROVIDER,
+                                updatedAt.format(DateTimeFormatter.ISO_INSTANT)))) {
+                            enrichFeature(feature, externalId);
+                            dataLakes.add(converter.convert(externalId, updatedAt, feature.toString()));
+                        } else {
+                            LOG.debug("USGS earthquake {} with updated_at {} already present", externalId, updatedAt);
+                        }
                     }
                 } catch (Exception e) {
                     LOG.error("Failed to process feature from usgs earthquake feed", e);
