@@ -33,13 +33,13 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals(dl.getObservationId(), obs.getObservationId());
         assertEquals(dl.getProvider(), obs.getProvider());
         assertEquals("nc75206757", obs.getExternalEventId());
-        assertEquals(Severity.MINOR, obs.getEventSeverity());
+        assertEquals(Severity.SEVERE, obs.getEventSeverity());
         assertEquals(EventType.EARTHQUAKE, obs.getType());
-        assertEquals("M 1.6 - 2 km E of Aromas, CA", obs.getName());
+        assertEquals("M 7.6 - 2 km E of Aromas, CA", obs.getName());
         assertNull(obs.getProperName());
         assertEquals("2 km E of Aromas, CA", obs.getDescription());
         assertEquals("CA", obs.getRegion());
-        String descr = "On 7/7/2025 4:43:17 PM, an earthquake occurred 2 km E of Aromas, CA. The earthquake had Magnitude 1.6M, Depth:0.45km.";
+        String descr = "On 7/7/2025 4:43:17 PM, an earthquake occurred 2 km E of Aromas, CA. The earthquake had Magnitude 7.6M, Depth:0.45km.";
         assertEquals(descr, obs.getEpisodeDescription());
         assertEquals(dl.getUpdatedAt(), obs.getEndedAt());
         assertEquals(dl.getLoadedAt(), obs.getLoadedAt());
@@ -55,7 +55,7 @@ class UsgsEarthquakeNormalizerTest {
                 "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{\"value\":2.5}}]}");
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
-        DataLake dl = createDataLake("/usgs/sample_with_shakemap.json");
+        DataLake dl = createDataLake("/usgs/sample.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildShakemapPolygons(any());
@@ -67,7 +67,7 @@ class UsgsEarthquakeNormalizerTest {
         assertEquals(dl.getExternalId(), props.get("eventid"));
         assertEquals("EQ", props.get("eventtype"));
         assertEquals("Intensity 2.5", props.get("polygonlabel"));
-        assertEquals(Severity.MINOR, obs.getEventSeverity());
+        assertEquals(Severity.SEVERE, obs.getEventSeverity());
     }
 
     @Test
@@ -75,7 +75,7 @@ class UsgsEarthquakeNormalizerTest {
         when(shakemapDao.buildPgaMask(any())).thenReturn("{\"type\":\"Polygon\"}");
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
-        DataLake dl = createDataLake("/usgs/sample_with_pga.json");
+        DataLake dl = createDataLake("/usgs/sample.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildPgaMask(any());
@@ -92,7 +92,7 @@ class UsgsEarthquakeNormalizerTest {
     void testMagnitudeUpgrade() throws Exception {
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
-        DataLake dl = createDataLake("/usgs/sample_high_mag.json");
+        DataLake dl = createDataLake("/usgs/sample.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         assertEquals(Severity.SEVERE, obs.getEventSeverity());
