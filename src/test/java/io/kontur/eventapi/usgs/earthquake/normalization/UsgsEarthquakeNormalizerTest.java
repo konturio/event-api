@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
+import java.util.HashMap;
+import com.fasterxml.jackson.core.type.TypeReference;
+import io.kontur.eventapi.util.JsonUtil;
 import org.wololo.geojson.Feature;
 
 import static io.kontur.eventapi.TestUtil.readFile;
@@ -55,7 +58,7 @@ class UsgsEarthquakeNormalizerTest {
                 "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{\"value\":2.5}}]}");
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
-        DataLake dl = createDataLake("/usgs/sample_with_shakemap.json");
+        DataLake dl = createDataLake("/usgs/sample.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildShakemapPolygons(any());
@@ -75,7 +78,7 @@ class UsgsEarthquakeNormalizerTest {
         when(shakemapDao.buildPgaMask(any())).thenReturn("{\"type\":\"Polygon\"}");
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
-        DataLake dl = createDataLake("/usgs/sample_with_pga.json");
+        DataLake dl = createDataLake("/usgs/sample.json");
         NormalizedObservation obs = normalizer.normalize(dl);
 
         verify(shakemapDao).buildPgaMask(any());
@@ -92,14 +95,28 @@ class UsgsEarthquakeNormalizerTest {
     void testMagnitudeUpgrade() throws Exception {
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 
-        DataLake dl = createDataLake("/usgs/sample_high_mag.json");
+        DataLake dl = createDataLake("/usgs/sample.json", 7.6);
         NormalizedObservation obs = normalizer.normalize(dl);
 
         assertEquals(Severity.SEVERE, obs.getEventSeverity());
     }
 
     private DataLake createDataLake(String file) throws IOException {
+        return createDataLake(file, null);
+    }
+
+    private DataLake createDataLake(String file, Double magOverride) throws IOException {
         String data = readFile(this, file);
+        if (magOverride != null) {
+            Map<String, Object> feature = JsonUtil.readJson(data, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> props = (Map<String, Object>) feature.get("properties");
+            if (props == null) {
+                props = new HashMap<>();
+                feature.put("properties", props);
+            }
+            props.put("mag", magOverride);
+            data = JsonUtil.writeJson(feature);
+        }
         DataLake dl = new DataLake(UUID.randomUUID(), "nc75206757",
                 DateTimeUtil.getDateTimeFromMilli(1751906694946L), OffsetDateTime.now());
         dl.setData(data);
