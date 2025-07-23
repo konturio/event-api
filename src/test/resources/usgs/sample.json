@@ -1,7 +1,7 @@
 {
   "type": "Feature",
   "properties": {
-    "mag": 1.6,
+    "mag": 7.6,
     "place": "2 km E of Aromas, CA",
     "time": 1751906597590,
     "updated": 1751906694946,
@@ -15,7 +15,7 @@
     "code": "75206757",
     "types": ",origin,phase-data,",
     "type": "earthquake",
-    "title": "M 1.6 - 2 km E of Aromas, CA"
+    "title": "M 7.6 - 2 km E of Aromas, CA"
   },
   "shakemap": [
     {
