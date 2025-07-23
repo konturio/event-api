@@ -137,18 +137,18 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 result.set("properties", props);
             }
             JsonNode contents = first.get("contents");
-            JsonNode contNode = contents != null ? contents.get("download/cont_pga.json") : null;
+            JsonNode contNode = contents != null ? contents.get("download/cont_mmi.json") : null;
             if (contNode != null) {
                 String url = contNode.get("url").asText();
                 feature.put("shm_url", url);
                 String contPga = fetchUrl(url);
                 if (contPga != null) {
-                    result.set("download/cont_pga.json", contNode);
+                    result.set("download/cont_mmi.json", contNode);
                     try {
                         JsonNode contPgaNode = JsonUtil.readTree(contPga);
-                        result.set("cont_pga", contPgaNode);
+                        result.set("cont_mmi", contPgaNode);
                     } catch (Exception e) {
-                        LOG.warn("Failed to parse cont_pga.json for event {}", externalId, e);
+                        LOG.warn("Failed to parse cont_mmi.json for event {}", externalId, e);
                         feature.put("shakemap_cont_retrieval", false);
                         return;
                     }
@@ -159,6 +159,21 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             } else {
                 feature.put("shakemap_cont_retrieval", false);
                 return;
+            }
+
+            JsonNode contPgaHiNode = contents != null ? contents.get("download/cont_pga_highres.json") : null;
+            if (contPgaHiNode != null) {
+                String url = contPgaHiNode.get("url").asText();
+                String contHiContent = fetchUrl(url);
+                if (contHiContent != null) {
+                    result.set("download/cont_pga_highres.json", contPgaHiNode);
+                    try {
+                        JsonNode contHi = JsonUtil.readTree(contHiContent);
+                        result.set("cont_pga_highres", contHi);
+                    } catch (Exception e) {
+                        LOG.warn("Failed to parse cont_pga_highres.json for event {}", externalId, e);
+                    }
+                }
             }
 
             JsonNode hiResNode = contents != null ? contents.get("download/coverage_pga_high_res.covjson") : null;
