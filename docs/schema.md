@@ -54,7 +54,8 @@ For USGS earthquakes `geometries` may contain ShakeMap polygons. They are derive
 from contour lines published by USGS. If `shakemap` is an array, only
 its first element is used. ShakeMap polygons do not include the original
 `Class`, `country` or `areaType` attributes. Polygons whose `value` ends up
-`null` are discarded during normalization. Each polygon is enriched with
+`null` are discarded during normalization. If `cont_mmi` contains no
+`features` array, the polygons are skipped. Each polygon is enriched with
 `Class`, `eventid`, `eventtype` and `polygonlabel` derived from the intensity
 value. `Class` becomes `Poly_SMPInt_&lt;intensity&gt;`, `eventid` matches the
 earthquake external ID, `eventtype` is `EQ` and `polygonlabel` is

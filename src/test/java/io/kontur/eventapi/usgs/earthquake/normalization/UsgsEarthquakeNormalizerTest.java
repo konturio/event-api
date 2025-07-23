@@ -71,6 +71,18 @@ class UsgsEarthquakeNormalizerTest {
     }
 
     @Test
+    void testNormalizeWithNullShakeMapFeatures() throws Exception {
+        when(shakemapDao.buildShakemapPolygons(any())).thenReturn("{\"type\":\"FeatureCollection\"}");
+        when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
+
+        DataLake dl = createDataLake("/usgs/sample.json");
+        NormalizedObservation obs = normalizer.normalize(dl);
+
+        verify(shakemapDao).buildShakemapPolygons(any());
+        assertEquals(2, obs.getGeometries().getFeatures().length);
+    }
+
+    @Test
     void testNormalizeWithPgaMask() throws Exception {
         when(shakemapDao.buildPgaMask(any())).thenReturn("{\"type\":\"Polygon\"}");
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
