@@ -178,10 +178,12 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
 
                 FeatureCollection smPolygons = buildShakemapPolygons(shakemap);
                 if (smPolygons != null) {
-                    for (Feature smFeature : smPolygons.getFeatures()) {
-                        Map<String, Object> polygonProps = smFeature.getProperties() == null
-                                ? new HashMap<>()
-                                : new HashMap<>(smFeature.getProperties());
+                    Feature[] smFeatures = smPolygons.getFeatures();
+                    if (smFeatures != null) {
+                        for (Feature smFeature : smFeatures) {
+                            Map<String, Object> polygonProps = smFeature.getProperties() == null
+                                    ? new HashMap<>()
+                                    : new HashMap<>(smFeature.getProperties());
 
                         Object valObj = polygonProps.get("value");
                         String intensity = null;
@@ -203,9 +205,12 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                             polygonProps.put("polygonlabel", "Intensity " + intensity);
                         }
 
-                        geometryFeatures.add(new Feature(smFeature.getGeometry(), polygonProps));
+                            geometryFeatures.add(new Feature(smFeature.getGeometry(), polygonProps));
+                        }
+                        LOG.debug("Appended {} ShakeMap polygon(s)", smFeatures.length);
+                    } else {
+                        LOG.debug("ShakeMap polygons feature array is null");
                     }
-                    LOG.debug("Appended {} ShakeMap polygon(s)", smPolygons.getFeatures().length);
                 } else {
                     LOG.debug("No ShakeMap polygons were built");
                 }
