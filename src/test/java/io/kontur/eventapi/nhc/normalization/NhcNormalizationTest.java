@@ -164,6 +164,31 @@ public class NhcNormalizationTest {
     }
 
     @Test
+    public void testNormalizationSpecialAdvisory() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test_special.xml", NhcUtil.NHC_EP_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId());
+        assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider());
+        assertEquals("EP102024", observation.getExternalEventId());
+        assertEquals("EP102024_10", observation.getExternalEpisodeId());
+        assertEquals(Severity.MINOR, observation.getEventSeverity());
+        assertEquals("REMNANTS JOHN", observation.getName());
+        assertEquals("REMNANTS OF CENTER LOCATED NEAR 17.7N 100.6W AT 24/1800Z", observation.getDescription());
+        assertEquals(EventType.CYCLONE, observation.getType());
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2024-09-24T18:00:00Z", null), observation.getStartedAt());
+        assertNull(observation.getEndedAt());
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt());
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP5+shtml/241747.shtml"), observation.getUrls());
+        checkGeometriesValue(observation.getGeometries(), 1);
+    }
+
+    @Test
     public void testNormalizationNegativeType() throws Exception {
         //given - type is absent
         DataLake dataLake = createDataLake("nhc_norm_test_neg1.xml", NhcUtil.NHC_AT_PROVIDER);
