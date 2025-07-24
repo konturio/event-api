@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: v1.23.0/create-shakemap-polygons
+      id: v1.23.0/create-shakemap-polygons-function
       author: event-api-migrations
       changes:
         - sqlFile:
