@@ -430,8 +430,7 @@
 							<jvmFlag>-XX:InitialRAMPercentage=20</jvmFlag>
 							<jvmFlag>-XX:+HeapDumpOnOutOfMemoryError</jvmFlag>
 							<jvmFlag>-XX:HeapDumpPath=/tmp/eventapi_oom.hprof</jvmFlag>
-							<jvmFlag>-XX:+UseParallelGC</jvmFlag>
-							<!--jvmFlag>-XX:+UseZGC</jvmFlag-->
+                                                        <jvmFlag>-XX:+UseZGC</jvmFlag>
 							<jvmFlag>-XX:SoftMaxHeapSize=34359738368</jvmFlag>
 							<!--<jvmFlag>-XX:+UseG1GC</jvmFlag>-->
 							<!--<jvmFlag>-Xlog:gc*:file=%h/log/event-api.GC.log</jvmFlag>-->
