@@ -10,50 +10,42 @@ create function buildShakemapPolygons(jsonb) returns jsonb
     strict
     parallel safe
 as $_$
-    with cnt as (
+    with params as (
         select $1 -> 'bbox' as bbox,
                $1 -> 'features' as features
     ),
     bbox as (
-        select (ST_Dump(
-            ST_Boundary(
-                ST_MakeEnvelope(
-                    (bbox ->> 0)::double precision,
-                    (bbox ->> 1)::double precision,
-                    (bbox ->> 2)::double precision,
-                    (bbox ->> 3)::double precision,
-                    4326
-                )
-            )
-        )).geom as geom
-        from cnt
+        select ST_Boundary(
+                   ST_MakeEnvelope(
+                       (bbox ->> 0)::double precision,
+                       (bbox ->> 1)::double precision,
+                       (bbox ->> 2)::double precision,
+                       (bbox ->> 3)::double precision,
+                       4326
+                   )
+               ) as geom
+        from params
     ),
     lines as (
         select jsonb_array_elements(features) -> 'properties' as properties,
-               (ST_Dump(
-                   ST_GeomFromGeoJSON(jsonb_array_elements(features) -> 'geometry')
-               )).geom as geom
-        from cnt
+               ST_GeomFromGeoJSON(jsonb_array_elements(features) -> 'geometry') as geom
+        from params
     ),
-    splitted_bbox as (
-        select (ST_Dump(
-                ST_Split(b.geom, ST_Collect(l.geom))
-               )).geom as geom
-        from bbox b
-        join lines l on true
-        group by b.geom
+    linework as (
+        select ST_UnaryUnion(
+                   ST_Collect( ARRAY[
+                       (select geom from bbox),
+                       (select ST_Collect(geom) from lines)
+                   ])
+               )::geometry(MultiLineString,4326) as geom
     ),
-    merged as (
-        select ST_Collect(geom) as geom
-        from (
-            select geom from splitted_bbox
-            union all
-            select geom from lines
-        ) as all_geom
+    noded as (
+        select ST_Node(geom) as geom
+        from linework
     ),
     polys as (
         select (ST_Dump(ST_Polygonize(geom))).geom::geometry(Polygon,4326) as geom
-        from merged
+        from noded
     ),
     poly_attr as (
         select row_number() over () as id,
