@@ -55,7 +55,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
         try {
             String geoJson = client.getEarthquakes();
             if (StringUtils.isBlank(geoJson)) {
-                LOG.warn("Skip processing usgs earthquake feed due to empty response");
+                LOG.warn("usgs: Skip processing earthquake feed due to empty response");
                 return;
             }
             JsonNode root = JsonUtil.readTree(geoJson);
@@ -74,18 +74,18 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                             enrichFeature(feature, externalId);
                             dataLakes.add(converter.convert(externalId, updatedAt, feature.toString()));
                         } else {
-                            LOG.debug("USGS earthquake {} with updated_at {} already present", externalId, updatedAt);
+                            LOG.debug("usgs earthquake {} with updated_at {} already present", externalId, updatedAt);
                         }
                     }
                 } catch (Exception e) {
-                    LOG.error("Failed to process feature from usgs earthquake feed", e);
+                    LOG.error("usgs: Failed to process feature from earthquake feed", e);
                 }
             }
             if (!dataLakes.isEmpty()) {
                 dataLakeDao.storeDataLakes(dataLakes);
             }
         } catch (Exception e) {
-            LOG.warn("Error while obtaining usgs earthquake feed", e);
+            LOG.warn("usgs: Error while obtaining earthquake feed", e);
         }
     }
 
@@ -117,7 +117,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 enrichWithLossEstimation(feature, detail, externalId);
             }
         } catch (Exception e) {
-            LOG.warn("Failed to enrich feature {}", externalId, e);
+            LOG.warn("usgs: Failed to enrich feature {}", externalId, e);
         }
     }
 
@@ -155,7 +155,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                         JsonNode contPgaNode = JsonUtil.readTree(contPga);
                         result.set("cont_mmi", contPgaNode);
                     } catch (Exception e) {
-                        LOG.warn("Failed to parse cont_mmi.json for event {}", externalId, e);
+                        LOG.warn("usgs: Failed to parse cont_mmi.json for event {}", externalId, e);
                         feature.put("shakemap_cont_retrieval", false);
                         return;
                     }
@@ -178,7 +178,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                         JsonNode contHi = JsonUtil.readTree(contHiContent);
                         result.set("cont_pga_highres", contHi);
                     } catch (Exception e) {
-                        LOG.warn("Failed to parse cont_pga_highres.json for event {}", externalId, e);
+                        LOG.warn("usgs: Failed to parse cont_pga_highres.json for event {}", externalId, e);
                     }
                 }
             }
@@ -193,7 +193,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                         JsonNode hiRes = JsonUtil.readTree(hiResContent);
                         result.set("coverage_pga_high_res", hiRes);
                     } catch (Exception e) {
-                        LOG.warn("Failed to parse coverage_pga_high_res.covjson for event {}", externalId, e);
+                        LOG.warn("usgs: Failed to parse coverage_pga_high_res.covjson for event {}", externalId, e);
                         feature.put("shakemap_hishres_pga_retrieval", false);
                     }
                 } else {
@@ -205,7 +205,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             ArrayNode arr = feature.putArray("shakemap");
             arr.add(result);
         } catch (Exception e) {
-            LOG.warn("Failed to enrich feature with shakemap", e);
+            LOG.warn("usgs: Failed to enrich feature with shakemap", e);
             feature.put("shakemap_cont_retrieval", false);
             feature.put("shakemap_hishres_pga_retrieval", false);
         }
@@ -252,7 +252,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             ArrayNode arr = feature.putArray("loss_estimation");
             arr.add(result);
         } catch (Exception e) {
-            LOG.warn("Failed to enrich feature with loss estimation", e);
+            LOG.warn("usgs: Failed to enrich feature with loss estimation", e);
             feature.put("loss_estimation_retrieval", false);
         }
     }
@@ -272,7 +272,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 return resp.body();
             }
         } catch (Exception e) {
-            LOG.warn("Failed to download url {}", url, e);
+            LOG.warn("usgs: Failed to download url {}", url, e);
         }
         return null;
     }
