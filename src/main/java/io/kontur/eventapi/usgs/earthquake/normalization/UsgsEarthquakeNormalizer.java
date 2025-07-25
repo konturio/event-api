@@ -155,19 +155,19 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             Object smObj = feature.get("shakemap");
             Map<String, Object> shakemap = null;
             if (smObj instanceof List<?> list) {
-                LOG.debug("ShakeMap is array with {} item(s)", list.size());
+                LOG.debug("usgs ShakeMap is array with {} item(s)", list.size());
                 if (!list.isEmpty() && list.get(0) instanceof Map<?, ?> first) {
                     shakemap = (Map<String, Object>) first;
                 } else {
-                    LOG.debug("ShakeMap array is empty or first element is not a map");
+                    LOG.debug("usgs ShakeMap array is empty or first element is not a map");
                 }
             } else if (smObj instanceof Map<?, ?>) {
-                LOG.debug("ShakeMap is an object");
+                LOG.debug("usgs ShakeMap is an object");
                 shakemap = (Map<String, Object>) smObj;
             } else if (smObj != null) {
-                LOG.debug("Unexpected ShakeMap type: {}", smObj.getClass());
+                LOG.debug("usgs unexpected ShakeMap type: {}", smObj.getClass());
             } else {
-                LOG.debug("No ShakeMap found in root object");
+                LOG.debug("usgs ShakeMap not found in root object");
             }
             if (shakemap != null) {
                 Map<String, Object> shaProps = (Map<String, Object>) shakemap.get("properties");
@@ -207,12 +207,12 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
 
                             geometryFeatures.add(new Feature(smFeature.getGeometry(), polygonProps));
                         }
-                        LOG.debug("Appended {} ShakeMap polygon(s)", smFeatures.length);
+                        LOG.debug("usgs appended {} ShakeMap polygon(s)", smFeatures.length);
                     } else {
-                        LOG.debug("ShakeMap polygons feature array is null");
+                        LOG.debug("usgs ShakeMap polygons feature array is null");
                     }
                 } else {
-                    LOG.debug("No ShakeMap polygons were built");
+                    LOG.debug("usgs no ShakeMap polygons were built");
                 }
             }
         }
@@ -241,12 +241,12 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
                         circleProps.put("eventtype", "EQ");
                         circleProps.put("polygonlabel", "100km");
                         geometryFeatures.add(new Feature(circle, circleProps));
-                        LOG.debug("Appended 100km buffer polygon");
+                        LOG.debug("usgs appended 100km buffer polygon");
                     } else {
-                        LOG.debug("buildCentroidBuffer returned null JSON");
+                        LOG.debug("usgs buildCentroidBuffer returned null JSON");
                     }
                 } catch (Exception e) {
-                    LOG.warn("Failed to build 100km buffer polygon", e);
+                    LOG.warn("Failed to build usgs 100km buffer polygon", e);
                 }
             }
         }
@@ -309,7 +309,7 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
             }
             return maxPga;
         } catch (Exception e) {
-            LOG.warn("Failed to build PGA mask", e);
+            LOG.warn("Failed to build usgs PGA mask", e);
             return null;
         }
     }
@@ -318,19 +318,19 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
     private FeatureCollection buildShakemapPolygons(Map<String, Object> shakemap) {
         Object contObj = shakemap.get("cont_mmi");
         if (!(contObj instanceof Map)) {
-            LOG.debug("ShakeMap does not contain cont_mmi section");
+            LOG.debug("usgs ShakeMap does not contain cont_mmi section");
             return null;
         }
         try {
             String fcJson = shakemapDao.buildShakemapPolygons(JsonUtil.writeJson(contObj));
             if (fcJson == null) {
-                LOG.debug("buildShakemapPolygons returned null JSON");
+                LOG.debug("usgs buildShakemapPolygons returned null JSON");
                 return null;
             }
-            LOG.debug("ShakeMap polygons JSON size: {} bytes", fcJson.length());
+            LOG.debug("usgs ShakeMap polygons JSON size: {} bytes", fcJson.length());
             return JsonUtil.readJson(fcJson, FeatureCollection.class);
         } catch (Exception e) {
-            LOG.warn("Failed to build ShakeMap polygons", e);
+            LOG.warn("Failed to build usgs ShakeMap polygons", e);
             return null;
         }
     }

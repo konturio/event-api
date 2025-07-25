@@ -117,7 +117,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 enrichWithLossEstimation(feature, detail, externalId);
             }
         } catch (Exception e) {
-            LOG.warn("Failed to enrich feature {}", externalId, e);
+            LOG.warn("Failed to enrich usgs feature {}", externalId, e);
         }
     }
 
@@ -201,7 +201,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             ArrayNode arr = feature.putArray("shakemap");
             arr.add(result);
         } catch (Exception e) {
-            LOG.warn("Failed to enrich feature with shakemap", e);
+            LOG.warn("Failed to enrich usgs feature with shakemap", e);
             feature.put("shakemap_cont_retrieval", false);
             feature.put("shakemap_hishres_pga_retrieval", false);
         }
@@ -248,7 +248,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
             ArrayNode arr = feature.putArray("loss_estimation");
             arr.add(result);
         } catch (Exception e) {
-            LOG.warn("Failed to enrich feature with loss estimation", e);
+            LOG.warn("Failed to enrich usgs feature with loss estimation", e);
             feature.put("loss_estimation_retrieval", false);
         }
     }
@@ -261,13 +261,13 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
     }
 
     private JsonNode parseJson(String content, String description, String eventId) {
-        LOG.debug("Fetched {} for event {} length {}", description, eventId, content.length());
+        LOG.debug("Fetched usgs {} for event {} length {}", description, eventId, content.length());
         try {
             JsonNode node = JsonUtil.readTree(content);
-            LOG.debug("{} for event {} is valid JSON", description, eventId);
+            LOG.debug("USGS {} for event {} is valid JSON", description, eventId);
             return node;
         } catch (Exception e) {
-            LOG.warn("Invalid {} for event {}", description, eventId, e);
+            LOG.warn("Invalid usgs {} for event {}", description, eventId, e);
             return null;
         }
     }
@@ -280,7 +280,7 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 return resp.body();
             }
         } catch (Exception e) {
-            LOG.warn("Failed to download url {}", url, e);
+            LOG.warn("Failed to download usgs url {}", url, e);
         }
         return null;
     }
