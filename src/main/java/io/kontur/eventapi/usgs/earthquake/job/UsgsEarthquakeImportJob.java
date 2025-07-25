@@ -151,11 +151,10 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 String contPga = fetchUrl(url);
                 if (contPga != null) {
                     result.set("download/cont_mmi.json", contNode);
-                    try {
-                        JsonNode contPgaNode = JsonUtil.readTree(contPga);
+                    JsonNode contPgaNode = parseJson(contPga, "cont_mmi.json", externalId);
+                    if (contPgaNode != null) {
                         result.set("cont_mmi", contPgaNode);
-                    } catch (Exception e) {
-                        LOG.warn("Failed to parse cont_mmi.json for event {}", externalId, e);
+                    } else {
                         feature.put("shakemap_cont_retrieval", false);
                         return;
                     }
@@ -174,11 +173,9 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 String contHiContent = fetchUrl(url);
                 if (contHiContent != null) {
                     result.set("download/cont_pga_highres.json", contPgaHiNode);
-                    try {
-                        JsonNode contHi = JsonUtil.readTree(contHiContent);
+                    JsonNode contHi = parseJson(contHiContent, "cont_pga_highres.json", externalId);
+                    if (contHi != null) {
                         result.set("cont_pga_highres", contHi);
-                    } catch (Exception e) {
-                        LOG.warn("Failed to parse cont_pga_highres.json for event {}", externalId, e);
                     }
                 }
             }
@@ -189,11 +186,10 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
                 String hiResContent = fetchUrl(url);
                 if (hiResContent != null) {
                     result.set("download/coverage_pga_high_res.covjson", hiResNode);
-                    try {
-                        JsonNode hiRes = JsonUtil.readTree(hiResContent);
+                    JsonNode hiRes = parseJson(hiResContent, "coverage_pga_high_res.covjson", externalId);
+                    if (hiRes != null) {
                         result.set("coverage_pga_high_res", hiRes);
-                    } catch (Exception e) {
-                        LOG.warn("Failed to parse coverage_pga_high_res.covjson for event {}", externalId, e);
+                    } else {
                         feature.put("shakemap_hishres_pga_retrieval", false);
                     }
                 } else {
@@ -261,6 +257,18 @@ public class UsgsEarthquakeImportJob extends AbstractJob {
         JsonNode node = from.get(field);
         if (node != null) {
             to.set(field, node);
+        }
+    }
+
+    private JsonNode parseJson(String content, String description, String eventId) {
+        LOG.debug("Fetched {} for event {} length {}", description, eventId, content.length());
+        try {
+            JsonNode node = JsonUtil.readTree(content);
+            LOG.debug("{} for event {} is valid JSON", description, eventId);
+            return node;
+        } catch (Exception e) {
+            LOG.warn("Invalid {} for event {}", description, eventId, e);
+            return null;
         }
     }
 
