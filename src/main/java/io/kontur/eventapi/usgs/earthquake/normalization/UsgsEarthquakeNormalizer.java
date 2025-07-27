@@ -293,7 +293,15 @@ public class UsgsEarthquakeNormalizer extends Normalizer {
     private Double enrichPgaMask(Map<String, Object> shakemap, Map<String, Object> shaProps) {
         try {
             Object maxPgaObj = shaProps.get("maxpga");
-            Double maxPga = maxPgaObj == null ? null : Double.valueOf(maxPgaObj.toString());
+            Double maxPga = null;
+            if (maxPgaObj != null) {
+                String pgaStr = maxPgaObj.toString();
+                try {
+                    maxPga = Double.valueOf(pgaStr);
+                } catch (NumberFormatException ignored) {
+                    LOG.debug("Cannot parse maxpga value '{}'", pgaStr);
+                }
+            }
 
             Object coverage = shakemap.get("coverage_pga_high_res");
             if (coverage instanceof Map) {
