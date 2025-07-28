@@ -35,3 +35,25 @@ The system ingests data from multiple providers. Each provider name reflects its
 | `cyclones.nhc-at.noaa` | Atlantic cyclone advisories from NHC |
 | `cyclones.nhc-cp.noaa` | Central Pacific cyclone advisories from NHC |
 | `cyclones.nhc-ep.noaa` | Eastern Pacific cyclone advisories from NHC |
+| `usgs.earthquake` | Earthquake events from the USGS 4.5‑week feed |
+
+## usgs.earthquake ##
+
+For USGS earthquakes `geometries` may contain ShakeMap polygons. They are derived
+from contour lines published by USGS. If `shakemap` is an array, only
+its first element is used. ShakeMap polygons do not include the original
+`Class`, `country` or `areaType` attributes. Polygons whose `value` ends up
+`null` are discarded during normalization. If `cont_mmi` contains no
+`features` array, the polygons are skipped. Each polygon is enriched with
+`Class`, `eventid`, `eventtype` and `polygonlabel` derived from the intensity
+value. `Class` becomes `Poly_SMPInt_&lt;intensity&gt;`, `eventid` matches the
+earthquake external ID, `eventtype` is `EQ` and `polygonlabel` is
+`Intensity &lt;intensity&gt;`. If the numeric `maxpga` value in ShakeMap
+properties reaches at least `0.4` and the data provides `coverage_pga_high_res`,
+a union of pixels with PGA above `0.4 g` is computed and stored as a GeoJSON
+object in `severity_data` under the key `pga40Mask`.
+If ShakeMap provides `coverage_pga_high_res`, it is copied to `severity_data` under `coverage_pga_highres`.
+Polygons created from ShakeMap contours and the `pga40Mask` are shifted with `ST_ShiftLongitude` if they cross the antimeridian so that longitudes stay within `[-180, 180]`.
+For every USGS earthquake a circular polygon with 100&nbsp;km radius is built around the epicenter. If this buffer crosses the antimeridian it is also shifted.
+It is stored in `geometries` with properties `Class`=`Poly_Circle`, `eventid` equal
+to the external ID, `areaType`=`alertArea`, `eventtype`=`EQ` and `polygonlabel`=`100km`.
