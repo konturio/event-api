@@ -19,8 +19,6 @@ public class SeverityUtil {
     public final static String FUJITA_SCALE = "fujitaScale";
     public final static String TORNADO_LENGTH_KM = "tornadoLengthKm";
     public final static String TORNADO_WIDTH_M = "tornadoWidthM";
-    public final static String PGA40_MASK = "pga40Mask";
-    public final static String COVERAGE_PGA_HIGHRES = "coverage_pga_highres";
 
     public final static String CATEGORY_TD = "TD";
     public final static String CATEGORY_TS = "TS";

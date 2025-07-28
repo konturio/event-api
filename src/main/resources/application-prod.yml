@@ -19,9 +19,6 @@ pdc:
 staticdata:
   s3Folder: 'PROD/'
 
-usgs:
-  host: 'https://earthquake.usgs.gov'
-
 humanitarianCrisis:
   s3Folder: 'kontur_events/PROD/'
 

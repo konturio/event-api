@@ -22,9 +22,6 @@ humanitarianCrisis:
 staticdata:
   s3Folder: 'TEST DEV/'
 
-usgs:
-  host: 'https://earthquake.usgs.gov'
-
 aws:
   sqs:
     enabled: true
