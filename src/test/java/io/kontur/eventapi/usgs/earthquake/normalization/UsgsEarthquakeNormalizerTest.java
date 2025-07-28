@@ -101,6 +101,21 @@ class UsgsEarthquakeNormalizerTest {
     }
 
     @Test
+    void testNormalizeWithNaNMaxPga() throws Exception {
+        when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
+
+        DataLake dl = createDataLake("/usgs/sample_nan.json");
+        NormalizedObservation obs = normalizer.normalize(dl);
+
+        verify(shakemapDao, never()).buildPgaMask(any());
+        assertFalse(obs.getSeverityData().containsKey("pga40Mask"));
+
+        Object cov = obs.getSeverityData().get("coverage_pga_highres");
+        assertTrue(cov instanceof Map);
+        assertEquals("Coverage", ((Map<?, ?>) cov).get("type"));
+    }
+
+    @Test
     void testMagnitudeUpgrade() throws Exception {
         when(shakemapDao.buildCentroidBuffer(anyDouble(), anyDouble())).thenReturn("{\"type\":\"Polygon\"}");
 

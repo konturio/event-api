@@ -48,10 +48,10 @@ its first element is used. ShakeMap polygons do not include the original
 `Class`, `eventid`, `eventtype` and `polygonlabel` derived from the intensity
 value. `Class` becomes `Poly_SMPInt_&lt;intensity&gt;`, `eventid` matches the
 earthquake external ID, `eventtype` is `EQ` and `polygonlabel` is
-`Intensity &lt;intensity&gt;`. If `maxpga` in ShakeMap properties reaches at
-least `0.4` and the data provides `coverage_pga_high_res`, a union of
-pixels with PGA above `0.4 g` is computed and stored as a GeoJSON object in
-`severity_data` under the key `pga40Mask`.
+`Intensity &lt;intensity&gt;`. If the numeric `maxpga` value in ShakeMap
+properties reaches at least `0.4` and the data provides `coverage_pga_high_res`,
+a union of pixels with PGA above `0.4 g` is computed and stored as a GeoJSON
+object in `severity_data` under the key `pga40Mask`.
 If ShakeMap provides `coverage_pga_high_res`, it is copied to `severity_data` under `coverage_pga_highres`.
 Polygons created from ShakeMap contours and the `pga40Mask` are shifted with `ST_ShiftLongitude` if they cross the antimeridian so that longitudes stay within `[-180, 180]`.
 For every USGS earthquake a circular polygon with 100&nbsp;km radius is built around the epicenter. If this buffer crosses the antimeridian it is also shifted.
