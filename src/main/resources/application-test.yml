@@ -16,9 +16,6 @@ pdc:
   host: 'https://testemops.pdc.org'
   mapSrvHost: 'https://testapps.pdc.org'
 
-usgs:
-  host: 'https://earthquake.usgs.gov'
-
 staticdata:
   s3Folder: 'TEST QA/'
 

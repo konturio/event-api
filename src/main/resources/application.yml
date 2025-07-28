@@ -88,9 +88,6 @@ nifc:
 inciweb:
   host: 'https://inciweb.nwcg.gov'
 
-usgs:
-  host: 'https://earthquake.usgs.gov'
-
 nhc:
   host: 'https://www.nhc.noaa.gov'
 
@@ -153,10 +150,6 @@ scheduler:
     enable: true
     initialDelay: 1000
     fixedDelay: 300000
-  usgsEarthquakeImport:
-    enable: true
-    initialDelay: 1000
-    fixedDelay: 300000
   inciwebImport:
     enable: false
     initialDelay: 1000
@@ -185,7 +178,7 @@ scheduler:
       tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
       wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
       wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa,
-      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa, usgs.earthquake
+      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
   eventCombination:
     enable: true
     initialDelay: 1000
@@ -194,7 +187,7 @@ scheduler:
       tornado.australian-bm, tornado.osm-wiki, tornado.des-inventar-sendai, storms.noaa, wildfire.frap.cal,
       wildfire.sa-gov, wildfire.qld-des-gov, wildfire.victoria-gov, wildfire.nsw-gov, wildfire.calfire,
       wildfire.perimeters.nifc, wildfire.locations.nifc, cyclones.nhc-at.noaa, cyclones.nhc-ep.noaa, cyclones.nhc-cp.noaa,
-      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa, usgs.earthquake
+      pdcSqs, pdcMapSrv, pdcSqsNasa, pdcMapSrvNasa
   feedComposition:
     enable: true
     initialDelay: 1000
