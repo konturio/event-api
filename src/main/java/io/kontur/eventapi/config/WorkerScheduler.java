@@ -18,6 +18,8 @@ import io.kontur.eventapi.nhc.job.NhcEpImportJob;
 import io.kontur.eventapi.nifc.job.NifcImportJob;
 import io.kontur.eventapi.pdc.job.PdcMapSrvSearchJob;
 import io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob;
+import io.kontur.eventapi.usgs.earthquake.job.UsgsEarthquakeImportJob;
+import io.kontur.eventapi.usgs.earthquake.job.UsgsEarthquakeNormalizationJob;
 import io.kontur.eventapi.staticdata.job.StaticImportJob;
 import io.kontur.eventapi.emdat.jobs.EmDatImportJob;
 import io.kontur.eventapi.gdacs.job.GdacsSearchJob;
@@ -54,6 +56,8 @@ public class WorkerScheduler {
     private final EnrichmentJob enrichmentJob;
     private final CalFireSearchJob calFireSearchJob;
     private final NifcImportJob nifcImportJob;
+    private final UsgsEarthquakeImportJob usgsEarthquakeImportJob;
+    private final UsgsEarthquakeNormalizationJob usgsEarthquakeNormalizationJob;
     private final InciWebImportJob inciWebImportJob;
     private final HumanitarianCrisisImportJob humanitarianCrisisImportJob;
     private final MetricsJob metricsJob;
@@ -99,6 +103,8 @@ public class WorkerScheduler {
     private String calfireEnabled;
     @Value("${scheduler.nifcImport.enable}")
     private String nifcImportEnabled;
+    @Value("${scheduler.usgsEarthquakeImport.enable}")
+    private String usgsEarthquakeImportEnabled;
     @Value("${scheduler.inciwebImport.enable}")
     private String inciwebEnabled;
     @Value("${scheduler.humanitarianCrisisImport.enable}")
@@ -127,6 +133,8 @@ public class WorkerScheduler {
                            HistoricalTornadoJapanMaImportJob historicalTornadoJapanMaImportJob,
                            PdcMapSrvSearchJobs pdcMapSrvSearchJobs,
                            EnrichmentJob enrichmentJob, CalFireSearchJob calFireSearchJob, NifcImportJob nifcImportJob,
+                           UsgsEarthquakeImportJob usgsEarthquakeImportJob,
+                           UsgsEarthquakeNormalizationJob usgsEarthquakeNormalizationJob,
                            InciWebImportJob inciWebImportJob, HumanitarianCrisisImportJob humanitarianCrisisImportJob,
                            NhcAtImportJob nhcAtImportJob, NhcCpImportJob nhcCpImportJob, NhcEpImportJob nhcEpImportJob,
                            MetricsJob metricsJob, ReEnrichmentJob reEnrichmentJob, EventExpirationJob eventExpirationJob) {
@@ -149,6 +157,8 @@ public class WorkerScheduler {
         this.enrichmentJob = enrichmentJob;
         this.calFireSearchJob = calFireSearchJob;
         this.nifcImportJob = nifcImportJob;
+        this.usgsEarthquakeImportJob = usgsEarthquakeImportJob;
+        this.usgsEarthquakeNormalizationJob = usgsEarthquakeNormalizationJob;
         this.inciWebImportJob = inciWebImportJob;
         this.nhcAtImportJob = nhcAtImportJob;
         this.nhcCpImportJob = nhcCpImportJob;
@@ -263,6 +273,13 @@ public class WorkerScheduler {
         }
     }
 
+    @Scheduled(initialDelayString = "${scheduler.usgsEarthquakeImport.initialDelay}", fixedDelayString = "${scheduler.usgsEarthquakeImport.fixedDelay}")
+    public void startUsgsEarthquakeImport() {
+        if (Boolean.parseBoolean(usgsEarthquakeImportEnabled)) {
+            usgsEarthquakeImportJob.run();
+        }
+    }
+
     @Scheduled(initialDelayString = "${scheduler.inciwebImport.initialDelay}", fixedDelayString = "${scheduler.inciwebImport.fixedDelay}")
     public void startInciWebImport() {
         if (Boolean.parseBoolean(inciwebEnabled)) {
@@ -306,6 +323,13 @@ public class WorkerScheduler {
         }
     }
 
+    @Scheduled(initialDelayString = "${scheduler.normalization.initialDelay}", fixedDelayString = "${scheduler.normalization.fixedDelay}")
+    public void startUsgsEarthquakeNormalization() {
+        if (Boolean.parseBoolean(normalizationEnabled)) {
+            usgsEarthquakeNormalizationJob.run();
+        }
+    }
+
     @Scheduled(initialDelayString = "${scheduler.eventCombination.initialDelay}", fixedDelayString = "${scheduler.eventCombination.fixedDelay}")
     public void startCombinationJob() {
         if (Boolean.parseBoolean(eventCombinationEnabled)) {
@@ -319,6 +343,7 @@ public class WorkerScheduler {
             firmsEventCombinationJob.run();
         }
     }
+
 
     @Scheduled(initialDelayString = "${scheduler.feedComposition.initialDelay}", fixedDelayString = "${scheduler.feedComposition.fixedDelay}")
     public void startFeedCompositionJob() {
