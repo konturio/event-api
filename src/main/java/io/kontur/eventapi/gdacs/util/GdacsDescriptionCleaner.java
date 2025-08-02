@@ -30,7 +30,7 @@ public class GdacsDescriptionCleaner {
             return "";
         }
 
-        result = result.replaceAll("\\(vulnerability \\[unknown\\])", "");
+        result = result.replace("(vulnerability [unknown])", "");
         result = result.replaceAll("Estimated population affected by category 1 \\(120 km/h\\) wind speeds or higher is 0\\s*(\\(0 in tropical storm\\))?\\.?", "");
         result = result.replaceAll("The flood caused 0 deaths and 0 displaced \\.", "");
         result = result.replaceAll("The flood caused 0 deaths and (\\d+) displaced", "The flood caused $1 displaced");
