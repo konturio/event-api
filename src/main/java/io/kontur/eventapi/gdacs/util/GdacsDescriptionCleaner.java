@@ -25,13 +25,17 @@ public class GdacsDescriptionCleaner {
 
         result = DATE_PREFIX.matcher(result).replaceFirst("");
         result = PERIOD_RANGE_PREFIX.matcher(result).replaceFirst("");
+        // drop leftover indefinite article after removing date range
+        result = result.replaceFirst("(?i)^a\\s+", "");
 
         if (FOREST_FIRE_SENTENCE.matcher(result).matches()) {
             return "";
         }
 
         result = result.replace("(vulnerability [unknown])", "");
-        result = result.replaceAll("Estimated population affected by category 1 \\(120 km/h\\) wind speeds or higher is 0\\s*(\\(0 in tropical storm\\))?\\.?", "");
+        result = result.replaceAll(
+                "Estimated population affected by category 1 \\(120 km/h\\) wind speeds or higher is 0(?:\\s*\\(0 in tropical storm\\))?\\s*\\.(?:\\s*$)",
+                "");
         result = result.replaceAll("The flood caused 0 deaths and 0 displaced \\.", "");
         result = result.replaceAll("The flood caused 0 deaths and (\\d+) displaced", "The flood caused $1 displaced");
         result = result.replaceAll("The flood caused (\\d+) deaths and 0 displaced", "The flood caused $1 deaths");
