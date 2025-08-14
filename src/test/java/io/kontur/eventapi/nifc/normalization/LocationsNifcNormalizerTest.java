@@ -48,6 +48,9 @@ class LocationsNifcNormalizerTest {
         assertNull(observation.getExternalEpisodeId());
 
         assertEquals(LOCATIONS_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
+        assertEquals("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Incident_Locations_YearToDate/FeatureServer/0/query?where=UniqueFireIdentifier%3D%272021-IDIPF-000504%27&outFields=*&f=geojson",
+                observation.getSeverityData().get("source_link"));
+        assertEquals("9fdfcf35-602b-439e-8cf7-e4225c89ad9f", observation.getSeverityData().get("IrwinID"));
     }
 
     private DataLake createDataLake() throws IOException {
