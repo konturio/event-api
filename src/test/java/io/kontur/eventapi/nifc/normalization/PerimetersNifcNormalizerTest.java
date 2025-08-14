@@ -44,10 +44,10 @@ class PerimetersNifcNormalizerTest {
         assertNull(observation.getActive());
         assertNull(observation.getCost());
         assertNull(observation.getRegion());
-       assertTrue(observation.getUrls().isEmpty());
-       assertNull(observation.getExternalEpisodeId());
+        assertTrue(observation.getUrls().isEmpty());
+        assertNull(observation.getExternalEpisodeId());
 
-       assertEquals(PERIMETERS_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
+        assertEquals(PERIMETERS_PROPERTIES, observation.getGeometries().getFeatures()[0].getProperties());
         assertEquals("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters_YearToDate/FeatureServer/0/query?where=attr_UniqueFireIdentifier%3D%272021-ALALF-210222%27&outFields=*&f=geojson",
                 observation.getSeverityData().get("source_link"));
         assertEquals("{39826AC1-1244-4AA1-B23A-C55C2EF939FE}", observation.getSeverityData().get("IrwinID"));
