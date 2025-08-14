@@ -58,6 +58,19 @@ public class PerimetersNifcNormalizer extends NifcNormalizer {
         if (percentContained != null) {
             observation.getSeverityData().put(CONTAINED_AREA_PCT, percentContained);
         }
+
+        String uniqueFireId = readString(props, "attr_UniqueFireIdentifier");
+        if (uniqueFireId != null) {
+            String sourceLink = String.format(
+                    "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters_YearToDate/FeatureServer/0/query?where=attr_UniqueFireIdentifier%%3D%%27%s%%27&outFields=*&f=geojson",
+                    uniqueFireId);
+            observation.getSeverityData().put("source_link", sourceLink);
+        }
+
+        String irwinId = readString(props, "attr_IrwinID");
+        if (irwinId != null) {
+            observation.getSeverityData().put("IrwinID", irwinId);
+        }
         return observation;
     }
 

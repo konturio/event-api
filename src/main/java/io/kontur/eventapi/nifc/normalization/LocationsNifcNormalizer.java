@@ -60,6 +60,19 @@ public class LocationsNifcNormalizer extends NifcNormalizer {
             observation.getSeverityData().put(CONTAINED_AREA_PCT, percentContained);
         }
 
+        String uniqueFireId = readString(props, "UniqueFireIdentifier");
+        if (uniqueFireId != null) {
+            String sourceLink = String.format(
+                    "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Incident_Locations_YearToDate/FeatureServer/0/query?where=UniqueFireIdentifier%%3D%%27%s%%27&outFields=*&f=geojson",
+                    uniqueFireId);
+            observation.getSeverityData().put("source_link", sourceLink);
+        }
+
+        String irwinId = readString(props, "IrwinID");
+        if (irwinId != null) {
+            observation.getSeverityData().put("IrwinID", irwinId);
+        }
+
         return observation;
     }
 }
