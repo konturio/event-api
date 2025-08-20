@@ -4,6 +4,7 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.normalization.Normalizer;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +52,10 @@ public class StormsNoaaNormalizer extends Normalizer {
             "K", BigDecimal.valueOf(1000),
             "M", BigDecimal.valueOf(1000000),
             "B", BigDecimal.valueOf(1000000000));
+
+    private static final BigDecimal FLOOD_MODERATE_DAMAGE_THRESHOLD = BigDecimal.valueOf(20_000);
+    private static final BigDecimal FLOOD_SEVERE_DAMAGE_THRESHOLD = BigDecimal.valueOf(1_000_000);
+    private static final BigDecimal FLOOD_EXTREME_DAMAGE_THRESHOLD = BigDecimal.valueOf(10_000_000);
 
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
@@ -132,26 +137,36 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setExternalEventId(parseString(data, "EVENT_ID"));
         normalizedObservation.setDescription(parseString(data, "EPISODE_NARRATIVE"));
         normalizedObservation.setEpisodeDescription(parseString(data, "EVENT_NARRATIVE"));
-        BigDecimal propertyDamage = getCost(parseString(data, "DAMAGE_PROPERTY"));
+        String injuriesDirectStr = parseString(data, "INJURIES_DIRECT");
+        String injuriesIndirectStr = parseString(data, "INJURIES_INDIRECT");
+        String deathsDirectStr = parseString(data, "DEATHS_DIRECT");
+        String deathsIndirectStr = parseString(data, "DEATHS_INDIRECT");
+        String damagePropertyStr = parseString(data, "DAMAGE_PROPERTY");
+        String damageCropsStr = parseString(data, "DAMAGE_CROPS");
+
+        BigDecimal propertyDamage = getCost(damagePropertyStr);
         normalizedObservation.setCost(propertyDamage);
         Map<String, Object> loss = new HashMap<>();
         if (propertyDamage != null) {
             loss.put(LossUtil.PROPERTY_DAMAGE, propertyDamage);
         }
-        BigDecimal cropsDamage = getCost(parseString(data, "DAMAGE_CROPS"));
+        BigDecimal cropsDamage = getCost(damageCropsStr);
         if (cropsDamage != null) {
             loss.put(LossUtil.CROPS_DAMAGE, cropsDamage);
         }
-        int dead = parseInt(data, "DEATHS_DIRECT") + parseInt(data, "DEATHS_INDIRECT");
+        int deathsDirect = parseInt(deathsDirectStr);
+        int deathsIndirect = parseInt(deathsIndirectStr);
+        int dead = deathsDirect + deathsIndirect;
         if (dead > 0) {
             loss.put(LossUtil.PEOPLE_DEAD, dead);
         }
-        int injured = parseInt(data, "INJURIES_DIRECT") + parseInt(data, "INJURIES_INDIRECT");
+        int injuriesDirect = parseInt(injuriesDirectStr);
+        int injuriesIndirect = parseInt(injuriesIndirectStr);
+        int injured = injuriesDirect + injuriesIndirect;
         if (injured > 0) {
             loss.put(LossUtil.PEOPLE_INJURED, injured);
         }
         normalizedObservation.setLoss(loss);
-        normalizedObservation.setEventSeverity(convertFujitaScale(parseString(data, "TOR_F_SCALE")));
 
         setGeometry(data, normalizedObservation);
 
@@ -162,13 +177,21 @@ public class StormsNoaaNormalizer extends Normalizer {
         normalizedObservation.setEndedAt(convertDate(endedAt != null ? endedAt : startedAt, timezone));
 
         String eventType = parseString(data, "EVENT_TYPE");
-        normalizedObservation.setType(EVENT_TYPES_MAPPER.getOrDefault(eventType, EventType.OTHER));
+        EventType type = EVENT_TYPES_MAPPER.getOrDefault(eventType, EventType.OTHER);
+        normalizedObservation.setType(type);
 
         String zone = parseString(data, "CZ_NAME");
         String state = parseString(data, "STATE");
         normalizedObservation.setName(createName(eventType, zone, state, "USA"));
 
-        normalizedObservation.setSeverityData(getSeverityData(data, normalizedObservation.getType()));
+        normalizedObservation.setSeverityData(getSeverityData(data, type));
+
+        Severity severity = type == EventType.FLOOD
+                ? calculateFloodSeverity(injuriesDirectStr, injuriesIndirectStr, deathsDirectStr, deathsIndirectStr,
+                damagePropertyStr, damageCropsStr, injuriesDirect, injuriesIndirect, deathsDirect, deathsIndirect,
+                propertyDamage, cropsDamage)
+                : convertFujitaScale(parseString(data, "TOR_F_SCALE"));
+        normalizedObservation.setEventSeverity(severity);
 
         return normalizedObservation;
     }
@@ -261,6 +284,35 @@ public class StormsNoaaNormalizer extends Normalizer {
         return severityData;
     }
 
+    private Severity calculateFloodSeverity(String injuriesDirectStr, String injuriesIndirectStr,
+                                            String deathsDirectStr, String deathsIndirectStr,
+                                            String damagePropertyStr, String damageCropsStr,
+                                            int injuriesDirect, int injuriesIndirect,
+                                            int deathsDirect, int deathsIndirect,
+                                            BigDecimal propertyDamage, BigDecimal cropsDamage) {
+        boolean anyPresent = injuriesDirectStr != null || injuriesIndirectStr != null || deathsDirectStr != null
+                || deathsIndirectStr != null || damagePropertyStr != null || damageCropsStr != null;
+        if (!anyPresent) {
+            return Severity.UNKNOWN;
+        }
+        if (injuriesDirect >= 2000 || injuriesIndirect >= 2000 || deathsDirect >= 50 || deathsIndirect >= 50
+                || (propertyDamage != null && propertyDamage.compareTo(FLOOD_EXTREME_DAMAGE_THRESHOLD) >= 0)
+                || (cropsDamage != null && cropsDamage.compareTo(FLOOD_EXTREME_DAMAGE_THRESHOLD) >= 0)) {
+            return Severity.EXTREME;
+        }
+        if (injuriesDirect >= 1000 || injuriesIndirect >= 1000 || deathsDirect >= 10 || deathsIndirect >= 10
+                || (propertyDamage != null && propertyDamage.compareTo(FLOOD_SEVERE_DAMAGE_THRESHOLD) >= 0)
+                || (cropsDamage != null && cropsDamage.compareTo(FLOOD_SEVERE_DAMAGE_THRESHOLD) >= 0)) {
+            return Severity.SEVERE;
+        }
+        if (injuriesDirect >= 100 || injuriesIndirect >= 100 || deathsDirect >= 1 || deathsIndirect >= 1
+                || (propertyDamage != null && propertyDamage.compareTo(FLOOD_MODERATE_DAMAGE_THRESHOLD) >= 0)
+                || (cropsDamage != null && cropsDamage.compareTo(FLOOD_MODERATE_DAMAGE_THRESHOLD) >= 0)) {
+            return Severity.MODERATE;
+        }
+        return Severity.MINOR;
+    }
+
     private String parseString(Map<String, String> map, String key) {
         String value = map.get(key);
         return StringUtils.isBlank(value) ? null : value;
@@ -273,6 +325,14 @@ public class StormsNoaaNormalizer extends Normalizer {
 
     private int parseInt(Map<String, String> map, String key) {
         String value = parseString(map, key);
+        try {
+            return value == null ? 0 : Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private int parseInt(String value) {
         try {
             return value == null ? 0 : Integer.parseInt(value);
         } catch (NumberFormatException e) {

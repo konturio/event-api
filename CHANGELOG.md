@@ -5,6 +5,7 @@
 #### Added
 
 #### Changed
+- Implement flood-specific severity calculation for `storms.noaa` events.
 
 #### Removed
 
