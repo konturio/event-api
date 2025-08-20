@@ -128,8 +128,8 @@ public class StormsNoaaNormalizer extends Normalizer {
         String[] csvHeaderAndRow = dataLakeDto.getData().split("\n");
         Map<String, String> data = parseRow(csvHeaderAndRow[0], csvHeaderAndRow[1]);
 
-        normalizedObservation.setExternalEventId(parseString(data, "EPISODE_ID"));
-        normalizedObservation.setExternalEpisodeId(parseString(data, "EVENT_ID"));
+        normalizedObservation.setExternalEpisodeId(parseString(data, "EPISODE_ID"));
+        normalizedObservation.setExternalEventId(parseString(data, "EVENT_ID"));
         normalizedObservation.setDescription(parseString(data, "EPISODE_NARRATIVE"));
         normalizedObservation.setEpisodeDescription(parseString(data, "EVENT_NARRATIVE"));
         BigDecimal propertyDamage = getCost(parseString(data, "DAMAGE_PROPERTY"));
