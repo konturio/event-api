@@ -22,7 +22,6 @@ import java.util.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.kontur.eventapi.entity.Severity.UNKNOWN;
-import static io.kontur.eventapi.stormsnoaa.job.StormsNoaaImportJob.STORMS_NOAA_PROVIDER;
 import static io.kontur.eventapi.util.SeverityUtil.*;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -155,10 +154,6 @@ public class FeedCompositionJob extends AbstractJob {
                 .filter(ep -> ep.getType() != null)
                 .max(comparing(FeedEpisode::getUpdatedAt))
                 .map(FeedEpisode::getType).orElse(null));
-
-        if (eventObservations.stream().anyMatch(obs -> obs.getProvider().equals(STORMS_NOAA_PROVIDER))) {
-            feedData.setType(EventType.STORM);
-        }
 
         Map<String, Object> loss = new HashMap<>();
         episodes.stream()
