@@ -8,6 +8,7 @@ import io.kontur.eventapi.nifc.converter.NifcDataLakeConverter;
 import io.micrometer.core.instrument.MeterRegistry;
 import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import reactor.util.function.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCAT
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
 import static io.kontur.eventapi.util.DateTimeUtil.getDateTimeFromMilli;
 import static io.kontur.eventapi.util.JsonUtil.writeJson;
+import static io.kontur.eventapi.util.JsonUtil.readTree;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Component
@@ -81,7 +83,18 @@ public class NifcImportJob extends AbstractJob {
                 LOG.warn("Skip processing {} due to invalid response", provider);
                 return;
             }
-            FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(geoJson);
+            JsonNode root;
+            try {
+                root = readTree(geoJson);
+            } catch (Exception e) {
+                LOG.warn("Skip processing {} due to malformed JSON", provider);
+                return;
+            }
+            if (!root.has("type") || !"FeatureCollection".equals(root.get("type").asText()) || !root.has("features")) {
+                LOG.warn("Skip processing {} due to unexpected JSON structure", provider);
+                return;
+            }
+            FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(root.toString());
             Map<Tuple2<String, OffsetDateTime>, DataLake> dataLakes = new HashMap<>();
             Set<String> ids = Arrays.stream(fc.getFeatures())
                     .map(feature -> String.valueOf(feature.getProperties().get(externalIdProp)))
