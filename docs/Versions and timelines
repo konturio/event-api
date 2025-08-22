@@ -1,0 +1,51 @@
+# RFC1 - Versions and timelines
+
+Field: Content
+
+Requirements to keep in mind:
+* Consumer can get all the data by requesting feed updates after a timestamp.
+* Kontur never alters the data that we served to consumer already.
+* Events can go to different feeds having different access limits. (Swiss Re wants PDC+EM-DAT+(maybe FIRMS), Disaster Ninja wants GDACS+FIRMS).
+* One Kontur Event can collect information from multiple data sources.
+* Event Feeds can be limited to be built only from a subset of source data that consumer asked for (currenly only per source provider).
+* PDC has a problem with their system when some data can come in with delay and it creates a new user-visible record. We want to avoid that: if we have some new information about the past it should naturally slide into the right spot in the history of event.
+* One consumer should not notice that we got some new data in other feeds if we got them but did not publish into feed accessible by them.
+
+Provider limitations: 
+* PDC serves data via SQS and hp_srv. Duplicate things should be merged into one single episode on the outgoing side even though they have different external IDs.
+* GDACS serves disaster info as XML data snapshot and GeoJSON geometry snapshot available on different URLs. These have different observation id's but need to be presented as same episode on output.
+* FIRMS serves hotspots as separate CSV rows. We want to report a sum of geometries seen in single satellite imagery shot as single output episode even if it is shown as one.
+
+To solve this we want to employ [bitemporal data mode](https://en.wikipedia.org/wiki/Temporal_database#Bi-Temporal "https://en.wikipedia.org/wiki/Temporal_database#Bi-Temporal")l. Valid time is the axis of Episodes, System time is the axis of Versions. Each feed has independent view on the data in the database.
+
+Events have following:
+* [[Glossary/Term: Event#^7604dff0-ca8a-11ea-9032-fd7b98b9da5f/5e26f8a0-2345-11eb-a95d-29b1426e7c27]] - a collection of pointers to data about a certain disaster or related chains of disasters. Visible for external consumers only as Event Snapshots in the Feed.
+* Event Snapshot - a view on Event that combines together all the Observations visible to feed consumer. Snapshots are saved verbatim, copying all the information, so that a change in the future will not alter the information presented in them.
+* Feed - a stream of event snapshots we provide to consumer. Has a number of snapshots, and a way to query new ones.
+* Version - is a sequential number of Event Snapshot of Event that we serve to the consumer. Exists in context of Event and Feed ID.
+* Episode - a snapshot of the state of the event in time. Exists in context of Event Snapshot. Is combined from one or multiple observations that are visible 
+* Observation - atomic chunk of data coming from external provider. Can be visible or invisible to a Feed. Should be linked to an Event. 
+
+Idealized workflow:
+* Event Sources -> Event Data Lake
+  * A job that fetches data from remote provider and stores it as is, without any format conversion. Is the only spot where the system can contact external servers.
+* Observation Normalization: Event Data Lake -> Normalized Observation record
+  * A job that takes non-normalized observation and transforms it into a (number of) normalized observations. 
+* Event recombination
+  * A job that links each Observation to an Event. Can use source provider's event id for matching (PDC, GDACS), or a heuristic (FIRMS), or be a manual operation (future). 
+* Episode rollup
+  * A job that publishes a Snapshot of Event into Feed. For each feed, for each event, pulls in observations visible for the feed for the event. Checks if list of observations matches one in the last published version. If lists don't match (new observation in event, change in access restrictions, observation manually unlinked) the new version is produced and stored in output feed. 
+  * While producing the new Snapshot of event, the Observations that relate to the same time are folded together into one single Episode. Data from previous Observations is generally used to fill in the gaps in newer ones.
+
+
+
+See Also:
+
+<https://www.dataversity.net/implementing-bitemporal-modeling-best-value/>
+
+<https://www.thegoldensource.com/bitemporal-data-preserving-moment-time/> 
+
+<https://en.wikipedia.org/wiki/Bitemporal_Modeling> 
+
+<https://en.wikipedia.org/wiki/Temporal_database#Bi-Temporal> 
+
