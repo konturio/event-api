@@ -1,0 +1,67 @@
+# How to build a cyclone?
+
+Building cyclones from point observations:
+* raw data of cyclones is in the xml format + in tabular form/txt (the same, but more structured), for example <https://webcritech.jrc.ec.europa.eu/ModellingOutput/GDACS/cycloneSurgeVM/1000799_JTWC/41/all_inpData.txt> 
+* represent a set of points for each cyclone episode (i.e. several point observations correspond to one episode);
+* for each point there is:
+  * observation time in hours (cumulative total starting from 0);
+  * coordinates;
+  * maximum wind speed;
+  * radius of wind propagation at a point in 4 directions (ne, nw, se, sw) for 3 wind directions (34, 50, 64, knots, 1 knot \~ 1.852km/h);
+  * the radius is indicated in nautical miles (1 nautical mile \~ 1.852km);
+  * point date;
+  * type (C - current, F - forecast);
+* if you build a buffer zone (green, orange, red), you need to take the maximum radius of wind propagation at the point (you get the outlines of gdacs);
+* if you build a buffer from points, you can get several concentric circles, it looks artificial, for example: 
+
+Therefore, the buffer must be built from the line (with different distances in points);
+* the data from this source is not entirely raw, it is most likely processed data by NOAA, JTWC. The GDACS website is copyright EC-JRC (Copyright Joint Research Center of the European Commission).
+* in the raw data there is no information on the cone of uncertainty; according to [information from external sources](https://blog.mapbox.com/mapping-active-hurricanes-9817ea935fd8 "https://blog.mapbox.com/mapping-active-hurricanes-9817ea935fd8"), it is built along the cyclone track at predicted points, increasing the radius in proportion to the distance from the current date.
+  * NOAA presents different radii of the cone of uncertainty depends on the cyclone region <https://www.nhc.noaa.gov/aboutcone.shtml>
+  * ![image.png](https://kontur.fibery.io/api/files/6d6de4c0-213c-4642-bcbc-075ce46f8b2c#width=1217&height=332 "")need to check if it works for predictions
+
+Code for cyclone calculation:
+
+```
+drop table if exists cyclone_points;
+create table cyclone_points (
+    id      int,
+    geom    geometry,
+    radius1 float,
+    radius2 float,
+    radius3 float
+);
+insert into
+    cyclone_points (id, geom, radius1, radius2, radius3)
+values
+    (1, 'POINT(134.6 17.5)', 0, 0, 0),
+    (2, 'POINT(134.5 18.5)', 0, 0, 0),
+    (3, 'POINT(134.4 19.6)', 314840, 0, 0),
+    (4, 'POINT(134.1 20.8)', 351880, 166680, 0),
+    (5, 'POINT(133.3 22.1)', 351880, 92600 , 0),
+    (6, 'POINT(131.4 23.8)', 259280, 92600, 55560),
+    (7, 'POINT(128.7 25.4)', 314840, 148160, 74080),
+    (8, 'POINT(125.7 26.8)', 370400, 129640, 55560);
+
+select ST_AsGeoJSON(ST_Union(geom))
+from
+    (
+        select
+            ST_Segmentize(
+                ST_ConvexHull(
+                    ST_Collect(
+                        ST_Buffer(geom::geography, ST_M(geom))::geometry,
+                        ST_Buffer(lag(geom) over (order by path)::geography, lag(ST_M(geom)) over (order by path))::geometry
+                        )
+                    )::geography,
+                10000
+                )::geometry as geom
+        from
+            (
+                select
+                    (ST_DumpPoints(ST_Segmentize(ST_MakeLine(ST_Force3DM(geom, radius3))::geography, 1000)::geometry)).*
+                from
+                    cyclone_points
+            ) z
+    ) z;
+```
