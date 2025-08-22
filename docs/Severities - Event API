@@ -1,0 +1,140 @@
+# Severities - Event API
+
+**Severity levels (in Kontur)**: TERMINATION, MINOR, MODERATE, SEVERE, EXTREME, UNKNOWN.
+* Severity calculation**
+
+The level of severity is calculated using different algorithms for different data:
+
+1. **PDC's, GDACS's** severities. Cyclone, drought, earthquake, flood, storm, tornado, tsunami, volcano, wildfire, other: severity values match according to the table below (using field 'data', key 'severityId' from table data_lake).
+
+|     |     |     |
+| --- | --- | --- |
+| **PDC** | **GDACS's**  | **Kontur** |
+| TERMINATION |  | TERMINATION |
+| INFORMATION | Minor | MINOR |
+| ADVISORY | Moderate | MODERATE |
+| WATCH | Severe | SEVERE |
+| WARNING | Extreme | EXTREME |
+|  | Unknown | UNKNOWN |
+
+2. **Firms's** severities. Wildfire data:
+
+|     |     |     |
+| --- | --- | --- |
+| **Area** | **Duration** | **Severity** |
+| any | <= 24 hours | MINOR |
+| < 10 km2 | any | MINOR |
+| \>= 10 km2 AND < 50 km2 | \> 24 hours | MODERATE |
+| \>= 50 km2 AND < 100 km2 | \> 24 hours | SEVERE |
+| \>= 100 km2  | \> 24 hours | EXTREME |
+
+3. **EM-DAT's** severities:
+
+|     |     |
+| --- | --- |
+| **Dis Mag Value** | **Kontur Severity** |
+| **Tropical Cyclones, Tornadoes** |  |
+| less than 154 kph | MODERATE |
+| 154 - 208 kph | SEVERE |
+| 209+ kph | EXTREME |
+| **Earthquake** |  |
+| magnitude less than 4 | MINOR |
+| 4-6 | MODERATE |
+| 6 | SEVERE |
+| 7+ | EXTREME |
+| **Wildfires** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| 10 and more deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **Floods** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| 10 and more deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **Drought** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| 10 and more deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **Extreme Temperature** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| More than 10 deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **Epidemic** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| 10 and more deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **Tsunami** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| 10 and more deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **VOLCANO** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| More than 10 deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **Winter Storm** |  |
+| Population was not affected but there was some $ damage | MODERATE |
+| Population was affected and less than 10 deaths | SEVERE |
+| 10 and more deaths | EXTREME |
+| Population was not affected and no $ damage | UNKNOWN |
+| **Other types** | UNKNOWN |
+
+4. **Tornado's** severity (depending on [the Fujita scale](https://en.wikipedia.org/wiki/Fujita_scale "https://en.wikipedia.org/wiki/Fujita_scale"))
+
+|     |     |
+| --- | --- |
+| **Fujita scale** | **Kontur severity** |
+| F0 | MINOR |
+| F1 | MODERATE |
+| F2 | MODERATE |
+| F3 | SEVERE |
+| F4 | EXTREME |
+| F5 | EXTREME |
+
+5. **Tornado's** severity (depending on [the Enhanced Fujita scale](https://en.wikipedia.org/wiki/Enhanced_Fujita_scale "https://en.wikipedia.org/wiki/Enhanced_Fujita_scale"))
+
+|     |     |
+| --- | --- |
+| **Enhanced Fujita scale** | **Kontur severity** |
+| EFU | UNKNOWN |
+| EF0 | MINOR |
+| EF1 | MODERATE |
+| EF2 | MODERATE |
+| EF3 | SEVERE |
+| EF4 | EXTREME |
+| EF5 | EXTREME |
+
+6. **Tornado's** severity (depending on[ the Japanese Enhanced Fujita scale](https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/kaisetsu/guideline_en.pdf "https://www.data.jma.go.jp/obd/stats/data/bosai/tornado/kaisetsu/guideline_en.pdf"))
+
+|     |     |
+| --- | --- |
+| **Japanese Enhanced Fujita scale** | **Kontur severity** |
+| JEF0 | MINOR |
+| JEF1 | MODERATE |
+| JEF2 | MODERATE |
+| JEF3 | SEVERE |
+| JEF4 | EXTREME |
+| JEF5 | EXTREME |
+* Possible measurable severity for events' types:**
+
+|     |     |     |
+| --- | --- | --- |
+| **Event type** | **Severity scale** | **Severity unit** |
+| CYCLONE | max. speed | km/h |
+| DROUGHT | area | sqr.km OR ha |
+| EARTHQUAKE | magnitude depth |  → M  → km |
+| FLOOD | ?? |  |
+| STORM |  |  |
+| TORNADO | fujita scale (it may be a different version of the scale, i've met 3): **Fujita scale** **Enhanced Fujita scale** **Japanese Enhanced Fujita scale** | score (no specific unit) |
+| TSUNAMI | magnitude | → M |
+| VOLCANO | ?? |  |
+| WILDFIRE | area | sqr.km OR ha |
+| WINTER_STORM |  |  |
+| THERMAL_ANOMALY | ?? area |  |
+| OTHER | \- | \- |
+
