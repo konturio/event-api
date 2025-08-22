@@ -6,7 +6,7 @@ import io.kontur.eventapi.job.AbstractJob;
 import io.kontur.eventapi.nifc.client.NifcClient;
 import io.kontur.eventapi.nifc.converter.NifcDataLakeConverter;
 import io.micrometer.core.instrument.MeterRegistry;
-import liquibase.repackaged.org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.util.function.Tuple2;
 import org.slf4j.Logger;
