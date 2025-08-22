@@ -24,3 +24,6 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: false
             endDelimiter: $_$;
+  - include:
+      relativeToChangelogFile: true
+      file: add-updated-at-feed-index.sql
