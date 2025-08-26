@@ -1,5 +1,8 @@
 # Analytic enrichment stage
 
+The property `enrichmentExecutor.poolSize` defines how many threads process analytic enrichment concurrently.
+Adjust it in configuration to tune resource usage.
+
 ### **Business requirements:**
 * we want to add Kontur analytic data into feeds (to DN can use it and for selling);
 * some **feeds** can be enriched and others - not (depends on who pays for analytic data or who needs it). so enrichment happens on the feed level;
