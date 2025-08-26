@@ -100,6 +100,9 @@ firms:
   suomi: '/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Global_24h.csv'
   noaa: '/noaa-20-viirs-c2/csv/J1_VIIRS_C2_Global_24h.csv'
 
+enrichmentExecutor:
+  poolSize: 5 # Number of threads for EventEnrichmentTask executor.
+
 scheduler:
   hpSrvImport:
     enable: false
