@@ -161,6 +161,7 @@ public class NhcNormalizationTest {
         assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt());
         assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP3+shtml/270852.shtml"), observation.getUrls());
         checkGeometriesValue(observation.getGeometries(), 6);
+    }
 
     @Test
     public void testSpecialAdvisoryWithoutRequestLine() throws Exception {
