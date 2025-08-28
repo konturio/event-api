@@ -164,6 +164,40 @@ public class NhcNormalizationTest {
     }
 
     @Test
+    public void testNormalizationRemnants() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test7.xml", NhcUtil.NHC_EP_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertNotNull(observation, "Normalization should produce observation for REMNANTS advisory");
+        assertEquals(dataLake.getObservationId(), observation.getObservationId(),
+                "Observation id must match DataLake id");
+        assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider(),
+                "Provider must remain NHC EP");
+        assertEquals("EP102024", observation.getExternalEventId(),
+                "External event id should be parsed from advisory");
+        assertEquals("EP102024_10", observation.getExternalEpisodeId(),
+                "Episode id should combine event id and advisory number");
+        assertEquals("REMNANTS JOHN", observation.getName(),
+                "Name should include type and proper name");
+        assertEquals("JOHN", observation.getProperName(),
+                "Proper name should be extracted");
+        assertEquals(EventType.CYCLONE, observation.getType(),
+                "Event type should be cyclone");
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2024-09-24T18:00:00Z", null),
+                observation.getStartedAt(), "Start time should be parsed");
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt(),
+                "Source updated time should match DataLake updatedAt");
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt(),
+                "Loaded time should match DataLake loadedAt");
+        assertNotNull(observation.getGeometries(),
+                "Geometries must be present for REMNANTS advisory");
+    }
+
+    @Test
     public void testNormalizationNegativeType() throws Exception {
         //given - type is absent
         DataLake dataLake = createDataLake("nhc_norm_test_neg1.xml", NhcUtil.NHC_AT_PROVIDER);
