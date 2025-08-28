@@ -171,15 +171,15 @@ scheduler:
   nhcAtImport:
     enable: true
     initialDelay: 1000
-    fixedDelay: 1800000
+    fixedDelay: 300000 # every 5 minutes
   nhcCpImport:
     enable: true
     initialDelay: 1000
-    fixedDelay: 1800000
+    fixedDelay: 300000 # every 5 minutes
   nhcEpImport:
     enable: true
     initialDelay: 1000
-    fixedDelay: 1800000
+    fixedDelay: 300000 # every 5 minutes
   normalization:
     enable: true
     initialDelay: 1000
