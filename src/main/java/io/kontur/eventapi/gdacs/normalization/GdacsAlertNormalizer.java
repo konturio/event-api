@@ -4,6 +4,7 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.gdacs.converter.GdacsAlertXmlParser;
 import io.kontur.eventapi.gdacs.dto.ParsedAlert;
+import io.kontur.eventapi.gdacs.util.GdacsDescriptionCleaner;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,8 +60,9 @@ public class GdacsAlertNormalizer extends GdacsNormalizer {
 
         normalizedObservation.setName(parsedAlert.getHeadLine());
         normalizedObservation.setProperName(parsedAlert.getEventName().trim());
-        normalizedObservation.setDescription(parsedAlert.getDescription());
-        normalizedObservation.setEpisodeDescription(parsedAlert.getDescription());
+        String cleanedDescription = GdacsDescriptionCleaner.clean(parsedAlert.getDescription());
+        normalizedObservation.setDescription(cleanedDescription);
+        normalizedObservation.setEpisodeDescription(cleanedDescription);
         normalizedObservation.setType(defineType(parsedAlert.getEvent()));
         normalizedObservation.setEventSeverity(defineSeverity(parsedAlert.getSeverity()));
         normalizedObservation.setExternalEventId(composeExternalEventId(parsedAlert.getEventType(), parsedAlert.getEventId()));

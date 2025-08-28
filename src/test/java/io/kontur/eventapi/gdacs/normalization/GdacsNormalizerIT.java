@@ -88,7 +88,7 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
     public void normalizeGdacsAlert() {
         var observation = gdacsAlertNormalizer.normalize(dataLakeAlert);
 
-        String description = "On 10/12/2020 7:03:07 AM, an earthquake occurred in Mexico potentially affecting About 13000 people within 100km. The earthquake had Magnitude 4.9M, Depth:28.99km.";
+        String description = "The earthquake had Magnitude 4.9M, Depth:28.99km.";
         String name = "Green earthquake alert (Magnitude 4.9M, Depth:28.99km) in Mexico 12/10/2020 07:03 UTC, About 13000 people within 100km.";
 
         var fromDate = OffsetDateTime.of(
@@ -113,8 +113,10 @@ public class GdacsNormalizerIT extends AbstractIntegrationTest {
         assertEquals(Severity.MINOR, observation.getEventSeverity());
 
         assertEquals(name, observation.getName());
-        assertEquals(description, observation.getDescription());
-        assertEquals(description, observation.getEpisodeDescription());
+        assertEquals(description, observation.getDescription(),
+                "Description should be cleaned of dates and locations if irrelevant");
+        assertEquals(description, observation.getEpisodeDescription(),
+                "Episode description should match cleaned description");
         assertEquals(fromDate, observation.getStartedAt());
         assertEquals(toDate, observation.getEndedAt());
 
