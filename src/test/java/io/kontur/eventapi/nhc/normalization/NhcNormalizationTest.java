@@ -167,7 +167,7 @@ public class NhcNormalizationTest {
         //given
         DataLake dataLake = createDataLake("nhc_norm_test_special.xml", NhcUtil.NHC_EP_PROVIDER);
 
-        //when
+        // when
         NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
 
         //then
