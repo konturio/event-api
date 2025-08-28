@@ -1,1 +1,0 @@
-- Maven tests fail to resolve parent POM from kontur nexus due to network restrictions in the CI environment. Consider configuring offline dependencies or a mirror.
