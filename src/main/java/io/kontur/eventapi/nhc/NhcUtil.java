@@ -15,7 +15,8 @@ public final class NhcUtil {
     // allows optional "REMNANTS OF" prefix before center location
     public static final String MAIN_REGEXP = "(.*?)(TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE|REMNANTS)( OF )?(.*?)?(?=(FORECAST\\/ADVISORY))FORECAST\\/ADVISORY NUMBER ([0-9]{1,}).*((AL[0-9]{6})|([EC]P[0-9]{6}))(.*?)?([0-9]{4} \\w{3} \\w{3} \\w{3} [0-9]{2} [0-9]{4})(.*)?(TROPICAL DEPRESSION|SUBTROPICAL DEPRESSION|TROPICAL STORM|HURRICANE \\(TYPHOON\\)|HURRICANE|SUBTROPICAL STORM|POST-TROPICAL CYCLONE \\/ REMNANTS|POST-TROPICAL CYCLONE|POTENTIAL TROPICAL CYCLONE|TROPICAL CYCLONE|POTENTIAL TROP CYCLONE|REMNANTS)( OF )?(.*)?((?:REMNANTS OF )?CENTER LOCATED NEAR .*)(MAX SUSTAINED WINDS.*)(REPEAT.*?)( FORECAST VALID .*?)?( EXTENDED OUTLOOK.*?)?( OUTLOOK VALID .*?)?( REQUEST.*)";
 
-    public static final String CENTER_REGEXP = "CENTER LOCATED NEAR\\s*([0-9]*\\.[0-9]*[NS])\\s*([0-9]*\\.[0-9]*[WE]) AT ([0-9]{2})\\/([0-9]{2})([0-9]{2})Z";
+    // allows optional "REMNANTS OF" prefix before center location
+    public static final String CENTER_REGEXP = "(?:REMNANTS OF )?CENTER LOCATED NEAR\\s*([0-9]*\\.[0-9]*[NS])\\s*([0-9]*\\.[0-9]*[WE]) AT ([0-9]{2})\\/([0-9]{2})([0-9]{2})Z";
 
     public static final String MAX_SUSTAINED_WIND_REGEXP = "MAX SUSTAINED WINDS\\s*([0-9]*) KT WITH GUSTS TO\\s*([0-9]*) KT\\.(\\s*64 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*50 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*34 KT\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?(\\s*12 FT SEAS\\.*\\s*[0-9]*NE\\s*[0-9]*SE\\s*[0-9]*SW\\s*[0-9]*NW\\.)?";
 
