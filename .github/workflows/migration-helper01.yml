@@ -15,7 +15,7 @@ jobs:
     outputs:
       CI_COMMIT_REF_SLUG: ${{ steps.create-CI_COMMIT_REF_SLUG.outputs.CI_COMMIT_REF_SLUG }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: create-CI_COMMIT_REF_SLUG
         env:
           REF_NAME: ${{ github.head_ref || github.ref_name }}
