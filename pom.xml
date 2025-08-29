@@ -27,8 +27,9 @@
                 <jts2geojson.version>0.18.1</jts2geojson.version>
                 <geographiclib-java.version>2.0</geographiclib-java.version>
                 <gt-geojson.version>24.2-oss84-1</gt-geojson.version>
-		<spatial4j.version>0.8</spatial4j.version>
+                <spatial4j.version>0.8</spatial4j.version>
                 <jts-core.version>1.20.0</jts-core.version>
+                <jackson.version>2.17.1</jackson.version>
                 <jib.source.image>openjdk:17-alpine</jib.source.image>
                 <image.tag>${IMAGE_TAG}</image.tag>
                 <use.system.proxies>-Djava.net.useSystemProxies=true</use.system.proxies>
@@ -170,18 +171,18 @@
 		</dependency>
 
 		<!-- Parsing -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-modules-java8</artifactId>
-                        <version>2.17.1</version>
-			<type>pom</type>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-csv</artifactId>
-                        <version>2.17.1</version>
-		</dependency>
+                <dependency>
+                        <groupId>com.fasterxml.jackson.module</groupId>
+                        <artifactId>jackson-modules-java8</artifactId>
+                        <version>${jackson.version}</version>
+                        <type>pom</type>
+                        <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                        <groupId>com.fasterxml.jackson.dataformat</groupId>
+                        <artifactId>jackson-dataformat-csv</artifactId>
+                        <version>${jackson.version}</version>
+                </dependency>
 		<dependency>
 			<groupId>org.dhatim</groupId>
 			<artifactId>fastexcel-reader</artifactId>
@@ -297,17 +298,24 @@
                 <!-- Default: Maven Central -->
         </repositories>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+        <dependencyManagement>
+                <dependencies>
+                        <dependency>
+                                <groupId>org.springframework.cloud</groupId>
+                                <artifactId>spring-cloud-dependencies</artifactId>
+                                <version>${spring-cloud.version}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                        </dependency>
+                        <dependency>
+                                <groupId>com.fasterxml.jackson</groupId>
+                                <artifactId>jackson-bom</artifactId>
+                                <version>${jackson.version}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                        </dependency>
+                </dependencies>
+        </dependencyManagement>
 
 	<build>
 		<plugins>
