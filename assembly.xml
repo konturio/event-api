@@ -23,13 +23,6 @@
             <fileMode>0640</fileMode>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/unpacked</directory>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <outputDirectory>./</outputDirectory>
-            <filtered>true</filtered>
-            <fileMode>0750</fileMode>
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}</directory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <includes>

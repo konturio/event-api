@@ -358,45 +358,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<!-- Copy dependencies for runnable app archive packaging -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-                                <version>3.8.1</version>
-				<executions>
-					<execution>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<includeScope>runtime</includeScope>
-						</configuration>
-					</execution>
-					<execution>
-						<id>unpack</id>
-						<phase>package</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>io.kontur.common</groupId>
-									<artifactId>systemd-service-wrapper</artifactId>
-									<version>1.0.8</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/unpacked</outputDirectory>
-									<includes>**/*.sh</includes>
-									<excludes>**/*.xml</excludes>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<!-- Config assembly for runnable app archive packaging -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
