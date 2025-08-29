@@ -12,7 +12,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
-import jakarta.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 import static io.kontur.eventapi.util.CacheUtil.*;
@@ -54,7 +54,7 @@ public class CacheConfiguration {
     private record CustomCacheResolver(CacheManager cacheManager) implements CacheResolver {
 
         @Override
-        @Nonnull
+        @NotNull
         public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> context) {
             if (CACHED_TARGET.equals(context.getTarget().getClass().getSimpleName())
                     && EVENT_LIST_CACHED_METHOD.equals(context.getMethod().getName())) {

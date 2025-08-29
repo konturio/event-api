@@ -4,6 +4,7 @@ import io.kontur.eventapi.entity.EventType;
 import io.kontur.eventapi.entity.Feed;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
+import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.*;
 import org.locationtech.jts.geom.Geometry;
 import org.springframework.stereotype.Component;
@@ -45,10 +46,11 @@ public class LossPostProcessor extends EnrichmentPostProcessor {
         EventType type = getType(event);
         if (area > 0 && allowedEventTypes.contains(type)) {
             Map<String, Double> features = getFeatures(event.getEventDetails(), area, type);
-            Map<String, FieldValue> arguments = evaluator.getInputFields()
+            Map<FieldName, FieldValue> arguments = evaluator.getInputFields()
                     .stream()
-                    .collect(toMap(ModelField::getName, field -> field.prepare(features.get(field.getName()))));
-            Double loss = (Double) decodeAll(evaluator.evaluate(arguments)).get(TARGET);
+                    .collect(toMap(ModelField::getName,
+                            field -> field.prepare(features.get(field.getName().getValue()))));
+            Double loss = (Double) decodeAll(evaluator.evaluate(arguments)).get(FieldName.create(TARGET));
             event.getEventDetails().put(LOSS, loss >= 0 ? loss : 0.);
             event.getEventDetails().put(LOSS_BOUND, abs(loss * errorBoundPct));
         }

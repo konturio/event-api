@@ -77,12 +77,24 @@ public class HpSrvService {
     }
 
     private JsonNode obtainHazardsScheduled(HpSrvSearchBody searchBody) {
-        bucket.asScheduler().consume(1, SCHEDULER);
+        try {
+            // wait until a token is available to respect rate limiting
+            bucket.asBlocking().consume(1);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while acquiring rate limit token", e);
+        }
         return hpSrvClient.searchHazards(searchBody);
     }
 
     private JsonNode obtainMagsScheduled(String hazardId) {
-        bucket.asScheduler().consume(1, SCHEDULER);
+        try {
+            // wait until a token is available to respect rate limiting
+            bucket.asBlocking().consume(1);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while acquiring rate limit token", e);
+        }
         return hpSrvClient.getMags(hazardId);
     }
 
