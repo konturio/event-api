@@ -172,6 +172,7 @@ public class NhcNormalizationTest {
         NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
 
         //then
+        assertNotNull(observation, "Normalization returned null for REMNANTS OF JOHN advisory");
         assertEquals(dataLake.getObservationId(), observation.getObservationId(),
                 "Observation ID should remain unchanged for REMNANTS OF JOHN advisory");
         assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider(),
