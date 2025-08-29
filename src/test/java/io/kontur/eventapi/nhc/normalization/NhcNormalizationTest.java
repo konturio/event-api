@@ -164,6 +164,44 @@ public class NhcNormalizationTest {
     }
 
     @Test
+    public void testNormalization7() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test7.xml", NhcUtil.NHC_EP_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId(),
+                "Observation ID should match input for remnants special advisory");
+        assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider(),
+                "Provider should remain EP for remnants special advisory");
+        assertEquals("EP102024", observation.getExternalEventId(),
+                "External event ID not parsed from advisory");
+        assertEquals("EP102024_10", observation.getExternalEpisodeId(),
+                "External episode ID not constructed properly");
+        assertEquals(Severity.MINOR, observation.getEventSeverity(),
+                "Severity should be MINOR for 30kt winds");
+        assertEquals("REMNANTS JOHN", observation.getName(),
+                "Name should include storm type and proper name");
+        assertEquals("THIS IS THE LAST FORECAST/ADVISORY ISSUED BY THE NATIONAL HURRICANE CENTER ON THIS SYSTEM",
+                observation.getDescription(),
+                "Description not parsed correctly");
+        assertEquals(EventType.CYCLONE, observation.getType(),
+                "Event type should be CYCLONE");
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2024-09-24T18:00:00Z", null), observation.getStartedAt(),
+                "Start time not parsed correctly");
+        assertNull(observation.getEndedAt(), "End time should be null");
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt(),
+                "Source update time mismatch");
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt(),
+                "LoadedAt time mismatch");
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP5+shtml/241747.shtml"), observation.getUrls(),
+                "Unexpected URLs parsed");
+        checkGeometriesValue(observation.getGeometries(), 1);
+    }
+
+    @Test
     public void testNormalizationNegativeType() throws Exception {
         //given - type is absent
         DataLake dataLake = createDataLake("nhc_norm_test_neg1.xml", NhcUtil.NHC_AT_PROVIDER);
