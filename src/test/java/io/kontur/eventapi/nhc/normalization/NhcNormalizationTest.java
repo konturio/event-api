@@ -164,6 +164,48 @@ public class NhcNormalizationTest {
     }
 
     @Test
+    public void testNormalization7() throws Exception {
+        //given
+        DataLake dataLake = createDataLake("nhc_norm_test7.xml", NhcUtil.NHC_EP_PROVIDER);
+
+        //when
+        NormalizedObservation observation = new NhcNormalizer().normalize(dataLake);
+
+        //then
+        assertEquals(dataLake.getObservationId(), observation.getObservationId(),
+                "Observation ID should remain unchanged for REMNANTS OF JOHN advisory");
+        assertEquals(NhcUtil.NHC_EP_PROVIDER, observation.getProvider(),
+                "Provider should match NHC EP for REMNANTS OF JOHN advisory");
+        assertEquals("EP102024", observation.getExternalEventId(),
+                "External event ID parsed incorrectly for REMNANTS OF JOHN");
+        assertEquals("EP102024_10", observation.getExternalEpisodeId(),
+                "Episode ID should combine event ID and advisory number for REMNANTS OF JOHN");
+        assertEquals(Severity.MINOR, observation.getEventSeverity(),
+                "Severity should be MINOR for 30 kt winds in REMNANTS OF JOHN");
+        assertEquals("REMNANTS JOHN", observation.getName(),
+                "Name should be 'REMNANTS JOHN' for the special advisory");
+        assertEquals(
+                "THIS IS THE LAST FORECAST/ADVISORY ISSUED BY THE NATIONAL HURRICANE CENTER ON THIS SYSTEM",
+                observation.getDescription(),
+                "Description parsed incorrectly for REMNANTS OF JOHN special advisory");
+        assertEquals(EventType.CYCLONE, observation.getType(),
+                "Event type should be CYCLONE for REMNANTS OF JOHN");
+        assertEquals(DateTimeUtil.parseDateTimeByPattern("2024-09-24T18:00:00Z", null),
+                observation.getStartedAt(),
+                "Start time mismatch for REMNANTS OF JOHN advisory");
+        assertNull(observation.getEndedAt(),
+                "EndedAt should be null for ongoing REMNANTS OF JOHN event");
+        assertEquals(dataLake.getUpdatedAt(), observation.getSourceUpdatedAt(),
+                "Source updated timestamp mismatch for REMNANTS OF JOHN advisory");
+        assertEquals(dataLake.getLoadedAt(), observation.getLoadedAt(),
+                "Loaded timestamp should match DataLake for REMNANTS OF JOHN");
+        assertEquals(List.of("https://www.nhc.noaa.gov/text/refresh/MIATCMEP5+shtml/241747.shtml"),
+                observation.getUrls(),
+                "URL list parsed incorrectly for REMNANTS OF JOHN advisory");
+        checkGeometriesValue(observation.getGeometries(), 1);
+    }
+
+    @Test
     public void testNormalizationNegativeType() throws Exception {
         //given - type is absent
         DataLake dataLake = createDataLake("nhc_norm_test_neg1.xml", NhcUtil.NHC_AT_PROVIDER);
@@ -236,21 +278,25 @@ public class NhcNormalizationTest {
     }
 
     private void checkGeometriesValue(FeatureCollection geom, Integer expectedCount) {
-        assertNotNull(geom);
-        assertEquals(expectedCount, geom.getFeatures().length);
+        assertNotNull(geom, "Geometries should not be null");
+        assertEquals(expectedCount, geom.getFeatures().length,
+                "Unexpected number of geometry features");
         Feature feature = geom.getFeatures()[0];
-        assertTrue(feature.getGeometry() instanceof Point);
+        assertTrue(feature.getGeometry() instanceof Point,
+                "First feature geometry must be a Point");
         assertEquals(1, Arrays.stream(geom.getFeatures())
                 .map(Feature::getProperties)
                 .map(item -> item.get(IS_OBSERVED_PROPERTY))
-                .filter(Boolean.TRUE::equals).toList().size());
+                .filter(Boolean.TRUE::equals).toList().size(),
+                "Exactly one feature should have is_observed property set to true");
     }
 
     private DataLake createDataLake(String fileName, String provider) throws Exception {
         String data = IOUtils.toString(
                 Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
         Optional<CapParsedEvent> parsedItem = new NhcXmlParser().getParsedItemForDataLake(data, provider);
-        assertTrue(parsedItem.isPresent());
+        assertTrue(parsedItem.isPresent(),
+                "Parsed item should be present for test file: " + fileName);
         return new NhcDataLakeConverter().convertEvent((CapParsedItem) parsedItem.get(),
                 provider);
     }
