@@ -22,7 +22,7 @@
 		<spring-cloud-aws-messaging.version>2.2.6.RELEASE</spring-cloud-aws-messaging.version>
                 <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
                 <feign-micrometer.version>13.6</feign-micrometer.version>
-                <mybatis-spring-boot-starter.version>3.0.4</mybatis-spring-boot-starter.version>
+                <mybatis-spring-boot-starter.version>2.3.2</mybatis-spring-boot-starter.version>
                 <liquibase-core.version>4.32.0</liquibase-core.version>
                 <jts2geojson.version>0.18.1</jts2geojson.version>
                 <geographiclib-java.version>2.0</geographiclib-java.version>
