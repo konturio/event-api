@@ -5,8 +5,13 @@ import io.kontur.eventapi.entity.Feed;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import org.dmg.pmml.FieldName;
-import org.jpmml.evaluator.*;
+import org.jpmml.evaluator.EvaluationException;
+import org.jpmml.evaluator.Evaluator;
+import org.jpmml.evaluator.FieldValue;
+import org.jpmml.evaluator.ModelField;
 import org.locationtech.jts.geom.Geometry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.FeatureCollection;
 
@@ -30,8 +35,9 @@ public class LossPostProcessor extends EnrichmentPostProcessor {
             STORM, CYCLONE, DROUGHT, VOLCANO);
     private static final Set<String> allowedAreaTypes = Set.of(ALERT_AREA, EXPOSURE, POSITION);
     private static final Set<String> requiredAnalytics = Set.of(POPULATION, GDP, BUILDING_COUNT, HIGHWAY_LENGTH, INDUSTRIAL_AREA_KM2);
-    private final Evaluator evaluator;
+    private static final Logger logger = LoggerFactory.getLogger(LossPostProcessor.class);
 
+    private final Evaluator evaluator;
 
     public LossPostProcessor(Evaluator lossEvaluator) {
         this.evaluator = lossEvaluator;
@@ -46,13 +52,37 @@ public class LossPostProcessor extends EnrichmentPostProcessor {
         EventType type = getType(event);
         if (area > 0 && allowedEventTypes.contains(type)) {
             Map<String, Double> features = getFeatures(event.getEventDetails(), area, type);
-            Map<FieldName, FieldValue> arguments = evaluator.getInputFields()
-                    .stream()
+
+            for (ModelField field : evaluator.getInputFields()) {
+                String name = field.getName().getValue();
+                if (!features.containsKey(name)) {
+                    logger.warn("Missing required feature '{}' for loss model", name);
+                    event.getEventDetails().put(LOSS, 0d);
+                    event.getEventDetails().put(LOSS_BOUND, 0d);
+                    return;
+                }
+            }
+
+            Map<FieldName, FieldValue> arguments = evaluator.getInputFields().stream()
                     .collect(toMap(ModelField::getName,
                             field -> field.prepare(features.get(field.getName().getValue()))));
-            Double loss = (Double) decodeAll(evaluator.evaluate(arguments)).get(FieldName.create(TARGET));
-            event.getEventDetails().put(LOSS, loss >= 0 ? loss : 0.);
-            event.getEventDetails().put(LOSS_BOUND, abs(loss * errorBoundPct));
+            try {
+                Map<FieldName, ?> result = decodeAll(evaluator.evaluate(arguments));
+                Object raw = result.get(FieldName.create(TARGET));
+                if (raw instanceof Number number) {
+                    double loss = number.doubleValue();
+                    event.getEventDetails().put(LOSS, loss >= 0 ? loss : 0d);
+                    event.getEventDetails().put(LOSS_BOUND, abs(loss * errorBoundPct));
+                } else {
+                    logger.warn("Loss model returned non-numeric result: {}", raw);
+                    event.getEventDetails().put(LOSS, 0d);
+                    event.getEventDetails().put(LOSS_BOUND, 0d);
+                }
+            } catch (EvaluationException e) {
+                logger.error("Failed to evaluate loss model", e);
+                event.getEventDetails().put(LOSS, 0d);
+                event.getEventDetails().put(LOSS_BOUND, 0d);
+            }
         }
     }
 
