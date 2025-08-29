@@ -43,7 +43,7 @@ class HpSrvServiceTest {
 
         //then
         verify(hpSrvClient, times(1)).searchHazards(searchBody);
-        verify(bucket, times(1)).asScheduler();
+        verify(bucket, times(1)).asBlocking();
     }
 
     @Test
@@ -57,7 +57,7 @@ class HpSrvServiceTest {
 
         //then
         verify(hpSrvClient, times(1)).getMags("id1");
-        verify(bucket, times(1)).asScheduler();
+        verify(bucket, times(1)).asBlocking();
     }
 
     public Bucket getBucket() {
