@@ -33,7 +33,7 @@
                 <image.tag>${IMAGE_TAG}</image.tag>
                 <use.system.proxies>-Djava.net.useSystemProxies=true</use.system.proxies>
                 <skipITs>false</skipITs>
-                <docker.tests.exclude>!-unused-</docker.tests.exclude>
+                <docker.tests.exclude></docker.tests.exclude>
         </properties>
 
 	<dependencies>
@@ -288,9 +288,11 @@
 		</dependency>
         </dependencies>
 
-        <!-- Using default Maven Central; no extra repositories declared -->
+        <repositories>
+                <!-- Default: Maven Central -->
+        </repositories>
 
-        <dependencyManagement>
+	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
@@ -322,7 +324,7 @@
                                         <runOrder>alphabetical</runOrder>
                                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                         <trimStackTrace>false</trimStackTrace>
-                                        <argLine>${argLine} ${use.system.proxies}</argLine>
+                                        <argLine>${use.system.proxies}</argLine>
                                 </configuration>
 			</plugin>
 			<plugin>
@@ -411,7 +413,7 @@
                                 <configuration>
                                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                         <trimStackTrace>false</trimStackTrace>
-                                        <argLine>${argLine} ${use.system.proxies}</argLine>
+                                        <argLine>${use.system.proxies}</argLine>
                                         <excludes>
                                                 <exclude>${docker.tests.exclude}</exclude>
                                         </excludes>
