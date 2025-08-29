@@ -12,7 +12,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
-import jakarta.annotation.Nonnull;
+import org.springframework.lang.NonNull;
 import java.util.Collection;
 
 import static io.kontur.eventapi.util.CacheUtil.*;
@@ -51,16 +51,25 @@ public class CacheConfiguration {
         return new CustomCacheResolver(cacheManager(redisConnectionFactory));
     }
 
+    // Resolve caches dynamically for methods annotated with caching.
+    // Only the event list retrieval is supported to avoid accidental cache misuse.
     private record CustomCacheResolver(CacheManager cacheManager) implements CacheResolver {
 
         @Override
-        @Nonnull
+        @NonNull
         public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> context) {
             if (CACHED_TARGET.equals(context.getTarget().getClass().getSimpleName())
                     && EVENT_LIST_CACHED_METHOD.equals(context.getMethod().getName())) {
-                return singletonList(cacheManager.getCache(EVENT_LIST_CACHE_NAME_PREFIX + context.getArgs()[0]));
+                String cacheName = EVENT_LIST_CACHE_NAME_PREFIX + context.getArgs()[0];
+                Cache cache = cacheManager.getCache(cacheName);
+                if (cache == null) {
+                    throw new IllegalStateException("Cache not configured: " + cacheName);
+                }
+                return singletonList(cache);
             }
-            throw new RuntimeException("CustomCacheResolver is used for unsupported method");
+            throw new UnsupportedOperationException(
+                    "CustomCacheResolver supports only %s.%s"
+                            .formatted(CACHED_TARGET, EVENT_LIST_CACHED_METHOD));
         }
     }
 }
