@@ -1,4 +1,4 @@
---- # Time-stamp: <2022-09-15 20:47:57>
+--- # Time-stamp: <2025-08-29 19:02:00>
 
 name: "99 Migration helper" # reusable workflow
 
@@ -17,6 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: create-CI_COMMIT_REF_SLUG
+        env:
+          REF_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          CI_COMMIT_REF_SLUG=$(echo '${{ github.ref }}' | cut -d/ -f3- | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_-]/-/g; s/^-*//; s/-*$//')
-          echo "::set-output name=CI_COMMIT_REF_SLUG::$CI_COMMIT_REF_SLUG"
+          CI_COMMIT_REF_SLUG=$(echo "$REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_-]/-/g; s/^-*//; s/-*$//')
+          echo "CI_COMMIT_REF_SLUG=$CI_COMMIT_REF_SLUG" >> "$GITHUB_OUTPUT"
