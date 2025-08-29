@@ -1,4 +1,4 @@
---- # Time-stamp: <2022-09-16 19:23:39>
+--- # Time-stamp: <2025-08-29 19:02:30>
 
 name: 10 Manual Deployment
 
@@ -38,8 +38,8 @@ jobs:
       - name: Extracting metadata from a cloned repository
         id: get-cloned
         run: |-
-          echo "::set-output name=SHA::$(git log -1 --format='%H')"
-          echo "::set-output name=REF::$(git symbolic-ref HEAD 2>/dev/null)"
+          echo "SHA=$(git log -1 --format='%H')" >> "$GITHUB_OUTPUT"
+          echo "REF=$(git symbolic-ref HEAD 2>/dev/null)" >> "$GITHUB_OUTPUT"
 
       - name: Download artifact(s)
         id: download-artifact
