@@ -11,7 +11,10 @@ public abstract class WildfireEpisodeCombinator extends EpisodeCombinator {
 
     @Override
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
-        if (episodes.size() < 2) return episodes;
+        episodes = super.postProcessEpisodes(episodes);
+        if (episodes.size() < 2) {
+            return episodes;
+        }
 
         episodes.sort(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getEndedAt));
         OffsetDateTime lastEndedAt = null;

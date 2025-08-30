@@ -4,7 +4,6 @@ import static io.kontur.eventapi.entity.Severity.UNKNOWN;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import io.kontur.eventapi.entity.FeedData;
@@ -12,19 +11,88 @@ import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.job.Applicable;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
-
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
+import org.wololo.geojson.FeatureCollection;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class EpisodeCombinator implements Applicable<NormalizedObservation> {
 
     protected static final Integer COMMON_GEOMETRY_FUNCTION = 0;
     protected static final Integer NHC_GEOMETRY_FUNCTION = 1;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
-        return episodes;
+        if (CollectionUtils.isEmpty(episodes) || episodes.size() == 1) {
+            return episodes;
+        }
+
+        List<FeedEpisode> sorted = new ArrayList<>(episodes);
+        sorted.sort(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getEndedAt));
+
+        List<FeedEpisode> merged = new ArrayList<>();
+        FeedEpisode current = sorted.get(0);
+        for (int i = 1; i < sorted.size(); i++) {
+            FeedEpisode next = sorted.get(i);
+            if (canMerge(current, next)) {
+                if (next.getStartedAt().isBefore(current.getStartedAt())) {
+                    current.setStartedAt(next.getStartedAt());
+                }
+                if (next.getEndedAt().isAfter(current.getEndedAt())) {
+                    current.setEndedAt(next.getEndedAt());
+                }
+                if (next.getUpdatedAt() != null
+                        && (current.getUpdatedAt() == null || next.getUpdatedAt().isAfter(current.getUpdatedAt()))) {
+                    current.setUpdatedAt(next.getUpdatedAt());
+                }
+                if (next.getSourceUpdatedAt() != null
+                        && (current.getSourceUpdatedAt() == null
+                        || next.getSourceUpdatedAt().isAfter(current.getSourceUpdatedAt()))) {
+                    current.setSourceUpdatedAt(next.getSourceUpdatedAt());
+                }
+                current.addObservations(next.getObservations());
+                current.addUrlIfNotExists(next.getUrls());
+                current.getLoss().putAll(next.getLoss());
+                current.getSeverityData().putAll(next.getSeverityData());
+            } else {
+                merged.add(current);
+                current = next;
+            }
+        }
+        merged.add(current);
+        return merged;
+    }
+
+    private boolean canMerge(FeedEpisode a, FeedEpisode b) {
+        return Objects.equals(a.getType(), b.getType())
+                && Objects.equals(a.getSeverity(), b.getSeverity())
+                && Objects.equals(a.getName(), b.getName())
+                && Objects.equals(a.getProperName(), b.getProperName())
+                && Objects.equals(a.getDescription(), b.getDescription())
+                && Objects.equals(a.getLocation(), b.getLocation())
+                && Objects.equals(a.getLoss(), b.getLoss())
+                && Objects.equals(a.getSeverityData(), b.getSeverityData())
+                && Objects.equals(a.getUrls(), b.getUrls())
+                && geometriesEqual(a.getGeometries(), b.getGeometries());
+    }
+
+    private boolean geometriesEqual(FeatureCollection a, FeatureCollection b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        try {
+            return MAPPER.writeValueAsString(a).equals(MAPPER.writeValueAsString(b));
+        } catch (JsonProcessingException e) {
+            return false;
+        }
     }
 
     public abstract List<FeedEpisode> processObservation(NormalizedObservation observation, FeedData feedData, Set<NormalizedObservation> eventObservations);

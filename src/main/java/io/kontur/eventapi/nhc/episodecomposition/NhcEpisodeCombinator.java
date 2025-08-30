@@ -217,6 +217,7 @@ public class NhcEpisodeCombinator extends EpisodeCombinator {
 
     @Override
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
+        episodes = super.postProcessEpisodes(episodes);
         if (CollectionUtils.isEmpty(episodes)) {
             return episodes;
         }
