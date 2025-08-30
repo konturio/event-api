@@ -3,6 +3,7 @@ package io.kontur.eventapi.nifc.episodecomposition;
 import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
+import io.kontur.eventapi.util.GeometryUtil;
 import org.junit.jupiter.api.Test;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -23,6 +24,28 @@ class NifcEpisodeCombinatorTest {
 
     private static final String GEOMETRY_JSON =
             "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[10,10]},\"properties\":{}}]}";
+
+    private static final String GEOMETRY_ORDER_1 =
+            "{\"type\":\"FeatureCollection\",\"features\":["
+                    + "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,0]},\"properties\":{\"id\":1}},"
+                    + "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{\"id\":2}}]}";
+
+    private static final String GEOMETRY_ORDER_2 =
+            "{\"type\":\"FeatureCollection\",\"features\":["
+                    + "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,1]},\"properties\":{\"id\":2}},"
+                    + "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,0]},\"properties\":{\"id\":1}}]}";
+
+    private static final String POLYGON_NORMAL =
+            "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[0,1],[1,1],[1,0],[0,0]]]},\"properties\":{}}]}";
+
+    private static final String POLYGON_REVERSED =
+            "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[1,0],[1,1],[0,1],[0,0]]]},\"properties\":{}}]}";
+
+    private static final String PROP1 =
+            "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[5,5]},\"properties\":{\"a\":1}}]}";
+
+    private static final String PROP2 =
+            "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[5,5]},\"properties\":{\"a\":2}}]}";
 
     private final NifcEpisodeCombinator combinator = new NifcEpisodeCombinator();
 
@@ -60,6 +83,27 @@ class NifcEpisodeCombinatorTest {
         FeedEpisode merged = feedData.getEpisodes().get(0);
         assertNotEquals(firstEnd, merged.getEndedAt());
         assertEquals(obs2.getEndedAt(), merged.getEndedAt());
+    }
+
+    @Test
+    void geometriesEqualRegardlessOfFeatureOrder() {
+        FeatureCollection fc1 = (FeatureCollection) GeoJSONFactory.create(GEOMETRY_ORDER_1);
+        FeatureCollection fc2 = (FeatureCollection) GeoJSONFactory.create(GEOMETRY_ORDER_2);
+        assertTrue(GeometryUtil.isEqualGeometries(fc1, fc2));
+    }
+
+    @Test
+    void geometriesEqualWithReversedRingOrientation() {
+        FeatureCollection fc1 = (FeatureCollection) GeoJSONFactory.create(POLYGON_NORMAL);
+        FeatureCollection fc2 = (FeatureCollection) GeoJSONFactory.create(POLYGON_REVERSED);
+        assertTrue(GeometryUtil.isEqualGeometries(fc1, fc2));
+    }
+
+    @Test
+    void geometryPropertiesMismatchPreventsEquality() {
+        FeatureCollection fc1 = (FeatureCollection) GeoJSONFactory.create(PROP1);
+        FeatureCollection fc2 = (FeatureCollection) GeoJSONFactory.create(PROP2);
+        assertFalse(GeometryUtil.isEqualGeometries(fc1, fc2));
     }
 
     private NormalizedObservation createObservation(OffsetDateTime updatedAt) {

@@ -4,19 +4,18 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.WildfireEpisodeCombinator;
+import io.kontur.eventapi.util.EpisodeEqualityUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.Objects;
+import java.util.Set;
 
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_LOCATIONS_PROVIDER;
 import static io.kontur.eventapi.nifc.converter.NifcDataLakeConverter.NIFC_PERIMETERS_PROVIDER;
-import static io.kontur.eventapi.util.GeometryUtil.isEqualGeometries;
 import static java.util.Collections.emptyList;
 
 @Component
@@ -37,6 +36,9 @@ public class NifcEpisodeCombinator extends WildfireEpisodeCombinator {
 
         NormalizedObservation latestObservation = findLatestEpisodeObservation(episodeObservations);
         FeedEpisode episode = createDefaultEpisode(latestObservation);
+        // ensure timestamps are populated so subsequent merge doesn't overwrite with nulls
+        episode.setEndedAt(latestObservation.getSourceUpdatedAt());
+        episode.setUpdatedAt(latestObservation.getSourceUpdatedAt());
         episode.setStartedAt(findEpisodeStartedAt(episodeObservations));
         episode.setObservations(mapObservationsToIDs(episodeObservations));
         episode.setGeometries(computeEpisodeGeometries(episodeObservations));
@@ -44,7 +46,7 @@ public class NifcEpisodeCombinator extends WildfireEpisodeCombinator {
 
         List<FeedEpisode> episodes = feedData.getEpisodes();
         FeedEpisode lastEpisode = episodes.isEmpty() ? null : episodes.get(episodes.size() - 1);
-        if (lastEpisode != null && sameEpisodes(lastEpisode, episode)) {
+        if (lastEpisode != null && EpisodeEqualityUtil.areSame(lastEpisode, episode)) {
             lastEpisode.setEndedAt(episode.getEndedAt());
             lastEpisode.setSourceUpdatedAt(episode.getSourceUpdatedAt());
             lastEpisode.setUpdatedAt(episode.getUpdatedAt());
@@ -57,25 +59,15 @@ public class NifcEpisodeCombinator extends WildfireEpisodeCombinator {
     }
 
     private FeatureCollection computeEpisodeGeometries(Set<NormalizedObservation> episodeObservations) {
-        Feature[] features = episodeObservations
-                .stream()
-                .map(observation -> observation.getGeometries().getFeatures()[0])
+        Feature[] features = episodeObservations.stream()
+                .map(NormalizedObservation::getGeometries)
+                .filter(Objects::nonNull)
+                .map(FeatureCollection::getFeatures)
+                .filter(arr -> arr != null && arr.length > 0 && arr[0] != null && arr[0].getGeometry() != null)
+                .map(arr -> arr[0])
                 .distinct()
                 .toArray(Feature[]::new);
         return new FeatureCollection(features);
-    }
-
-    private boolean sameEpisodes(FeedEpisode episode1, FeedEpisode episode2) {
-        FeatureCollection geom1 = episode1.getGeometries();
-        FeatureCollection geom2 = episode2.getGeometries();
-        boolean geometriesEqual = (geom1 == null && geom2 == null)
-                || (geom1 != null && geom2 != null && isEqualGeometries(geom1, geom2));
-
-        return StringUtils.equalsIgnoreCase(episode1.getName(), episode2.getName())
-                && Objects.equals(episode1.getLoss(), episode2.getLoss())
-                && episode1.getSeverity() == episode2.getSeverity()
-                && StringUtils.equalsIgnoreCase(episode1.getLocation(), episode2.getLocation())
-                && geometriesEqual;
     }
 
 }
