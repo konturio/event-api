@@ -6,9 +6,16 @@ import io.kontur.eventapi.dao.NormalizedObservationsDao;
 import io.kontur.eventapi.entity.*;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
 import io.kontur.eventapi.job.exception.FeedCompositionSkipException;
+import io.kontur.eventapi.util.GeometryUtil;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.locationtech.jts.geom.Geometry;
+import org.wololo.geojson.Feature;
+import org.wololo.geojson.FeatureCollection;
+import org.wololo.jts2geojson.GeoJSONReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +41,16 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class FeedCompositionJob extends AbstractJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeedCompositionJob.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final GeoJSONReader GEOJSON_READER = new GeoJSONReader();
+
+    static ObjectMapper getMapper() {
+        return MAPPER;
+    }
+
+    static GeoJSONReader getGeoJsonReader() {
+        return GEOJSON_READER;
+    }
     @Value("${scheduler.feedComposition.alias}")
     private String[] alias;
 
@@ -65,7 +82,7 @@ public class FeedCompositionJob extends AbstractJob {
     protected void updateFeed(Feed feed) {
         Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         if (!CollectionUtils.isEmpty(eventsIds)) {
-            LOG.info(format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
+            LOG.info(format(Locale.ROOT, "%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
             eventsIds
                     .forEach(event -> createFeedData(event, feed));
         }
@@ -75,13 +92,14 @@ public class FeedCompositionJob extends AbstractJob {
     @Counted(value = "feedComposition.event.counter")
     protected void createFeedData(UUID eventId, Feed feed) {
         List<NormalizedObservation> eventObservations = emptyList();
+        FeedData feedData = null;
         try {
             eventObservations = observationsDao.getObservationsByEventId(eventId);
             eventObservations.sort(comparing(NormalizedObservation::getStartedAt, nullsLast(naturalOrder()))
                     .thenComparing(NormalizedObservation::getLoadedAt));
 
             Optional<Long> lastFeedDataVersion = feedDao.getLastFeedDataVersion(eventId, feed.getFeedId());
-            FeedData feedData = new FeedData(eventId, feed.getFeedId(),
+            feedData = new FeedData(eventId, feed.getFeedId(),
                     lastFeedDataVersion.map(v -> v + 1).orElse(1L));
 
             // sort observations by their timestamp for deterministic ordering in feed_data
@@ -97,19 +115,20 @@ public class FeedCompositionJob extends AbstractJob {
 
             feedDao.insertFeedData(feedData, feed.getAlias());
         } catch (FeedCompositionSkipException fe) {
-            LOG.info(format("Skipped processing event: id = '%s', feed = '%s'. Error: %s",
+            LOG.info(format(Locale.ROOT, "Skipped processing event: id = '%s', feed = '%s'. Error: %s",
                     eventId.toString(), feed.getAlias(), fe.getMessage()));
         } catch (Exception e) {
             if (isJsonbSizeExceeded(e)) {
-                logJsonbSizeExceeded(eventId, feed, eventObservations, e);
+                logJsonbSizeExceeded(eventId, feed, eventObservations, feedData, e);
             } else {
-                LOG.error(format("Error while processing event: id = '%s', feed = '%s'. Error: %s", eventId.toString(),
+                LOG.error(format(Locale.ROOT, "Error while processing event: id = '%s', feed = '%s'. Error: %s", eventId.toString(),
                                 feed.getAlias(), e.getMessage()), e);
             }
         }
     }
 
-    private void logJsonbSizeExceeded(UUID eventId, Feed feed, List<NormalizedObservation> observations, Exception e) {
+    private void logJsonbSizeExceeded(UUID eventId, Feed feed, List<NormalizedObservation> observations,
+                                      FeedData feedData, Exception e) {
         String providers = observations.stream()
                 .map(NormalizedObservation::getProvider)
                 .filter(Objects::nonNull)
@@ -119,8 +138,67 @@ public class FeedCompositionJob extends AbstractJob {
                 .map(NormalizedObservation::getObservationId)
                 .map(UUID::toString)
                 .collect(Collectors.joining(","));
-        LOG.error(format("Skipped processing event due to oversized jsonb: id = '%s', feed = '%s', providers = %s, observations = [%s]. Error: %s",
-                eventId, feed.getAlias(), providers, observationIds, e.getMessage()), e);
+
+        String episodesInfo = feedData == null ? "[]" : buildEpisodesDebugInfo(feedData.getEpisodes());
+
+        LOG.error(format(Locale.ROOT, "Skipped processing event due to oversized jsonb: id = '%s', feed = '%s', providers = %s, observations = [%s], episodes = %s. Error: %s",
+                eventId, feed.getAlias(), providers, observationIds, episodesInfo, e.getMessage()), e);
+    }
+
+    /**
+     * Build semicolon-separated summaries for each episode, including start/end timestamps,
+     * observation identifiers, and geometry metrics (MD5 hash, byte length, total area in
+     * square kilometres, and total length in kilometres). Units are WGS84-based and entries
+     * are separated by "; ".
+     */
+    static String buildEpisodesDebugInfo(List<FeedEpisode> episodes) {
+        if (CollectionUtils.isEmpty(episodes)) {
+            return "[]";
+        }
+        return episodes.stream()
+                .map(FeedCompositionJob::buildEpisodeInfo)
+                .collect(Collectors.joining("; "));
+    }
+
+    private static String buildEpisodeInfo(FeedEpisode episode) {
+        Set<UUID> observations = Optional.ofNullable(episode.getObservations())
+                .orElse(Collections.emptySet());
+        String obs = observations.stream()
+                .map(UUID::toString)
+                .collect(Collectors.joining(","));
+        String geom = buildGeometryInfo(episode.getGeometries());
+        return format(Locale.ROOT, "{start=%s, end=%s, observations=[%s], geometry=%s}",
+                episode.getStartedAt(), episode.getEndedAt(), obs, geom);
+    }
+
+    private static String buildGeometryInfo(FeatureCollection fc) {
+        if (fc == null) {
+            return "{}";
+        }
+        try {
+            byte[] jsonBytes = MAPPER.writeValueAsBytes(fc);
+            String hash = DigestUtils.md5Hex(jsonBytes);
+            int bytes = jsonBytes.length;
+            double areaKm2 = 0d;
+            double lengthKm = 0d;
+            for (Feature feature : fc.getFeatures()) {
+                org.wololo.geojson.Geometry g = feature.getGeometry();
+                if (g == null) {
+                    continue;
+                }
+                Geometry geometry = GEOJSON_READER.read(g);
+                if (geometry.getArea() > 0) {
+                    areaKm2 += GeometryUtil.calculateAreaKm2(geometry);
+                } else {
+                    lengthKm += GeometryUtil.calculateLengthKm(geometry);
+                }
+            }
+            return format(Locale.ROOT, "{hash=%s, bytes=%d, areaKm2=%.2f, lengthKm=%.2f}",
+                    hash, bytes, areaKm2, lengthKm);
+        } catch (Exception ex) {
+            LOG.warn("Failed to build geometry info for episode", ex);
+            return "{error}";
+        }
     }
 
     private boolean isJsonbSizeExceeded(Throwable throwable) {

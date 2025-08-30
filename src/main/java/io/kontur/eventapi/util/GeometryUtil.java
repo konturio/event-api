@@ -4,6 +4,7 @@ import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,41 @@ public class GeometryUtil {
             areaInMeters += Math.abs(polygonArea.Compute().area);
         }
         return areaInMeters / 1_000_000;
+    }
+
+    /**
+     * Calculate geodesic length on the WGS84 ellipsoid in kilometres.
+     * <p>Designed for linear geometries (LineString/MultiLineString). When a
+     * polygon is supplied its exterior ring is measured; for area calculations
+     * prefer {@link #calculateAreaKm2(Geometry)}.</p>
+     * <p>Returns {@code 0.0} when the geometry is {@code null}, empty or
+     * contains no segments. Coordinate sequences shorter than two points are
+     * skipped.</p>
+     *
+     * @param geometry geometry to measure
+     * @return length in kilometres
+     */
+    public static double calculateLengthKm(Geometry geometry) {
+        if (geometry == null || geometry.getNumGeometries() == 0) {
+            return 0d;
+        }
+        double lengthInMeters = 0d;
+        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+            Geometry g = geometry.getGeometryN(i);
+            var coords = g instanceof Polygon
+                    ? ((Polygon) g).getExteriorRing().getCoordinates()
+                    : g.getCoordinates();
+            if (coords == null || coords.length < 2) {
+                continue;
+            }
+            for (int j = 1; j < coords.length; j++) {
+                lengthInMeters += Geodesic.WGS84.Inverse(
+                        coords[j - 1].y, coords[j - 1].x,
+                        coords[j].y, coords[j].x
+                ).s12;
+            }
+        }
+        return lengthInMeters / 1_000d;
     }
 
     public static FeatureCollection convertGeometryToFeatureCollection(org.wololo.geojson.Geometry geometry, Map<String, Object> properties) {
