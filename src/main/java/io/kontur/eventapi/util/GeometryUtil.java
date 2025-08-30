@@ -12,7 +12,10 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.jts2geojson.GeoJSONReader;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -77,21 +80,34 @@ public class GeometryUtil {
     }
 
     public static boolean isEqualGeometries(FeatureCollection fc1, FeatureCollection fc2) {
-        if (fc1.getFeatures().length != fc2.getFeatures().length) return false;
-        for (int i = 0; i < fc1.getFeatures().length; i++) {
-            Feature feature1 = fc1.getFeatures()[i];
-            Feature feature2 = fc2.getFeatures()[i];
-            if (!feature1.getProperties().equals(feature2.getProperties())) return false;
-
-            Geometry geom1 = reader.read(feature1.getGeometry());
-            Geometry geom2 = reader.read(feature2.getGeometry());
-
-            if (!IsValidOp.isValid(geom1) || !IsValidOp.isValid(geom2)) {
-                geom1 = geom1.buffer(0);
-                geom2 = geom2.buffer(0);
-            }
-            if (!geom1.equalsExact(geom2, 0.0001)) return false;
+        if (fc1 == null || fc2 == null) {
+            return fc1 == null && fc2 == null;
         }
-        return true;
+        Feature[] features1 = fc1.getFeatures();
+        Feature[] features2 = fc2.getFeatures();
+        if (features1.length != features2.length) return false;
+
+        List<Feature> remaining = new ArrayList<>(Arrays.asList(features2));
+        outer: for (Feature feature1 : features1) {
+            Geometry geom1 = reader.read(feature1.getGeometry());
+            if (!IsValidOp.isValid(geom1)) {
+                geom1 = geom1.buffer(0);
+            }
+            for (Iterator<Feature> it = remaining.iterator(); it.hasNext();) {
+                Feature feature2 = it.next();
+                if (!feature1.getProperties().equals(feature2.getProperties())) continue;
+
+                Geometry geom2 = reader.read(feature2.getGeometry());
+                if (!IsValidOp.isValid(geom2)) {
+                    geom2 = geom2.buffer(0);
+                }
+                if (geom1.equalsExact(geom2, 0.0001)) {
+                    it.remove();
+                    continue outer;
+                }
+            }
+            return false;
+        }
+        return remaining.isEmpty();
     }
 }

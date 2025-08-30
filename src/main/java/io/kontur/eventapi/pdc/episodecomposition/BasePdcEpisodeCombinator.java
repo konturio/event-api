@@ -120,11 +120,16 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
     }
 
     private boolean sameEpisodes(FeedEpisode episode1, FeedEpisode episode2) {
+        FeatureCollection geom1 = episode1.getGeometries();
+        FeatureCollection geom2 = episode2.getGeometries();
+        boolean geometriesEqual = (geom1 == null && geom2 == null)
+                || (geom1 != null && geom2 != null && isEqualGeometries(geom1, geom2));
+
         return equalsIgnoreCase(episode1.getName(), episode2.getName())
-                && episode1.getLoss().equals(episode2.getLoss())
+                && Objects.equals(episode1.getLoss(), episode2.getLoss())
                 && episode1.getSeverity() == episode2.getSeverity()
                 && equalsIgnoreCase(episode1.getLocation(), episode2.getLocation())
-                && isEqualGeometries(episode1.getGeometries(), episode2.getGeometries());
+                && geometriesEqual;
     }
 
     private void addExposuresToEpisodes(List<FeedEpisode> episodes, Set<NormalizedObservation> exposureObservations) {
