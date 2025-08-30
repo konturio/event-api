@@ -44,6 +44,10 @@ public interface FeedMapper {
                                     @Param("feedId") UUID feedId,
                                     @Param("version") Long version);
 
+    /**
+     * Mark the given version as the latest if it is the most recent enriched one.
+     * Older versions remain unchanged when enrichments arrive out of order.
+     */
     void markEventVersionAsLatest(@Param("eventId") UUID eventId,
                                   @Param("feedId") UUID feedId,
                                   @Param("version") Long version);
