@@ -74,8 +74,9 @@ public class FeedCompositionJob extends AbstractJob {
     @Timed(value = "feedComposition.event.timer")
     @Counted(value = "feedComposition.event.counter")
     protected void createFeedData(UUID eventId, Feed feed) {
+        List<NormalizedObservation> eventObservations = emptyList();
         try {
-            List<NormalizedObservation> eventObservations = observationsDao.getObservationsByEventId(eventId);
+            eventObservations = observationsDao.getObservationsByEventId(eventId);
             eventObservations.sort(comparing(NormalizedObservation::getStartedAt, nullsLast(naturalOrder()))
                     .thenComparing(NormalizedObservation::getLoadedAt));
 
@@ -99,9 +100,40 @@ public class FeedCompositionJob extends AbstractJob {
             LOG.info(format("Skipped processing event: id = '%s', feed = '%s'. Error: %s",
                     eventId.toString(), feed.getAlias(), fe.getMessage()));
         } catch (Exception e) {
-            LOG.error(format("Error while processing event: id = '%s', feed = '%s'. Error: %s", eventId.toString(),
-                            feed.getAlias(), e.getMessage()), e);
+            if (isJsonbSizeExceeded(e)) {
+                logJsonbSizeExceeded(eventId, feed, eventObservations, e);
+            } else {
+                LOG.error(format("Error while processing event: id = '%s', feed = '%s'. Error: %s", eventId.toString(),
+                                feed.getAlias(), e.getMessage()), e);
+            }
         }
+    }
+
+    private void logJsonbSizeExceeded(UUID eventId, Feed feed, List<NormalizedObservation> observations, Exception e) {
+        String providers = observations.stream()
+                .map(NormalizedObservation::getProvider)
+                .filter(Objects::nonNull)
+                .collect(toSet())
+                .toString();
+        String observationIds = observations.stream()
+                .map(NormalizedObservation::getObservationId)
+                .map(UUID::toString)
+                .collect(Collectors.joining(","));
+        LOG.error(format("Skipped processing event due to oversized jsonb: id = '%s', feed = '%s', providers = %s, observations = [%s]. Error: %s",
+                eventId, feed.getAlias(), providers, observationIds, e.getMessage()), e);
+    }
+
+    private boolean isJsonbSizeExceeded(Throwable throwable) {
+        Throwable cause = throwable;
+        while (cause != null) {
+            if ("org.postgresql.util.PSQLException".equals(cause.getClass().getName())
+                    && cause.getMessage() != null
+                    && cause.getMessage().contains("total size of jsonb array elements exceeds the maximum")) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     private void fillFeedData(FeedData feedData, List<NormalizedObservation> eventObservations) {
