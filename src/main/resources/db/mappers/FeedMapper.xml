@@ -50,9 +50,19 @@
     </update>
 
     <update id="markEventVersionAsLatest">
-        update feed_data
-        set is_latest_version = case when version = #{version} then true else false end
-        where event_id = #{eventId} and feed_id = #{feedId};
+        with maxv as (
+            select max(version) as v
+            from feed_data
+            where event_id = #{eventId}
+              and feed_id  = #{feedId}
+              and enriched
+        )
+        update feed_data fd
+        set is_latest_version = case when fd.version = (select v from maxv) then true else false end
+        where fd.event_id = #{eventId}
+          and fd.feed_id  = #{feedId}
+          and (fd.is_latest_version is true or fd.version = (select v from maxv))
+          and #{version}  = (select v from maxv);
     </update>
 
     <select id="getLastFeedDataVersion" resultType="java.lang.Long">
