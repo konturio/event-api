@@ -147,12 +147,13 @@ class WorkerSchedulerTest {
         when(pdcMapSrvSearchJobs.getJobs()).thenReturn(initList);
         scheduler.startPdcMapSrvSearch();
         try {
-            Thread.sleep(2);
+            Thread.sleep(50);
         } catch (InterruptedException ignored) {
         }
         List<PdcMapSrvSearchJob> jobsList = pdcMapSrvSearchJobs.getJobs();
-        for(int i = 0; i < PDC_MAP_SRV_IDS.length; i++) {
-            verify(jobsList.get(i), times(1)).run(PDC_MAP_SRV_IDS[i]);
+        for (int i = 0; i < PDC_MAP_SRV_IDS.length; i++) {
+            verify(jobsList.get(i), times(1).description("Job " + PDC_MAP_SRV_IDS[i] + " should run once"))
+                    .run(PDC_MAP_SRV_IDS[i]);
         }
     }
 

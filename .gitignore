@@ -33,3 +33,5 @@ build/
 
 log/
 *.log
+.m2/
+target/jib-cache/

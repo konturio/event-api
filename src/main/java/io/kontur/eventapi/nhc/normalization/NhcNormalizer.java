@@ -74,8 +74,15 @@ public class NhcNormalizer extends Normalizer {
                         normalizedObservation.setName(
                                 (mainMatches.get(TYPE_POS) != null ? mainMatches.get(TYPE_POS).trim() : "")
                                 + " " + (mainMatches.get(NAME_POS) != null ? mainMatches.get(NAME_POS).trim() : ""));
-                        normalizedObservation.setDescription(mainMatches.get(NEWS_POS).trim());
-                        normalizedObservation.setEpisodeDescription(mainMatches.get(NEWS_POS).trim());
+                        String news = StringUtils.trimToEmpty(mainMatches.get(NEWS_POS));
+                        if (StringUtils.isBlank(news) && StringUtils.isNotBlank(mainMatches.get(FORECAST_POS))) {
+                            news = mainMatches.get(FORECAST_POS)
+                                    .replaceAll(NhcUtil.FORECAST_REGEXP, "")
+                                    .replaceAll("(?si)FORECAST.*?DISSIPATED|\\$\\$.*", "")
+                                    .trim();
+                        }
+                        normalizedObservation.setDescription(news);
+                        normalizedObservation.setEpisodeDescription(news);
                         normalizedObservation.setExternalEpisodeId(
                                 (mainMatches.get(EVENT_ID_POS) != null ? mainMatches.get(EVENT_ID_POS).trim() : "") + "_"
                                         + (mainMatches.get(ADV_NUMBER_POS) != null
