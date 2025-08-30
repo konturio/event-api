@@ -1,15 +1,11 @@
 package io.kontur.eventapi.job;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.util.GeometryUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
-import org.wololo.jts2geojson.GeoJSONReader;
-
-import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Locale;
@@ -44,7 +40,8 @@ class FeedCompositionJobTest {
 
         String info = FeedCompositionJob.buildEpisodesDebugInfo(Collections.singletonList(episode));
 
-        double length = GeometryUtil.calculateLengthKm(new GeoJSONReader().read(fc.getFeatures()[0].getGeometry()));
+        double length = GeometryUtil.calculateLengthKm(
+                FeedCompositionJob.getGeoJsonReader().read(fc.getFeatures()[0].getGeometry()));
         assertTrue(info.contains("lengthKm=" + String.format(Locale.ROOT, "%.2f", length)),
                 "Geometry length missing in debug info: " + info);
     }
@@ -62,12 +59,11 @@ class FeedCompositionJobTest {
 
         String info = FeedCompositionJob.buildEpisodesDebugInfo(Collections.singletonList(episode));
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(fc);
-        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = FeedCompositionJob.getMapper().writeValueAsBytes(fc);
         String hash = DigestUtils.md5Hex(bytes);
         int length = bytes.length;
-        double area = GeometryUtil.calculateAreaKm2(new GeoJSONReader().read(fc.getFeatures()[0].getGeometry()));
+        double area = GeometryUtil.calculateAreaKm2(
+                FeedCompositionJob.getGeoJsonReader().read(fc.getFeatures()[0].getGeometry()));
 
         assertTrue(info.contains("start=2020-01-01T00:00Z"),
                 "Start time missing in debug info: " + info);
@@ -96,8 +92,11 @@ class FeedCompositionJobTest {
 
         String info = FeedCompositionJob.buildEpisodesDebugInfo(Collections.singletonList(episode));
 
-        double length = GeometryUtil.calculateLengthKm(new GeoJSONReader().read(fc.getFeatures()[0].getGeometry()));
+        double length = GeometryUtil.calculateLengthKm(
+                FeedCompositionJob.getGeoJsonReader().read(fc.getFeatures()[0].getGeometry()));
 
+        assertTrue(info.contains(obsId.toString()),
+                "Observation ID missing in debug info: " + info);
         assertTrue(info.contains("lengthKm=" + String.format(Locale.ROOT, "%.2f", length)),
                 "Geometry length missing in debug info: " + info);
     }

@@ -11,7 +11,6 @@ import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.locationtech.jts.geom.Geometry;
 import org.wololo.geojson.Feature;
@@ -44,6 +43,14 @@ public class FeedCompositionJob extends AbstractJob {
     private static final Logger LOG = LoggerFactory.getLogger(FeedCompositionJob.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final GeoJSONReader GEOJSON_READER = new GeoJSONReader();
+
+    static ObjectMapper getMapper() {
+        return MAPPER;
+    }
+
+    static GeoJSONReader getGeoJsonReader() {
+        return GEOJSON_READER;
+    }
     @Value("${scheduler.feedComposition.alias}")
     private String[] alias;
 
@@ -169,9 +176,9 @@ public class FeedCompositionJob extends AbstractJob {
             return "{}";
         }
         try {
-            String json = MAPPER.writeValueAsString(fc);
-            String hash = DigestUtils.md5Hex(json);
-            int bytes = json.getBytes(StandardCharsets.UTF_8).length;
+            byte[] jsonBytes = MAPPER.writeValueAsBytes(fc);
+            String hash = DigestUtils.md5Hex(jsonBytes);
+            int bytes = jsonBytes.length;
             double areaKm2 = 0d;
             double lengthKm = 0d;
             for (Feature feature : fc.getFeatures()) {

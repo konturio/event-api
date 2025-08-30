@@ -4,6 +4,7 @@ import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +53,16 @@ public class GeometryUtil {
     }
 
     /**
-     * Calculate geodesic length of the provided geometry in kilometers.
-     * Returns {@code 0.0} when geometry is {@code null}, empty or has no segments.
+     * Calculate geodesic length on the WGS84 ellipsoid in kilometres.
+     * <p>Designed for linear geometries (LineString/MultiLineString). When a
+     * polygon is supplied its exterior ring is measured; for area calculations
+     * prefer {@link #calculateAreaKm2(Geometry)}.</p>
+     * <p>Returns {@code 0.0} when the geometry is {@code null}, empty or
+     * contains no segments. Coordinate sequences shorter than two points are
+     * skipped.</p>
      *
      * @param geometry geometry to measure
-     * @return length in kilometers
+     * @return length in kilometres
      */
     public static double calculateLengthKm(Geometry geometry) {
         if (geometry == null || geometry.getNumGeometries() == 0) {
@@ -64,7 +70,10 @@ public class GeometryUtil {
         }
         double lengthInMeters = 0d;
         for (int i = 0; i < geometry.getNumGeometries(); i++) {
-            var coords = geometry.getGeometryN(i).getCoordinates();
+            Geometry g = geometry.getGeometryN(i);
+            var coords = g instanceof Polygon
+                    ? ((Polygon) g).getExteriorRing().getCoordinates()
+                    : g.getCoordinates();
             if (coords == null || coords.length < 2) {
                 continue;
             }
