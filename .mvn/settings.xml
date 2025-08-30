@@ -1,20 +1,20 @@
 <settings>
-  <mirrors>
-    <mirror>
-      <id>central-only</id>
-      <name>Maven Central</name>
-      <url>https://repo1.maven.org/maven2</url>
-      <mirrorOf>central</mirrorOf>
-    </mirror>
-  </mirrors>
   <proxies>
     <proxy>
-      <id>proxy</id>
-      <active>true</active>
+      <id>http-proxy</id>
+      <active>${env.MAVEN_PROXY_ACTIVE}</active>
       <protocol>http</protocol>
       <host>proxy</host>
       <port>8080</port>
-      <nonProxyHosts>localhost|127.0.0.1</nonProxyHosts>
+      <nonProxyHosts>localhost|127.0.0.1|::1</nonProxyHosts>
+    </proxy>
+    <proxy>
+      <id>https-proxy</id>
+      <active>${env.MAVEN_PROXY_ACTIVE}</active>
+      <protocol>https</protocol>
+      <host>proxy</host>
+      <port>8080</port>
+      <nonProxyHosts>localhost|127.0.0.1|::1</nonProxyHosts>
     </proxy>
   </proxies>
 </settings>
