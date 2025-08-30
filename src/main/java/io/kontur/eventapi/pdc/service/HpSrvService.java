@@ -8,6 +8,8 @@ import io.kontur.eventapi.entity.DataLake;
 import io.kontur.eventapi.pdc.client.HpSrvClient;
 import io.kontur.eventapi.pdc.converter.PdcDataLakeConverter;
 import io.kontur.eventapi.pdc.dto.HpSrvSearchBody;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Component;
 public class HpSrvService {
 
     private final static Logger LOG = LoggerFactory.getLogger(HpSrvService.class);
+    private static final ScheduledExecutorService SCHEDULER =
+            Executors.newSingleThreadScheduledExecutor();
 
     private final DataLakeDao dataLakeDao;
     private final Bucket bucket;
@@ -74,20 +78,24 @@ public class HpSrvService {
 
     private JsonNode obtainHazardsScheduled(HpSrvSearchBody searchBody) {
         try {
-            bucket.asScheduler().consume(1);
-            return hpSrvClient.searchHazards(searchBody);
+            // wait until a token is available to respect rate limiting
+            bucket.asBlocking().consume(1);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while acquiring rate limit token", e);
         }
+        return hpSrvClient.searchHazards(searchBody);
     }
 
     private JsonNode obtainMagsScheduled(String hazardId) {
         try {
-            bucket.asScheduler().consume(1);
-            return hpSrvClient.getMags(hazardId);
+            // wait until a token is available to respect rate limiting
+            bucket.asBlocking().consume(1);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while acquiring rate limit token", e);
         }
+        return hpSrvClient.getMags(hazardId);
     }
 
 }

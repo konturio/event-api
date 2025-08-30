@@ -49,12 +49,12 @@ jobs:
 
       - name: Extracting metadata from a cloned repository
         id: get-cloned
-        run: |-
-          echo "::set-output name=SHA::$(git log -1 --format='%h')"
+        run: |
+          echo "SHA=$(git log -1 --format='%h')" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-java@v4
         with:
-          java-version: 16
+          java-version: 17
           distribution: corretto
           cache: maven
 

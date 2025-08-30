@@ -1,0 +1,248 @@
+name: Deploy to Stage
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - test
+
+jobs:
+  notify-start:
+    runs-on: ubuntu-24.04
+    outputs:
+      slack_ts: ${{ steps.slack-info.outputs.slack_ts }}
+    steps:
+      - name: Send initial Slack notification
+        id: slack-init
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          method: chat.postMessage
+          errors: true
+          payload: |
+            {
+              "text": "*🔄 Event API Deployment to ${{ github.event.inputs.environment == 'dev' && 'DEV' || 'TEST' }}*\n              *Status:* Building image *Created by:* <https://github.com/${{ github.actor }}|${{ github.actor }}>\n              *Branch:* <https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}|${{ github.ref_name }}>\n",
+              "channel": "${{ secrets.SLACK_DEPLOY_STAGE_CHANNEL }}",
+              "unfurl_links": false,
+              "unfurl_media": false
+            }
+
+      - name: Extract Slack message info
+        id: slack-info
+        run: |
+          RESPONSE='${{ steps.slack-init.outputs.response }}'
+          OK=$(echo "$RESPONSE" | jq -r '.ok')
+          if [ "$OK" != "true" ]; then
+            echo "Error: Slack API call failed with response: $RESPONSE"
+            exit 1
+          fi
+          SLACK_TS=$(echo "$RESPONSE" | jq -r '.ts')
+          if [ -z "$SLACK_TS" ]; then
+            echo "Error: Missing Slack timestamp"
+            exit 1
+          fi
+          echo "slack_ts=${SLACK_TS}" >> $GITHUB_OUTPUT
+
+  build-and-publish:
+    needs: notify-start
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set_image_tag.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract git SHA
+        id: get_cloned
+        run: |
+          echo "sha=$(git log -1 --format='%h')" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: corretto
+          cache: maven
+
+      - name: Build and push Docker image
+        env:
+          MAVEN_CLI_OPTS: '--batch-mode'
+          NEXUS_DEPLOYER: ${{ secrets.NEXUS_DEPLOYER }}
+          NEXUS_DEPLOYER_PASS: ${{ secrets.NEXUS_DEPLOYER_PASS }}
+          TAG: ${{ github.ref_name }}.${{ steps.get_cloned.outputs.sha }}.${{ github.run_attempt }}
+        run: |
+          set -e
+
+          wget -q https://kontur-github-runners.s3.eu-central-1.amazonaws.com/public_resources/projects/common/2022091500.tar.xz && tar -C "$HOME" -xf 2022091500.tar.xz && rm 2022091500.tar.xz
+
+          echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8084 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
+          echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8085 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
+
+          IMAGE_TAG="$TAG" mvn $MAVEN_CLI_OPTS clean install jib:build -U
+          echo "<h3>Docker image tag</h3> $TAG <br><br>" >> $GITHUB_STEP_SUMMARY
+
+      - name: Set image tag output
+        id: set_image_tag
+        run: echo "image_tag=${TAG}" >> $GITHUB_OUTPUT
+        env:
+          TAG: ${{ github.ref_name }}.${{ steps.get_cloned.outputs.sha }}.${{ github.run_attempt }}
+
+  update-helm-manifests:
+    needs: [notify-start, build-and-publish]
+    runs-on: ubuntu-24.04
+    outputs:
+      image_tag: ${{ steps.set_image_tag.outputs.image_tag }}
+    steps:
+      - name: Set IMAGE_TAG output
+        id: set_image_tag
+        run: |
+          DOCKER_TAGS="${{ needs.build-and-publish.outputs.image_tag }}"
+          IMAGE_TAG="${DOCKER_TAGS##*:}"
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Update Slack notification with image tag
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          method: chat.update
+          errors: true
+          payload: |
+            {
+              "text": "*🔄 Event API Deployment to ${{ github.event.inputs.environment == 'dev' && 'DEV' || 'TEST' }}*\n              *Status:* Updating manifests *Created by:* <https://github.com/${{ github.actor }}|${{ github.actor }}>\n              *Branch:* <https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}|${{ github.ref_name }}>\n              *Image Tag:* `${{ steps.set_image_tag.outputs.image_tag }}`",
+              "channel": "${{ secrets.SLACK_DEPLOY_STAGE_CHANNEL }}",
+              "ts": "${{ needs.notify-start.outputs.slack_ts }}",
+              "unfurl_links": false,
+              "unfurl_media": false
+            }
+
+      - name: Checkout CD repository
+        uses: actions/checkout@v4
+        with:
+          repository: konturio/disaster-ninja-cd
+          token: ${{ secrets.CD_GITHUB_TOKEN }}
+          path: cd
+
+      - name: Install yq utility
+        run: |
+          wget -qO /tmp/yq https://github.com/mikefarah/yq/releases/download/v4.34.2/yq_linux_amd64
+          chmod +x /tmp/yq
+          sudo mv /tmp/yq /usr/local/bin/yq
+
+      - name: Update image tag in values file
+        working-directory: cd/helm/event-api/values
+        run: |
+          echo "Updating image tag to ${{ steps.set_image_tag.outputs.image_tag }}"
+          yq -i ".image.tag = \"${{ steps.set_image_tag.outputs.image_tag }}\"" values-${{ github.event.inputs.environment }}.yaml
+          echo "New contents of values-${{ github.event.inputs.environment }}.yaml:"
+          cat values-${{ github.event.inputs.environment }}.yaml
+
+      - name: Bump version in Chart.yaml
+        working-directory: cd/helm/event-api
+        run: |
+          echo "Current contents of Chart.yaml:"
+          cat Chart.yaml
+          CURRENT_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          NEW_PATCH=$((patch + 1))
+          NEW_VERSION="${major}.${minor}.${NEW_PATCH}"
+          echo "Updating Chart version from $CURRENT_VERSION to $NEW_VERSION"
+          yq -i ".version = \"${NEW_VERSION}\"" Chart.yaml
+          echo "New contents of Chart.yaml:"
+          cat Chart.yaml
+
+      - name: Create and push changes branch
+        working-directory: cd
+        run: |
+          BRANCH_NAME="deploy-event-api-${{ github.event.inputs.environment }}-${{ github.run_id }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -b $BRANCH_NAME
+          git add .
+          git commit -m "Deploy API to ${{ github.event.inputs.environment }}: update image tag to ${{ steps.set_image_tag.outputs.image_tag }} and bump Chart version"
+          git push origin $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.CD_GITHUB_TOKEN }}
+
+      - name: Create Pull Request using gh
+        working-directory: cd
+        run: |
+          BRANCH_NAME="deploy-event-api-${{ github.event.inputs.environment }}-${{ github.run_id }}"
+          gh pr create \
+            --title "Deploy API to ${{ github.event.inputs.environment }}: update image tag to ${{ steps.set_image_tag.outputs.image_tag }} and bump Chart version. RunId: ${{ github.run_id }}" \
+            --body "Automatically created PR to update helm manifests with the new image tag. @coderabbitai ignore" \
+            --base main --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.CD_GITHUB_TOKEN }}
+
+      - name: Merge Pull Request using gh
+        working-directory: cd
+        run: |
+          PR_NUMBER=$(gh pr list --head "deploy-event-api-${{ github.event.inputs.environment }}-${{ github.run_id }}" --json number --jq '.[0].number')
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR found for branch deploy-event-api-${{ github.event.inputs.environment }}-${{ github.run_id }}. Exiting."
+            exit 1
+          fi
+          echo "Merging PR #$PR_NUMBER"
+          gh pr merge $PR_NUMBER --squash --delete-branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.CD_GITHUB_TOKEN }}
+
+  notify-result:
+    needs: [notify-start, build-and-publish, update-helm-manifests]
+    runs-on: ubuntu-24.04
+    if: ${{ always() && !cancelled() }}
+    steps:
+      - name: Update Slack notification on Success
+        if: needs.update-helm-manifests.result == 'success' && needs.build-and-publish.result == 'success'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          method: chat.update
+          errors: true
+          payload: |
+            {
+              "text": "*🏁 Event API Deployment to ${{ github.event.inputs.environment == 'dev' && 'DEV' || 'TEST' }}*\n              *Status:* Done *Created by:* <https://github.com/${{ github.actor }}|${{ github.actor }}>\n              *Branch:* <https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}|${{ github.ref_name }}>\n              *Image Tag:* `${{ needs.update-helm-manifests.outputs.image_tag }}`",
+              "channel": "${{ secrets.SLACK_DEPLOY_STAGE_CHANNEL }}",
+              "ts": "${{ needs.notify-start.outputs.slack_ts }}",
+              "unfurl_links": false,
+              "unfurl_media": false
+            }
+      - name: Update Slack notification on Failure
+        if: needs.notify-start.result == 'success' && (needs.update-helm-manifests.result != 'success' || needs.build-and-publish.result != 'success')
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          method: chat.update
+          errors: true
+          payload: |
+            {
+              "text": "*❌ Event API Deployment to ${{ github.event.inputs.environment == 'dev' && 'DEV' || 'TEST' }}*\n              *Status:* Failed *Created by:* <https://github.com/${{ github.actor }}|${{ github.actor }}>\n              *Branch:* <https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}|${{ github.ref_name }}>",
+              "channel": "${{ secrets.SLACK_DEPLOY_STAGE_CHANNEL }}",
+              "ts": "${{ needs.notify-start.outputs.slack_ts }}",
+              "unfurl_links": false,
+              "unfurl_media": false
+            }
+
+  notify-cancel:
+    needs: [notify-start, build-and-publish, update-helm-manifests]
+    runs-on: ubuntu-24.04
+    if: ${{ cancelled() }}
+    steps:
+      - name: Update Slack notification on Cancelled
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          method: chat.update
+          errors: true
+          payload: |
+            {
+              "text": "*❌ Event API Deployment to ${{ github.event.inputs.environment == 'dev' && 'DEV' || 'TEST' }}*\n              *Status:* Cancelled *Created by:* <https://github.com/${{ github.actor }}|${{ github.actor }}>\n              *Branch:* <https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}|${{ github.ref_name }}>",
+              "channel": "${{ secrets.SLACK_DEPLOY_STAGE_CHANNEL }}",
+              "ts": "${{ needs.notify-start.outputs.slack_ts }}",
+              "unfurl_links": false,
+              "unfurl_media": false
+            }
