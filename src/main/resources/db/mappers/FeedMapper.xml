@@ -20,7 +20,7 @@
                                active, started_at, ended_at, updated_at, location, urls,
                                <if test='loss != null'>loss,</if>
                                <if test='severityData != null'>severity_data,</if>
-                               observations, geometries, episodes, enriched, auto_expire)
+                               observations, geometries, episodes, enriched, auto_expire, is_latest_version)
         values (#{eventId}, #{feedId}, #{version}, #{name}, #{properName}, #{description}, #{type},
                 (select severity_id from severities where severity = #{severity}),
                 #{active}, #{startedAt}, #{endedAt}, #{updatedAt}, #{location},
@@ -36,7 +36,7 @@
                         collectEventGeometries(#{episodes}::jsonb),
                     </otherwise>
                 </choose>
-                #{episodes}::jsonb, #{enriched}, #{autoExpire})
+                #{episodes}::jsonb, #{enriched}, #{autoExpire}, #{enriched})
     </insert>
 
     <update id="markOutdatedEventsVersions">
@@ -47,6 +47,22 @@
                 and version < #{version}
                 and is_latest_version is true
         ]]>
+    </update>
+
+    <update id="markEventVersionAsLatest">
+        with maxv as (
+            select max(version) as v
+            from feed_data
+            where event_id = #{eventId}
+              and feed_id  = #{feedId}
+              and enriched
+        )
+        update feed_data fd
+        set is_latest_version = case when fd.version = (select v from maxv) then true else false end
+        where fd.event_id = #{eventId}
+          and fd.feed_id  = #{feedId}
+          and (fd.is_latest_version is true or fd.version = (select v from maxv))
+          and #{version}  = (select v from maxv);
     </update>
 
     <select id="getLastFeedDataVersion" resultType="java.lang.Long">
