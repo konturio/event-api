@@ -70,10 +70,13 @@ jobs:
           # sanitize IMAGE_TAG for jib-compatible docker tagging
           IMAGE_TAG="$(echo "$IMAGE_TAG" | tr '/\\,' '--')"
 
-          echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8084 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
-          echo '${{ secrets.NEXUS_DEPLOYER_PASS }}' | docker login nexus.kontur.io:8085 -u '${{ secrets.NEXUS_DEPLOYER }}' --password-stdin
-
-          IMAGE_TAG="$IMAGE_TAG" mvn -T 1C $MAVEN_CLI_OPTS clean install jib:build -U -Prelease
+          if [ -n "$NEXUS_DEPLOYER" ] && [ -n "$NEXUS_DEPLOYER_PASS" ]; then
+            echo "$NEXUS_DEPLOYER_PASS" | docker login nexus.kontur.io:8084 -u "$NEXUS_DEPLOYER" --password-stdin
+            echo "$NEXUS_DEPLOYER_PASS" | docker login nexus.kontur.io:8085 -u "$NEXUS_DEPLOYER" --password-stdin
+            IMAGE_TAG="$IMAGE_TAG" mvn -T 1C $MAVEN_CLI_OPTS clean install jib:build -U -Prelease
+          else
+            mvn -T 1C $MAVEN_CLI_OPTS clean install -U -Prelease
+          fi
           echo "<h3>Docker image tag</h3> $IMAGE_TAG <br><br>" >> $GITHUB_STEP_SUMMARY
           mv -v target/*.zip .
 
