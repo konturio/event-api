@@ -51,6 +51,20 @@ public class GeometryUtil {
         return areaInMeters / 1_000_000;
     }
 
+    public static double calculateLengthKm(Geometry geometry) {
+        double lengthInMeters = 0d;
+        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+            var coords = geometry.getGeometryN(i).getCoordinates();
+            for (int j = 1; j < coords.length; j++) {
+                lengthInMeters += Geodesic.WGS84.Inverse(
+                        coords[j - 1].y, coords[j - 1].x,
+                        coords[j].y, coords[j].x
+                ).s12;
+            }
+        }
+        return lengthInMeters / 1_000d;
+    }
+
     public static FeatureCollection convertGeometryToFeatureCollection(org.wololo.geojson.Geometry geometry, Map<String, Object> properties) {
         Feature feature = new Feature(geometry, properties);
         return new FeatureCollection(new Feature[] {feature});

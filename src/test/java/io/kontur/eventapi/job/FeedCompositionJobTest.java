@@ -34,8 +34,9 @@ class FeedCompositionJobTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(fc);
-        String hash = DigestUtils.md5Hex(json);
-        int bytes = json.getBytes(StandardCharsets.UTF_8).length;
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        String hash = DigestUtils.md5Hex(bytes);
+        int length = bytes.length;
         double area = GeometryUtil.calculateAreaKm2(new GeoJSONReader().read(fc.getFeatures()[0].getGeometry()));
 
         assertTrue(info.contains("start=2020-01-01T00:00Z"),
@@ -46,9 +47,28 @@ class FeedCompositionJobTest {
                 "Observation ID missing in debug info: " + info);
         assertTrue(info.contains(hash),
                 "Geometry hash missing in debug info: " + info);
-        assertTrue(info.contains("bytes=" + bytes),
+        assertTrue(info.contains("bytes=" + length),
                 "Geometry byte length missing in debug info: " + info);
         assertTrue(info.contains("areaKm2=" + String.format(Locale.ROOT, "%.2f", area)),
                 "Geometry area missing in debug info: " + info);
+    }
+
+    @Test
+    void buildEpisodesDebugInfoIncludesGeometryLength() throws Exception {
+        FeedEpisode episode = new FeedEpisode();
+        episode.setStartedAt(OffsetDateTime.parse("2020-01-01T00:00Z"));
+        episode.setEndedAt(OffsetDateTime.parse("2020-01-02T00:00Z"));
+        UUID obsId = UUID.fromString("00000000-0000-0000-0000-000000000002");
+        episode.addObservation(obsId);
+        String fcString = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[0,0],[1,0]]},\"properties\":{}}]}";
+        FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(fcString);
+        episode.setGeometries(fc);
+
+        String info = FeedCompositionJob.buildEpisodesDebugInfo(Collections.singletonList(episode));
+
+        double length = GeometryUtil.calculateLengthKm(new GeoJSONReader().read(fc.getFeatures()[0].getGeometry()));
+
+        assertTrue(info.contains("lengthKm=" + String.format(Locale.ROOT, "%.2f", length)),
+                "Geometry length missing in debug info: " + info);
     }
 }

@@ -75,7 +75,7 @@ public class FeedCompositionJob extends AbstractJob {
     protected void updateFeed(Feed feed) {
         Set<UUID> eventsIds = eventsDao.getEventsForRolloutEpisodes(feed.getFeedId());
         if (!CollectionUtils.isEmpty(eventsIds)) {
-            LOG.info(format("%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
+            LOG.info(format(Locale.ROOT, "%s feed. %s events to compose", feed.getAlias(), eventsIds.size()));
             eventsIds
                     .forEach(event -> createFeedData(event, feed));
         }
@@ -108,13 +108,13 @@ public class FeedCompositionJob extends AbstractJob {
 
             feedDao.insertFeedData(feedData, feed.getAlias());
         } catch (FeedCompositionSkipException fe) {
-            LOG.info(format("Skipped processing event: id = '%s', feed = '%s'. Error: %s",
+            LOG.info(format(Locale.ROOT, "Skipped processing event: id = '%s', feed = '%s'. Error: %s",
                     eventId.toString(), feed.getAlias(), fe.getMessage()));
         } catch (Exception e) {
             if (isJsonbSizeExceeded(e)) {
                 logJsonbSizeExceeded(eventId, feed, eventObservations, feedData, e);
             } else {
-                LOG.error(format("Error while processing event: id = '%s', feed = '%s'. Error: %s", eventId.toString(),
+                LOG.error(format(Locale.ROOT, "Error while processing event: id = '%s', feed = '%s'. Error: %s", eventId.toString(),
                                 feed.getAlias(), e.getMessage()), e);
             }
         }
@@ -134,10 +134,16 @@ public class FeedCompositionJob extends AbstractJob {
 
         String episodesInfo = feedData == null ? "[]" : buildEpisodesDebugInfo(feedData.getEpisodes());
 
-        LOG.error(format("Skipped processing event due to oversized jsonb: id = '%s', feed = '%s', providers = %s, observations = [%s], episodes = %s. Error: %s",
+        LOG.error(format(Locale.ROOT, "Skipped processing event due to oversized jsonb: id = '%s', feed = '%s', providers = %s, observations = [%s], episodes = %s. Error: %s",
                 eventId, feed.getAlias(), providers, observationIds, episodesInfo, e.getMessage()), e);
     }
 
+    /**
+     * Build semicolon-separated summaries for each episode, including start/end timestamps,
+     * observation identifiers, and geometry metrics (MD5 hash, byte length, total area in
+     * square kilometres, and total length in kilometres). Units are WGS84-based and entries
+     * are separated by "; ".
+     */
     static String buildEpisodesDebugInfo(List<FeedEpisode> episodes) {
         if (CollectionUtils.isEmpty(episodes)) {
             return "[]";
@@ -148,11 +154,13 @@ public class FeedCompositionJob extends AbstractJob {
     }
 
     private static String buildEpisodeInfo(FeedEpisode episode) {
-        String obs = episode.getObservations().stream()
+        Set<UUID> observations = Optional.ofNullable(episode.getObservations())
+                .orElse(Collections.emptySet());
+        String obs = observations.stream()
                 .map(UUID::toString)
                 .collect(Collectors.joining(","));
         String geom = buildGeometryInfo(episode.getGeometries());
-        return format("{start=%s, end=%s, observations=[%s], geometry=%s}",
+        return format(Locale.ROOT, "{start=%s, end=%s, observations=[%s], geometry=%s}",
                 episode.getStartedAt(), episode.getEndedAt(), obs, geom);
     }
 
@@ -165,7 +173,7 @@ public class FeedCompositionJob extends AbstractJob {
             String hash = DigestUtils.md5Hex(json);
             int bytes = json.getBytes(StandardCharsets.UTF_8).length;
             double areaKm2 = 0d;
-            double length = 0d;
+            double lengthKm = 0d;
             for (Feature feature : fc.getFeatures()) {
                 org.wololo.geojson.Geometry g = feature.getGeometry();
                 if (g == null) {
@@ -175,10 +183,11 @@ public class FeedCompositionJob extends AbstractJob {
                 if (geometry.getArea() > 0) {
                     areaKm2 += GeometryUtil.calculateAreaKm2(geometry);
                 } else {
-                    length += geometry.getLength();
+                    lengthKm += GeometryUtil.calculateLengthKm(geometry);
                 }
             }
-            return format("{hash=%s, bytes=%d, areaKm2=%.2f, length=%.2f}", hash, bytes, areaKm2, length);
+            return format(Locale.ROOT, "{hash=%s, bytes=%d, areaKm2=%.2f, lengthKm=%.2f}",
+                    hash, bytes, areaKm2, lengthKm);
         } catch (Exception ex) {
             LOG.warn("Failed to build geometry info for episode", ex);
             return "{error}";
