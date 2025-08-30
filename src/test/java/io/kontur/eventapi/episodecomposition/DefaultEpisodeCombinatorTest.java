@@ -21,8 +21,8 @@ class DefaultEpisodeCombinatorTest {
     void mergesEpisodesWithUnchangedGeometryAndProperties() {
         OffsetDateTime start1 = OffsetDateTime.parse("2023-08-01T00:00:00Z");
         OffsetDateTime end1 = OffsetDateTime.parse("2023-08-01T01:00:00Z");
-        OffsetDateTime start2 = OffsetDateTime.parse("2023-08-01T02:00:00Z");
-        OffsetDateTime end2 = OffsetDateTime.parse("2023-08-01T03:00:00Z");
+        OffsetDateTime start2 = end1;
+        OffsetDateTime end2 = OffsetDateTime.parse("2023-08-01T02:00:00Z");
 
         FeatureCollection geom = new FeatureCollection(new Feature[] {
             new Feature(new Point(new double[] {10d, 10d}), null)
@@ -54,5 +54,15 @@ class DefaultEpisodeCombinatorTest {
         assertEquals(end2, mergedEpisode.getEndedAt(), "Merged episode end should be latest end");
         assertTrue(mergedEpisode.getObservations().containsAll(Arrays.asList(obs1, obs2)),
             "Merged episode must include all observations");
+
+        OffsetDateTime latestUpdatedAt = ep1.getUpdatedAt().isAfter(ep2.getUpdatedAt())
+                ? ep1.getUpdatedAt() : ep2.getUpdatedAt();
+        assertEquals(latestUpdatedAt, mergedEpisode.getUpdatedAt(),
+                "Merged episode must carry latest updatedAt");
+
+        OffsetDateTime latestSourceUpdatedAt = ep1.getSourceUpdatedAt().isAfter(ep2.getSourceUpdatedAt())
+                ? ep1.getSourceUpdatedAt() : ep2.getSourceUpdatedAt();
+        assertEquals(latestSourceUpdatedAt, mergedEpisode.getSourceUpdatedAt(),
+                "Merged episode must carry latest sourceUpdatedAt");
     }
 }

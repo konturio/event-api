@@ -35,8 +35,9 @@ Idealized workflow:
   * A job that links each Observation to an Event. Can use source provider's event id for matching (PDC, GDACS), or a heuristic (FIRMS), or be a manual operation (future). 
 * Episode rollup
   * A job that publishes a Snapshot of Event into Feed. For each feed, for each event, pulls in observations visible for the feed for the event. Checks if list of observations matches one in the last published version. If lists don't match (new observation in event, change in access restrictions, observation manually unlinked) the new version is produced and stored in output feed.
-  * While producing the new Snapshot of event, the Observations that relate to the same time are folded together into one single Episode. Data from previous Observations is generally used to fill in the gaps in newer ones.
-  * When geometry and other properties remain unchanged between consecutive observations, their time intervals are glued and a single Episode spans the whole range.
+  * While producing the new Snapshot of event, the Observations that relate to the same time are folded together into one single Episode.
+  * Data from previous Observations is generally used to fill in the gaps in newer ones.
+  * When geometry and properties such as type, severity, name, properName, description, location, loss, severityData, urls remain unchanged and observations are adjacent in time, their intervals are glued and a single Episode spans the whole range.
 
 
 

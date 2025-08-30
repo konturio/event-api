@@ -12,6 +12,7 @@ import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.entity.Severity;
 import io.kontur.eventapi.job.Applicable;
 import java.time.OffsetDateTime;
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,22 +29,36 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes) {
+        return postProcessEpisodes(episodes, Duration.ZERO);
+    }
+
+    public List<FeedEpisode> postProcessEpisodes(List<FeedEpisode> episodes, Duration mergeTolerance) {
         if (CollectionUtils.isEmpty(episodes) || episodes.size() == 1) {
             return episodes;
         }
 
         List<FeedEpisode> sorted = new ArrayList<>(episodes);
-        sorted.sort(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getEndedAt));
+        sorted.sort(
+                comparing(FeedEpisode::getStartedAt,
+                        java.util.Comparator.nullsLast(java.time.OffsetDateTime::compareTo))
+                        .thenComparing(FeedEpisode::getEndedAt,
+                                java.util.Comparator.nullsLast(java.time.OffsetDateTime::compareTo))
+        );
 
         List<FeedEpisode> merged = new ArrayList<>();
         FeedEpisode current = sorted.get(0);
         for (int i = 1; i < sorted.size(); i++) {
             FeedEpisode next = sorted.get(i);
-            if (canMerge(current, next)) {
-                if (next.getStartedAt().isBefore(current.getStartedAt())) {
+            boolean timeAdjacent = mergeTolerance == null
+                    || (current.getEndedAt() != null && next.getStartedAt() != null
+                    && !next.getStartedAt().isAfter(current.getEndedAt().plus(mergeTolerance)));
+            if (timeAdjacent && canMerge(current, next)) {
+                if (next.getStartedAt() != null
+                        && (current.getStartedAt() == null || next.getStartedAt().isBefore(current.getStartedAt()))) {
                     current.setStartedAt(next.getStartedAt());
                 }
-                if (next.getEndedAt().isAfter(current.getEndedAt())) {
+                if (next.getEndedAt() != null
+                        && (current.getEndedAt() == null || next.getEndedAt().isAfter(current.getEndedAt()))) {
                     current.setEndedAt(next.getEndedAt());
                 }
                 if (next.getUpdatedAt() != null
@@ -57,8 +72,18 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 }
                 current.addObservations(next.getObservations());
                 current.addUrlIfNotExists(next.getUrls());
-                current.getLoss().putAll(next.getLoss());
-                current.getSeverityData().putAll(next.getSeverityData());
+                if (next.getLoss() != null) {
+                    if (current.getLoss() == null) {
+                        current.setLoss(new HashMap<>());
+                    }
+                    current.getLoss().putAll(next.getLoss());
+                }
+                if (next.getSeverityData() != null) {
+                    if (current.getSeverityData() == null) {
+                        current.setSeverityData(new HashMap<>());
+                    }
+                    current.getSeverityData().putAll(next.getSeverityData());
+                }
             } else {
                 merged.add(current);
                 current = next;
@@ -77,8 +102,22 @@ public abstract class EpisodeCombinator implements Applicable<NormalizedObservat
                 && Objects.equals(a.getLocation(), b.getLocation())
                 && Objects.equals(a.getLoss(), b.getLoss())
                 && Objects.equals(a.getSeverityData(), b.getSeverityData())
-                && Objects.equals(a.getUrls(), b.getUrls())
+                && urlsEqualIgnoringOrder(a.getUrls(), b.getUrls())
                 && geometriesEqual(a.getGeometries(), b.getGeometries());
+    }
+
+    private boolean urlsEqualIgnoringOrder(List<String> a, List<String> b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null || a.size() != b.size()) {
+            return false;
+        }
+        List<String> sortedA = new ArrayList<>(a);
+        List<String> sortedB = new ArrayList<>(b);
+        Collections.sort(sortedA);
+        Collections.sort(sortedB);
+        return sortedA.equals(sortedB);
     }
 
     private boolean geometriesEqual(FeatureCollection a, FeatureCollection b) {
