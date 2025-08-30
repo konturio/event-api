@@ -1,21 +1,35 @@
 # Running tests
 
-All unit and integration tests run with Maven by default:
+Run all unit and integration tests with Maven's verify phase:
+
+```bash
+mvn verify
+```
+
+Most tests spin up PostgreSQL and Redis containers using Testcontainers.
+If Docker isn't available you can skip integration tests:
+
+```bash
+mvn verify -DskipITs=true
+```
+
+Run only unit tests with:
 
 ```bash
 mvn test
 ```
 
-Most tests spin up PostgreSQL and Redis containers using Testcontainers.
-They run by default together with unit tests.
-If Docker isn't available you can skip them:
-
-```bash
-mvn -DskipITs=true test
-```
-
 Unit tests always run regardless of Docker availability.
 
-Maven honours `HTTP_PROXY` and `HTTPS_PROXY` variables.
+Note on Makefile:
+`make test` runs `mvn test -DskipITs=true` (unit tests only).
+`make verify` runs `mvn verify` (integration tests included).
+To skip integration tests when using the Makefile:
+
+```bash
+make verify MAVEN_ARGS=-DskipITs=true
+```
+
+Maven honors `HTTP_PROXY` and `HTTPS_PROXY` variables.
 The Makefile sets JVM options (`-Djava.net.useSystemProxies=true`, `-Djava.net.preferIPv4Stack=true`, `-Djava.net.preferIPv6Addresses=false`) so Maven respects those proxies without a `.mvn/jvm.config` file.
-`make` targets append proxy command-line arguments when these variables are set, avoiding global configuration changes.
+Make targets append proxy command-line arguments when these variables are set, avoiding global configuration changes.

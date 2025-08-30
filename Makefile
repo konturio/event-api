@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-MAVEN_ARGS := -DskipITs=true
+MAVEN_ARGS :=
 MAVEN_JAVA_OPTS := -Djava.net.useSystemProxies=true -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false
 
 define run_mvn
@@ -24,21 +24,29 @@ if [ -n "$$HTTP_PROXY$$HTTPS_PROXY" ]; then \
     else \
         MAVEN_OPTS="$(MAVEN_JAVA_OPTS) $$MAVEN_OPTS"; \
     fi; \
-printf '%s\n' '</settings>' >> $$settings; \
-MAVEN_OPTS="$$MAVEN_OPTS" mvn --settings $$settings $(MAVEN_ARGS) $(1); \
-rm $$settings
+ printf '%s\n' '</settings>' >> $$settings; \
+ MAVEN_OPTS="$$MAVEN_OPTS" mvn --settings $$settings -Dmaven.repo.local=$(CURDIR)/.m2 $(MAVEN_ARGS) $(1); \
+ rm $$settings
 endef
 
-.PHONY: test verify precommit check-docs
+.PHONY: all clean test verify precommit check-docs
+
+all: test ## Default target runs unit tests
+
+clean: ## Remove build artifacts
+	rm -rf target .m2
 
 precommit: test check-docs ## Run checks before committing
 
 check-docs: ## Perform basic documentation checks
-	@find docs -name '*.md' -print >/dev/null
+	@if ! find docs -name '*.md' -print | grep -q .; then \
+		echo "No documentation files found in docs/" >&2; \
+		exit 1; \
+	fi
 
 verify: ## Run full Maven verification
 	@$(call run_mvn,verify)
 
 test: ## Run unit tests
-	@$(call run_mvn,test)
+	@$(call run_mvn,test -DskipITs=true)
 

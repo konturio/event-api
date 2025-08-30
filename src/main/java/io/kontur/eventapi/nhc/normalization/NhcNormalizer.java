@@ -78,8 +78,7 @@ public class NhcNormalizer extends Normalizer {
                         if (StringUtils.isBlank(news) && StringUtils.isNotBlank(mainMatches.get(FORECAST_POS))) {
                             news = mainMatches.get(FORECAST_POS)
                                     .replaceAll(NhcUtil.FORECAST_REGEXP, "")
-                                    .replaceAll("FORECAST VALID[^$]*?DISSIPATED", "")
-                                    .replaceAll("\\$\\$.*", "")
+                                    .replaceAll("(?si)FORECAST.*?DISSIPATED|\\$\\$.*", "")
                                     .trim();
                         }
                         normalizedObservation.setDescription(news);
