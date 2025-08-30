@@ -4,28 +4,29 @@ MAVEN_ARGS := -DskipITs=true
 MAVEN_JAVA_OPTS := -Djava.net.useSystemProxies=true -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false
 
 define run_mvn
+settings=$$(mktemp); \
+printf '%s\n' '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">' > $$settings; \
 if [ -n "$$HTTP_PROXY$$HTTPS_PROXY" ]; then \
         proxy=$${HTTPS_PROXY:-$$HTTP_PROXY}; \
         proxy=$${proxy#http://}; \
         proxy=$${proxy#https://}; \
         host=$${proxy%%:*}; \
         port=$${proxy##*:}; \
-        settings=$$(mktemp); \
-        printf '%s\n' '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">' \
-            '  <proxies>' \
+        printf '%s\n' '  <proxies>' \
             '    <proxy>' \
             '      <active>true</active>' \
             '      <protocol>http</protocol>' \
             "      <host>$$host</host>" \
             "      <port>$$port</port>" \
             '    </proxy>' \
-            '  </proxies>' \
-            '</settings>' > $$settings; \
-        MAVEN_OPTS="$(MAVEN_JAVA_OPTS) -Dhttp.proxyHost=$$host -Dhttp.proxyPort=$$port -Dhttps.proxyHost=$$host -Dhttps.proxyPort=$$port $$MAVEN_OPTS" mvn --settings $$settings $(MAVEN_ARGS) $(1); \
-        rm $$settings; \
+            '  </proxies>' >> $$settings; \
+        MAVEN_OPTS="$(MAVEN_JAVA_OPTS) -Dhttp.proxyHost=$$host -Dhttp.proxyPort=$$port -Dhttps.proxyHost=$$host -Dhttps.proxyPort=$$port $$MAVEN_OPTS"; \
     else \
-        MAVEN_OPTS="$(MAVEN_JAVA_OPTS) $$MAVEN_OPTS" mvn $(MAVEN_ARGS) $(1); \
-    fi
+        MAVEN_OPTS="$(MAVEN_JAVA_OPTS) $$MAVEN_OPTS"; \
+    fi; \
+printf '%s\n' '</settings>' >> $$settings; \
+MAVEN_OPTS="$$MAVEN_OPTS" mvn --settings $$settings $(MAVEN_ARGS) $(1); \
+rm $$settings
 endef
 
 .PHONY: test verify precommit check-docs
