@@ -274,21 +274,24 @@ public class NhcNormalizationTest {
     }
 
     private void checkGeometriesValue(FeatureCollection geom, Integer expectedCount) {
-        assertNotNull(geom);
-        assertEquals(expectedCount, geom.getFeatures().length);
+        assertNotNull(geom, "Geometries should not be null");
+        assertEquals(expectedCount, geom.getFeatures().length,
+                "Unexpected number of geometry features");
         Feature feature = geom.getFeatures()[0];
-        assertTrue(feature.getGeometry() instanceof Point);
+        assertTrue(feature.getGeometry() instanceof Point,
+                "First geometry must be a Point instance");
         assertEquals(1, Arrays.stream(geom.getFeatures())
-                .map(Feature::getProperties)
-                .map(item -> item.get(IS_OBSERVED_PROPERTY))
-                .filter(Boolean.TRUE::equals).toList().size());
+                        .map(Feature::getProperties)
+                        .map(item -> item.get(IS_OBSERVED_PROPERTY))
+                        .filter(Boolean.TRUE::equals).toList().size(),
+                "Exactly one geometry should be marked as observed");
     }
 
     private DataLake createDataLake(String fileName, String provider) throws Exception {
         String data = IOUtils.toString(
                 Objects.requireNonNull(this.getClass().getResourceAsStream(fileName)), "UTF-8");
         Optional<CapParsedEvent> parsedItem = new NhcXmlParser().getParsedItemForDataLake(data, provider);
-        assertTrue(parsedItem.isPresent());
+        assertTrue(parsedItem.isPresent(), "Parsed item should be present for " + fileName);
         return new NhcDataLakeConverter().convertEvent((CapParsedItem) parsedItem.get(),
                 provider);
     }
