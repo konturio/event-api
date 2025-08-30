@@ -51,10 +51,23 @@ public class GeometryUtil {
         return areaInMeters / 1_000_000;
     }
 
+    /**
+     * Calculate geodesic length of the provided geometry in kilometers.
+     * Returns {@code 0.0} when geometry is {@code null}, empty or has no segments.
+     *
+     * @param geometry geometry to measure
+     * @return length in kilometers
+     */
     public static double calculateLengthKm(Geometry geometry) {
+        if (geometry == null || geometry.getNumGeometries() == 0) {
+            return 0d;
+        }
         double lengthInMeters = 0d;
         for (int i = 0; i < geometry.getNumGeometries(); i++) {
             var coords = geometry.getGeometryN(i).getCoordinates();
+            if (coords == null || coords.length < 2) {
+                continue;
+            }
             for (int j = 1; j < coords.length; j++) {
                 lengthInMeters += Geodesic.WGS84.Inverse(
                         coords[j - 1].y, coords[j - 1].x,

@@ -15,9 +15,39 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FeedCompositionJobTest {
+
+    @Test
+    void buildEpisodesDebugInfoEmptyList() {
+        String info = FeedCompositionJob.buildEpisodesDebugInfo(Collections.emptyList());
+        assertEquals("[]", info, "Empty episodes debug string mismatch: " + info);
+    }
+
+    @Test
+    void buildEpisodesDebugInfoHandlesNullGeometries() {
+        FeedEpisode episode = new FeedEpisode();
+        episode.setGeometries(null);
+        String info = FeedCompositionJob.buildEpisodesDebugInfo(Collections.singletonList(episode));
+        assertTrue(info.contains("geometry={}"),
+                "Empty geometry token missing in debug info: " + info);
+    }
+
+    @Test
+    void buildEpisodesDebugInfoHandlesMultiLineStringLength() throws Exception {
+        FeedEpisode episode = new FeedEpisode();
+        String fcString = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"MultiLineString\",\"coordinates\":[[[0,0],[1,0]],[[1,0],[1,1]]]},\"properties\":{}}]}";
+        FeatureCollection fc = (FeatureCollection) GeoJSONFactory.create(fcString);
+        episode.setGeometries(fc);
+
+        String info = FeedCompositionJob.buildEpisodesDebugInfo(Collections.singletonList(episode));
+
+        double length = GeometryUtil.calculateLengthKm(new GeoJSONReader().read(fc.getFeatures()[0].getGeometry()));
+        assertTrue(info.contains("lengthKm=" + String.format(Locale.ROOT, "%.2f", length)),
+                "Geometry length missing in debug info: " + info);
+    }
 
     @Test
     void buildEpisodesDebugInfoIncludesGeometryData() throws Exception {
