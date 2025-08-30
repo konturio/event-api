@@ -2,7 +2,6 @@ package io.kontur.eventapi.pdc.episodecomposition;
 
 import static com.google.common.collect.Iterators.getLast;
 import static io.kontur.eventapi.pdc.converter.PdcDataLakeConverter.*;
-import static io.kontur.eventapi.util.GeometryUtil.isEqualGeometries;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.partitioningBy;
@@ -17,7 +16,8 @@ import io.kontur.eventapi.entity.FeedData;
 import io.kontur.eventapi.entity.FeedEpisode;
 import io.kontur.eventapi.entity.NormalizedObservation;
 import io.kontur.eventapi.episodecomposition.EpisodeCombinator;
-import org.bouncycastle.util.Arrays;
+import io.kontur.eventapi.util.EpisodeEqualityUtil;
+import org.apache.commons.lang3.ArrayUtils;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 
@@ -106,7 +106,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
                 .sorted(comparing(FeedEpisode::getStartedAt).thenComparing(FeedEpisode::getEndedAt))
                 .forEachOrdered(episode -> {
                     FeedEpisode lastEpisode = getLast(episodesWithoutDuplicates.iterator(), null);
-                    if (lastEpisode == null || !sameEpisodes(lastEpisode, episode)) {
+                    if (lastEpisode == null || !EpisodeEqualityUtil.areSame(lastEpisode, episode)) {
                         episodesWithoutDuplicates.add(episode);
                     } else {
                         lastEpisode.setEndedAt(episode.getEndedAt());
@@ -119,13 +119,6 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         return episodesWithoutDuplicates;
     }
 
-    private boolean sameEpisodes(FeedEpisode episode1, FeedEpisode episode2) {
-        return equalsIgnoreCase(episode1.getName(), episode2.getName())
-                && episode1.getLoss().equals(episode2.getLoss())
-                && episode1.getSeverity() == episode2.getSeverity()
-                && equalsIgnoreCase(episode1.getLocation(), episode2.getLocation())
-                && isEqualGeometries(episode1.getGeometries(), episode2.getGeometries());
-    }
 
     private void addExposuresToEpisodes(List<FeedEpisode> episodes, Set<NormalizedObservation> exposureObservations) {
         for (int i = 0; i < episodes.size(); i++) {
@@ -170,7 +163,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         episodeObservations.stream()
                 .filter(obs -> HP_SRV_SEARCH_PROVIDER.equalsIgnoreCase(obs.getProvider())
                         || (List.of(PDC_SQS_PROVIDER, PDC_SQS_NASA_PROVIDER).contains(obs.getProvider())
-                        && obs.getGeometries() != null && !Arrays.isNullOrEmpty(obs.getGeometries().getFeatures())
+                        && obs.getGeometries() != null && !ArrayUtils.isEmpty(obs.getGeometries().getFeatures())
                         && obs.getGeometries().getFeatures()[0].getGeometry() != null
                         && "Point".equalsIgnoreCase(obs.getGeometries().getFeatures()[0].getGeometry().getType())))
                 .max(comparing(NormalizedObservation::getSourceUpdatedAt))
@@ -179,7 +172,7 @@ public abstract class BasePdcEpisodeCombinator extends EpisodeCombinator {
         episodeObservations.stream()
                 .filter(obs -> HP_SRV_MAG_PROVIDER.equalsIgnoreCase(obs.getProvider())
                         || (List.of(PDC_SQS_PROVIDER, PDC_SQS_NASA_PROVIDER).contains(obs.getProvider())
-                        && obs.getGeometries() != null && !Arrays.isNullOrEmpty(obs.getGeometries().getFeatures())
+                        && obs.getGeometries() != null && !ArrayUtils.isEmpty(obs.getGeometries().getFeatures())
                         && obs.getGeometries().getFeatures()[0].getGeometry() != null
                         && ("Polygon".equalsIgnoreCase(obs.getGeometries().getFeatures()[0].getGeometry().getType())
                         || "MultiPolygon".equalsIgnoreCase(obs.getGeometries().getFeatures()[0].getGeometry().getType()))))
