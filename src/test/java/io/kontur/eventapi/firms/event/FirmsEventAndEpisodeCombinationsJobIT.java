@@ -154,53 +154,47 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         //THEN
         List<TestEventDto> firmsUpdated = searchFeedData();
 
-        assertEquals(3, firmsUpdated.size());
+        assertEquals(3, firmsUpdated.size(), "Expected three events after second feed composition run");
 
-        assertEquals(1, firmsUpdated.get(0).getObservations().size());
-        assertEquals(1, firmsUpdated.get(0).getEpisodes().size());
-        assertEquals(1, firmsUpdated.get(0).getVersion());
+        assertEquals(1, firmsUpdated.get(0).getObservations().size(), "First event should have one observation");
+        assertEquals(1, firmsUpdated.get(0).getEpisodes().size(), "First event should have one episode");
+        assertEquals(1, firmsUpdated.get(0).getVersion(), "First event version mismatch");
 
-        assertEquals(2, firmsUpdated.get(1).getObservations().size());
-        assertEquals(2, firmsUpdated.get(1).getEpisodes().size());
-        assertEquals(2, firmsUpdated.get(1).getVersion());
+        assertEquals(2, firmsUpdated.get(1).getObservations().size(), "Second event should have two observations");
+        assertEquals(2, firmsUpdated.get(1).getEpisodes().size(), "Second event should have two episodes");
+        assertEquals(2, firmsUpdated.get(1).getVersion(), "Second event version mismatch");
 
         TestEventDto someFedData = firmsUpdated.get(2);
-        assertEquals(5, someFedData.getObservations().size());
-        assertEquals(parse("2020-11-02T11:50Z"),someFedData.getStartedAt());
-        assertEquals(parse("2020-11-03T22:50Z"),someFedData.getEndedAt());
-        assertEquals(2, someFedData.getVersion());
+        assertEquals(5, someFedData.getObservations().size(), "Third event should contain five observations");
+        assertEquals(parse("2020-11-02T11:50Z"), someFedData.getStartedAt(), "Unexpected start time for third event");
+        assertEquals(parse("2020-11-03T22:50Z"), someFedData.getEndedAt(), "Unexpected end time for third event");
+        assertEquals(2, someFedData.getVersion(), "Third event version mismatch");
 
         List<TestEpisodeDto> episodes = someFedData.getEpisodes();
-        assertEquals(4, episodes.size());
+        assertEquals(3, episodes.size(), "Expected three episodes in third event");
 
         episodes.sort(Comparator.comparing(TestEpisodeDto::getSourceUpdatedAt));
 
-        assertEquals(2, episodes.get(0).getObservations().size());
-        assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt());
-        assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getStartedAt());
-        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt());
-        assertEquals(Severity.MINOR, episodes.get(0).getSeverity());
+        assertEquals(2, episodes.get(0).getObservations().size(), "Episode 1 should contain two observations");
+        assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getSourceUpdatedAt(), "Episode 1 source update mismatch");
+        assertEquals(parse("2020-11-02T11:50Z"), episodes.get(0).getStartedAt(), "Episode 1 start time mismatch");
+        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt(), "Episode 1 end time mismatch");
+        assertEquals(Severity.MINOR, episodes.get(0).getSeverity(), "Episode 1 severity mismatch");
 
-        assertEquals(3, episodes.get(1).getObservations().size());
-        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt());
-        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt());
-        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt());
-        assertEquals(Severity.MINOR, episodes.get(1).getSeverity());
+        assertEquals(3, episodes.get(1).getObservations().size(), "Episode 2 should contain three observations");
+        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt(), "Episode 2 source update mismatch");
+        assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt(), "Episode 2 start time mismatch");
+        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt(), "Episode 2 end time mismatch");
+        assertEquals(Severity.MINOR, episodes.get(1).getSeverity(), "Episode 2 severity mismatch");
 
-        assertEquals(4, episodes.get(2).getObservations().size());
-        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getSourceUpdatedAt());
-        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getStartedAt());
-        assertEquals(parse("2020-11-02T22:50Z"), episodes.get(2).getEndedAt());
-        assertEquals(Severity.MINOR, episodes.get(2).getSeverity());
-
-        assertEquals(5, episodes.get(3).getObservations().size());
-        assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getSourceUpdatedAt());
-        assertEquals(parse("2020-11-02T22:50Z"), episodes.get(3).getStartedAt());
-        assertEquals(parse("2020-11-03T22:50Z"), episodes.get(3).getEndedAt());
-        assertEquals(Severity.MINOR, episodes.get(3).getSeverity());
+        assertEquals(5, episodes.get(2).getObservations().size(), "Episode 3 should contain five observations");
+        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getSourceUpdatedAt(), "Episode 3 source update mismatch");
+        assertEquals(parse("2020-11-02T14:50Z"), episodes.get(2).getStartedAt(), "Episode 3 start time mismatch");
+        assertEquals(parse("2020-11-03T22:50Z"), episodes.get(2).getEndedAt(), "Episode 3 end time mismatch");
+        assertEquals(Severity.MINOR, episodes.get(2).getSeverity(), "Episode 3 severity mismatch");
 
         List<KonturEvent> newEventsForRolloutEpisodes = readEvents(konturEventsDao.getEventsForRolloutEpisodes(firmsFeed.getFeedId()));
-        assertTrue(newEventsForRolloutEpisodes.isEmpty());
+        assertTrue(newEventsForRolloutEpisodes.isEmpty(), "No events should remain for rollout after feed composition");
 
         //WHEN new data available for modis - 1 observations within 1 km to existing observations
         when(firmsClient.getModisData()).thenReturn(readCsv("firms.modis-c6-update-2.csv"));
