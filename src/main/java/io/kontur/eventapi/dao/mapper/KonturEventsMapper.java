@@ -26,4 +26,6 @@ public interface KonturEventsMapper {
     Set<UUID> getEventsForRolloutEpisodes(@Param("feedId") UUID feedId);
 
     Integer getNotComposedEventsCount();
+
+    Integer getNotComposedEventsCountForFeeds(@Param("aliases") List<String> aliases);
 }

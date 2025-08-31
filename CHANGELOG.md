@@ -4,6 +4,8 @@
 
 #### Added
 
+- Report total queue sizes for ingestion steps.
+
 #### Changed
 - Implement flood-specific severity calculation for `storms.noaa` events.
 - Do not override event type for `storms.noaa` events in feed composition.

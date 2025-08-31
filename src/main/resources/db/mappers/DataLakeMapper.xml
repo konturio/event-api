@@ -130,6 +130,16 @@
         select count(*) from data_lake where not normalized and not skipped;
     </select>
 
+    <select id="getNotNormalizedObservationsCountForProviders" resultType="java.lang.Integer">
+        select count(*) from data_lake
+        where not normalized
+          and not skipped
+          and provider in
+        <foreach item="provider" collection="providers" open="(" separator="," close=")">
+            #{provider}
+        </foreach>
+    </select>
+
     <resultMap id="dataLakeMap" type="io.kontur.eventapi.entity.DataLake">
         <result property="observationId" column="observation_id" />
         <result property="externalId" column="external_id" />

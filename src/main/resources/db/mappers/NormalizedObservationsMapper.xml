@@ -111,6 +111,15 @@
         select count(*) from normalized_observations where not recombined;
     </select>
 
+    <select id="getNotRecombinedObservationsCountForProviders" resultType="java.lang.Integer">
+        select count(*) from normalized_observations
+        where not recombined
+          and provider in
+        <foreach item="provider" collection="providers" open="(" separator="," close=")">
+            #{provider}
+        </foreach>
+    </select>
+
     <select id="buildShakemapPolygons" resultType="string">
         select buildShakemapPolygons(#{json}::jsonb)::text
     </select>

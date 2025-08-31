@@ -58,4 +58,11 @@ public class KonturEventsDao {
     public Integer getNotComposedEventsCount() {
         return mapper.getNotComposedEventsCount();
     }
+
+    public Integer getNotComposedEventsCountForFeeds(List<String> aliases) {
+        if (aliases == null || aliases.isEmpty()) {
+            return 0;
+        }
+        return mapper.getNotComposedEventsCountForFeeds(aliases);
+    }
 }

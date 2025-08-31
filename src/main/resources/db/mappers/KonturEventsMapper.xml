@@ -71,6 +71,16 @@
         select count(*) from feed_event_status where not actual;
     </select>
 
+    <select id="getNotComposedEventsCountForFeeds" resultType="java.lang.Integer">
+        select count(*) from feed_event_status fes
+        join feeds f on f.feed_id = fes.feed_id
+        where not actual
+          and f.alias in
+        <foreach item="alias" collection="aliases" open="(" separator="," close=")">
+            #{alias}
+        </foreach>
+    </select>
+
     <resultMap id="konturEventDtoMap" type="io.kontur.eventapi.entity.KonturEvent">
         <result property="eventId" column="event_id"/>
         <result property="observationIds" column="observation_ids" typeHandler="io.kontur.eventapi.typehandler.UUIDArrayTypeHandler"/>

@@ -61,6 +61,8 @@ public interface NormalizedObservationsMapper {
 
     Integer getNotRecombinedObservationsCount();
 
+    Integer getNotRecombinedObservationsCountForProviders(@Param("providers") List<String> providers);
+
     String buildShakemapPolygons(@Param("json") String json);
 
     String buildPgaMask(@Param("json") String json);
