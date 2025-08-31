@@ -61,6 +61,6 @@ public class UsgsEarthquakeEventCombinationJobTest {
         job.run();
 
         assertEquals(2, events.get("eq1").getObservationIds().size(),
-                "Merged earthquake event should contain two observations");
+                "Merged earthquake event should contain two observations sharing external ID 'eq1'");
     }
 }

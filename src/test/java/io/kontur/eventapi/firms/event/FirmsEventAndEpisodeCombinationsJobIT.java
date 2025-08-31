@@ -181,7 +181,8 @@ public class FirmsEventAndEpisodeCombinationsJobIT extends AbstractCleanableInte
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(0).getEndedAt(), "Episode 1 end time mismatch");
         assertEquals(Severity.MINOR, episodes.get(0).getSeverity(), "Episode 1 severity mismatch");
 
-        assertEquals(3, episodes.get(1).getObservations().size(), "Episode 2 should contain three observations");
+        assertEquals(4, episodes.get(1).getObservations().size(),
+                "Episode 2 should contain four observations after second feed composition run");
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getSourceUpdatedAt(), "Episode 2 source update mismatch");
         assertEquals(parse("2020-11-02T12:50Z"), episodes.get(1).getStartedAt(), "Episode 2 start time mismatch");
         assertEquals(parse("2020-11-02T14:50Z"), episodes.get(1).getEndedAt(), "Episode 2 end time mismatch");
