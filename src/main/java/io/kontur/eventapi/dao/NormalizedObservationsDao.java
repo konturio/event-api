@@ -68,4 +68,11 @@ public class NormalizedObservationsDao {
     public Integer getNotRecombinedObservationsCount() {
         return mapper.getNotRecombinedObservationsCount();
     }
+
+    public Integer getNotRecombinedObservationsCountForProviders(List<String> providers) {
+        if (providers == null || providers.isEmpty()) {
+            return 0;
+        }
+        return mapper.getNotRecombinedObservationsCountForProviders(providers);
+    }
 }

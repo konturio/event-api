@@ -35,6 +35,12 @@ public class MetricsConfig {
     private final AtomicInteger eventCombinationQueueSize;
     private final AtomicInteger normalizationQueueSize;
 
+    private final AtomicInteger enrichmentQueueSizeTotal;
+    private final AtomicInteger enrichmentSkippedQueueSizeTotal;
+    private final AtomicInteger feedCompositionQueueSizeTotal;
+    private final AtomicInteger eventCombinationQueueSizeTotal;
+    private final AtomicInteger normalizationQueueSizeTotal;
+
     private final AtomicInteger sqsQueueSize;
     private final AtomicInteger sqsDLQueueSize;
 
@@ -63,6 +69,12 @@ public class MetricsConfig {
         this.eventCombinationQueueSize = registry.gauge("eventCombination.queueSize", new AtomicInteger(0));
         this.normalizationQueueSize = registry.gauge("normalization.queueSize", new AtomicInteger(0));
 
+        this.enrichmentQueueSizeTotal = registry.gauge("enrichment.totalQueueSize", new AtomicInteger(0));
+        this.enrichmentSkippedQueueSizeTotal = registry.gauge("enrichmentSkipped.totalQueueSize", new AtomicInteger(0));
+        this.feedCompositionQueueSizeTotal = registry.gauge("feedComposition.totalQueueSize", new AtomicInteger(0));
+        this.eventCombinationQueueSizeTotal = registry.gauge("eventCombination.totalQueueSize", new AtomicInteger(0));
+        this.normalizationQueueSizeTotal = registry.gauge("normalization.totalQueueSize", new AtomicInteger(0));
+
         this.sqsQueueSize = registry.gauge("sqs.queueSize", new AtomicInteger(0));
         this.sqsDLQueueSize = registry.gauge("sqs.dl.queueSize", new AtomicInteger(0));
     }
@@ -83,8 +95,18 @@ public class MetricsConfig {
     }
 
     @Bean
+    public AtomicInteger enrichmentQueueSizeTotalGauge() {
+        return enrichmentQueueSizeTotal;
+    }
+
+    @Bean
     public AtomicInteger enrichmentSkippedQueueSizeGauge() {
         return enrichmentSkippedQueueSize;
+    }
+
+    @Bean
+    public AtomicInteger enrichmentSkippedQueueSizeTotalGauge() {
+        return enrichmentSkippedQueueSizeTotal;
     }
 
     @Bean
@@ -93,13 +115,28 @@ public class MetricsConfig {
     }
 
     @Bean
+    public AtomicInteger feedCompositionQueueSizeTotalGauge() {
+        return feedCompositionQueueSizeTotal;
+    }
+
+    @Bean
     public AtomicInteger eventCombinationQueueSizeGauge() {
         return eventCombinationQueueSize;
     }
 
     @Bean
+    public AtomicInteger eventCombinationQueueSizeTotalGauge() {
+        return eventCombinationQueueSizeTotal;
+    }
+
+    @Bean
     public AtomicInteger normalizationQueueSizeGauge() {
         return normalizationQueueSize;
+    }
+
+    @Bean
+    public AtomicInteger normalizationQueueSizeTotalGauge() {
+        return normalizationQueueSizeTotal;
     }
 
     @Bean Map<String, TableMetricsConfig> tableMetrics() {

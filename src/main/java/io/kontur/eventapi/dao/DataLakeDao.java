@@ -87,4 +87,11 @@ public class DataLakeDao {
         return mapper.getNotNormalizedObservationsCount();
     }
 
+    public Integer getNotNormalizedObservationsCountForProviders(List<String> providers) {
+        if (providers == null || providers.isEmpty()) {
+            return 0;
+        }
+        return mapper.getNotNormalizedObservationsCountForProviders(providers);
+    }
+
 }

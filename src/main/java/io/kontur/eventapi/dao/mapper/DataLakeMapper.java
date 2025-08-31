@@ -47,4 +47,6 @@ public interface DataLakeMapper {
                         @Param("updatedAt") String updatedAt);
 
     Integer getNotNormalizedObservationsCount();
+
+    Integer getNotNormalizedObservationsCountForProviders(@Param("providers") List<String> providers);
 }

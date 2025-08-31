@@ -87,6 +87,14 @@ public class FeedDao {
         return mapper.getEnrichmentSkippedEventsCount();
     }
 
+    public Integer getNotEnrichedEventsCountForFeedsWithEnrichment() {
+        return mapper.getNotEnrichedEventsCountForFeedsWithEnrichment();
+    }
+
+    public Integer getEnrichmentSkippedEventsCountForFeedsWithEnrichment() {
+        return mapper.getEnrichmentSkippedEventsCountForFeedsWithEnrichment();
+    }
+
     public void createFeed(UUID feedId, String alias, String name, List<String> providers) {
         mapper.createFeed(feedId, alias, name, providers);
     }

@@ -97,8 +97,22 @@
         select count(*) from feed_data where not enriched;
     </select>
 
+    <select id="getNotEnrichedEventsCountForFeedsWithEnrichment" resultType="java.lang.Integer">
+        select count(*) from feed_data fd
+        join feeds f on f.feed_id = fd.feed_id
+        where not fd.enriched
+          and array_length(f.enrichment, 1) > 0;
+    </select>
+
     <select id="getEnrichmentSkippedEventsCount" resultType="java.lang.Integer">
         select count(*) from feed_data where enrichment_skipped;
+    </select>
+
+    <select id="getEnrichmentSkippedEventsCountForFeedsWithEnrichment" resultType="java.lang.Integer">
+        select count(*) from feed_data fd
+        join feeds f on f.feed_id = fd.feed_id
+        where fd.enrichment_skipped
+          and array_length(f.enrichment, 1) > 0;
     </select>
 
     <update id="addAnalytics">
