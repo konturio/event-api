@@ -29,20 +29,23 @@ if [ -n "$$HTTP_PROXY$$HTTPS_PROXY" ]; then \
  rm $$settings
 endef
 
-.PHONY: all clean test verify precommit check-docs
+.PHONY: all clean test verify precommit check-docs check-shell-compat
 
 all: test ## Default target runs unit tests
 
 clean: ## Remove build artifacts
 	rm -rf target .m2
 
-precommit: test check-docs ## Run checks before committing
+precommit: test check-docs check-shell-compat ## Run checks before committing
 
 check-docs: ## Perform basic documentation checks
 	@if ! find docs -name '*.md' -print | grep -q .; then \
 		echo "No documentation files found in docs/" >&2; \
 		exit 1; \
 	fi
+
+check-shell-compat: ## Validate shell compatibility for scripts used by Make targets
+	@./scripts/check_shell_compat.sh
 
 verify: ## Run full Maven verification
 	@$(call run_mvn,verify)

@@ -35,6 +35,7 @@
                 <use.system.proxies>-Djava.net.useSystemProxies=true</use.system.proxies>
                 <skipITs>false</skipITs>
                 <docker.tests.exclude></docker.tests.exclude>
+	                <sentry.plugin.skip>true</sentry.plugin.skip>
         </properties>
 
 	<dependencies>
@@ -464,11 +465,11 @@
 					<!-- for showing output of sentry-cli -->
 					<debugSentryCli>true</debugSentryCli>
 					<!--  Disable the plugin -->
-					<skip>false</skip>
+					<skip>${sentry.plugin.skip}</skip>
 					<!--  Disable source-context -->
 					<skipSourceBundle>true</skipSourceBundle>
 					<!--  Disable auto-install of SDK and Integrations -->
-					<skipAutoInstall>false</skipAutoInstall>
+					<skipAutoInstall>true</skipAutoInstall>
 					<org>${env.SENTRY_ORG}</org>
 					<project>event-api</project>
 					<!-- provide your auth token via SENTRY_AUTH_TOKEN environment variable -->

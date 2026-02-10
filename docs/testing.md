@@ -33,3 +33,12 @@ make verify MAVEN_ARGS=-DskipITs=true
 Maven honors `HTTP_PROXY` and `HTTPS_PROXY` variables.
 The Makefile sets JVM options (`-Djava.net.useSystemProxies=true`, `-Djava.net.preferIPv4Stack=true`, `-Djava.net.preferIPv6Addresses=false`) so Maven respects those proxies without a `.mvn/jvm.config` file.
 Make targets append proxy command-line arguments when these variables are set, avoiding global configuration changes.
+
+
+## Precommit and shell checks
+
+`make precommit` now also runs a shell compatibility guard (`check-shell-compat`).
+This target validates that required shell tooling is available and that shell scripts used by Make targets have valid Bash syntax.
+
+Sentry Maven plugin is disabled by default for local/test runs to keep checks deterministic and avoid shell portability issues.
+If you need Sentry upload behavior, run Maven with `-Dsentry.plugin.skip=false` and provide required Sentry environment variables.
